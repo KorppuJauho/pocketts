@@ -1,0 +1,115 @@
+{
+  "eax": [
+    {
+      "key": "fa7ff873bc799b7e114016d38ce0ac1f",
+      "nonce": "436d8a3f56f1c59a19b64e45a0984943",
+      "header": "cfdb12f965",
+      "plain": "",
+      "ciphertext": "",
+      "mac": "50f39c263378df3e"
+    },
+    {
+      "key": "61281273f9ace41ae8d9fa33ce2c0afd",
+      "nonce": "aa8c960bbab7cc066eefa5b1f81b5be6",
+      "header": "520d651704",
+      "plain": "c4f06d17b8",
+      "ciphertext": "ff974ce17f",
+      "mac": "081d2dc05d2c9384"
+    },
+    {
+      "key": "c3864672c1f1777b1259fcb0569f7e59",
+      "nonce": "106f4d784a898aacde515a2aec462810",
+      "header": "2376889fee",
+      "plain": "662db1a225dd099782c5e9d15a5e9de7",
+      "ciphertext": "6742ca2efe3c31933093ef78efde34dc",
+      "mac": "0c3601cf18b9f5b1"
+    },
+    {
+      "key": "a28f9a04fe05fba5b7d8e0e36d827d9e",
+      "nonce": "9f5f69370e7e43f1d2ca7fd184a64fda",
+      "header": "e9dc720969",
+      "plain": "255dfa0d5bf19238bb1621980e19d253250b735510182e24e3a264e1e9a7951821",
+      "ciphertext": "5f6fc641387954263596c626bd240fb914f9bb0d336450e620e66d9568eb151904",
+      "mac": "625ce23ec400334d"
+    },
+    {
+      "key": "7013b106c2033c95b89dc5667933522e",
+      "nonce": "ca0434ac239561114d94aca83aa3153c",
+      "header": "e645a5cf4c",
+      "plain": "8910adc45b231afc13e55a37587499557c41168fedb5a6e7a64b9d5521720f4263f440de3b3b772c9cf64dfa0b39514920bfc077c5e59c70bf1470747edec8f1",
+      "ciphertext": "0a2eec9694c4584ffb9c1d2f37b5a030891c037c13eed134c982cace9e7c144af9afb674c25e634776ae26e7b4028ef28b7fb857760942ef37343ef7121cd0cb",
+      "mac": "3f14b82ed432ee48"
+    }
+  ],
+  "keyNonce": [
+    {
+      "iv": "9e98029b19bc7aa29ef4794204acd3d352bc4dc5",
+      "fromServer": true,
+      "packetId": 33610,
+      "gen": 0,
+      "type": 2,
+      "key": "43f8db2799fd1951661a0cc2509151ce",
+      "nonce": "e4aae6dbf69815e901f973c507a6fc99"
+    },
+    {
+      "iv": "6b02af18805ce1097776e9e29062d6e6b31ea76f",
+      "fromServer": false,
+      "packetId": 47668,
+      "gen": 1,
+      "type": 2,
+      "key": "70da034d2673f794f59861b6e7cd29f4",
+      "nonce": "a7ae1f90f4f8fbd572ae2306b0d58dd3"
+    },
+    {
+      "iv": "ff745acc2e45c698924e8189817b11db91ead9dff9e14b22d6fbd48979968fb691a09708c6179b2f5258a2573c32f6f73fc8406071d654e1063cb015758aa6bb",
+      "fromServer": true,
+      "packetId": 14048,
+      "gen": 1,
+      "type": 2,
+      "key": "f035063bee8c4bb8419f3c7254bbd8ea",
+      "nonce": "a8ec175cad65c6a0cf84e00e8187d445"
+    },
+    {
+      "iv": "98df5b4c5cfea79c6011ff0eac11b78f2c5cdeb5cd40b3a5a26bad53e6746c298aca4b5b32f6475a84a2a6011071e5e55fd914e726853e2f84faeda6e0e04611",
+      "fromServer": false,
+      "packetId": 32235,
+      "gen": 1,
+      "type": 2,
+      "key": "a30b064bfecd0f36ef60bdd723d94b12",
+      "nonce": "e0ffcda87dae8d85b895ff50c0658d41"
+    }
+  ],
+  "identities": {
+    "a": {
+      "scalar": "d9ed794f92cfbe1a3d287a3c3ffacdded2eefa0e15bd61da03e2fa050be50f28",
+      "offset": "215",
+      "publicKeyString": "ME0DAgcAAgEgAiEA0uh3o5CSrTB4VxAwcfeFqjiFg0BPudw5InmnDFS+nNgCIQCyQUWGBNByNLHl43fsfu1S19kAGoVkfNG/oPARfpgM9Q==",
+      "uid": "PEKBUnDa2JdBU0bJJ9/1Pi6Ol8A="
+    },
+    "b": {
+      "scalar": "94e5fb011ad9467028d299bce62229e06b84dd1eaa574d9165f67389635a2101",
+      "offset": "698",
+      "publicKeyString": "MEwDAgcAAgEgAiEA97j+tUBX+61O0VovtQUi5eD7OKwAHESllCGFavcdHE0CIG8/D5YRrLK0yDVhIS9Itl031+xHKk3WljK3eob3IVNQ",
+      "uid": "wIshrVM60AGp9mOI1hBwX/TmGvw="
+    },
+    "sharedSecretAB": "c98a5aebd7930413202887a091b5501f5cfd22de",
+    "signedData": "51eb1fea3b40cb78bca9d8d416c2b92c1feb2fe5a2951e40408d1569a9e1d07798c732590062ab8a",
+    "signatureA": "3045022100fb9e01c118c1d4c8b85da6431889a94352810c127b96613fccc77e382accf65b0220613c70af74336e6246ff8351aa69031557e8404230ef22e1696cbf1a611b3be4"
+  },
+  "tsExport": {
+    "exported": "215VEg9BqaHK0ObAN0jXQzqU1i0bhLlaU3JjS2AjBTVJdEIGUVFxQlheJAQCJDVAAEIEKltcXHR0YE0Le1Mie2lzS2FkZ3d2K3tJLyh5CFVSBxZXRQZmVQxYI3ALY1xXLXQfCmB3YWZwZ005UUloQU5udGVVK1N6NzRhUFNoNlBELzZ6ZDdTN3ZvT0ZiMWgyZ1BpK2dVTDVROG8=",
+    "scalar": "d9ed794f92cfbe1a3d287a3c3ffacdded2eefa0e15bd61da03e2fa050be50f28",
+    "uid": "PEKBUnDa2JdBU0bJJ9/1Pi6Ol8A="
+  },
+  "license": {
+    "license": "0100822b248ed46d9d91a573f8147b9491de8b5f0f77b4bc6e6bf6b86b5dbd83abbd002069520c2fcdaed69cbf101d546573740000e454a27b028e398bc29a4dfbd1a973daace51fa8cabe0911bf805b04a10475e820cce0b92dd8630a75",
+    "serverKey": "91c4e69995865291a13b1b5eb11d0cc59f3002ad50b6fc69789c3593debb8176",
+    "tempPrivate": "38a2f9ebd22131b6d29b911207240ca6cf5475d3ee3e6e5a7752cd4f7e30775c",
+    "tempPublic": "6ff82146f34fe4355b3b33076f4f6d1e64460a2df400ff707926623904842314",
+    "sharedSecret": "2a817bc4b4bc1a7fa8682e2c8cb408945b228fcd2941f3989dad39acbebddc682ff10267a5b13819720370a2dc3b7663f8f1faa9097e2cb0208ec8d4db6dcfdd"
+  },
+  "cmd": {
+    "built": "sendtextmessage targetmode=2 target=1 msg=Hei\\s\\p\\smaailma\\s\\/\\s\\\\\\säö\\n",
+    "hashedPassword": "CNj27N428T2bkVZzSnzFHOKg/KI="
+  }
+}
