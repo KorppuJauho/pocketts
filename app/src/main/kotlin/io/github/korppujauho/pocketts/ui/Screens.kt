@@ -270,6 +270,7 @@ fun TsField(
             focusedTextColor = Ts.bright, unfocusedTextColor = Ts.bright,
             focusedLabelColor = Ts.accent, unfocusedLabelColor = Ts.muted, cursorColor = Ts.accent,
         ),
+        shape = RoundedCornerShape(12.dp),
         modifier = modifier.fillMaxWidth(),
     )
 }

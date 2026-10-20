@@ -16,6 +16,7 @@ import io.github.korppujauho.pocketts.ui.SettingsActions
 import io.github.korppujauho.pocketts.ui.SettingsContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -66,6 +67,28 @@ class ScreenshotTest {
             s.copy(voice = VoiceSettings(activation = VoiceSettings.Activation.PTT), micAllowed = true, pttHeld = true, talking = s.talking + 3),
             Example.noActions,
         )
+    }
+
+    @get:Rule
+    val compose = androidx.compose.ui.test.junit4.createComposeRule()
+
+    // Popups open in windows of their own: the whole screen is captured
+    @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
+    private fun popup(name: String, content: @Composable () -> Unit) {
+        compose.setContent { PocketTsTheme { content() } }
+        compose.waitForIdle()
+        com.github.takahirom.roborazzi.captureScreenRoboImage("${roborazziSystemPropertyOutputDirectory()}/$name.png")
+    }
+
+    @Test
+    fun favouritePopup() = popup("popup-favourite") {
+        io.github.korppujauho.pocketts.ui.FavoriteDialog(Favorite("ts.example.com", "Friends", "Jamie"), {}, onDelete = {}) {}
+    }
+
+    @Test
+    fun personPopup() = popup("popup-person") {
+        val s = Example.state()
+        io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {})
     }
 
     @Test

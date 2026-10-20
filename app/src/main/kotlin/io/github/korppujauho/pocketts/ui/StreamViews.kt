@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.automirrored.rounded.ScreenShare
+import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
@@ -257,11 +259,21 @@ fun ShareDialog(
     var camera by remember { mutableStateOf(0) } // front, back, both
     var quality by remember { mutableStateOf(720) }
     val qualities = listOf(480, 720, 1080)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Ts.panel,
-        title = { Text(if (screen) "Share your screen" else "Share your camera", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-        text = {
+    TsDialog(
+        onDismiss = onDismiss, title = if (screen) "Share your screen" else "Share your camera",
+        icon = if (screen) androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ScreenShare else androidx.compose.material.icons.Icons.Rounded.Videocam, tint = ShareGreen,
+        subtitle = "Everyone in your channel can watch",
+        buttons = {
+            PillButton("Cancel", onClick = onDismiss)
+            PillButton("Start", PillKind.PRIMARY) {
+                when {
+                    screen -> onScreen()
+                    camera == 2 -> onBoth(quality)
+                    else -> onCamera(camera == 0, quality)
+                }
+            }
+        },
+    ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("What", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Segments(listOf("Camera", "Screen"), if (screen) 1 else 0) { screen = it == 1 }
@@ -282,34 +294,22 @@ fun ShareDialog(
                 } else {
                     Text("Android asks once more before it starts. Everything on your screen is shown, notifications too.", color = Ts.muted, fontSize = 13.sp)
                 }
-                Text("Everyone in your channel can watch.", color = Ts.muted, fontSize = 13.sp)
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                when {
-                    screen -> onScreen()
-                    camera == 2 -> onBoth(quality)
-                    else -> onCamera(camera == 0, quality)
-                }
-            }) { Text("Start", color = Ts.accent, fontWeight = FontWeight.SemiBold) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) } },
-    )
+    }
 }
 
 @Composable
 private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Ts.card).padding(3.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(14.dp)).padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         options.forEachIndexed { i, o ->
             Text(
-                o, color = if (i == selected) Ts.bright else Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+                o, color = if (i == selected) Color.White else Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.weight(1f).clip(RoundedCornerShape(6.dp)).background(if (i == selected) Color(0x1FFFFFFF) else Color.Transparent)
-                    .clickable { onSelect(i) }.padding(vertical = 8.dp),
+                modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(if (i == selected) Ts.accent.copy(alpha = 0.9f) else Color.Transparent)
+                    .clickable { onSelect(i) }.padding(vertical = 9.dp),
             )
         }
     }

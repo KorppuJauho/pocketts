@@ -10,6 +10,7 @@ import io.github.korppujauho.pocketts.proto.MessageText
 import io.github.korppujauho.pocketts.proto.ServerAddress
 import io.github.korppujauho.pocketts.proto.ServerModel
 import io.github.korppujauho.pocketts.proto.TsClient
+import io.github.korppujauho.pocketts.UiSounds.Cue
 import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -302,6 +303,7 @@ object Session : TsClient.Listener {
     fun toggleMic() {
         val muted = !_state.value.inputMuted
         _state.update { it.copy(inputMuted = muted) }
+        UiSounds.play(if (muted) Cue.MIC_OFF else Cue.MIC_ON, _state.value.voice, _state.value.outputMuted)
         sender?.muted = muted
         client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
     }
@@ -390,6 +392,7 @@ object Session : TsClient.Listener {
     fun toggleSound() {
         val muted = !_state.value.outputMuted
         _state.update { it.copy(outputMuted = muted) }
+        UiSounds.play(if (muted) Cue.SOUND_OFF else Cue.SOUND_ON, _state.value.voice, muted)
         player?.muted = muted
         client?.sendCommand(Commands.build("clientupdate", "client_output_muted" to muted))
     }
@@ -531,6 +534,68 @@ object Session : TsClient.Listener {
         }
         publish(Phase.CONNECTED)
         ConnectionService.start(app, "Connected to ${model.serverName.ifEmpty { _state.value.address }}")
+        kicked = false
+        soundsFrom = System.currentTimeMillis() + 3000
+        UiSounds.play(Cue.CONNECTED, s.voice, s.outputMuted)
+    }
+
+    // ====== Sounds for events ======
+
+    // Quiet for the first seconds after connecting, while the server lists who is already there (as in WebTS)
+    @Volatile private var soundsFrom = 0L
+    @Volatile private var kicked = false
+
+    private fun sound(cue: Cue) {
+        if (System.currentTimeMillis() < soundsFrom) return
+        UiSounds.play(cue, _state.value.voice, _state.value.outputMuted)
+    }
+
+    /** The sounds a command brings: read before the model takes it in (it still knows where everyone was). */
+    private fun eventCues(cmd: Command): List<Cue> {
+        val me = model.ownClientId
+        val here = model.ownClient?.channel ?: 0
+        val out = ArrayList<Cue>()
+        var reason = 0
+        fun person(id: Int) = model.clients[id]?.takeIf { it.type == 0 }
+        when (cmd.name) {
+            "notifyclientmoved" -> for (g in cmd.groups) {
+                g["reasonid"]?.toIntOrNull()?.let { reason = it }
+                val clid = g["clid"]?.toIntOrNull() ?: continue
+                val to = g["ctid"]?.toIntOrNull() ?: continue
+                if (clid == me) {
+                    // Switched yourself, moved by someone, or kicked from the channel
+                    out += when (reason) { 1 -> Cue.MOVED; 4 -> Cue.KICKED; else -> Cue.CHANNEL_SWITCHED }
+                } else {
+                    val p = person(clid) ?: continue
+                    if (to == here && here > 0) out += Cue.SOMEONE_JOINED
+                    else if (p.channel == here) out += Cue.SOMEONE_LEFT
+                }
+            }
+            // Connected into your channel, or came from a channel you don't see
+            "notifycliententerview" -> for (g in cmd.groups) {
+                val clid = g["clid"]?.toIntOrNull() ?: continue
+                if (clid == me || g["client_type"] == "1") continue
+                if (g["ctid"]?.toIntOrNull() == here && here > 0) out += Cue.SOMEONE_JOINED
+            }
+            // Left the server from your channel; or you were kicked or banned
+            "notifyclientleftview" -> for (g in cmd.groups) {
+                g["reasonid"]?.toIntOrNull()?.let { reason = it }
+                val clid = g["clid"]?.toIntOrNull() ?: continue
+                if (clid == me) {
+                    if (reason == 5 || reason == 6) { kicked = true; out += Cue.KICKED }
+                } else if (person(clid)?.channel == here) out += Cue.SOMEONE_LEFT
+            }
+            // A stream in your channel (yours too) starts or stops
+            "notifystreamstarted", "notifystreamstopped" -> {
+                val g = cmd.params
+                val id = g["id"] ?: g["stream_id"]
+                val clid = g["clid"]?.toIntOrNull()?.takeIf { it > 0 } ?: model.streams.entries.firstOrNull { it.value == id }?.key ?: 0
+                if (clid > 0 && (clid == me || model.clients[clid]?.channel == here)) {
+                    out += if (cmd.name == "notifystreamstarted") Cue.STREAM_STARTED else Cue.STREAM_STOPPED
+                }
+            }
+        }
+        return out.distinct()
     }
 
     // ====== Files: pictures, avatars, icons ======
@@ -609,10 +674,14 @@ object Session : TsClient.Listener {
         }
         files?.onCommand(cmd)
         engine?.onCommand(cmd, model.ownClientId, { _state.value.ownChannel }, { id -> _state.value.client(id)?.channel })
+        val cues = eventCues(cmd)
         val result = chat.handle(cmd, model) // before the model: a move's line needs where they were
         val changed = model.apply(cmd)
         result.poke?.let { poked(it) }
         val message = result.message
+        cues.forEach { sound(it) }
+        if (result.poke != null) sound(Cue.POKE)
+        if (message != null) sound(if (message.second.outgoing) Cue.MESSAGE_OUT else Cue.MESSAGE_IN)
         if (result.changed.isNotEmpty() || message != null) {
             val view = viewing
             // Unread: a message in a conversation not on screen (not our own, not join and leave lines)
@@ -643,6 +712,7 @@ object Session : TsClient.Listener {
             stopAudio()
             client = null
             retries++
+            if (retries == 1) sound(Cue.CONNECTION_LOST)
             _state.update { it.copy(phase = Phase.CONNECTING, reconnecting = retries, error = reason, talking = emptySet()) }
             ConnectionService.start(app, "Reconnecting to ${_state.value.address}…")
             scheduleRetry(minOf(30L, 2L * retries))
@@ -685,6 +755,8 @@ object Session : TsClient.Listener {
     }
 
     private fun finish(reason: String?) {
+        if (_state.value.phase != Phase.IDLE && !kicked) UiSounds.play(Cue.DISCONNECTED, _state.value.voice, _state.value.outputMuted)
+        kicked = false
         engine?.reset()
         retryTask?.cancel(false)
         target = null
