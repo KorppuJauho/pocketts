@@ -166,10 +166,31 @@ private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, s
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(entries, key = { it.id }) { e ->
-            val time = timeFormat.format(Date(e.time))
+            val time = lineTime(e.time, chatNow(), timeFormat.format(Date(e.time)))
             if (e.event != null) EventLine(time, e.event!!) else MessageLine(time, e, state) { viewing = it }
         }
     }
+}
+
+/** Now, for the lines' days (the screenshots set their own). */
+var chatNow: () -> Long = { System.currentTimeMillis() }
+
+/**
+ * A line's time as WebTS and the TeamSpeak app show it, so lines from the days before read as such: [clock] (the time
+ * in the phone's format) today, "21:36 - Mon" in the six days before, "21:36 - 6 Oct" earlier.
+ */
+fun lineTime(
+    time: Long, now: Long, clock: String,
+    zone: java.time.ZoneId = java.time.ZoneId.systemDefault(), locale: java.util.Locale = java.util.Locale.getDefault(),
+): String {
+    val day = java.time.Instant.ofEpochMilli(time).atZone(zone).toLocalDate()
+    val today = java.time.Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    val pattern = when {
+        !day.isBefore(today) -> return clock
+        !day.isBefore(today.minusDays(6)) -> "EEE"
+        else -> "d MMM"
+    }
+    return "$clock - ${day.format(java.time.format.DateTimeFormatter.ofPattern(pattern, locale))}"
 }
 
 @Composable
@@ -192,7 +213,8 @@ private fun EventLine(time: String, parts: List<Chat.Part>) {
 private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onPicture: (Any) -> Unit) {
     val (pictures, rest) = remember(e.text) { Pictures.channelPictures(e.text) }
     val text = remember(rest) { formatted(rest) }
-    val sender = state.clientByUid(e.senderUid) ?: state.client(e.senderId)
+    // A line from before has no client id: our own is ours today too
+    val sender = state.clientByUid(e.senderUid) ?: state.client(if (e.outgoing && e.senderId == 0) state.ownId else e.senderId)
     val uri = LocalUriHandler.current
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))

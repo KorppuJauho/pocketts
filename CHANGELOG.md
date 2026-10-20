@@ -50,6 +50,12 @@
   encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened (for
   example after moving to a new phone), the app says so and keeps it instead of quietly making a new one; Settings
   then offers Import or New identity.
+- Chat history, as in WebTS: channel chats, private chats (by the other person's identity) and join and leave lines
+  are kept on the phone per server and shown again when you connect to the same server, with the day on lines from
+  before today ("21:36 - Mon", "21:36 - 6 Oct"). At most 90 days and 300 lines per conversation; older lines go.
+  Pokes aren't kept. It's encrypted with the same Keystore key as the passwords, left out of Android's backups and
+  moves to a new phone, and simply starts over if it can't be opened. Settings > General > Clear chat history removes
+  it. Closing a private chat's tab keeps its lines: they're back when the tab opens again.
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel: in a box on the server screen with their sound (on/off, volume), a
     small window, and full screen turned the way the picture is (wide: sideways, tall: upright)

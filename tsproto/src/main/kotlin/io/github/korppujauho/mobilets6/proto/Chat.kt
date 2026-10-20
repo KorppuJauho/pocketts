@@ -46,10 +46,24 @@ class Chat(private val keep: Int = 300) {
         conversations.clear(); privateNames.clear(); sentPrivate.clear()
     }
 
-    /** Forgets a private conversation (its tab closed). */
+    /** A private conversation's tab closed: its lines stay (in the history too), and come back when it opens again. */
     fun close(uid: String) {
-        conversations.remove(Key.Private(uid))
         privateNames.remove(uid)
+    }
+
+    /** The lines kept from before ([ChatHistory]), oldest first and ahead of anything new; they get ids here. */
+    fun restore(history: Map<out Key, List<Entry>>) {
+        for ((key, lines) in history) {
+            val list = conversations.getOrPut(key) { ArrayDeque() }
+            list.addAll(0, lines.map { it.copy(id = nextId++, senderId = 0) }) // today's ids are someone else's
+            while (list.size > keep) list.removeFirst()
+        }
+    }
+
+    /** Forgets every line (the history was cleared); open private tabs stay, empty. */
+    fun clearLines() {
+        conversations.clear()
+        for (uid in privateNames.keys) conversations[Key.Private(uid)] = ArrayDeque()
     }
 
     /** Opens (or keeps) a private conversation with someone. */
