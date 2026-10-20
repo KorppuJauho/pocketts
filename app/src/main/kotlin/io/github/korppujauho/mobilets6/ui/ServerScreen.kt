@@ -65,6 +65,12 @@ interface ServerActions {
     fun shareScreen()
     fun stopShare()
     fun flipCamera()
+    /** Both cameras at once (asked for first if needed). */
+    fun shareBothCameras(hd: Boolean) {}
+    fun setRotateLock(on: Boolean) {}
+    fun setWatchMuted(muted: Boolean) {}
+    /** The stream player as a small window over other apps. */
+    fun pictureInPicture() {}
     /** The conversation on screen (null when the chat isn't showing). */
     fun viewing(key: Chat.Key?)
 }
@@ -83,6 +89,8 @@ fun ServerScreen(
     startSettings: Int? = null,
     favorites: List<io.github.korppujauho.mobilets6.Favorite> = emptyList(),
     egl: org.webrtc.EglBase? = null,
+    canBoth: Boolean = false, // the phone can use both cameras at once
+    pip: Boolean = false, // the app is a small picture-in-picture window: the stream player is drawn there instead
 ) {
     var shareDialog by remember { mutableStateOf(false) }
     var serversMenu by remember { mutableStateOf(false) }
@@ -106,11 +114,7 @@ fun ServerScreen(
             AppHeader {
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
-                    androidx.compose.material3.IconButton(onClick = { serversMenu = true }) {
-                        androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Filled.Star, contentDescription = "Servers", tint = Ts.text,
-                        )
-                    }
+                    HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, "Servers") { serversMenu = true }
                     androidx.compose.material3.DropdownMenu(serversMenu, onDismissRequest = { serversMenu = false }, containerColor = Ts.card) {
                         for (f in favorites) {
                             val here = io.github.korppujauho.mobilets6.Favorites.same(f.address, state.address)
@@ -131,6 +135,7 @@ fun ServerScreen(
                         }                    }
                 }
                 ExitButton("Disconnect") { actions.disconnect() }
+                androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp))
                 SettingsGear { settings = 0 }
             }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -142,7 +147,7 @@ fun ServerScreen(
                     sharing = state.stream.sharing != null,
                     onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
                 )
-                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare)
+                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock)
                 state.stream.message?.let { ErrorLine(it) }
                 ViewSwitch(view, unread = state.unread.isNotEmpty()) { view = it }
                 when (view) {
@@ -232,13 +237,15 @@ fun ServerScreen(
     if (shareDialog) {
         ShareDialog(
             onCamera = { front, hd -> shareDialog = false; actions.shareCamera(front, hd) },
+            onBoth = { hd -> shareDialog = false; actions.shareBothCameras(hd) },
+            canBoth = canBoth,
             onScreen = { shareDialog = false; actions.shareScreen() },
             onDismiss = { shareDialog = false },
         )
     }
-    if (state.stream.watching != 0 && egl != null) {
+    if (state.stream.watching != 0 && egl != null && !pip) {
         val who = state.client(state.stream.watching)?.nickname ?: "Stream"
-        StreamPlayer(state.stream, "$who's stream", egl, actions::stopWatching)
+        StreamPlayer(state.stream, "$who's stream", egl, actions::stopWatching, actions::setWatchMuted, actions::pictureInPicture)
     }
 }
 

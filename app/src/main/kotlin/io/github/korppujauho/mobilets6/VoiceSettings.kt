@@ -18,6 +18,8 @@ data class VoiceSettings(
     val turnUser: String = "",
     val turnPassword: String = "",
     val relayOnly: Boolean = false, // streams only through the relay
+    val cameraRotateLock: Boolean = false, // the camera stream's turn is locked (else it follows how the phone is held)
+    val overlayPtt: Boolean = false, // the push-to-talk button stays on screen over other apps
 ) {
     enum class Activation { VAD, PTT, CONTINUOUS }
 
@@ -42,6 +44,8 @@ data class VoiceSettings(
                 turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
                 turnPassword = p.getString("turnPassword", d.turnPassword).orEmpty(),
                 relayOnly = p.getBoolean("relayOnly", d.relayOnly),
+                cameraRotateLock = p.getBoolean("cameraRotateLock", d.cameraRotateLock),
+                overlayPtt = p.getBoolean("overlayPtt", d.overlayPtt),
             )
         }
     }
@@ -62,6 +66,8 @@ data class VoiceSettings(
             .putString("turnUser", turnUser.trim())
             .putString("turnPassword", turnPassword)
             .putBoolean("relayOnly", relayOnly)
+            .putBoolean("cameraRotateLock", cameraRotateLock)
+            .putBoolean("overlayPtt", overlayPtt)
             .apply()
     }
 }

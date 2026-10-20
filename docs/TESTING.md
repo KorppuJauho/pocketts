@@ -41,6 +41,9 @@ permissions guests may not have.
 - [ ] **Push-to-talk**: hold the round floating button, and the PC hears it only while you hold.
 - [ ] Push-to-talk with the **"Hold to talk" button** in the control bar.
 - [ ] Push-to-talk with the **volume buttons** (Settings › General).
+- [ ] **Talk button over other apps** (Settings › General, push-to-talk mode): Android asks to allow it. Go to another
+      app: the round button stays on screen. Hold it, and the PC hears you. Drag it somewhere else: it stays there.
+      Back in the app, it goes away.
 - [ ] **Continuous transmission** works.
 - [ ] Mic button off: the PC hears nothing and shows the phone's microphone as off.
 - [ ] **Echo cancellation on**, loudspeaker: the PC doesn't hear its own voice back.
@@ -54,7 +57,6 @@ permissions guests may not have.
 - [ ] **Bold** text (`[b]` from the PC, or `**bold**`) shows bold.
 - [ ] Private message: on the phone, tap the PC user › Chat. The PC gets it, and its reply arrives in the phone's @tab.
 - [ ] Unread red dot on a tab, and on "Chat", when a message arrives in a tab you're not looking at.
-- [ ] Server chat (the "Server" tab) both ways.
 - [ ] **Poke**: the PC pokes the phone and a card appears. Poke the PC from the phone's person menu.
 - [ ] With the app in the background, a private message and a poke come as **notifications**.
 - [ ] Tap the server name: server info (welcome message, users, channels, website).
@@ -70,8 +72,16 @@ permissions guests may not have.
 ## 7. Streams (Phone + PC)
 - [ ] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
 - [ ] WATCH: the PC's screen shows full screen on the phone, and its sound plays (try the mute button).
+- [ ] While watching, go to the home screen: the stream keeps playing in a **small window** over other apps. Move it,
+      tap it to open the app again. Close it with its ×: watching stops (the PC sees one viewer fewer).
+- [ ] The small-window button in the player's top bar does the same.
 - [ ] The PC stops sharing: the phone's player says it ended and closes.
 - [ ] Phone shares its **camera** (Share › Camera): the PC can watch it. Try **Flip**.
+- [ ] Phone's auto-rotate **off**, sharing the camera: hold the phone sideways. The PC's picture turns upright after
+      a moment. Tap the rotate button (it becomes a lock): turning the phone no longer turns the picture. The lock is
+      remembered for the next share.
+- [ ] **Both cameras** (Share › Camera › Both, only shown if the phone can do it): the PC sees the back camera with
+      the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [ ] HD and data saver both work.
 - [ ] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
 - [ ] Phone screen off while sharing the camera: the PC keeps seeing it.
@@ -81,7 +91,8 @@ permissions guests may not have.
 ## 8. Favourites and settings (Phone)
 - [ ] When connecting, tick "Save to favourites": it shows in the Favourites list.
 - [ ] ✎ edit a favourite: name, nickname there, password, connect automatically.
-- [ ] ★ connect automatically: close the app (swipe it away), open it, and it connects by itself.
+- [ ] Connect automatically (in ✎): close the app (swipe it away), open it, and it connects by itself.
+- [ ] ✎ › Delete is on the left of Cancel and Save, and removes the favourite.
 - [ ] On the server: ★ menu › switch to another favourite.
 - [ ] Settings › Nickname: the PC sees the new name.
 - [ ] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.

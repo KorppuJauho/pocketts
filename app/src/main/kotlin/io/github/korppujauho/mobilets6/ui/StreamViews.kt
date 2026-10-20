@@ -12,7 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PictureInPictureAlt
+import androidx.compose.material.icons.filled.ScreenLockRotation
+import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,12 +55,22 @@ fun WatchButton(onClick: () -> Unit) {
 
 /** A video track on screen. */
 @Composable
-fun VideoView(track: VideoTrack, egl: EglBase, modifier: Modifier = Modifier, mirror: Boolean = false, fill: Boolean = false) {
+fun VideoView(
+    track: VideoTrack, egl: EglBase, modifier: Modifier = Modifier, mirror: Boolean = false, fill: Boolean = false,
+    onSize: ((width: Int, height: Int) -> Unit)? = null,
+) {
     var renderer by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
     AndroidView(
         factory = { ctx ->
             SurfaceViewRenderer(ctx).apply {
-                init(egl.eglBaseContext, null)
+                init(egl.eglBaseContext, onSize?.let { report ->
+                    object : RendererCommon.RendererEvents {
+                        override fun onFirstFrameRendered() {}
+                        override fun onFrameResolutionChanged(w: Int, h: Int, rotation: Int) {
+                            if (rotation % 180 == 0) report(w, h) else report(h, w)
+                        }
+                    }
+                })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
                 setEnableHardwareScaler(true)
                 setMirror(mirror)
@@ -79,15 +94,14 @@ fun VideoView(track: VideoTrack, egl: EglBase, modifier: Modifier = Modifier, mi
 
 /** WebTS's stream player: the picture on the whole screen, the state while it connects, sound, close. */
 @Composable
-fun StreamPlayer(state: StreamEngine.State, title: String, egl: EglBase, onClose: () -> Unit) {
-    var muted by remember { mutableStateOf(false) }
-    DisposableEffect(state.watchAudio, muted) {
-        state.watchAudio?.setEnabled(!muted)
-        onDispose {}
-    }
+fun StreamPlayer(
+    state: StreamEngine.State, title: String, egl: EglBase, onClose: () -> Unit,
+    onMute: (Boolean) -> Unit = {}, onSmallWindow: (() -> Unit)? = null,
+) {
+    val muted = state.watchMuted
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Box(Modifier.fillMaxSize().background(Color.Black)) {
-            state.watchVideo?.let { VideoView(it, egl, Modifier.fillMaxSize()) }
+            state.watchVideo?.let { VideoView(it, egl, Modifier.fillMaxSize(), onSize = { w, h -> StreamSize.set(w, h) }) }
             if (state.watchStatus.isNotEmpty()) {
                 Text(
                     state.watchStatus, color = Color.White, fontSize = 16.sp,
@@ -102,7 +116,13 @@ fun StreamPlayer(state: StreamEngine.State, title: String, egl: EglBase, onClose
             ) {
                 Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f))
                 if (state.watchAudio != null) {
-                    Text(if (muted) "🔇" else "🔊", fontSize = 20.sp, modifier = Modifier.clickable { muted = !muted }.padding(6.dp))
+                    Text(if (muted) "🔇" else "🔊", fontSize = 20.sp, modifier = Modifier.clickable { onMute(!muted) }.padding(6.dp))
+                }
+                if (onSmallWindow != null) {
+                    Icon(
+                        Icons.Filled.PictureInPictureAlt, contentDescription = "Small window", tint = Color.White,
+                        modifier = Modifier.clickable(onClick = onSmallWindow).padding(6.dp).size(24.dp),
+                    )
                 }
                 Text("×", color = Color.White, fontSize = 28.sp, modifier = Modifier.clickable(onClick = onClose).padding(horizontal = 8.dp))
             }
@@ -112,9 +132,12 @@ fun StreamPlayer(state: StreamEngine.State, title: String, egl: EglBase, onClose
 
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
-fun ShareDialog(onCamera: (front: Boolean, hd: Boolean) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit) {
+fun ShareDialog(
+    onCamera: (front: Boolean, hd: Boolean) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
+    onBoth: (hd: Boolean) -> Unit = {}, canBoth: Boolean = false,
+) {
     var screen by remember { mutableStateOf(false) }
-    var front by remember { mutableStateOf(true) }
+    var camera by remember { mutableStateOf(0) } // front, back, both
     var hd by remember { mutableStateOf(true) }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -126,7 +149,8 @@ fun ShareDialog(onCamera: (front: Boolean, hd: Boolean) -> Unit, onScreen: () ->
                 Segments(listOf("Camera", "Screen"), if (screen) 1 else 0) { screen = it == 1 }
                 if (!screen) {
                     Text("Camera", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    Segments(listOf("Front", "Back"), if (front) 0 else 1) { front = it == 0 }
+                    Segments(if (canBoth) listOf("Front", "Back", "Both") else listOf("Front", "Back"), camera) { camera = it }
+                    if (camera == 2) Text("The back camera big, the front one small in the corner. Swap switches them.", color = Ts.muted, fontSize = 13.sp)
                     Text("Quality", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf("Data saver (480p)", "HD (720p)"), if (hd) 1 else 0) { hd = it == 1 }
                 } else {
@@ -136,7 +160,13 @@ fun ShareDialog(onCamera: (front: Boolean, hd: Boolean) -> Unit, onScreen: () ->
             }
         },
         confirmButton = {
-            TextButton(onClick = { if (screen) onScreen() else onCamera(front, hd) }) { Text("Start", color = Ts.accent, fontWeight = FontWeight.SemiBold) }
+            TextButton(onClick = {
+                when {
+                    screen -> onScreen()
+                    camera == 2 -> onBoth(hd)
+                    else -> onCamera(camera == 0, hd)
+                }
+            }) { Text("Start", color = Ts.accent, fontWeight = FontWeight.SemiBold) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) } },
     )
@@ -161,10 +191,11 @@ private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Un
 
 /** WebTS's share bar: our own picture small, what's shared and to how many, flip and stop. */
 @Composable
-fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit) {
+fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit, onRotateLock: (Boolean) -> Unit = {}) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
-    val mirror = kind == Streams.Kind.CAMERA && state.shareFront
+    val mirror = kind == Streams.Kind.CAMERA && state.shareFront && !state.shareBoth
+    val flip = if (state.shareBoth) "Swap" else "Flip"
     // Tapping the small picture shows it large: what the others see
     if (big) state.localVideo?.let { track ->
         Dialog(onDismissRequest = { big = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -179,7 +210,10 @@ fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop
                         if (kind == Streams.Kind.CAMERA) "Your camera" else "Your screen",
                         color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f),
                     )
-                    if (kind == Streams.Kind.CAMERA) Text("Flip", color = Color.White, fontSize = 15.sp, modifier = Modifier.clickable(onClick = onFlip).padding(8.dp))
+                    if (kind == Streams.Kind.CAMERA) {
+                        RotateButton(state.rotateLocked, Color.White) { onRotateLock(!state.rotateLocked) }
+                        Text(flip, color = Color.White, fontSize = 15.sp, modifier = Modifier.clickable(onClick = onFlip).padding(8.dp))
+                    }
                     Text("×", color = Color.White, fontSize = 28.sp, modifier = Modifier.clickable { big = false }.padding(horizontal = 8.dp))
                 }
             }
@@ -200,7 +234,11 @@ fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop
         }
         Column(Modifier.weight(1f)) {
             Text(
-                if (kind == Streams.Kind.CAMERA) "Sharing your camera" else "Sharing your screen",
+                when {
+                    kind == Streams.Kind.SCREEN -> "Sharing your screen"
+                    state.shareBoth -> "Sharing both cameras"
+                    else -> "Sharing your camera"
+                },
                 color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
             )
             Text(
@@ -213,11 +251,54 @@ fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop
                 color = Ts.muted, fontSize = 12.sp,
             )
         }
-        if (kind == Streams.Kind.CAMERA) SecondaryButton("Flip", onClick = onFlip)
+        if (kind == Streams.Kind.CAMERA) {
+            RotateButton(state.rotateLocked, Ts.text) { onRotateLock(!state.rotateLocked) }
+            SecondaryButton(flip, onClick = onFlip)
+        }
         Text(
             "Stop", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
             modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Ts.redButton).clickable(onClick = onStop)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         )
+    }
+}
+
+/** WebTS's rotate button: the camera's picture follows how the phone is held, or (locked) keeps its turn. */
+@Composable
+private fun RotateButton(locked: Boolean, tint: Color, onClick: () -> Unit) {
+    Icon(
+        if (locked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
+        contentDescription = if (locked) "Turn locked (tap to follow the phone)" else "Turn follows the phone (tap to lock)",
+        tint = if (locked) Ts.amber else tint,
+        modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onClick).padding(6.dp).size(22.dp),
+    )
+}
+
+/** The watched stream's picture size, for the small window's shape. */
+object StreamSize {
+    @Volatile var width = 16
+        private set
+    @Volatile var height = 9
+        private set
+    /** Called when it changes (from the picture's own thread). */
+    @Volatile var onChange: (() -> Unit)? = null
+
+    fun set(w: Int, h: Int) {
+        if (w <= 0 || h <= 0 || (w == width && h == height)) return
+        width = w
+        height = h
+        onChange?.invoke()
+    }
+}
+
+/** The app as a small window over other apps: only the stream's picture. */
+@Composable
+fun PipPlayer(state: StreamEngine.State, egl: EglBase) {
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        state.watchVideo?.let { VideoView(it, egl, Modifier.fillMaxSize(), onSize = { w, h -> StreamSize.set(w, h) }) }
+        val status = if (state.watching == 0) "Stream ended." else state.watchStatus
+        if (status.isNotEmpty()) {
+            Text(status, color = Color.White, fontSize = 12.sp, modifier = Modifier.align(Alignment.Center).padding(8.dp))
+        }
     }
 }

@@ -4,7 +4,7 @@
 
 - Server names work as in TeamSpeak apps: the server's DNS entry first, then TeamSpeak's name service (TSDNS), then
   the name itself on port 9987.
-- WebTS's look: its colours, header, control buttons (microphone and sound on/off), the server box, channels as boxes
+- WebTS's look: its colours, a slim header, control buttons (microphone and sound on/off), the server box, channels as boxes
   with the people inside, a "YOU" badge, a glow for whoever is talking, mute, "can't talk here" and AFK marks, and
   channel spacers drawn as TeamSpeak draws them.
 - Chat as in WebTS, under a Channels / Chat switch:
@@ -18,6 +18,7 @@
   - the microphone, encoded as Opus with Android's own encoder, in the channel's codec
   - voice activation (with WebTS's level and delay), push-to-talk, or continuous transmission
   - push-to-talk: WebTS's "Hold to talk" button and floating button, and optionally the volume buttons
+  - optionally the round talk button stays on screen over other apps (hold to talk, drag to move)
   - it keeps working with the screen off (the connection notification now also covers the microphone)
 - WebTS's Settings (General, Playback, Capture), behind the gear in the top right corner (also before connecting):
   - nickname
@@ -45,6 +46,12 @@
   - WATCH someone streaming in your channel, full screen with their sound
   - share your camera (front or back, 480p or 720p, flip while sharing) or your screen; tap your small picture to
     see it large
+  - the camera's picture stays upright for viewers however the phone is held, also with auto-rotate off (as in
+    WebTS); the rotate button locks the current turn instead
+  - both cameras at once on phones that can: the back camera big and the front camera small in a corner (Swap
+    switches them)
+  - a watched stream keeps playing in a small window over other apps when you leave the app (or with the player's
+    small-window button); closing the window stops watching
   - the TeamSpeak app can watch and be watched; the stream mark shows in every channel
   - streams use TeamSpeak's own STUN servers, plus an optional relay (TURN) server in Settings > General
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
