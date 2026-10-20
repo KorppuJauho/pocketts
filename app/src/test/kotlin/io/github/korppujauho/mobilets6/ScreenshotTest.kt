@@ -11,6 +11,10 @@ import io.github.korppujauho.mobilets6.ui.MobileTsTheme
 import io.github.korppujauho.mobilets6.ui.ServerActions
 import io.github.korppujauho.mobilets6.ui.ServerScreen
 import io.github.korppujauho.mobilets6.ui.View
+import io.github.korppujauho.mobilets6.ui.SettingsActions
+import io.github.korppujauho.mobilets6.ui.SettingsContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -46,6 +50,20 @@ class ScreenshotTest {
     }
 
     @Test
+    fun pushToTalk() = shot("push-to-talk") {
+        val s = Example.state()
+        ServerScreen(
+            s.copy(voice = VoiceSettings(activation = VoiceSettings.Activation.PTT), micAllowed = true, pttHeld = true, talking = s.talking + 3),
+            Example.noActions,
+        )
+    }
+
+    @Test
+    fun settings() = shot("settings-capture") {
+        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
     fun serverConnecting() = shot("server-connecting") {
         ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com"), Example.noActions)
     }
@@ -66,6 +84,14 @@ object Example {
         override fun dismissPoke(id: Long) {}
         override fun setVolume(person: ServerModel.Client, volume: Float) {}
         override fun viewing(key: Chat.Key?) {}
+        override fun setPtt(held: Boolean) {}
+    }
+
+    val noSettings = object : SettingsActions {
+        override fun save(voice: VoiceSettings, nickname: String) {}
+        override fun micLevel() = 0.022f to true
+        override fun micTest(on: Boolean) {}
+        override fun playTestSound() {}
     }
 
     fun model(): ServerModel {
@@ -135,6 +161,7 @@ object Example {
             ownChannel = 1,
             talking = setOf(4, 9),
             cannotTalk = m.clients.values.filter { !m.canTalk(it) }.map { it.id }.toSet(),
+            micAllowed = true,
         )
     }
 }

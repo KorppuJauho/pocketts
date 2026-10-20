@@ -10,7 +10,11 @@ import java.util.TreeMap
  * Plays everyone talking: per person a small buffer that puts packets back in order and evens out network jitter,
  * an Opus decoder, and one mixer thread writing 20 ms at a time to the speaker.
  */
-class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Unit) {
+class VoicePlayer(
+    /** Through the phone's call audio (for echo cancellation) rather than as media. */
+    private val communication: Boolean,
+    private val onTalking: (clientId: Int, talking: Boolean) -> Unit,
+) {
     private companion object {
         const val RATE = 48000
         const val FRAME = 960 // 20 ms
@@ -39,6 +43,8 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
     @Volatile var muted = false
     /** Per person (client id): how loud, 1 = as is. */
     @Volatile var gains: Map<Int, Float> = emptyMap()
+    /** Everyone's voice (Settings > Playback), 1 = as is. */
+    @Volatile var voiceGain = 1f
     private val thread = Thread({ mixLoop() }, "voice-mixer").apply { start() }
 
     fun onVoice(v: TsClient.Voice) {
@@ -89,7 +95,7 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
         val track = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setUsage(if (communication) AudioAttributes.USAGE_VOICE_COMMUNICATION else AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build()
             )
@@ -176,7 +182,7 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
 
         val ch = t.pcmChannels
         val samples = minOf(FRAME, t.pcm.size / ch)
-        val gain = gains[t.id] ?: 1f
+        val gain = (gains[t.id] ?: 1f) * voiceGain
         for (i in 0 until samples) {
             if (ch == 1) {
                 val s = (t.pcm[i] * gain).toInt()

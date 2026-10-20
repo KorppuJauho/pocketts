@@ -41,6 +41,9 @@ object Session : TsClient.Listener {
         val channelCount: Int = 0,
         val clientCount: Int = 0,
         val volumes: Map<String, Float> = emptyMap(), // per person (by identity), 1 = as is
+        val voice: VoiceSettings = VoiceSettings(),
+        val micAllowed: Boolean = false, // the microphone permission
+        val pttHeld: Boolean = false,
     ) {
         val ownChannelName: String get() = findChannel(tree, ownChannel)?.displayName.orEmpty()
 
@@ -75,6 +78,9 @@ object Session : TsClient.Listener {
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "session").apply { isDaemon = true } }
     private var client: TsClient? = null
     private var player: VoicePlayer? = null
+    private var sender: MicSender? = null
+    private var route: AudioRoute? = null
+    @Volatile private var ownCodec = 4 // our channel's (Opus Voice 4 or Opus Music 5)
     // Used on the connection's thread only
     private val model = ServerModel()
     private val chat = Chat()
@@ -99,7 +105,7 @@ object Session : TsClient.Listener {
         val prev = _state.value
         _state.value = UiState(
             phase = Phase.CONNECTING, address = address, inputMuted = prev.inputMuted, outputMuted = prev.outputMuted,
-            volumes = Settings(app).volumes(),
+            volumes = Settings(app).volumes(), voice = VoiceSettings.load(app), micAllowed = micPermitted(),
         )
         ConnectionService.start(app, "Connecting to $address")
         worker.execute {
@@ -108,7 +114,7 @@ object Session : TsClient.Listener {
             AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()
             chat.clear()
-            player = VoicePlayer(::setTalking).also { it.muted = _state.value.outputMuted }
+            startAudio()
             client = TsClient(this) { AppLog.log(it) }.also {
                 it.connect(
                     TsClient.Options(
@@ -140,7 +146,88 @@ object Session : TsClient.Listener {
     fun toggleMic() {
         val muted = !_state.value.inputMuted
         _state.update { it.copy(inputMuted = muted) }
+        sender?.muted = muted
         client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
+    }
+
+    // ====== Talking ======
+
+    private fun micPermitted() = ::app.isInitialized &&
+        app.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    /** The microphone permission was answered. */
+    fun micPermission(context: Context, granted: Boolean) {
+        app = context.applicationContext
+        _state.update { it.copy(micAllowed = granted) }
+        if (granted && _state.value.phase != Phase.IDLE) {
+            // Now the service may use the microphone in the background too
+            ConnectionService.start(app, "Connected to ${_state.value.serverName.ifEmpty { _state.value.address }}")
+            if (sender == null && player != null) startSender()
+        }
+    }
+
+    /** A new nickname, now (also kept for next time by the caller). */
+    fun setNickname(name: String) {
+        client?.sendCommand(Commands.build("clientupdate", "client_nickname" to name))
+    }
+
+    /** Push-to-talk held or let go (the button, or a volume button). */
+    fun setPtt(held: Boolean) {
+        sender?.pttHeld = held
+        if (_state.value.pttHeld != held) _state.update { it.copy(pttHeld = held) }
+    }
+
+    /** The microphone's level and whether it's "on", for the settings' meter. */
+    fun micLevel(): Pair<Float, Boolean> = sender?.let { it.level to it.active } ?: (0f to false)
+
+    /** Measuring only (settings open): nothing is sent. */
+    fun micTest(on: Boolean) {
+        sender?.testing = on
+    }
+
+    fun updateVoice(v: VoiceSettings) {
+        val old = _state.value.voice
+        v.save(app)
+        _state.update { it.copy(voice = v) }
+        player?.voiceGain = v.voiceGain
+        if (v.activation != VoiceSettings.Activation.PTT) setPtt(false)
+        if (_state.value.phase == Phase.IDLE) return
+        if (v.echoCancellation != old.echoCancellation) {
+            // Call audio or media: playback and the microphone start again
+            worker.execute { stopAudio(); startAudio() }
+        } else if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) {
+            sender?.reconfigure()
+        }
+    }
+
+    private fun startAudio() {
+        val v = _state.value.voice
+        if (v.echoCancellation) route = AudioRoute(app).also { it.start() }
+        player = VoicePlayer(v.echoCancellation, ::setTalking).also {
+            it.muted = _state.value.outputMuted
+            it.voiceGain = v.voiceGain
+        }
+        updateGains()
+        if (micPermitted()) startSender()
+    }
+
+    private fun startSender() {
+        sender = MicSender(
+            settings = { _state.value.voice },
+            canSend = { _state.value.phase == Phase.CONNECTED && _state.value.ownId !in _state.value.cannotTalk },
+            send = { client?.sendVoice(ownCodec, it) },
+            sendStop = { client?.sendVoiceStop(ownCodec) },
+            onTalking = { talking -> _state.value.ownId.takeIf { it > 0 }?.let { setTalking(it, talking) } },
+        ).also { it.muted = _state.value.inputMuted }
+    }
+
+    private fun stopAudio() {
+        sender?.release()
+        sender = null
+        player?.release()
+        player = null
+        route?.stop()
+        route = null
     }
 
     /** Our sound on/off: nothing is played, and the others see it. */
@@ -253,13 +340,12 @@ object Session : TsClient.Listener {
     }
 
     private fun finish(reason: String?) {
-        player?.release()
-        player = null
+        stopAudio()
         client = null
         val s = _state.value
         _state.value = UiState(
             phase = Phase.IDLE, error = reason, address = s.address, inputMuted = s.inputMuted, outputMuted = s.outputMuted,
-            volumes = s.volumes,
+            volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed,
         )
         if (::app.isInitialized) ConnectionService.stop(app)
     }
@@ -302,6 +388,7 @@ object Session : TsClient.Listener {
     private fun publish(phase: Phase) {
         val tree = model.tree()
         val me = model.ownClient
+        ownCodec = model.ownChannel?.codec?.takeIf { it == 4 || it == 5 } ?: 4
         _state.update {
             it.copy(
                 phase = phase, serverName = model.serverName, tree = tree,

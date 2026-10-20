@@ -80,8 +80,8 @@ fun PersonSheet(
                     ValueBadge("${(v * 100).roundToInt()}%")
                 }
                 Slider(
-                    value = v, onValueChange = { v = it }, onValueChangeFinished = { onVolume(v) },
-                    valueRange = 0f..2f, steps = 39,
+                    value = v, onValueChange = { v = (it * 20).roundToInt() / 20f }, onValueChangeFinished = { onVolume(v) },
+                    valueRange = 0f..2f,
                     colors = SliderDefaults.colors(thumbColor = Ts.accent, activeTrackColor = Ts.accent, inactiveTrackColor = Ts.card),
                 )
             }

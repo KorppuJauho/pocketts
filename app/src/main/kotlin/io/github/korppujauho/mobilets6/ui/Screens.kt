@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -40,6 +41,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -90,9 +94,51 @@ fun ControlButton(icon: ImageVector, label: String, off: Boolean = false, enable
     }
 }
 
-/** The bar with the microphone, sound and settings buttons. */
+/** Calls [onHold] with true while pressed, false when let go (push-to-talk). */
+fun Modifier.holdToTalk(onHold: (Boolean) -> Unit): Modifier = pointerInput(Unit) {
+    detectTapGestures(onPress = {
+        onHold(true)
+        try {
+            tryAwaitRelease()
+        } finally {
+            onHold(false)
+        }
+    })
+}
+
+/** WebTS's "Hold to talk" button (in the controls bar in push-to-talk mode). */
 @Composable
-fun ControlsBar(micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit, onSettings: () -> Unit) {
+fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
+    val color = if (held) Ts.talking else Ts.text
+    Box(
+        Modifier.size(48.dp).clip(CircleShape).background(if (held) Ts.talking.copy(alpha = 0.2f) else Ts.button)
+            .border(1.dp, if (held) Ts.talking else Ts.buttonBorder, CircleShape).holdToTalk(onHold),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = "Hold to talk", tint = color)
+    }
+}
+
+/** The floating push-to-talk button: round, at the bottom right, bigger while held. */
+@Composable
+fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    val size = if (held) 66.dp else 60.dp
+    Box(
+        modifier.size(size).shadow(10.dp, CircleShape).clip(CircleShape)
+            .background(if (held) Color(0xEB0E7490) else Color(0xC71E1F22))
+            .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(onHold),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(Icons.Filled.Mic, contentDescription = "Hold to talk", tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp))
+    }
+}
+
+/** The bar with the microphone, sound and settings buttons (and "Hold to talk" in push-to-talk mode). */
+@Composable
+fun ControlsBar(
+    micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit, onSettings: () -> Unit,
+    ptt: (@Composable () -> Unit)? = null,
+) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
             .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)).padding(12.dp),
@@ -103,6 +149,7 @@ fun ControlsBar(micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: 
             if (soundOff) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
             "Sound", off = soundOff, onClick = onSound,
         )
+        ptt?.invoke()
         ControlButton(Icons.Filled.Settings, "Settings", onClick = onSettings)
     }
 }

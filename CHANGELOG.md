@@ -14,6 +14,17 @@
 - Tap a person for WebTS's person menu: their volume for you (kept per person), poke, and private chat.
 - Pokes show as cards until dismissed. When the app isn't on screen, pokes and private messages come as
   notifications.
+- Talking:
+  - the microphone, encoded as Opus with Android's own encoder, in the channel's codec
+  - voice activation (with WebTS's level and delay), push-to-talk, or continuous transmission
+  - push-to-talk: WebTS's "Hold to talk" button and floating button, and optionally the volume buttons
+  - it keeps working with the screen off (the connection notification now also covers the microphone)
+- WebTS's Settings (General, Playback, Capture):
+  - nickname
+  - voice volume and a test sound
+  - microphone volume, activation, and a level meter with the activation threshold
+  - noise removal, echo cancellation and automatic gain
+  - With echo cancellation on, voices play like a phone call (loudspeaker or headset).
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
 - Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
 

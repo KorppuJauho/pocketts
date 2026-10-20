@@ -76,7 +76,15 @@ class ConnectionService : Service() {
             return START_NOT_STICKY
         }
         val text = intent?.getStringExtra(EXTRA_TEXT) ?: getString(R.string.app_name)
-        startForeground(ID, notification(text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        // The microphone may be used in the background only with its permission granted (and the service saying so)
+        val mic = checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val types = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK or (if (mic) ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0)
+        try {
+            startForeground(ID, notification(text), types)
+        } catch (e: Exception) {
+            AppLog.log("Foreground with the microphone refused, without it: $e")
+            startForeground(ID, notification(text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        }
         if (wakeLock == null) {
             wakeLock = (getSystemService(POWER_SERVICE) as PowerManager)
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MobileTS6:connection").apply { acquire() }

@@ -51,6 +51,7 @@ interface ServerActions {
     fun poke(person: ServerModel.Client, text: String)
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
+    fun setPtt(held: Boolean)
     /** The conversation on screen (null when the chat isn't showing). */
     fun viewing(key: Chat.Key?)
 }
@@ -62,9 +63,13 @@ enum class View { CHANNELS, CHAT }
 fun ServerScreen(
     state: Session.UiState,
     actions: ServerActions,
+    settingsActions: SettingsActions? = null,
+    nickname: String = "",
     startView: View = View.CHANNELS,
     startChat: Chat.Key = Chat.Key.Channel(0),
+    startSettings: Int? = null,
 ) {
+    var settings by remember { mutableStateOf(startSettings) }
     var view by rememberSaveable { mutableStateOf(startView) }
     var chatKey by remember { mutableStateOf(startChat) }
     var askPassword by remember { mutableStateOf<ServerModel.Channel?>(null) }
@@ -82,9 +87,11 @@ fun ServerScreen(
         Column(Modifier.fillMaxSize()) {
             AppHeader { ExitButton("Disconnect") { actions.disconnect() } }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val ptt = state.voice.activation == io.github.korppujauho.mobilets6.VoiceSettings.Activation.PTT
                 ControlsBar(
-                    micOff = state.inputMuted, soundOff = state.outputMuted,
-                    onMic = actions::toggleMic, onSound = actions::toggleSound, onSettings = actions::openSettings,
+                    micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
+                    onMic = actions::toggleMic, onSound = actions::toggleSound, onSettings = { settings = 0 },
+                    ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
                 )
                 ViewSwitch(view, unread = state.unread.isNotEmpty()) { view = it }
                 when (view) {
@@ -118,6 +125,17 @@ fun ServerScreen(
             }
         }
         PokeCards(state.pokes, actions::dismissPoke, Modifier.align(Alignment.TopCenter).padding(top = 56.dp))
+        if (state.voice.activation == io.github.korppujauho.mobilets6.VoiceSettings.Activation.PTT && state.voice.floatingPtt &&
+            state.phase == Session.Phase.CONNECTED
+        ) {
+            FloatingPtt(
+                state.pttHeld, actions::setPtt,
+                Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = if (view == View.CHAT) 96.dp else 24.dp),
+            )
+        }
+    }
+    settings?.let { tab ->
+        if (settingsActions != null) SettingsDialog(state.voice, nickname, settingsActions, onDismiss = { settings = null }, startTab = tab)
     }
 
     askPassword?.let { ch ->
