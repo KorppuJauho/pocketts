@@ -41,9 +41,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /** The camera: asked for first if needed. */
-    fun shareCamera(front: Boolean, hd: Boolean) = withCamera { Session.shareCamera(front, hd) }
+    fun shareCamera(front: Boolean, quality: Int) = withCamera { Session.shareCamera(front, quality) }
 
-    fun shareBothCameras(hd: Boolean) = withCamera { Session.shareBothCameras(hd) }
+    fun shareBothCameras(quality: Int) = withCamera { Session.shareBothCameras(quality) }
 
     private fun withCamera(start: () -> Unit) {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -233,7 +233,7 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
             override fun removeFavorite(f: Favorite) = saveFavorites(ctx, favs - f)
             override fun toggleAuto(f: Favorite) = saveFavorites(ctx, favs.map { it.copy(auto = if (it == f) !f.auto else false) })
         },
-        voice = state.voice, settingsActions = AppSettingsActions(ctx),
+        voice = state.voice, settingsActions = AppSettingsActions(ctx), onDismissError = Session::clearError,
     )
 }
 
@@ -273,8 +273,8 @@ private object SessionActions : ServerActions {
     override fun stopWatching() {
         Session.stopWatching()
     }
-    override fun shareCamera(front: Boolean, hd: Boolean) {
-        MainActivity.current?.shareCamera(front, hd)
+    override fun shareCamera(front: Boolean, quality: Int) {
+        MainActivity.current?.shareCamera(front, quality)
     }
     override fun shareScreen() {
         MainActivity.current?.shareScreen()
@@ -285,13 +285,14 @@ private object SessionActions : ServerActions {
     override fun flipCamera() {
         Session.flipCamera()
     }
-    override fun shareBothCameras(hd: Boolean) {
-        MainActivity.current?.shareBothCameras(hd)
+    override fun shareBothCameras(quality: Int) {
+        MainActivity.current?.shareBothCameras(quality)
     }
     override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
     override fun setWatchMuted(muted: Boolean) {
         Session.setWatchMuted(muted)
     }
+    override fun dismissError() = Session.clearError()
     override fun setWatchVolume(volume: Float) {
         Session.setWatchVolume(volume)
     }

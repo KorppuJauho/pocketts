@@ -65,6 +65,7 @@ fun ConnectScreen(
     actions: ConnectActions,
     voice: io.github.korppujauho.mobilets6.VoiceSettings = io.github.korppujauho.mobilets6.VoiceSettings(),
     settingsActions: SettingsActions? = null,
+    onDismissError: () -> Unit = {},
 ) {
     var settings by remember { mutableStateOf(false) }
     var nick by remember { mutableStateOf(nickname) }
@@ -100,7 +101,7 @@ fun ConnectScreen(
                     CheckRow("Remember the password", remember) { remember = it }
                     // Always there; ticked (and fixed) for a server that already is a favourite
                     CheckRow(if (known) "In favourites" else "Save to favourites", favorite || known, enabled = !known) { favorite = it }
-                    error?.let { Text(it, color = Color(0xFFF87171), fontSize = 14.sp) }
+                    error?.let { WarningBanner(it, onDismissError, inset = 0.dp) }
                     PrimaryButton(
                         "Connect", enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
                     ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
