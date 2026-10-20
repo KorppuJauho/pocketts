@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -162,6 +164,8 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
     var nick by remember { mutableStateOf(f.nickname) }
     var pw by remember { mutableStateOf(f.password) }
     var auto by remember { mutableStateOf(f.auto) }
+    var filePort by remember { mutableStateOf(f.filePort?.toString().orEmpty()) }
+    var advanced by remember { mutableStateOf(f.filePort != null) }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Ts.panel,
@@ -173,6 +177,24 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 TsField(nick, { nick = it }, "Your nickname on this server")
                 TsField(pw, { pw = it }, "Server password", password = true)
                 CheckRow("Connect automatically when the app opens", auto) { auto = it }
+                // Advanced: folded away unless used
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).clickable { advanced = !advanced }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Advanced", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    androidx.compose.material3.Icon(
+                        if (advanced) androidx.compose.material.icons.Icons.Rounded.ExpandLess else androidx.compose.material.icons.Icons.Rounded.ExpandMore,
+                        contentDescription = null, tint = Ts.muted,
+                    )
+                }
+                if (advanced) {
+                    TsField(
+                        filePort, { v -> filePort = v.filter { it.isDigit() }.take(5) }, "File transfer port",
+                        placeholder = "The server's own (usually 30033)", keyboard = KeyboardType.Number,
+                    )
+                    Text("Only if the server's pictures and avatars don't load: its file transfer is on another port.", color = Ts.muted, fontSize = 12.sp)
+                }
             }
         },
         // Delete on the left of the same row as Cancel and Save
@@ -181,7 +203,10 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 if (onDelete != null) TextButton(onClick = onDelete) { Text("Delete", color = Ts.red, fontWeight = FontWeight.SemiBold) }
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) }
-                TextButton(onClick = { onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto)) }, enabled = address.isNotBlank()) {
+                TextButton(
+                    onClick = { onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 })) },
+                    enabled = address.isNotBlank(),
+                ) {
                     Text("Save", color = Ts.accent, fontWeight = FontWeight.SemiBold)
                 }
             }

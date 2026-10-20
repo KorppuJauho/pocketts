@@ -14,6 +14,7 @@ data class Favorite(
     val nickname: String = "",
     val password: String = "",
     val auto: Boolean = false,
+    val filePort: Int? = null, // the server's file transfer port when it isn't the one the server tells (advanced)
 ) {
     val label: String get() = name.ifBlank { address }
 }
@@ -25,7 +26,10 @@ object Favorites {
         val a = JSONArray(prefs(c).getString("list", "[]"))
         (0 until a.length()).map { i ->
             val o = a.getJSONObject(i)
-            Favorite(o.optString("address"), o.optString("name"), o.optString("nickname"), o.optString("password"), o.optBoolean("auto"))
+            Favorite(
+                o.optString("address"), o.optString("name"), o.optString("nickname"), o.optString("password"), o.optBoolean("auto"),
+                o.optInt("filePort", 0).takeIf { it in 1..65535 },
+            )
         }.filter { it.address.isNotBlank() }
     } catch (_: Exception) {
         emptyList()
@@ -38,7 +42,7 @@ object Favorites {
         list.forEachIndexed { i, f ->
             a.put(
                 JSONObject().put("address", f.address.trim()).put("name", f.name.trim()).put("nickname", f.nickname.trim())
-                    .put("password", f.password).put("auto", i == autoAt)
+                    .put("password", f.password).put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
             )
         }
         prefs(c).edit().putString("list", a.toString()).apply()

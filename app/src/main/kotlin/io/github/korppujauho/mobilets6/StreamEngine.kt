@@ -56,6 +56,8 @@ class StreamEngine(
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
+        val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
+        val watchVolume: Float = 1f, // the watched stream's sound, 0 - 1
         val viewers: Int = 0,
         val localVideo: VideoTrack? = null,
         val message: String? = null, // why a share stopped or couldn't start
@@ -183,6 +185,12 @@ class StreamEngine(
 
     fun stopWatching() = exec.execute { closeWatch(sendLeave = true) }
 
+    /** How loud the watched stream is, 0 - 1. */
+    fun setWatchVolume(volume: Float) = exec.execute {
+        state.watchAudio?.setVolume(volume.toDouble())
+        update { it.copy(watchVolume = volume) }
+    }
+
     /** The stream's sound off or on (kept while the player becomes a small window and back). */
     fun setWatchMuted(muted: Boolean) = exec.execute {
         state.watchAudio?.setEnabled(!muted)
@@ -263,6 +271,7 @@ class StreamEngine(
                         is VideoTrack -> update { it.copy(watchVideo = track, watchStatus = "") }
                         is org.webrtc.AudioTrack -> {
                             track.setEnabled(!state.watchMuted)
+                            track.setVolume(state.watchVolume.toDouble())
                             update { it.copy(watchAudio = track) }
                         }
                     }
@@ -292,7 +301,9 @@ class StreamEngine(
     private var track: VideoTrack? = null
     private var bitrate = 2500
     private var fps = 30
-    private val turn by lazy { CameraTurn(context) }
+    private val turn by lazy {
+        CameraTurn(context).also { t -> t.onTurn = { deg -> exec.execute { if (state.sharing == Streams.Kind.CAMERA || deg == 0) update { it.copy(phoneTurn = deg) } } } }
+    }
     private var dual: DualCamera? = null
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
@@ -391,7 +402,7 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0) }
     }
 
     private fun releaseCapture() {

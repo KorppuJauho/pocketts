@@ -1,5 +1,7 @@
 package io.github.korppujauho.mobilets6.ui
 
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,6 +71,7 @@ interface ServerActions {
     fun shareBothCameras(hd: Boolean) {}
     fun setRotateLock(on: Boolean) {}
     fun setWatchMuted(muted: Boolean) {}
+    fun setWatchVolume(volume: Float) {}
     /** The stream player as a small window over other apps. */
     fun pictureInPicture() {}
     /** The conversation on screen (null when the chat isn't showing). */
@@ -109,9 +112,25 @@ fun ServerScreen(
     val shownKey = if (chatKey is Chat.Key.Channel) Chat.Key.Channel(state.ownChannel) else chatKey
     LaunchedEffect(view, shownKey) { actions.viewing(if (view == View.CHAT) shownKey else null) }
 
+    val display = androidx.compose.ui.platform.LocalView.current.display
+    androidx.compose.ui.platform.LocalConfiguration.current // a new screen turn comes as a new configuration
+    val screenTurn = if (state.stream.sharing == io.github.korppujauho.mobilets6.proto.Streams.Kind.CAMERA) {
+        (state.stream.phoneTurn + (display?.rotation ?: 0) * 90) % 360
+    } else 0
+    val iconAngle = remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
+    LaunchedEffect(screenTurn) {
+        // The nearest way round to the new angle
+        val target = -screenTurn.toFloat()
+        val diff = ((target - iconAngle.floatValue) % 360f + 540f) % 360f - 180f
+        iconAngle.floatValue += diff
+    }
+    val iconTurn by androidx.compose.animation.core.animateFloatAsState(iconAngle.floatValue, label = "icons")
+    androidx.compose.runtime.CompositionLocalProvider(LocalIconTurn provides iconTurn) {
     Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
         Column(Modifier.fillMaxSize()) {
             AppHeader {
+                ExitButton("Disconnect") { actions.disconnect() }
+                androidx.compose.foundation.layout.Spacer(Modifier.size(14.dp)) // so the star isn't Disconnect by mistake
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
                     HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, "Servers") { serversMenu = true }
@@ -119,14 +138,23 @@ fun ServerScreen(
                         for (f in favorites) {
                             val here = io.github.korppujauho.mobilets6.Favorites.same(f.address, state.address)
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text((if (here) "● " else "★ ") + f.label, color = Ts.text) },
+                                text = { Text(f.label, color = Ts.text) },
+                                leadingIcon = {
+                                    androidx.compose.material3.Icon(
+                                        if (here) androidx.compose.material.icons.Icons.Filled.CheckCircle else androidx.compose.material.icons.Icons.Filled.Star,
+                                        contentDescription = if (here) "Connected" else null, tint = if (here) Ts.green else Ts.muted,
+                                    )
+                                },
                                 enabled = !here,
                                 onClick = { serversMenu = false; actions.switchTo(f) },
                             )
                         }
                         if (favorites.none { io.github.korppujauho.mobilets6.Favorites.same(it.address, state.address) }) {
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("☆ Add to favourites", color = Ts.text) },
+                                text = { Text("Add to favourites", color = Ts.text) },
+                                leadingIcon = {
+                                    androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.StarBorder, contentDescription = null, tint = Ts.muted)
+                                },
                                 onClick = {
                                     serversMenu = false
                                     addingFavorite = io.github.korppujauho.mobilets6.Favorite(state.address, state.serverName, nickname)
@@ -134,8 +162,6 @@ fun ServerScreen(
                             )
                         }                    }
                 }
-                ExitButton("Disconnect") { actions.disconnect() }
-                androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp))
                 SettingsGear { settings = 0 }
             }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -147,7 +173,14 @@ fun ServerScreen(
                     sharing = state.stream.sharing != null,
                     onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
                 )
-                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock)
+                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn)
+                if (state.stream.watching != 0 && egl != null && !pip) {
+                    val who = state.client(state.stream.watching)?.nickname ?: "Stream"
+                    WatchCard(
+                        state.stream, "$who's stream", egl, actions::stopWatching, actions::setWatchMuted, actions::setWatchVolume,
+                        actions::pictureInPicture,
+                    )
+                }
                 state.stream.message?.let { ErrorLine(it) }
                 val unread = state.unread.any { k ->
                     if (k is Chat.Key.Private) state.privateTabs.any { it.uid == k.uid } else k == Chat.Key.Channel(state.ownChannel)
@@ -195,6 +228,7 @@ fun ServerScreen(
                 Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = if (view == View.CHAT) 96.dp else 24.dp),
             )
         }
+    }
     }
     settings?.let { tab ->
         if (settingsActions != null) SettingsDialog(
@@ -246,10 +280,7 @@ fun ServerScreen(
             onDismiss = { shareDialog = false },
         )
     }
-    if (state.stream.watching != 0 && egl != null && !pip) {
-        val who = state.client(state.stream.watching)?.nickname ?: "Stream"
-        StreamPlayer(state.stream, "$who's stream", egl, actions::stopWatching, actions::setWatchMuted, actions::pictureInPicture)
-    }
+
 }
 
 /** "Channels" and "Chat" on a phone. */

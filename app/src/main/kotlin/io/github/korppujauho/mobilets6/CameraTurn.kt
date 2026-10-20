@@ -23,6 +23,9 @@ class CameraTurn(context: Context) {
     @Volatile var locked = false
         private set
 
+    /** Called (on the main thread) when the way the phone is held changes. */
+    @Volatile var onTurn: ((Int) -> Unit)? = null
+
     private var seen = -1
     private var seenAt = 0L
 
@@ -38,6 +41,7 @@ class CameraTurn(context: Context) {
             if (now - seenAt < 400) return
             phone = nearest
             seen = -1
+            onTurn?.invoke(nearest)
         }
     }
 
@@ -45,6 +49,7 @@ class CameraTurn(context: Context) {
         locked = false
         lock(lock)
         if (sensor.canDetectOrientation()) sensor.enable()
+        onTurn?.invoke(phone)
     }
 
     fun stop() = sensor.disable()

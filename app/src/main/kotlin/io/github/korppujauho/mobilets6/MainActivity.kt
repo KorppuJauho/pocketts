@@ -198,17 +198,17 @@ private fun App() {
 }
 
 /** Connects (the microphone is asked for once; talking starts when it's allowed). */
-private fun connect(context: Context, address: String, nickname: String, password: String) {
+private fun connect(context: Context, address: String, nickname: String, password: String, filePort: Int? = null) {
     Settings(context).let {
         it.nickname = nickname
         it.address = address
     }
     MainActivity.current?.ensureMic()
-    Session.connect(context, address, nickname, password)
+    Session.connect(context, address, nickname, password, filePort)
 }
 
 private fun connectFavorite(context: Context, f: Favorite) =
-    connect(context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password)
+    connect(context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password, f.filePort)
 
 private fun saveFavorites(context: Context, list: List<Favorite>) {
     Favorites.save(context, list)
@@ -291,6 +291,9 @@ private object SessionActions : ServerActions {
     override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
     override fun setWatchMuted(muted: Boolean) {
         Session.setWatchMuted(muted)
+    }
+    override fun setWatchVolume(volume: Float) {
+        Session.setWatchVolume(volume)
     }
     override fun pictureInPicture() {
         MainActivity.current?.enterPip()
