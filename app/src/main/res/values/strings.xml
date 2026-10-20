@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MobileTS6</string>
+    <string name="connect_intro">Connect to a TeamSpeak server.</string>
+    <string name="nickname">Nickname</string>
+    <string name="server_address">Server address</string>
+    <string name="server_password">Server password (if any)</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connecting_to">Connecting to %1$s…</string>
+    <string name="channel_password">Channel password</string>
+    <string name="join">Join</string>
+    <string name="cancel">Cancel</string>
+    <string name="away">away</string>
+    <string name="notification_channel">Connection</string>
+</resources>
