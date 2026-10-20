@@ -30,6 +30,9 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "w411dp-h891dp-xxhdpi", sdk = [36])
 class ScreenshotTest {
+    init {
+        io.github.korppujauho.mobilets6.ui.chatNow = { Example.T0 + 600_000 } // the example lines are "today"
+    }
 
     private fun shot(name: String, content: @Composable () -> Unit) =
         captureRoboImage("${roborazziSystemPropertyOutputDirectory()}/$name.png") { MobileTsTheme { content() } }
@@ -158,6 +161,8 @@ object Example {
         val chat = Chat()
         var t = T0
         chat.now = { t.also { t += 45_000 } }
+        // A line from yesterday, kept in the chat history
+        chat.restore(mapOf(Chat.Key.Channel(1) to listOf(Chat.Entry(0, T0 - 86_400_000L, senderName = "Noa", text = "Good game yesterday, everyone!"))))
         fun feed(s: String) { val c = Commands.parse(s); chat.handle(c, m); m.apply(c) }
         fun say(id: Int, name: String, msg: String) =
             feed(Commands.build("notifytextmessage", "targetmode" to 2, "msg" to msg, "invokerid" to id, "invokername" to name))

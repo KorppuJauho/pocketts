@@ -357,4 +357,5 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     }
     override fun identityProblem(): String? = Settings(context).identityProblem()
     override fun forgetIdentity() = Settings(context).forgetIdentity()
+    override fun clearChatHistory() = Session.clearChatHistory(context)
 }

@@ -165,6 +165,13 @@ object Session : TsClient.Listener {
     private val model = ServerModel()
     private val chat = Chat()
 
+    // The chat history: the server whose history is loaded (null while none is), and its writes, one at a time
+    private val historyLock = Any()
+    private var historyServer: String? = null
+    private var historySave: java.util.concurrent.ScheduledFuture<*>? = null
+    private val historyWriter = Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "chat-history").apply { isDaemon = true } }
+    private val history by lazy { ChatHistoryStore(java.io.File(app.noBackupFilesDir, "chat")) }
+
     /** The conversation on screen (null: the chat isn't showing): it gets no unread mark. */
     @Volatile var viewing: Chat.Key? = null
         set(value) {
@@ -198,6 +205,7 @@ object Session : TsClient.Listener {
         set(value) {
             field = value
             TalkOverlay.refresh()
+            if (!value) flushHistory()
         }
 
     /** The app is only the small stream window (picture-in-picture). */
@@ -233,6 +241,7 @@ object Session : TsClient.Listener {
             return
         }
         val prev = _state.value
+        if (!keepChat) synchronized(historyLock) { historyServer = null }
         _state.value = UiState(
             phase = Phase.CONNECTING, address = address, inputMuted = prev.inputMuted, outputMuted = prev.outputMuted,
             volumes = Settings(app).volumes(), voice = VoiceSettings.load(app), micAllowed = micPermitted(),
@@ -252,7 +261,10 @@ object Session : TsClient.Listener {
             val target = ServerAddress.resolve(typed, AndroidDns) { AppLog.log(it) }
             AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()
-            if (!keepChat) chat.clear()
+            if (!keepChat) {
+                chat.clear()
+                restoreHistory(address)
+            }
             startAudio()
             client = TsClient(this) { AppLog.log(it) }.also {
                 files = FileTransfer(it, portOverride = filePort)
@@ -424,6 +436,74 @@ object Session : TsClient.Listener {
 
     fun dismissPoke(id: Long) = _state.update { s -> s.copy(pokes = s.pokes.filter { it.id != id }) }
 
+    // ====== Chat history ======
+
+    /** The server's chat from before, into the chat (before the connection starts, on the worker). */
+    private fun restoreHistory(address: String) {
+        val server = io.github.korppujauho.mobilets6.proto.ChatHistory.serverKey(address) ?: return
+        val saved = history.load(server, System.currentTimeMillis())
+        if (saved.isNotEmpty()) {
+            chat.restore(saved)
+            publishChat()
+            AppLog.log("Chat history: ${saved.values.sumOf { it.size }} lines from before")
+        }
+        synchronized(historyLock) { historyServer = server }
+    }
+
+    /** New lines are written together, at most every few seconds (and when the connection ends). */
+    private fun saveHistorySoon(delaySeconds: Long = 10) {
+        synchronized(historyLock) {
+            if (historyServer == null || historySave?.isDone == false) return
+            historySave = historyWriter.schedule({ saveHistory() }, delaySeconds, java.util.concurrent.TimeUnit.SECONDS)
+        }
+    }
+
+    private fun saveHistory() {
+        val (server, lines) = synchronized(historyLock) { (historyServer ?: return) to _state.value.chat }
+        history.save(server, lines, System.currentTimeMillis())
+    }
+
+    /** Now, and no more for this server (the connection ended). Before the chat on screen is emptied. */
+    private fun closeHistory() {
+        synchronized(historyLock) {
+            val server = historyServer ?: return
+            val lines = _state.value.chat
+            historyServer = null
+            historySave?.cancel(false)
+            historyWriter.execute { history.save(server, lines, System.currentTimeMillis()) }
+        }
+    }
+
+    /** Settings › Clear chat history: every server's, and the lines on screen now. */
+    fun clearChatHistory(context: Context) {
+        app = context.applicationContext
+        val c = client
+        if (c != null) {
+            c.post {
+                chat.clearLines()
+                publishChat()
+                historyWriter.execute { history.clear() } // after any write of the lines just cleared
+            }
+        } else {
+            // Between connections, or waiting to reconnect: the chat is the worker's then
+            worker.execute {
+                chat.clearLines()
+                publishChat()
+                historyWriter.execute { history.clear() }
+            }
+        }
+        AppLog.log("Chat history cleared")
+    }
+
+    /** Leaving the app: lines waiting to be written go now (Android may stop the app later). */
+    private fun flushHistory() {
+        synchronized(historyLock) {
+            val pending = historySave ?: return
+            if (pending.isDone || !pending.cancel(false)) return
+            historySave = historyWriter.schedule({ saveHistory() }, 0, java.util.concurrent.TimeUnit.SECONDS)
+        }
+    }
+
     /** How loud someone is for us (0 to 2), kept by their identity. */
     fun setVolume(person: ServerModel.Client, volume: Float) {
         if (person.uid.isEmpty()) return
@@ -539,6 +619,7 @@ object Session : TsClient.Listener {
             if (message != null && !message.second.outgoing && message.first != view) _state.update { it.copy(unread = it.unread + message.first) }
             if (message != null && !message.second.outgoing) messageArrived(message.first, message.second)
             publishChat()
+            saveHistorySoon()
         }
         if (changed) {
             publish(_state.value.phase)
@@ -611,6 +692,7 @@ object Session : TsClient.Listener {
         files = null
         stopAudio()
         client = null
+        closeHistory()
         val s = _state.value
         _state.value = UiState(
             phase = Phase.IDLE, error = reason, address = s.address, inputMuted = s.inputMuted, outputMuted = s.outputMuted,

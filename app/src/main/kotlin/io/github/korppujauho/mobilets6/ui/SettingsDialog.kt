@@ -72,6 +72,8 @@ interface SettingsActions {
     fun identityProblem(): String? = null
     /** Lets go of the saved identity: a new one is made at the next connect. */
     fun forgetIdentity() {}
+    /** Forgets every server's chat history, and the lines on screen. */
+    fun clearChatHistory() {}
 }
 
 /** Who we are on the server, for the profile picture in Settings. */
@@ -149,6 +151,7 @@ fun SettingsContent(
                         if (self != null) ProfilePicture(self, actions)
                         General(v, nick, { nick = it }) { v = it }
                         Identity(actions)
+                        ChatHistory(actions)
                     }
                     1 -> Playback(v, actions) { v = it }
                     2 -> Capture(v, actions) { v = it }
@@ -273,6 +276,38 @@ private fun Identity(actions: SettingsActions) {
                 androidx.compose.material3.TextButton(onClick = { done(actions.importIdentity(text)) }) { Text("Import", color = Ts.accent) }
             },
             dismissButton = { androidx.compose.material3.TextButton(onClick = { importing = false }) { Text("Cancel", color = Ts.muted) } },
+        )
+    }
+}
+
+@Composable
+private fun ChatHistory(actions: SettingsActions) {
+    var asking by remember { mutableStateOf(false) }
+    var cleared by remember { mutableStateOf(false) }
+    val rules = io.github.korppujauho.mobilets6.proto.ChatHistory
+    Group("Chat history") {
+        Desc(
+            "Channel chats, private chats and who joined or left are kept on this phone, encrypted, and shown again " +
+                "when you connect to the same server: the last ${rules.DAYS} days, at most ${rules.LINES} lines per " +
+                "conversation. Pokes aren't kept."
+        )
+        SecondaryButton("Clear chat history") { asking = true }
+        if (cleared) Desc("Cleared.")
+    }
+    if (asking) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { asking = false },
+            containerColor = Ts.panel,
+            title = { Text("Clear chat history?", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
+            text = { Desc("Every server's saved chat is removed from this phone, and the chat on screen now.") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    actions.clearChatHistory()
+                    cleared = true
+                    asking = false
+                }) { Text("Clear", color = Ts.red) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { asking = false }) { Text("Cancel", color = Ts.muted) } },
         )
     }
 }

@@ -65,6 +65,14 @@ permissions guests may not have.
 - [x] **Poke**: the PC pokes the phone and a card appears. Poke the PC from the phone's person menu.
 - [x] With the app in the background, a private message and a poke come as **notifications**.
 - [x] Tap the server name: server info (welcome message, users, channels, website).
+- [ ] **Chat history**: write in the channel and privately with the PC, and let the PC join and leave. Disconnect,
+      connect to the same server again: the channel's lines (with the join and leave lines) are back. When the PC
+      user writes privately again, or you open a private chat with them, the old private lines are there too.
+- [ ] Swipe the app away while connected, open it and connect: the last lines are still there.
+- [ ] Another server: its chat starts empty (each server keeps its own).
+- [ ] The next day: yesterday's lines show the day after the time ("21:36 - Mon").
+- [ ] Close a private chat's tab and open it again from the person's menu: its lines are still there.
+- [ ] Settings › General › Clear chat history › Clear: the chat on screen empties, and after reconnecting it stays empty.
 
 ## 6. Pictures (Phone + PC)
 Sending pictures needs a server whose file transfer works for you (and the permission to upload).
