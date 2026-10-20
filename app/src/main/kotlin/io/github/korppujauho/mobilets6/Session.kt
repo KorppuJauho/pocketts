@@ -123,6 +123,7 @@ object Session : TsClient.Listener {
     fun stopShare() = engine?.stopShare()
     fun flipCamera() = engine?.flipCamera()
     fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
+    fun setWatchVolume(volume: Float) = engine?.setWatchVolume(volume)
 
     /** The camera's turn locked or following the phone; remembered for the next share. */
     fun setRotateLock(on: Boolean) {
@@ -200,7 +201,7 @@ object Session : TsClient.Listener {
         }
 
     /** What the last connect asked for, to get a lost connection back. */
-    private data class Target(val address: String, val nickname: String, val password: String)
+    private data class Target(val address: String, val nickname: String, val password: String, val filePort: Int? = null)
     private var target: Target? = null
     private var retries = 0
     @Volatile private var wasConnected = false // only a connection that worked is tried again
@@ -208,18 +209,18 @@ object Session : TsClient.Listener {
     private var retryTask: java.util.concurrent.ScheduledFuture<*>? = null
     private var network: android.net.ConnectivityManager.NetworkCallback? = null
 
-    fun connect(context: Context, address: String, nickname: String, serverPassword: String) {
+    fun connect(context: Context, address: String, nickname: String, serverPassword: String, filePort: Int? = null) {
         app = context.applicationContext
         if (_state.value.phase != Phase.IDLE) return
         retries = 0
         wasConnected = false
-        target = Target(address, nickname, serverPassword)
+        target = Target(address, nickname, serverPassword, filePort)
         start(keepChat = false)
     }
 
     /** Connects to [target]; a reconnect keeps the chat and the pokes. */
     private fun start(keepChat: Boolean) {
-        val (address, nickname, serverPassword) = target ?: return
+        val (address, nickname, serverPassword, filePort) = target ?: return
         val typed = ServerAddress.parse(address) ?: run {
             _state.update { it.copy(error = "That doesn't look like a server address") }
             return
@@ -242,7 +243,7 @@ object Session : TsClient.Listener {
             if (!keepChat) chat.clear()
             startAudio()
             client = TsClient(this) { AppLog.log(it) }.also {
-                files = FileTransfer(it)
+                files = FileTransfer(it, portOverride = filePort)
                 it.connect(
                     TsClient.Options(
                         host = target.host, port = target.port, identity = identity,

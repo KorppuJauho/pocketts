@@ -1,5 +1,6 @@
 package io.github.korppujauho.mobilets6.ui
 
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -110,16 +111,19 @@ fun SettingsContent(
         ) {
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("Settings", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.weight(1f))
-                Text("×", color = Ts.muted, fontSize = 24.sp, modifier = Modifier.clickable(onClick = onDismiss).padding(horizontal = 4.dp))
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Ts.muted,
+                    modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onDismiss).padding(4.dp),
+                )
             }
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                listOf("General", "Playback", "Capture").forEachIndexed { i, name ->
+                listOf("General", "Playback", "Capture", "Advanced").forEachIndexed { i, name ->
                     val active = i == tab
                     Text(
                         name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
                         modifier = Modifier.clickable { tab = i }
                             .drawBehind { if (active) drawLine(Ts.accent, Offset(0f, size.height), Offset(size.width, size.height), 2.dp.toPx()) }
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 9.dp, vertical = 8.dp),
                     )
                 }
             }
@@ -135,7 +139,8 @@ fun SettingsContent(
                         Identity(actions)
                     }
                     1 -> Playback(v, actions) { v = it }
-                    else -> Capture(v, actions) { v = it }
+                    2 -> Capture(v, actions) { v = it }
+                    else -> Advanced(v) { v = it }
                 }
             }
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(16.dp), horizontalArrangement = Arrangement.End) {
@@ -265,12 +270,19 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Check("Volume buttons are push-to-talk", v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
         Desc("In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).")
     }
+}
+
+@Composable
+private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group("Video connection") {
         Desc("Streams go straight between you and the other end. Behind some networks they need a relay (a TURN server): enter one here if you have it.")
         TsField(v.turnUrl, { onChange(v.copy(turnUrl = it)) }, "Relay (turn:host:port)", placeholder = "turn:relay.example.com:3478")
         TsField(v.turnUser, { onChange(v.copy(turnUser = it)) }, "Relay username")
         TsField(v.turnPassword, { onChange(v.copy(turnPassword = it)) }, "Relay password", password = true)
         Check("Always through the relay", v.relayOnly) { onChange(v.copy(relayOnly = it)) }
+    }
+    Group {
+        Desc("A server whose file transfer is on another port (its pictures and avatars don't load) can have its own port in the favourite's Advanced part.")
     }
 }
 
@@ -281,7 +293,7 @@ private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (Voic
         RangeEnds("Quiet", "Loud")
     }
     Group {
-        SecondaryButton("▶  Play test sound") { actions.playTestSound() }
+        SecondaryButton("Play test sound") { actions.playTestSound() }
     }
     Desc(
         if (v.echoCancellation) "With echo cancellation on, voices follow the call volume: press a volume button while connected."

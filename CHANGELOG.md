@@ -41,19 +41,22 @@
 - A lost connection (Wi-Fi to mobile data, a dead spot) reconnects by itself, keeping the chat; sooner when a
   network comes back.
 - Away, with a message (tap yourself).
+- A favourite can have its own file transfer port (its Advanced part), for servers where it isn't the usual one.
 - The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General).
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
-  - WATCH someone streaming in your channel, full screen with their sound
+  - WATCH someone streaming in your channel: in a box on the server screen with their sound (on/off, volume), a
+    small window, and full screen turned the way the picture is (wide: sideways, tall: upright)
   - share your camera (front or back, 480p or 720p, flip while sharing) or your screen; tap your small picture to
     make it bigger inside the share bar (WebTS's green bar with a live dot and round buttons)
   - the camera's picture stays upright for viewers however the phone is held, also with auto-rotate off (as in
-    WebTS); the rotate button locks the current turn instead
+    WebTS); the rotate button locks the current turn instead. Your preview stays the right way up to you, and the
+    round buttons' icons turn with the phone, as in a camera app
   - both cameras at once on phones that can: the back camera big and the front camera small in a corner (Swap
     switches them)
   - a watched stream keeps playing in a small window over other apps when you leave the app (or with the player's
     small-window button); closing the window stops watching
   - the TeamSpeak app can watch and be watched; the stream mark shows in every channel
-  - streams use TeamSpeak's own STUN servers, plus an optional relay (TURN) server in Settings > General
+  - streams use TeamSpeak's own STUN servers, plus an optional relay (TURN) server in Settings > Advanced
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
 - Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
 

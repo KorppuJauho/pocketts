@@ -73,7 +73,10 @@ permissions guests may not have.
 
 ## 7. Streams (Phone + PC)
 - [ ] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
-- [ ] WATCH: the PC's screen shows full screen on the phone, and its sound plays (try the mute button).
+- [ ] WATCH: the PC's stream shows in a blue box on the server screen (like your own large preview), with its sound.
+- [ ] The sound button: on/off and the volume slider work.
+- [ ] Full screen: a wide stream turns the app sideways (even with auto-rotate off), a tall one stays upright. Tap
+      for the buttons; leave full screen and the app turns back.
 - [ ] While watching, go to the home screen: the stream keeps playing in a **small window** over other apps. Move it,
       tap it to open the app again. Close it with its ×: watching stops (the PC sees one viewer fewer).
 - [ ] The small-window button in the player's top bar does the same.
@@ -86,9 +89,12 @@ permissions guests may not have.
       the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [ ] HD and data saver both work.
 - [ ] The share bar looks like WebTS's. Tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
+- [ ] Small picture: "Camera", the eye and the number of viewers sit on one line, with the buttons below.
+- [ ] Auto-rotate **off**, sharing the camera, phone held sideways: your preview is the right way up to you, and the
+      round buttons' icons turn to stay upright (the buttons stay where they are).
 - [ ] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
 - [ ] Phone screen off while sharing the camera: the PC keeps seeing it.
-- [ ] On mobile data instead of Wi-Fi. If it doesn't connect, a relay (TURN) server may be needed (Settings › General).
+- [ ] On mobile data instead of Wi-Fi. If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
 
 ## 8. Favourites and settings (Phone)
@@ -96,6 +102,8 @@ permissions guests may not have.
 - [ ] The edit button (pencil) on a favourite: name, nickname there, password, connect automatically.
 - [ ] Connect automatically (in the edit window): close the app (swipe it away), open it, and it connects by itself.
 - [ ] In the edit window, Delete is on the left of Cancel and Save, and removes the favourite.
+- [ ] Edit window › Advanced › File transfer port: set the test server's port. Avatars and pictures load there.
+- [ ] Server screen header: Disconnect, a gap, then the star and the gear on the right.
 - [ ] On the server: ★ menu › switch to another favourite.
 - [ ] Settings › Nickname: the PC sees the new name.
 - [ ] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.

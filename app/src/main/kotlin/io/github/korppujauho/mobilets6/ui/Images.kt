@@ -1,5 +1,6 @@
 package io.github.korppujauho.mobilets6.ui
 
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -96,7 +97,7 @@ fun PictureViewer(model: Any, onDismiss: () -> Unit) {
                     scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y
                 },
             )
-            Text("×", color = Color.White, fontSize = 30.sp, modifier = Modifier.align(Alignment.TopEnd).padding(20.dp))
+            Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Color.White, modifier = Modifier.align(Alignment.TopEnd).padding(20.dp).size(28.dp))
         }
     }
 }

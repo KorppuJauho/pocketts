@@ -1,5 +1,6 @@
 package io.github.korppujauho.mobilets6.ui
 
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -137,7 +138,10 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
         if (prefix.isNotEmpty()) Text(prefix, color = Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
         Text(name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
         if (unread) Box(Modifier.size(8.dp).clip(CircleShape).background(Ts.red))
-        if (onClose != null) Text("×", color = Ts.muted, fontSize = 17.sp, modifier = Modifier.clickable(onClick = onClose).padding(horizontal = 2.dp))
+        if (onClose != null) Icon(
+            androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Ts.muted,
+            modifier = Modifier.clip(CircleShape).clickable(onClick = onClose).padding(2.dp).size(16.dp),
+        )
     }
 }
 
@@ -296,7 +300,10 @@ private fun MessageBox(
             AsyncImage(uri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)))
             Text("Picture ready to send", color = Ts.text, fontSize = 14.sp, modifier = Modifier.weight(1f))
             PrimaryButton("Send") { onPicture(uri); pending = null }
-            Text("×", color = Ts.muted, fontSize = 22.sp, modifier = Modifier.clickable { pending = null }.padding(horizontal = 4.dp))
+            Icon(
+                androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Don't send", tint = Ts.muted,
+                modifier = Modifier.clip(CircleShape).clickable { pending = null }.padding(4.dp),
+            )
         }
     }
     fun send() {

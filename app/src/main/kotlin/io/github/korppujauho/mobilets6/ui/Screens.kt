@@ -41,7 +41,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -54,6 +56,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+/**
+ * How far the round buttons' icons are turned (degrees, clockwise): while you share the camera with the screen
+ * locked upright and hold the phone sideways, they turn to stay upright to you, as in a camera app. The buttons stay
+ * where they are.
+ */
+val LocalIconTurn = androidx.compose.runtime.compositionLocalOf { 0f }
+
+/** An icon kept upright to you (see [LocalIconTurn]). */
+fun Modifier.upright(): Modifier = composed { rotate(LocalIconTurn.current) }
 
 /** WebTS's header: the logo and name on the left, an action on the right. */
 @Composable
@@ -105,7 +117,7 @@ fun ControlButton(icon: ImageVector, label: String, off: Boolean = false, enable
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = label, tint = if (off) Color.White else Ts.text.copy(alpha = if (enabled) 1f else 0.4f))
+        Icon(icon, contentDescription = label, tint = if (off) Color.White else Ts.text.copy(alpha = if (enabled) 1f else 0.4f), modifier = Modifier.upright())
     }
 }
 
@@ -130,7 +142,7 @@ fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
             .border(1.dp, if (held) Ts.talking else Ts.buttonBorder, CircleShape).holdToTalk(onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = "Hold to talk", tint = color)
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = "Hold to talk", tint = color, modifier = Modifier.upright())
     }
 }
 
@@ -144,7 +156,7 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
             .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.Mic, contentDescription = "Hold to talk", tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp))
+        Icon(Icons.Filled.Mic, contentDescription = "Hold to talk", tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
     }
 }
 
@@ -173,7 +185,7 @@ fun ControlsBar(
                     .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(onClick = onShare),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Filled.ScreenShare, contentDescription = "Share", tint = if (sharing) Color.White else Ts.text)
+                Icon(Icons.Filled.ScreenShare, contentDescription = "Share", tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
             }
         }
     }
