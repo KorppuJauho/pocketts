@@ -324,18 +324,19 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun playTestSound() = TestSound.play(Session.state.value.voice)
     override fun setAvatar(uri: android.net.Uri) = Session.setAvatar(context, uri)
     override fun removeAvatar() = Session.removeAvatar()
-    override fun exportIdentity() {
-        val activity = MainActivity.current ?: return
-        val text = try {
-            Settings(context).identity().export()
-        } catch (e: Settings.IdentityUnreadable) {
-            return // Settings shows why
-        }
-        val send = android.content.Intent(android.content.Intent.ACTION_SEND)
-            .setType("text/plain")
-            .putExtra(android.content.Intent.EXTRA_TEXT, text)
-            .putExtra(android.content.Intent.EXTRA_SUBJECT, "TeamSpeak identity")
-        activity.startActivity(android.content.Intent.createChooser(send, "Export the identity"))
+    override fun exportIdentity(uri: android.net.Uri): String? = try {
+        // Into the file the person chose, as TeamSpeak apps save it (so they can open it too); nowhere else
+        val s = Settings(context)
+        val ini = s.identity().exportIni("PocketTS", s.nickname)
+        context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(ini.toByteArray(Charsets.UTF_8)) }
+            ?: throw java.io.IOException("no file")
+        AppLog.log("Identity saved to a file")
+        null
+    } catch (e: Settings.IdentityUnreadable) {
+        "The identity can't be read, so it can't be saved."
+    } catch (e: Exception) {
+        AppLog.log("Couldn't save the identity: ${e.javaClass.simpleName}")
+        "That file couldn't be written."
     }
     override fun importIdentity(text: String): String? = Settings(context).importIdentity(text)
     override fun importIdentityFile(uri: android.net.Uri): String? = try {

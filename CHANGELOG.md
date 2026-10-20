@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Exporting the identity warns first that the file is you on every server, then saves it as a file you choose (in
+  the .ini format TeamSpeak apps open) instead of sharing it to an app. Import hides the identity while it's pasted.
 - Sounds for events, made for the app (simple tones, not TeamSpeak's): connecting and disconnecting, switching channel,
   people coming and going in your channel, messages, pokes, the microphone and sound buttons, and streams starting
   and stopping. On/off and volume in Settings > Playback.

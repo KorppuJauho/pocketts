@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
@@ -64,8 +65,8 @@ interface SettingsActions {
     fun playTestSound()
     fun setAvatar(uri: android.net.Uri) {}
     fun removeAvatar() {}
-    /** Shares the identity (TeamSpeak's export format) to wherever the person chooses. */
-    fun exportIdentity() {}
+    /** Saves the identity into the file the person chose (TeamSpeak's .ini format); null when it worked, else why not. */
+    fun exportIdentity(uri: android.net.Uri): String? = null
     /** Takes an identity exported from a TeamSpeak app; null when it worked, else why not. */
     fun importIdentity(text: String): String? = null
     /** The same from a file a TeamSpeak app saved (its .ini export). */
@@ -247,11 +248,15 @@ private fun Identity(actions: SettingsActions) {
     val pickFile = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
     ) { uri -> if (uri != null) done(actions.importIdentityFile(uri)) }
+    var warning by remember { mutableStateOf(false) }
+    val saveFile = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: "Saved. Keep the file somewhere only you can reach." }
     Group("TeamSpeak identity") {
         Desc("Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.")
         problem?.let { Desc(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (problem == null) SecondaryButton("Export…") { actions.exportIdentity() }
+            if (problem == null) SecondaryButton("Export…") { warning = true }
             SecondaryButton("Import…") { importing = true }
             if (problem != null) SecondaryButton("New identity") {
                 actions.forgetIdentity()
@@ -260,6 +265,29 @@ private fun Identity(actions: SettingsActions) {
             }
         }
         status?.let { Desc(it) }
+    }
+    // Export: what the file means first, then a file of the person's choosing (not shared to an app)
+    if (warning) {
+        TsDialog(
+            onDismiss = { warning = false }, title = "Export your identity", icon = androidx.compose.material.icons.Icons.Rounded.Warning,
+            tint = Ts.amber, subtitle = "Keep it private",
+            buttons = {
+                PillButton("Cancel") { warning = false }
+                PillButton("Save to a file", PillKind.PRIMARY) {
+                    warning = false
+                    saveFile.launch("pocketts-identity.ini")
+                }
+            },
+        ) {
+            Desc(
+                "The file is your identity itself: anyone who has it is you on every server, with your groups and " +
+                    "permissions, such as a server admin's. Nobody can tell the difference."
+            )
+            Desc(
+                "Save it somewhere only you can reach, like this phone or a private drive. Don't send it in a chat or " +
+                    "an email, and don't post it. A TeamSpeak app can open it, and so can PocketTS on another phone."
+            )
+        }
     }
     if (importing) {
         var text by remember { mutableStateOf("") }
@@ -272,7 +300,8 @@ private fun Identity(actions: SettingsActions) {
             },
         ) {
             Desc("Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone's own from the next connect.")
-            TsField(text, { text = it }, "Identity", singleLine = false)
+            // Hidden like a password while it's on screen
+            TsField(text, { text = it }, "Identity", password = true)
             PillButton("Choose a file…", modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
         }
     }
