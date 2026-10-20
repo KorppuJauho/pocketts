@@ -33,21 +33,51 @@ class MainActivity : ComponentActivity() {
         Session.micPermission(this, granted)
     }
 
-    private var cameraWanted: Pair<Boolean, Boolean>? = null
+    private var cameraWanted: (() -> Unit)? = null
     private val askCamera = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        val (front, hd) = cameraWanted ?: return@registerForActivityResult
+        val start = cameraWanted ?: return@registerForActivityResult
         cameraWanted = null
-        if (granted) Session.shareCamera(front, hd)
+        if (granted) start()
     }
 
     /** The camera: asked for first if needed. */
-    fun shareCamera(front: Boolean, hd: Boolean) {
+    fun shareCamera(front: Boolean, hd: Boolean) = withCamera { Session.shareCamera(front, hd) }
+
+    fun shareBothCameras(hd: Boolean) = withCamera { Session.shareBothCameras(hd) }
+
+    private fun withCamera(start: () -> Unit) {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            Session.shareCamera(front, hd)
+            start()
         } else {
-            cameraWanted = front to hd
+            cameraWanted = start
             askCamera.launch(Manifest.permission.CAMERA)
         }
+    }
+
+    // ====== The watched stream as a small window (picture-in-picture), like a video app ======
+
+    private fun pipParams(): android.app.PictureInPictureParams {
+        // Android allows shapes between 1:2.39 and 2.39:1
+        val w = io.github.korppujauho.mobilets6.ui.StreamSize.width
+        val h = io.github.korppujauho.mobilets6.ui.StreamSize.height
+        val ratio = (w * 1000L / h).coerceIn(419L, 2390L).toInt()
+        val b = android.app.PictureInPictureParams.Builder().setAspectRatio(android.util.Rational(ratio, 1000))
+        if (Build.VERSION.SDK_INT >= 31) b.setAutoEnterEnabled(Session.state.value.stream.watching != 0).setSeamlessResizeEnabled(false)
+        return b.build()
+    }
+
+    /** Leaving the app while watching makes the stream a small window (Android 12 and later do it by themselves). */
+    fun updatePip() {
+        try { setPictureInPictureParams(pipParams()) } catch (e: Exception) { AppLog.log("Small window: $e") }
+    }
+
+    fun enterPip() {
+        try { enterPictureInPictureMode(pipParams()) } catch (e: Exception) { AppLog.log("Small window: $e") }
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (Build.VERSION.SDK_INT < 31 && Session.state.value.stream.watching != 0) enterPip()
     }
 
     private val askScreen = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -105,6 +135,14 @@ class MainActivity : ComponentActivity() {
             Session.autoConnected = true
             favorites.value.firstOrNull { it.auto }?.let { connectFavorite(applicationContext, it) }
         }
+        TalkOverlay.start(this)
+        io.github.korppujauho.mobilets6.ui.StreamSize.onChange = { runOnUiThread { current?.updatePip() } }
+        addOnPictureInPictureModeChangedListener { info ->
+            inPip.value = info.isInPictureInPictureMode
+            Session.pip = info.isInPictureInPictureMode
+            // The small window closed (not opened full again): watching ends, as in a video app
+            if (!info.isInPictureInPictureMode && lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) Session.stopWatching()
+        }
         setContent { MobileTsTheme { App() } }
     }
 
@@ -128,6 +166,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** The app is a small picture-in-picture window. */
+private val inPip = mutableStateOf(false)
+
+/** Whether this phone can use both cameras at once (asked once). */
+private val canBoth by lazy { MainActivity.current?.let { DualCamera.pair(it) != null } ?: false }
+
 /** The favourites, shared by the screens (they change from both). */
 private val favorites = kotlinx.coroutines.flow.MutableStateFlow<List<Favorite>>(emptyList())
 
@@ -137,10 +181,19 @@ private fun App() {
     val favs by favorites.collectAsState()
     val ctx = LocalContext.current
     val settings = remember { Settings(ctx) }
+    val pip by inPip
+    androidx.compose.runtime.LaunchedEffect(state.stream.watching) { MainActivity.current?.updatePip() }
     if (state.phase == Session.Phase.IDLE) {
         Connect(state, favs)
     } else {
-        ServerScreen(state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = Session.streams().egl)
+        val egl = Session.streams().egl
+        androidx.compose.foundation.layout.Box {
+            ServerScreen(
+                state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = egl,
+                canBoth = canBoth, pip = pip,
+            )
+            if (pip) io.github.korppujauho.mobilets6.ui.PipPlayer(state.stream, egl)
+        }
     }
 }
 
@@ -232,6 +285,16 @@ private object SessionActions : ServerActions {
     override fun flipCamera() {
         Session.flipCamera()
     }
+    override fun shareBothCameras(hd: Boolean) {
+        MainActivity.current?.shareBothCameras(hd)
+    }
+    override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
+    override fun setWatchMuted(muted: Boolean) {
+        Session.setWatchMuted(muted)
+    }
+    override fun pictureInPicture() {
+        MainActivity.current?.enterPip()
+    }
     override fun addFavorite(f: Favorite) {
         val ctx = MainActivity.current?.applicationContext ?: return
         saveFavorites(ctx, favorites.value.map { if (f.auto) it.copy(auto = false) else it } + f)
@@ -240,6 +303,12 @@ private object SessionActions : ServerActions {
 
 private class AppSettingsActions(private val context: Context) : SettingsActions {
     override fun save(voice: VoiceSettings, nickname: String) {
+        // Turned on: Android's own page to allow it, if not allowed yet
+        if (voice.overlayPtt && !Session.state.value.voice.overlayPtt && !TalkOverlay.allowed(context)) {
+            MainActivity.current?.startActivity(
+                android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
+            )
+        }
         Session.updateVoice(voice)
         if (nickname.isNotEmpty() && nickname != Settings(context).nickname) {
             Settings(context).nickname = nickname

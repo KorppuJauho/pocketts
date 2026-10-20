@@ -258,6 +258,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Desc("In push-to-talk mode, a round button stays at the bottom of the screen, so you can talk while you scroll the chat.")
     }
     Group {
+        Check("Talk button over other apps", v.overlayPtt) { onChange(v.copy(overlayPtt = it)) }
+        Desc("In push-to-talk mode, the round button stays on screen when you go to other apps. Hold it to talk, drag it to move it. Android asks once to let MobileTS6 display over other apps.")
+    }
+    Group {
         Check("Volume buttons are push-to-talk", v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
         Desc("In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).")
     }

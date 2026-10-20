@@ -122,12 +122,25 @@ object Session : TsClient.Listener {
     fun stopWatching() = engine?.stopWatching()
     fun stopShare() = engine?.stopShare()
     fun flipCamera() = engine?.flipCamera()
+    fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
+
+    /** The camera's turn locked or following the phone; remembered for the next share. */
+    fun setRotateLock(on: Boolean) {
+        updateVoice(_state.value.voice.copy(cameraRotateLock = on))
+        engine?.setRotateLock(on)
+    }
 
     fun shareCamera(front: Boolean, hd: Boolean) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         // The service says "camera" before the camera opens (Android's rule for using it in the background)
         ConnectionService.start(app, "Sharing your camera", camera = true)
         streams().shareCamera(front, hd, name)
+    }
+
+    fun shareBothCameras(hd: Boolean) {
+        val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
+        ConnectionService.start(app, "Sharing your cameras", camera = true)
+        streams().shareBothCameras(hd, name)
     }
 
     /** Screen sharing, with Android's permission ([projection]); the service must say "screen" before it starts. */
@@ -174,6 +187,17 @@ object Session : TsClient.Listener {
 
     /** Whether the app is on screen; away, private messages and pokes also come as notifications. */
     @Volatile var foreground = false
+        set(value) {
+            field = value
+            TalkOverlay.refresh()
+        }
+
+    /** The app is only the small stream window (picture-in-picture). */
+    @Volatile var pip = false
+        set(value) {
+            field = value
+            TalkOverlay.refresh()
+        }
 
     /** What the last connect asked for, to get a lost connection back. */
     private data class Target(val address: String, val nickname: String, val password: String)

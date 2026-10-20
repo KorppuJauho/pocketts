@@ -13,7 +13,6 @@ import org.webrtc.CapturerObserver
 import org.webrtc.EglBase
 import org.webrtc.GlRectDrawer
 import org.webrtc.GlTextureFrameBuffer
-import org.webrtc.RendererCommon
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.ThreadUtils
 import org.webrtc.VideoCapturer
@@ -67,6 +66,7 @@ class DualCamera(
     private var egl: EglBase? = null
     private var drawer: GlRectDrawer? = null
     private val frameDrawer = VideoFrameDrawer()
+    private val identity = FloatArray(16).also { android.opengl.Matrix.setIdentityM(it, 0) }
     private var small: GlTextureFrameBuffer? = null
     private var hasSmall = false
     private var outW = 0
@@ -169,7 +169,7 @@ class DualCamera(
             GLES20.glClearColor(1f, 1f, 1f, 1f)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
             GLES20.glDisable(GLES20.GL_SCISSOR_TEST)
-            drawer?.drawRgb(fb.textureId, RendererCommon.identityMatrix(), fb.width, fb.height, x, y, sw, sh)
+            drawer?.drawRgb(fb.textureId, identity, fb.width, fb.height, x, y, sw, sh)
         }
         e.swapBuffers(f.timestampNs)
     }

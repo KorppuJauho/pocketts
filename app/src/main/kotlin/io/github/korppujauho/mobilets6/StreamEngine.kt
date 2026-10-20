@@ -50,9 +50,12 @@ class StreamEngine(
         val watchStatus: String = "",
         val watchVideo: VideoTrack? = null,
         val watchAudio: org.webrtc.AudioTrack? = null,
+        val watchMuted: Boolean = false,
         val sharing: Streams.Kind? = null,
         val shareLive: Boolean = false,
-        val shareFront: Boolean = true,
+        val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
+        val shareBoth: Boolean = false, // both cameras at once
+        val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val viewers: Int = 0,
         val localVideo: VideoTrack? = null,
         val message: String? = null, // why a share stopped or couldn't start
@@ -171,11 +174,17 @@ class StreamEngine(
     fun watch(streamer: ServerModel.Client, streamId: String?) = exec.execute {
         closeWatch(sendLeave = true)
         watch = Watch(streamer.id, streamId)
-        update { it.copy(watching = streamer.id, watchStatus = "Requesting access…", watchVideo = null, watchAudio = null) }
+        update { it.copy(watching = streamer.id, watchStatus = "Requesting access…", watchVideo = null, watchAudio = null, watchMuted = false) }
         if (streamId == null) send(Streams.requestInfo(streamer.id, rc("info"))) else send(Streams.join(streamId, streamer.id, rc("join")))
     }
 
     fun stopWatching() = exec.execute { closeWatch(sendLeave = true) }
+
+    /** The stream's sound off or on (kept while the player becomes a small window and back). */
+    fun setWatchMuted(muted: Boolean) = exec.execute {
+        state.watchAudio?.setEnabled(!muted)
+        update { it.copy(watchMuted = muted) }
+    }
 
     private fun closeWatch(sendLeave: Boolean) {
         val w = watch ?: return
@@ -249,7 +258,10 @@ class StreamEngine(
                     if (watch !== w) return@execute
                     when (track) {
                         is VideoTrack -> update { it.copy(watchVideo = track, watchStatus = "") }
-                        is org.webrtc.AudioTrack -> update { it.copy(watchAudio = track) }
+                        is org.webrtc.AudioTrack -> {
+                            track.setEnabled(!state.watchMuted)
+                            update { it.copy(watchAudio = track) }
+                        }
                     }
                 }
             }
@@ -277,6 +289,8 @@ class StreamEngine(
     private var track: VideoTrack? = null
     private var bitrate = 2500
     private var fps = 30
+    private val turn by lazy { CameraTurn(context) }
+    private var dual: DualCamera? = null
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
     fun shareCamera(front: Boolean, hd: Boolean, name: String) = exec.execute {
@@ -287,8 +301,32 @@ class StreamEngine(
             return@execute
         }
         bitrate = if (hd) 2500 else 1000
-        startCapture(cams.createCapturer(device, null), false, if (hd) 1280 else 640, if (hd) 720 else 480, Streams.Kind.CAMERA, name)
-        update { it.copy(shareFront = cams.isFrontFacing(device)) }
+        update { it.copy(shareFront = cams.isFrontFacing(device), shareBoth = false) }
+        turn.start(settings().cameraRotateLock)
+        startCapture(cams.createCapturer(device, null), false, if (hd) 1280 else 640, if (hd) 720 else 480, Streams.Kind.CAMERA, name) {
+            turn.observer(it) { state.shareFront }
+        }
+    }
+
+    /** Both cameras at once: the back one big, the front one small in a corner (Flip swaps them). */
+    fun shareBothCameras(hd: Boolean, name: String) = exec.execute {
+        if (state.sharing != null) return@execute
+        val ids = DualCamera.pair(context) ?: run {
+            update { it.copy(message = "This phone can't use both cameras at the same time.") }
+            return@execute
+        }
+        bitrate = if (hd) 3000 else 1200
+        update { it.copy(shareFront = false, shareBoth = true) }
+        turn.start(settings().cameraRotateLock)
+        val cam = DualCamera(context, egl.eglBaseContext, ids) { front -> turn.extra(front) }
+        dual = cam
+        startCapture(cam, false, if (hd) 1280 else 640, if (hd) 720 else 480, Streams.Kind.CAMERA, name)
+    }
+
+    /** The camera's turn locked, or following how the phone is held. */
+    fun setRotateLock(on: Boolean) = exec.execute {
+        turn.lock(on)
+        update { it.copy(rotateLocked = on) }
     }
 
     /** Starts sharing the screen, with the permission Android gave ([projection]: its result). */
@@ -303,27 +341,35 @@ class StreamEngine(
         startCapture(cap, true, (width * scale).toInt() / 2 * 2, (height * scale).toInt() / 2 * 2, Streams.Kind.SCREEN, name)
     }
 
-    private fun startCapture(cap: VideoCapturer, screen: Boolean, w: Int, h: Int, kind: Streams.Kind, name: String) {
+    private fun startCapture(
+        cap: VideoCapturer, screen: Boolean, w: Int, h: Int, kind: Streams.Kind, name: String,
+        observer: (org.webrtc.CapturerObserver) -> org.webrtc.CapturerObserver = { it },
+    ) {
         try {
             val src = factory.createVideoSource(screen)
             val help = SurfaceTextureHelper.create("capture", egl.eglBaseContext)
-            cap.initialize(help, context.applicationContext, src.capturerObserver)
+            cap.initialize(help, context.applicationContext, observer(src.capturerObserver))
             cap.startCapture(w, h, fps)
             capturer = cap; source = src; helper = help
             track = factory.createVideoTrack("share", src)
             sharePending = true
-            update { it.copy(sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null) }
+            update { it.copy(sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked) }
             send(Streams.setup(name, kind, bitrate, audio = false, returnCode = rc("setup")))
             log("Share starting: $kind ${w}x$h")
         } catch (e: Exception) {
             log("Share failed to start: $e")
             releaseCapture()
-            update { it.copy(sharing = null, localVideo = null) }
+            update { it.copy(sharing = null, localVideo = null, message = "The share couldn't start.") }
         }
     }
 
     /** The other camera (front ↔ back) while sharing it. */
     fun flipCamera() = exec.execute {
+        dual?.let { d ->
+            d.frontBig = !d.frontBig
+            update { it.copy(shareFront = d.frontBig) }
+            return@execute
+        }
         val cam = capturer as? org.webrtc.CameraVideoCapturer ?: return@execute
         cam.switchCamera(object : org.webrtc.CameraVideoCapturer.CameraSwitchHandler {
             override fun onCameraSwitchDone(front: Boolean) = exec.execute { update { it.copy(shareFront = front) } }
@@ -346,8 +392,10 @@ class StreamEngine(
     }
 
     private fun releaseCapture() {
+        turn.stop()
         try { capturer?.stopCapture() } catch (_: Exception) {}
         capturer?.dispose(); capturer = null
+        dual = null
         track?.dispose(); track = null
         source?.dispose(); source = null
         helper?.dispose(); helper = null
