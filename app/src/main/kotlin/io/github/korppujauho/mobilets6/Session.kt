@@ -50,6 +50,8 @@ object Session : TsClient.Listener {
         val sendingPicture: Boolean = false,
         val avatarStatus: String? = null, // the profile picture's last change, as words
         val reconnecting: Int = 0, // the try, while getting a lost connection back (0 = not)
+        val stream: StreamEngine.State = StreamEngine.State(),
+        val streams: Map<Int, String> = emptyMap(), // running streams: whose and their id
         val away: Boolean = false,
         val awayMessage: String = "",
     ) {
@@ -88,6 +90,52 @@ object Session : TsClient.Listener {
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "session").apply { isDaemon = true } }
     private var client: TsClient? = null
     @Volatile private var files: FileTransfer? = null
+    private var engine: StreamEngine? = null
+
+    /** The stream engine (made once, kept across connections: WebRTC is slow to start). */
+    fun streams(): StreamEngine {
+        engine?.let { return it }
+        return StreamEngine(
+            app,
+            sendNow = { client?.sendCommand(it) },
+            settings = { _state.value.voice },
+            onState = { st ->
+                val before = _state.value.stream
+                _state.update { it.copy(stream = st) }
+                if (before.sharing != st.sharing) refreshService()
+            },
+        ).also { engine = it }
+    }
+
+    /** The service's kinds follow what we do: the microphone, and the camera or the screen while shared. */
+    private fun refreshService() {
+        if (!::app.isInitialized || _state.value.phase == Phase.IDLE) return
+        val kind = _state.value.stream.sharing
+        ConnectionService.start(
+            app, "Connected to ${_state.value.serverName.ifEmpty { _state.value.address }}",
+            camera = kind == io.github.korppujauho.mobilets6.proto.Streams.Kind.CAMERA,
+            projection = kind == io.github.korppujauho.mobilets6.proto.Streams.Kind.SCREEN,
+        )
+    }
+
+    fun watch(person: ServerModel.Client) = streams().watch(person, _state.value.streams[person.id])
+    fun stopWatching() = engine?.stopWatching()
+    fun stopShare() = engine?.stopShare()
+    fun flipCamera() = engine?.flipCamera()
+
+    fun shareCamera(front: Boolean, hd: Boolean) {
+        val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
+        // The service says "camera" before the camera opens (Android's rule for using it in the background)
+        ConnectionService.start(app, "Sharing your camera", camera = true)
+        streams().shareCamera(front, hd, name)
+    }
+
+    /** Screen sharing, with Android's permission ([projection]); the service must say "screen" before it starts. */
+    fun shareScreen(projection: android.content.Intent, width: Int, height: Int) {
+        val name = _state.value.client(_state.value.ownId)?.nickname ?: "Screen"
+        ConnectionService.onForeground = { streams().shareScreen(projection, width, height, name) }
+        ConnectionService.start(app, "Sharing your screen", projection = true)
+    }
     private var player: VoicePlayer? = null
     private var sender: MicSender? = null
     private var route: AudioRoute? = null
@@ -440,6 +488,7 @@ object Session : TsClient.Listener {
             }
         }
         files?.onCommand(cmd)
+        engine?.onCommand(cmd, model.ownClientId, { _state.value.ownChannel }, { id -> _state.value.client(id)?.channel })
         val result = chat.handle(cmd, model) // before the model: a move's line needs where they were
         val changed = model.apply(cmd)
         result.poke?.let { poked(it) }
@@ -470,6 +519,7 @@ object Session : TsClient.Listener {
             // The network went away (Wi-Fi to mobile data, a tunnel...): try again, sooner when a network comes back
             files?.onDisconnected()
             files = null
+            engine?.reset()
             stopAudio()
             client = null
             retries++
@@ -515,6 +565,7 @@ object Session : TsClient.Listener {
     }
 
     private fun finish(reason: String?) {
+        engine?.reset()
         retryTask?.cancel(false)
         target = null
         files?.onDisconnected()
@@ -579,6 +630,7 @@ object Session : TsClient.Listener {
                 cannotTalk = model.clients.values.filter { c -> !model.canTalk(c) }.map { c -> c.id }.toSet(),
                 server = HashMap(model.serverVars),
                 badges = model.clients.values.associate { c -> c.id to model.badges(c) },
+                streams = HashMap(model.streams),
                 serverIcon = model.serverVars["virtualserver_icon_id"]?.toLongOrNull()?.let { v -> if (v < 0) v + (1L shl 32) else v } ?: 0,
                 channelCount = model.channels.size,
                 clientCount = model.clients.values.count { c -> c.type == 0 },

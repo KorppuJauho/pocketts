@@ -22,6 +22,8 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
+        // Phones (WebRTC's native code is large; these two cover practically every phone)
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
 
     buildTypes {
@@ -67,6 +69,8 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
     implementation(libs.coil.network)
+    // Screen and camera streams (TeamSpeak 6's are WebRTC)
+    implementation(libs.webrtc)
 
     // Screenshots of the screens, made on the build machine (scripts/dev.sh screenshots)
     testImplementation(libs.junit4)

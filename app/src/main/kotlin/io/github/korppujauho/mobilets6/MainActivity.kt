@@ -33,6 +33,37 @@ class MainActivity : ComponentActivity() {
         Session.micPermission(this, granted)
     }
 
+    private var cameraWanted: Pair<Boolean, Boolean>? = null
+    private val askCamera = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        val (front, hd) = cameraWanted ?: return@registerForActivityResult
+        cameraWanted = null
+        if (granted) Session.shareCamera(front, hd)
+    }
+
+    /** The camera: asked for first if needed. */
+    fun shareCamera(front: Boolean, hd: Boolean) {
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            Session.shareCamera(front, hd)
+        } else {
+            cameraWanted = front to hd
+            askCamera.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    private val askScreen = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        if (result.resultCode == RESULT_OK && data != null) {
+            val m = resources.displayMetrics
+            Session.shareScreen(data, m.widthPixels, m.heightPixels)
+        }
+    }
+
+    /** The screen: Android asks the person first. */
+    fun shareScreen() {
+        val pm = getSystemService(android.media.projection.MediaProjectionManager::class.java)
+        askScreen.launch(pm.createScreenCaptureIntent())
+    }
+
     /** Asks for the microphone if it isn't allowed yet; true when it already is. */
     fun ensureMic(): Boolean {
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) return true
@@ -108,7 +139,7 @@ private fun App() {
     if (state.phase == Session.Phase.IDLE) {
         Connect(state, favs)
     } else {
-        ServerScreen(state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs)
+        ServerScreen(state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = Session.streams().egl)
     }
 }
 
@@ -180,6 +211,24 @@ private object SessionActions : ServerActions {
     override fun switchTo(f: Favorite) {
         val ctx = MainActivity.current?.applicationContext ?: return
         Session.switchTo { connectFavorite(ctx, f) }
+    }
+    override fun watch(person: ServerModel.Client) {
+        Session.watch(person)
+    }
+    override fun stopWatching() {
+        Session.stopWatching()
+    }
+    override fun shareCamera(front: Boolean, hd: Boolean) {
+        MainActivity.current?.shareCamera(front, hd)
+    }
+    override fun shareScreen() {
+        MainActivity.current?.shareScreen()
+    }
+    override fun stopShare() {
+        Session.stopShare()
+    }
+    override fun flipCamera() {
+        Session.flipCamera()
     }
     override fun addFavorite(f: Favorite) {
         val ctx = MainActivity.current?.applicationContext ?: return

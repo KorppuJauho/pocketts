@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.outlined.MicExternalOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -71,6 +72,7 @@ data class TreeContext(
     val talking: Set<Int>,
     val server: String = "",
     val badges: Map<Int, List<Long>> = emptyMap(),
+    val onWatch: ((ServerModel.Client) -> Unit)? = null,
     val canTalk: (ServerModel.Client) -> Boolean,
 )
 
@@ -236,6 +238,11 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
                     Icon(Icons.Filled.MicOff, "Microphone off", tint = Ts.red, modifier = Modifier.size(14.dp))
                 !ctx.canTalk(c) ->
                     Icon(Icons.Outlined.MicExternalOff, "Can't talk in this channel", tint = Ts.amber, modifier = Modifier.size(15.dp))
+            }
+            if (c.streaming) {
+                // Like the desktop app: the mark in every channel, WATCH only in your own
+                if (!self && c.channel == ctx.ownChannel && ctx.onWatch != null) WatchButton { ctx.onWatch.invoke(c) }
+                Icon(Icons.Filled.Videocam, "Streaming", tint = Ts.green, modifier = Modifier.size(15.dp))
             }
             if (c.away) Tag("AFK", Ts.afk, Ts.afkBg, Ts.afkBorder)
             if (self) Tag("YOU", Ts.you, Ts.afkBg.copy(alpha = 0f), Ts.youBorder)

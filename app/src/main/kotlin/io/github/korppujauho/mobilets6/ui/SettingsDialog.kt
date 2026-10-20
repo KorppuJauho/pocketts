@@ -261,6 +261,13 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Check("Volume buttons are push-to-talk", v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
         Desc("In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).")
     }
+    Group("Video connection") {
+        Desc("Streams go straight between you and the other end. Behind some networks they need a relay (a TURN server): enter one here if you have it.")
+        TsField(v.turnUrl, { onChange(v.copy(turnUrl = it)) }, "Relay (turn:host:port)", placeholder = "turn:relay.example.com:3478")
+        TsField(v.turnUser, { onChange(v.copy(turnUser = it)) }, "Relay username")
+        TsField(v.turnPassword, { onChange(v.copy(turnPassword = it)) }, "Relay password", password = true)
+        Check("Always through the relay", v.relayOnly) { onChange(v.copy(relayOnly = it)) }
+    }
 }
 
 @Composable

@@ -41,6 +41,11 @@
   network comes back.
 - Away, with a message (tap yourself).
 - The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General).
+- Screen and camera streams (TeamSpeak 6's), as in WebTS:
+  - WATCH someone streaming in your channel, full screen with their sound
+  - share your camera (front or back, 480p or 720p, flip while sharing) or your screen
+  - the TeamSpeak app can watch and be watched; the stream mark shows in every channel
+  - streams use TeamSpeak's own STUN servers, plus an optional relay (TURN) server in Settings > General
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
 - Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
 

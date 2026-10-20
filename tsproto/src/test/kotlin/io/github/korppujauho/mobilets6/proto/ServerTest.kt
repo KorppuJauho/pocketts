@@ -28,6 +28,7 @@ class ServerTest {
         val voices = CopyOnWriteArrayList<TsClient.Voice>()
         val messages = CopyOnWriteArrayList<Command>()
         val pokes = CopyOnWriteArrayList<Command>()
+        val commands = CopyOnWriteArrayList<Command>()
         val errors = CopyOnWriteArrayList<Command>()
         var connected = false
         var disconnected: String? = "not yet"
@@ -39,6 +40,7 @@ class ServerTest {
         override fun onConnected(clientId: Int) = update { connected = true }
         override fun onCommand(cmd: Command) = update {
             files.onCommand(cmd)
+            commands.add(cmd)
             model.apply(cmd)
             when (cmd.name) {
                 "channellistfinished" -> client.sendCommand("channelsubscribeall")
@@ -162,6 +164,52 @@ class ServerTest {
         } catch (e: FileTransfer.Error) {
             println("Avatars not allowed here (${e.code}: ${e.message})")
         }
+
+        // A stream's signalling (no media here: that's WebRTC on the phone): A shares, B asks to watch, A's offer
+        // reaches B, B's answer and an address reach A
+        val streamErrors = a.errors.size
+        a.client.sendCommand(Streams.setup("MobileTS6 test", Streams.Kind.SCREEN, 2000, audio = false, returnCode = "stream-setup-t"))
+        a.await("A's stream starts or is refused") {
+            a.model.streams.containsKey(aId) || a.errors.size > streamErrors
+        }
+        val streamId = a.model.streams[aId]
+        if (streamId == null) {
+            println("Streams not allowed here (${a.errors.removeLast()["msg"]})")
+        } else {
+            b.await("B sees A streaming") { b.model.clients[aId]?.streaming == true || b.model.streams.containsKey(aId) }
+            if (!b.model.streams.containsKey(aId)) b.client.sendCommand(Streams.requestInfo(aId, "stream-info-t"))
+            b.await("B knows the stream's id") { b.model.streams[aId] == streamId }
+            b.client.sendCommand(Streams.join(streamId, aId, "stream-join-t"))
+            a.await("A gets B's request") { a.commands.any { it.name == "notifyjoinstreamrequest" && it["clid"] == bId.toString() } }
+            val fakeOffer = "v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\n"
+            a.client.sendCommand(Streams.accept(streamId, bId, fakeOffer, "stream-accept-t"))
+            b.await("B gets A's offer") {
+                b.commands.any { it.name == "notifyrespondjoinstreamrequest" && it["offer"] == fakeOffer && it["decision"] == "1" } ||
+                    b.commands.any { it.name == "notifystreamsignaling" && Streams.readSignal(it)?.sdp == fakeOffer }
+            }
+            b.client.sendCommand(Streams.answer(streamId, aId, "v=0\r\nanswer\r\n", "stream-answer-t"))
+            a.await("A gets B's answer") {
+                a.commands.any { it.name == "notifystreamsignaling" && Streams.readSignal(it)?.let { s -> s.cmd == "answer" && s.from == bId } == true }
+            }
+            b.client.sendCommand(Streams.candidate(streamId, aId, "candidate:1 1 UDP 2122260223 192.0.2.10 50000 typ host", "0", 0, "stream-ice-t"))
+            a.await("A gets B's address") {
+                a.commands.any { it.name == "notifystreamsignaling" && Streams.readSignal(it)?.cmd == "iceCandidate" }
+            }
+            // The test sends many commands at once; the server may ask to wait ("client is flooding")
+            val before = a.commands.size
+            a.client.sendCommand(Streams.stop(streamId))
+            a.await("A's stop answered") { a.commands.drop(before).any { it.name == "error" } }
+            a.commands.drop(before).firstOrNull { it.name == "error" && it["id"] == "524" }?.let { flood ->
+                val wait = Regex("""(\d+)ms""").find(flood["extra_msg"].orEmpty())?.groupValues?.get(1)?.toLong() ?: 10_000
+                println("Server asked to wait ${wait}ms (flood limit), stopping again")
+                Thread.sleep(wait + 500)
+                a.client.sendCommand(Streams.stop(streamId))
+            }
+            b.await("B sees the stream stop") { !b.model.streams.containsKey(aId) }
+            println("Stream signalling went both ways")
+        }
+        a.errors.removeAll { it["return_code"]?.startsWith("stream-") == true || it["id"] == "524" }
+        b.errors.removeAll { it["return_code"]?.startsWith("stream-") == true }
 
         // A private message and a poke, from B to A
         val private = "Vain sinulle ${'$'}run"
