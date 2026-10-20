@@ -35,6 +35,8 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
     private val lock = Object()
     private val talkers = HashMap<Int, Talker>()
     @Volatile private var running = true
+    /** Sound off: incoming voice is dropped (people still show as talking). */
+    @Volatile var muted = false
     private val thread = Thread({ mixLoop() }, "voice-mixer").apply { start() }
 
     fun onVoice(v: TsClient.Voice) {
@@ -121,6 +123,7 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
                 for (t in active) addFrame(t, mix)
                 if (active.isNotEmpty()) idleSince = System.currentTimeMillis()
 
+                if (muted) mix.fill(0)
                 for (i in mix.indices) out[i] = mix[i].coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
                 track.write(out, 0, out.size, AudioTrack.WRITE_BLOCKING) // blocks: this paces the loop
             }

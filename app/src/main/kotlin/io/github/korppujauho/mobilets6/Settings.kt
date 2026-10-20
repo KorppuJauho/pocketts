@@ -33,26 +33,4 @@ class Settings(context: Context) {
         AppLog.log("Made a new identity (security level ${id.securityLevel})")
         return id
     }
-
-    companion object {
-        /** "host", "host:port", "[ipv6]:port" or a ts3server:// link; the port defaults to 9987. */
-        fun parseAddress(input: String): Pair<String, Int>? {
-            val t = input.trim()
-                .removePrefix("ts3server://").removePrefix("ts://")
-                .substringBefore('?').trimEnd('/')
-            if (t.isEmpty()) return null
-            return when {
-                t.startsWith("[") -> {
-                    val host = t.substringAfter('[').substringBefore(']')
-                    val port = t.substringAfter("]", "").removePrefix(":").toIntOrNull() ?: 9987
-                    host to port
-                }
-                t.count { it == ':' } == 1 -> {
-                    val port = t.substringAfter(':').toIntOrNull() ?: return null
-                    t.substringBefore(':') to port
-                }
-                else -> t to 9987
-            }.takeIf { it.first.isNotEmpty() && it.second in 1..65535 }
-        }
-    }
 }
