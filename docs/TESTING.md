@@ -74,6 +74,13 @@ permissions guests may not have.
 - [ ] Close a private chat's tab and open it again from the person's menu: its lines are still there.
 - [ ] Settings › General › Clear chat history › Clear: the chat on screen empties, and after reconnecting it stays empty.
 
+## 5b. Sounds (Phone + PC)
+- [ ] Settings › Playback › Sounds for events is on, the volume slider and "Play a sound" work.
+- [ ] Sounds: you connect and disconnect, you switch channel, the PC joins and leaves your channel, a message comes
+      in and goes out, the PC pokes you, the microphone and sound buttons, a stream in your channel starts and stops.
+- [ ] Sound button off: no event sounds (only the sound button's own click).
+- [ ] Sounds for events off: none at all.
+
 ## 6. Pictures (Phone + PC)
 Sending pictures needs a server whose file transfer works for you (and the permission to upload).
 
@@ -129,6 +136,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] On the server: ★ menu › switch to another favourite.
 - [x] Settings › Nickname: the PC sees the new name.
 - [x] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.
+- [ ] Popups (channel password, favourite, poke, share, server info, identity import) and the person menu have the
+      new rounded look, with pill buttons.
 - [ ] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
 - [ ] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
       itself after a few seconds.

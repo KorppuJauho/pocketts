@@ -1,5 +1,10 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.NotificationsActive
+import androidx.compose.material.icons.rounded.Dns
+import androidx.compose.material.icons.automirrored.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.VolumeDown
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -60,58 +67,85 @@ fun PersonSheet(
     awayMessage: String = "",
     onAway: (Boolean, String) -> Unit = { _, _ -> },
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Ts.panel) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss, containerColor = Pop.bottom,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), dragHandle = { SheetHandle() },
+    ) {
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(bottom = 28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 8.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            PersonAvatar(person, server, 96)
-            Text(person.nickname, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, textAlign = TextAlign.Center)
-            if (person.description.isNotEmpty()) Text(person.description, color = Ts.muted, fontSize = 14.sp, textAlign = TextAlign.Center)
-            if (person.away) Text(
-                "Away" + if (person.awayMessage.isNotEmpty()) ": ${person.awayMessage}" else "",
-                color = Ts.afk, fontSize = 14.sp,
-            )
+            // Who: the picture with a ring, the name, the description and whether they're away
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.border(2.dp, if (isSelf) Ts.youBorder else Ts.accent.copy(alpha = 0.6f), CircleShape).padding(4.dp)) {
+                    PersonAvatar(person, server, 68)
+                }
+                Spacer(Modifier.size(16.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(person.nickname, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, maxLines = 2)
+                    if (person.description.isNotEmpty()) Text(person.description, color = Ts.muted, fontSize = 14.sp, maxLines = 3)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (isSelf) Chip("You", Ts.you)
+                        if (person.away) Chip("Away" + if (person.awayMessage.isNotEmpty()) ": ${person.awayMessage}" else "", Ts.afk)
+                    }
+                }
+            }
             if (isSelf) {
                 // Away, as the TeamSpeak app sets it: others see AFK and the message
                 var msg by remember { mutableStateOf(awayMessage) }
-                TsField(msg, { msg = it.take(80) }, "Away message (optional)")
+                PopCard {
+                    Text("Away", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Spacer(Modifier.height(8.dp))
+                    TsField(msg, { msg = it.take(80) }, "Away message (optional)")
+                }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (away) {
-                        SecondaryButton("I'm back", Modifier.weight(1f)) { onAway(false, ""); onDismiss() }
-                        SecondaryButton("Update message", Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                        PillButton("I'm back", modifier = Modifier.weight(1f)) { onAway(false, ""); onDismiss() }
+                        PillButton("Update", PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
                     } else {
-                        SecondaryButton("Set away", Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                        PillButton("Set away", PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
                     }
                 }
                 return@Column
             }
             var v by remember { mutableFloatStateOf(volume) }
-            Column(Modifier.fillMaxWidth()) {
+            PopCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Volume for you", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     ValueBadge("${(v * 100).roundToInt()}%")
                 }
-                Slider(
-                    value = v, onValueChange = { v = (it * 20).roundToInt() / 20f }, onValueChangeFinished = { onVolume(v) },
-                    valueRange = 0f..2f,
-                    colors = SliderDefaults.colors(thumbColor = Ts.accent, activeTrackColor = Ts.accent, inactiveTrackColor = Ts.card),
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.VolumeDown, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp))
+                    Slider(
+                        value = v, onValueChange = { v = (it * 20).roundToInt() / 20f }, onValueChangeFinished = { onVolume(v) },
+                        valueRange = 0f..2f, modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
+                        colors = SliderDefaults.colors(thumbColor = Ts.accent, activeTrackColor = Ts.accent, inactiveTrackColor = Ts.card),
+                    )
+                    androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.VolumeUp, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp))
+                }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SecondaryButton("Poke", Modifier.weight(1f), onPoke)
-                SecondaryButton("Chat", Modifier.weight(1f), onChat)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ActionTile(androidx.compose.material.icons.Icons.Rounded.NotificationsActive, "Poke", Modifier.weight(1f), onClick = onPoke)
+                ActionTile(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Chat, "Chat", Modifier.weight(1f), onClick = onChat)
             }
         }
     }
+}
+
+/** A small rounded label in its colour. */
+@Composable
+private fun Chip(text: String, color: Color) {
+    Text(
+        text, color = color, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(color.copy(alpha = 0.14f)).padding(horizontal = 8.dp, vertical = 3.dp),
+    )
 }
 
 @Composable
 fun ValueBadge(text: String) {
     Text(
         text, color = Ts.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Ts.card).padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(Ts.accent.copy(alpha = 0.16f)).padding(horizontal = 8.dp, vertical = 3.dp),
     )
 }
 
@@ -119,14 +153,16 @@ fun ValueBadge(text: String) {
 @Composable
 fun PokeDialog(person: ServerModel.Client, onSend: (String) -> Unit, onDismiss: () -> Unit) {
     var msg by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Ts.panel,
-        title = { Text("Poke ${person.nickname}", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-        text = { TsField(msg, { msg = it.take(100) }, "Message (optional)") },
-        confirmButton = { TextButton(onClick = { onSend(msg) }) { Text("Poke", color = Ts.accent, fontWeight = FontWeight.SemiBold) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) } },
-    )
+    TsDialog(
+        onDismiss = onDismiss, title = "Poke ${person.nickname}", icon = androidx.compose.material.icons.Icons.Rounded.NotificationsActive,
+        subtitle = "They get a popup with your message",
+        buttons = {
+            PillButton("Cancel", onClick = onDismiss)
+            PillButton("Poke", PillKind.PRIMARY) { onSend(msg) }
+        },
+    ) {
+        TsField(msg, { msg = it.take(100) }, "Message (optional)")
+    }
 }
 
 /** Pokes received: a card each until dismissed, the newest last. */
@@ -158,15 +194,12 @@ fun PokeCards(pokes: List<Chat.Poke>, onDismiss: (Long) -> Unit, modifier: Modif
 fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
     val v = state.server
     val uri = LocalUriHandler.current
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Ts.panel,
-        title = { Text(state.serverName.ifEmpty { "Server info" }, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-        text = {
-            Column(
-                Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+    TsDialog(
+        onDismiss = onDismiss, title = state.serverName.ifEmpty { "Server info" }, icon = androidx.compose.material.icons.Icons.Rounded.Dns,
+        subtitle = state.address,
+        buttons = { PillButton("Close", PillKind.PRIMARY, onClick = onDismiss) },
+    ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val banner = v["virtualserver_hostbanner_gfx_url"].orEmpty()
                 if (banner.startsWith("https://", ignoreCase = true)) {
                     val link = v["virtualserver_hostbanner_url"].orEmpty().takeIf { it.startsWith("https://", ignoreCase = true) }
@@ -214,14 +247,12 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
                 ).filter { it.isNotEmpty() }.joinToString(" • ")
                 if (version.isNotEmpty()) Text(version, color = Ts.muted, fontSize = 12.sp)
             }
-        },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Close", color = Ts.accent) } },
-    )
+    }
 }
 
 @Composable
 private fun InfoBox(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Ts.card).padding(horizontal = 14.dp, vertical = 10.dp)) {
+    Column(modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).padding(horizontal = 14.dp, vertical = 10.dp)) {
         content()
     }
 }

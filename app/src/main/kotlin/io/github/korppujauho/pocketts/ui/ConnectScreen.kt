@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -167,12 +168,20 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
     var auto by remember { mutableStateOf(f.auto) }
     var filePort by remember { mutableStateOf(f.filePort?.toString().orEmpty()) }
     var advanced by remember { mutableStateOf(f.filePort != null) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Ts.panel,
-        title = { Text(if (onDelete != null) "Edit favourite" else "Add to favourites", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    TsDialog(
+        onDismiss = onDismiss, title = if (onDelete != null) "Edit favourite" else "Add to favourites",
+        icon = androidx.compose.material.icons.Icons.Rounded.Star, tint = Ts.amber, subtitle = f.address.takeIf { onDelete != null },
+        // Delete on the left of the same row as Cancel and Save
+        buttons = {
+            if (onDelete != null) PillButton("Delete", PillKind.DANGER_TEXT, onClick = onDelete)
+            Spacer(Modifier.weight(1f))
+            PillButton("Cancel", onClick = onDismiss)
+            PillButton("Save", PillKind.PRIMARY, enabled = address.isNotBlank()) {
+                onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 }))
+            }
+        },
+    ) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 TsField(name, { name = it }, "Name in your lists", placeholder = address)
                 TsField(address, { address = it }, "Server address", keyboard = KeyboardType.Uri)
                 TsField(nick, { nick = it }, "Your nickname on this server")
@@ -197,20 +206,5 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                     Text("Only if the server's pictures and avatars don't load: its file transfer is on another port.", color = Ts.muted, fontSize = 12.sp)
                 }
             }
-        },
-        // Delete on the left of the same row as Cancel and Save
-        confirmButton = {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (onDelete != null) TextButton(onClick = onDelete) { Text("Delete", color = Ts.red, fontWeight = FontWeight.SemiBold) }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) }
-                TextButton(
-                    onClick = { onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 })) },
-                    enabled = address.isNotBlank(),
-                ) {
-                    Text("Save", color = Ts.accent, fontWeight = FontWeight.SemiBold)
-                }
-            }
-        },
-    )
+    }
 }

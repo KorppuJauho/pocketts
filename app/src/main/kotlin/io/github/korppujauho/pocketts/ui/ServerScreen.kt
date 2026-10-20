@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.foundation.background
@@ -137,7 +138,11 @@ fun ServerScreen(
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
                     HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, "Servers") { serversMenu = true }
-                    androidx.compose.material3.DropdownMenu(serversMenu, onDismissRequest = { serversMenu = false }, containerColor = Ts.card) {
+                    androidx.compose.material3.DropdownMenu(
+                        serversMenu, onDismissRequest = { serversMenu = false },
+                        shape = RoundedCornerShape(16.dp), containerColor = Pop.top, shadowElevation = 12.dp,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Pop.edge),
+                    ) {
                         for (f in favorites) {
                             val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
                             androidx.compose.material3.DropdownMenuItem(
@@ -243,14 +248,16 @@ fun ServerScreen(
 
     askPassword?.let { ch ->
         var pw by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { askPassword = null },
-            containerColor = Ts.panel,
-            title = { Text(ch.displayName, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-            text = { TsField(pw, { pw = it }, "Channel password", password = true) },
-            confirmButton = { TextButton(onClick = { actions.join(ch, pw); askPassword = null }) { Text("Join", color = Ts.accent) } },
-            dismissButton = { TextButton(onClick = { askPassword = null }) { Text("Cancel", color = Ts.muted) } },
-        )
+        TsDialog(
+            onDismiss = { askPassword = null }, title = ch.displayName, icon = androidx.compose.material.icons.Icons.Rounded.Lock,
+            subtitle = "This channel has a password",
+            buttons = {
+                PillButton("Cancel") { askPassword = null }
+                PillButton("Join", PillKind.PRIMARY, enabled = pw.isNotEmpty()) { actions.join(ch, pw); askPassword = null }
+            },
+        ) {
+            TsField(pw, { pw = it }, "Channel password", password = true)
+        }
     }
     person?.let { p ->
         PersonSheet(

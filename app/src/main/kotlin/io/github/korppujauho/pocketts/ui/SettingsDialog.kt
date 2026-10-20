@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -261,22 +263,18 @@ private fun Identity(actions: SettingsActions) {
     }
     if (importing) {
         var text by remember { mutableStateOf("") }
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { importing = false },
-            containerColor = Ts.panel,
-            title = { Text("Import an identity", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Desc("Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone's own from the next connect.")
-                    TsField(text, { text = it }, "Identity", singleLine = false)
-                    SecondaryButton("Choose a file…") { pickFile.launch(arrayOf("*/*")) }
-                }
+        TsDialog(
+            onDismiss = { importing = false }, title = "Import an identity", icon = androidx.compose.material.icons.Icons.Rounded.Key,
+            subtitle = "From a TeamSpeak app",
+            buttons = {
+                PillButton("Cancel") { importing = false }
+                PillButton("Import", PillKind.PRIMARY, enabled = text.isNotBlank()) { done(actions.importIdentity(text)) }
             },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = { done(actions.importIdentity(text)) }) { Text("Import", color = Ts.accent) }
-            },
-            dismissButton = { androidx.compose.material3.TextButton(onClick = { importing = false }) { Text("Cancel", color = Ts.muted) } },
-        )
+        ) {
+            Desc("Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone's own from the next connect.")
+            TsField(text, { text = it }, "Identity", singleLine = false)
+            PillButton("Choose a file…", modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
+        }
     }
 }
 
@@ -295,20 +293,19 @@ private fun ChatHistory(actions: SettingsActions) {
         if (cleared) Desc("Cleared.")
     }
     if (asking) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { asking = false },
-            containerColor = Ts.panel,
-            title = { Text("Clear chat history?", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
-            text = { Desc("Every server's saved chat is removed from this phone, and the chat on screen now.") },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = {
+        TsDialog(
+            onDismiss = { asking = false }, title = "Clear chat history?", icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
+            buttons = {
+                PillButton("Cancel") { asking = false }
+                PillButton("Clear", PillKind.DANGER) {
                     actions.clearChatHistory()
                     cleared = true
                     asking = false
-                }) { Text("Clear", color = Ts.red) }
+                }
             },
-            dismissButton = { androidx.compose.material3.TextButton(onClick = { asking = false }) { Text("Cancel", color = Ts.muted) } },
-        )
+        ) {
+            Desc("Every server's saved chat is removed from this phone, and the chat on screen now.")
+        }
     }
 }
 
@@ -353,6 +350,16 @@ private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (Voic
     }
     Group {
         SecondaryButton("Play test sound") { actions.playTestSound() }
+    }
+    Group {
+        Check("Sounds for events", v.uiSounds) { onChange(v.copy(uiSounds = it)) }
+        Desc("Short sounds when someone comes into or leaves your channel, for messages, pokes and streams, and for the microphone and sound buttons.")
+    }
+    if (v.uiSounds) {
+        Group("Sound volume", "${(v.uiSoundVolume * 100).roundToInt()}%") {
+            TsSlider(v.uiSoundVolume, 0f..1f, 19) { onChange(v.copy(uiSoundVolume = (it * 20).roundToInt() / 20f)) }
+            SecondaryButton("Play a sound") { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
+        }
     }
     Desc(
         if (v.echoCancellation) "With echo cancellation on, voices follow the call volume: press a volume button while connected."

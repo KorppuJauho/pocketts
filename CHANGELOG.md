@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Sounds for events, made for the app (simple tones, not TeamSpeak's): connecting and disconnecting, switching channel,
+  people coming and going in your channel, messages, pokes, the microphone and sound buttons, and streams starting
+  and stopping. On/off and volume in Settings > Playback.
+- Popups and the person menu have a new rounded look, with an icon, pill buttons and softer fields.
 - The app is now called **PocketTS** (it was MobileTS6), with a new app ID, `io.github.korppujauho.pocketts`. Android
   sees it as a new app: remove the old test build, and import your identity again if you exported it.
 - Server names work as in TeamSpeak apps: the server's DNS entry first, then TeamSpeak's name service (TSDNS), then
