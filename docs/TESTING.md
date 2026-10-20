@@ -9,18 +9,20 @@ machine, so the time is enough for the log to be found.
 - **PC**: the TeamSpeak app on a computer, on the same server.
 - **2nd phone**: a second phone with MobileTS6, or WebTS in a browser (optional).
 
+Ticked items have been tested on the phone (Samsung Galaxy A56, Android 16) with the test builds of 20 October 2026.
+
 Use the same server for all of them. A test server is fine, except that some things (pictures, streams) need
 permissions guests may not have.
 
 ## 1. Install and connect (Phone)
-- [ ] The test build installs. Remove an older test build first if Android says the package conflicts.
-- [ ] Connect with a nickname and the server's **name** (no port): it connects.
-- [ ] Connect with **address:port**.
+- [x] The test build installs. Remove an older test build first if Android says the package conflicts.
+- [x] Connect with a nickname and the server's **name** (no port): it connects.
+- [x] Connect with **address:port**.
 - [ ] A wrong server password shows the server's refusal, and the app stays on the connect screen.
-- [ ] Your name in the channel tree has the **YOU** badge, and your channel is outlined in blue.
+- [x] Your name in the channel tree has the **YOU** badge, and your channel is outlined in blue.
 
 ## 2. Channels (Phone + PC)
-- [ ] Phone: tap another channel to move there. PC: you see the phone move.
+- [x] Phone: tap another channel to move there. PC: you see the phone move.
 - [ ] PC: move into the phone's channel. Phone: the chat shows "… joined coming from …".
 - [ ] A password-protected channel asks for the password; a wrong one is refused.
 - [ ] Spacers (if the server has any) look like they do in the TeamSpeak app.
@@ -57,7 +59,7 @@ permissions guests may not have.
 - [ ] Message with a link: the link can be tapped. A link to a picture shows the picture.
 - [ ] **Bold** text (`[b]` from the PC, or `**bold**`) shows bold.
 - [ ] Private message: on the phone, tap the PC user › Chat. The PC gets it, and its reply arrives in the phone's @tab.
-- [ ] Unread red dot on a tab, and on "Chat", when a message arrives in a tab you're not looking at.
+- [x] Unread red dot on a tab, and on "Chat", when a message arrives in a tab you're not looking at.
 - [ ] Read it (open the tab): the dots go away and stay away. People joining or leaving don't make a dot.
 - [ ] **Poke**: the PC pokes the phone and a card appears. Poke the PC from the phone's person menu.
 - [ ] With the app in the background, a private message and a poke come as **notifications**.
@@ -72,7 +74,7 @@ permissions guests may not have.
 - [ ] A GIF from the phone moves on the PC.
 
 ## 7. Streams (Phone + PC)
-- [ ] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
+- [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
 - [ ] WATCH: the PC's stream shows in a blue box on the server screen (like your own large preview), with its sound.
 - [ ] The sound button: on/off and the volume slider work.
 - [ ] Full screen: a wide stream turns the app sideways (even with auto-rotate off), a tall one stays upright. Tap
@@ -81,26 +83,28 @@ permissions guests may not have.
       tap it to open the app again. Close it with its ×: watching stops (the PC sees one viewer fewer).
 - [ ] The small-window button in the player's top bar does the same.
 - [ ] The PC stops sharing: the phone's player says it ended and closes.
-- [ ] Phone shares its **camera** (Share › Camera): the PC can watch it. Try **Flip**.
-- [ ] Phone's auto-rotate **off**, sharing the camera: hold the phone sideways. The PC's picture turns upright after
-      a moment. Tap the rotate button (it becomes a lock): turning the phone no longer turns the picture. The lock is
+- [x] Phone shares its **camera** (Share › Camera): the PC can watch it.
+- [ ] While sharing the camera, **Flip** switches between the front and back camera.
+- [x] Phone's auto-rotate **off**, sharing the camera: hold the phone sideways. The PC's picture turns upright after
+      a moment.
+- [ ] Tap the rotate button (it becomes a yellow lock): turning the phone no longer turns the picture. The lock is
       remembered for the next share.
 - [ ] **Both cameras** (Share › Camera › Both, only shown if the phone can do it): the PC sees the back camera with
       the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [ ] HD and data saver both work.
-- [ ] The share bar looks like WebTS's. Tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
+- [x] The share bar looks like WebTS's. Tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
 - [ ] Small picture: "Camera", the eye and the number of viewers sit on one line, with the buttons below.
 - [ ] Auto-rotate **off**, sharing the camera, phone held sideways: your preview is the right way up to you, and the
       round buttons' icons turn to stay upright (the buttons stay where they are).
-- [ ] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
+- [x] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
 - [ ] Phone screen off while sharing the camera: the PC keeps seeing it.
 - [ ] On mobile data instead of Wi-Fi. If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
 
 ## 8. Favourites and settings (Phone)
-- [ ] When connecting, tick "Save to favourites": it shows in the Favourites list.
-- [ ] The edit button (pencil) on a favourite: name, nickname there, password, connect automatically.
-- [ ] Connect automatically (in the edit window): close the app (swipe it away), open it, and it connects by itself.
+- [x] When connecting, tick "Save to favourites": it shows in the Favourites list.
+- [x] The edit button (pencil) on a favourite: name, nickname there, password, connect automatically.
+- [x] Connect automatically (in the edit window): close the app (swipe it away), open it, and it connects by itself.
 - [ ] In the edit window, Delete is on the left of Cancel and Save, and removes the favourite.
 - [ ] Edit window › Advanced › File transfer port: set the test server's port. Avatars and pictures load there.
 - [ ] Server screen header: Disconnect, a gap, then the star and the gear on the right.
