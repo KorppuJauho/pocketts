@@ -137,6 +137,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
 - [ ] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
+- [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
+  come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.

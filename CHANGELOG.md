@@ -47,9 +47,11 @@
   pasted, or as the .ini file a TeamSpeak app saves (chosen with Android's file picker).
 - The identity and the passwords the app keeps (the remembered server password, favourites' passwords and the relay
   password) are encrypted with a key that stays in the phone's Android Keystore. Ones saved by an earlier version are
-  encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened (for
-  example after moving to a new phone), the app says so and keeps it instead of quietly making a new one; Settings
-  then offers Import or New identity.
+  encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened, the app
+  says so and keeps it instead of quietly making a new one; Settings then offers Import or New identity.
+- Moving to a new phone with Android's copy of app data brings the nickname, favourites and settings, but not the
+  identity and passwords: they can't be opened on another phone. Export the identity first and import it on the new
+  phone to stay the same user; otherwise the new phone makes a new identity.
 - Chat history, as in WebTS: channel chats, private chats (by the other person's identity) and join and leave lines
   are kept on the phone per server and shown again when you connect to the same server, with the day on lines from
   before today ("21:36 - Mon", "21:36 - 6 Oct"). At most 90 days and 300 lines per conversation; older lines go.
