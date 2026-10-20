@@ -1,13 +1,13 @@
-# Testing MobileTS6 by hand
+# Testing PocketTS by hand
 
 What the automatic tests can't cover: real voice, pictures, video and how it behaves on a phone. Tick each item
 and note anything odd: what you did, what happened, roughly when. Test builds send their log to the development
 machine, so the time is enough for the log to be found.
 
 **Where each test happens:**
-- **Phone**: MobileTS6 on the Android phone.
+- **Phone**: PocketTS on the Android phone.
 - **PC**: the TeamSpeak app on a computer, on the same server.
-- **2nd phone**: a second phone with MobileTS6, or WebTS in a browser (optional).
+- **2nd phone**: a second phone with PocketTS, or WebTS in a browser (optional).
 
 Ticked items have been tested on the phone (Samsung Galaxy A56, Android 16) with the test builds of 20 October 2026.
 

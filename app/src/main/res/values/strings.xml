@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MobileTS6</string>
+    <string name="app_name">PocketTS</string>
     <string name="connect_intro">Connect to a TeamSpeak server.</string>
     <string name="nickname">Nickname</string>
     <string name="server_address">Server address</string>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The app is now called **PocketTS** (it was MobileTS6), with a new app ID, `io.github.korppujauho.pocketts`. Android
+  sees it as a new app: remove the old test build, and import your identity again if you exported it.
 - Server names work as in TeamSpeak apps: the server's DNS entry first, then TeamSpeak's name service (TSDNS), then
   the name itself on port 9987.
 - WebTS's look: its colours, a slim header, control buttons (microphone and sound on/off), the server box, channels as boxes

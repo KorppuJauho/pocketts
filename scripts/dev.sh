@@ -20,8 +20,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ -f "$ROOT/dev.env" ] && . "$ROOT/dev.env"
 
-IMAGE=mobilets6-build
-DEV_NAME=mobilets6-dev
+IMAGE=pocketts-build
+DEV_NAME=pocketts-dev
 DEV_PORT="${DEV_PORT:-8686}"
 CPUS="${CPUS:-4}"   # keep builds from taking every core
 
@@ -29,9 +29,9 @@ gradle() {
   # The build output goes to a Docker volume (fast), not next to the sources on the Windows drive.
   # Host networking, so the tests reach a test server published on this machine.
   docker run --rm -t --network host --cpus "$CPUS" --memory 6g \
-    -v "$ROOT":/work -v mobilets6-gradle:/gradle -v mobilets6-out:/out \
+    -v "$ROOT":/work -v pocketts-gradle:/gradle -v pocketts-out:/out \
     -e ANDROID_USER_HOME=/gradle/android-user \
-    -e MOBILETS6_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
+    -e POCKETTS_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
     "$IMAGE" ./gradlew --no-daemon --console=plain "$@"
 }
 
@@ -51,7 +51,7 @@ case "${1:-}" in
   apk)
     gradle :app:assembleDebug
     mkdir -p "$ROOT/dist"
-    docker run --rm -v mobilets6-out:/out -v "$ROOT/dist":/dist "$IMAGE" \
+    docker run --rm -v pocketts-out:/out -v "$ROOT/dist":/dist "$IMAGE" \
       bash -c 'cp /out/app/outputs/apk/debug/*.apk /dist/ && ls -l /dist'
     ;;
   ts-server)
