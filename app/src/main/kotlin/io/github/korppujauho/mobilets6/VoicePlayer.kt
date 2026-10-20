@@ -37,6 +37,8 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
     @Volatile private var running = true
     /** Sound off: incoming voice is dropped (people still show as talking). */
     @Volatile var muted = false
+    /** Per person (client id): how loud, 1 = as is. */
+    @Volatile var gains: Map<Int, Float> = emptyMap()
     private val thread = Thread({ mixLoop() }, "voice-mixer").apply { start() }
 
     fun onVoice(v: TsClient.Voice) {
@@ -174,14 +176,15 @@ class VoicePlayer(private val onTalking: (clientId: Int, talking: Boolean) -> Un
 
         val ch = t.pcmChannels
         val samples = minOf(FRAME, t.pcm.size / ch)
+        val gain = gains[t.id] ?: 1f
         for (i in 0 until samples) {
             if (ch == 1) {
-                val s = t.pcm[i].toInt()
+                val s = (t.pcm[i] * gain).toInt()
                 mix[i * 2] += s
                 mix[i * 2 + 1] += s
             } else {
-                mix[i * 2] += t.pcm[i * 2].toInt()
-                mix[i * 2 + 1] += t.pcm[i * 2 + 1].toInt()
+                mix[i * 2] += (t.pcm[i * 2] * gain).toInt()
+                mix[i * 2 + 1] += (t.pcm[i * 2 + 1] * gain).toInt()
             }
         }
         t.pcm = t.pcm.copyOfRange(samples * ch, t.pcm.size)

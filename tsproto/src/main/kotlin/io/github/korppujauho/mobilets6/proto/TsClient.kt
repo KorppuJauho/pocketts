@@ -142,6 +142,11 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         }
     }
 
+    /** Runs [block] on the connection's thread (where the listener is called), after what was asked before. */
+    fun post(block: () -> Unit) {
+        exec.execute(block)
+    }
+
     fun sendCommand(cmd: String) {
         exec.execute { if (state == State.CONNECTED) sendCommandNow(cmd) }
     }

@@ -3,12 +3,14 @@ package io.github.korppujauho.mobilets6
 import androidx.compose.runtime.Composable
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.roborazziSystemPropertyOutputDirectory
+import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.Commands
 import io.github.korppujauho.mobilets6.proto.ServerModel
 import io.github.korppujauho.mobilets6.ui.ConnectScreen
 import io.github.korppujauho.mobilets6.ui.MobileTsTheme
 import io.github.korppujauho.mobilets6.ui.ServerActions
 import io.github.korppujauho.mobilets6.ui.ServerScreen
+import io.github.korppujauho.mobilets6.ui.View
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -36,6 +38,14 @@ class ScreenshotTest {
     fun server() = shot("server") { ServerScreen(Example.state(), Example.noActions) }
 
     @Test
+    fun chat() = shot("chat") { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+
+    @Test
+    fun poked() = shot("poke") {
+        ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions)
+    }
+
+    @Test
     fun serverConnecting() = shot("server-connecting") {
         ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com"), Example.noActions)
     }
@@ -49,8 +59,13 @@ object Example {
         override fun toggleMic() {}
         override fun toggleSound() {}
         override fun openSettings() {}
-        override fun openServerInfo() {}
-        override fun openPerson(client: ServerModel.Client) {}
+        override fun send(key: Chat.Key, text: String) {}
+        override fun openPrivate(person: ServerModel.Client) {}
+        override fun closePrivate(uid: String) {}
+        override fun poke(person: ServerModel.Client, text: String) {}
+        override fun dismissPoke(id: Long) {}
+        override fun setVolume(person: ServerModel.Client, volume: Float) {}
+        override fun viewing(key: Chat.Key?) {}
     }
 
     fun model(): ServerModel {
@@ -82,6 +97,31 @@ object Example {
         person(11, 4, "Mia")
         person(12, 5, "Quinn", "client_away=1 client_talk_power=0")
         return m
+    }
+
+    const val T0 = 1_760_000_000_000L // a fixed time for the example lines
+
+    fun chatState(): Session.UiState {
+        val m = model()
+        val chat = Chat()
+        var t = T0
+        chat.now = { t.also { t += 45_000 } }
+        fun feed(s: String) { val c = Commands.parse(s); chat.handle(c, m); m.apply(c) }
+        fun say(id: Int, name: String, msg: String) =
+            feed(Commands.build("notifytextmessage", "targetmode" to 2, "msg" to msg, "invokerid" to id, "invokername" to name))
+        say(4, "Riley", "Anyone up for a match later tonight?")
+        say(3, "Jamie", "Count me in, after 8 pm")
+        feed("notifyclientmoved ctid=1 reasonid=0 clid=5")
+        say(4, "Riley", "Nice! I will set up a **lobby** at 8: https://example.com/lobby")
+        feed(Commands.build("notifyclientleftview", "cfid" to 1, "ctid" to 0, "reasonid" to 8, "reasonmsg" to "see you", "clid" to 2))
+        feed("notifytextmessage targetmode=1 msg=Psst invokerid=9 invokername=Robin invokeruid=robin=")
+        val s = state()
+        return s.copy(
+            tree = m.tree(),
+            chat = chat.keys().associateWith { chat.entries(it) },
+            privateTabs = chat.privateNames.map { (uid, name) -> Session.PrivateTab(uid, name) },
+            unread = setOf(Chat.Key.Private("robin=")),
+        )
     }
 
     fun state(): Session.UiState {

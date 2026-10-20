@@ -24,6 +24,7 @@ class ServerTest {
         val model = ServerModel()
         val voices = CopyOnWriteArrayList<TsClient.Voice>()
         val messages = CopyOnWriteArrayList<Command>()
+        val pokes = CopyOnWriteArrayList<Command>()
         val errors = CopyOnWriteArrayList<Command>()
         var connected = false
         var disconnected: String? = "not yet"
@@ -39,6 +40,7 @@ class ServerTest {
                 // A new channel isn't subscribed yet: without this, people moving into it just disappear.
                 "notifychannelcreated" -> client.sendCommand(Commands.build("channelsubscribe", "cid" to cmd["cid"]))
                 "notifytextmessage" -> messages.add(cmd)
+                "notifyclientpoke" -> pokes.add(cmd)
                 "error" -> if (cmd["id"] != "0") errors.add(cmd)
             }
         }
@@ -120,6 +122,13 @@ class ServerTest {
         val text = "Hei | kaikki / ä ö ${'$'}run"
         a.client.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to home, "msg" to text))
         b.await("B gets the message") { b.messages.any { it["msg"] == text && it["invokerid"] == aId.toString() } }
+
+        // A private message and a poke, from B to A
+        val private = "Vain sinulle ${'$'}run"
+        b.client.sendCommand(Commands.build("sendtextmessage", "targetmode" to 1, "target" to aId, "msg" to private))
+        a.await("A gets the private message") { a.messages.any { it["msg"] == private && it["targetmode"] == "1" } }
+        b.client.sendCommand(Commands.build("clientpoke", "clid" to aId, "msg" to "Hei!"))
+        a.await("A gets poked") { a.pokes.any { it["msg"] == "Hei!" && it["invokerid"] == bId.toString() } }
 
         assertTrue(a.errors.isEmpty() && b.errors.isEmpty(), "Errors: ${a.errors + b.errors}")
 

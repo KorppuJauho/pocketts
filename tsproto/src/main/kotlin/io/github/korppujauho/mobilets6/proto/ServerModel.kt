@@ -83,6 +83,9 @@ class ServerModel {
     var ownClientId = 0
         private set
 
+    /** Everything the server told about itself (virtualserver_*: welcome message, banner, version...). */
+    val serverVars = HashMap<String, String>()
+
     val channels = LinkedHashMap<Int, Channel>()
     val clients = LinkedHashMap<Int, Client>()
 
@@ -91,7 +94,7 @@ class ServerModel {
 
     fun clear() {
         serverName = ""; welcomeMessage = ""; ownClientId = 0
-        channels.clear(); clients.clear()
+        serverVars.clear(); channels.clear(); clients.clear()
     }
 
     /** Returns true when something shown changed. */
@@ -101,8 +104,13 @@ class ServerModel {
                 ownClientId = cmd["aclid"]?.toIntOrNull() ?: 0
                 serverName = cmd["virtualserver_name"].orEmpty()
                 welcomeMessage = cmd["virtualserver_welcomemessage"].orEmpty()
+                cmd.params.filterKeys { it.startsWith("virtualserver_") }.forEach { (k, v) -> serverVars[k] = v }
             }
-            "notifyserverupdated" -> cmd["virtualserver_name"]?.let { serverName = it }
+            "notifyserverupdated" -> {
+                cmd["virtualserver_name"]?.let { serverName = it }
+                cmd["virtualserver_welcomemessage"]?.let { welcomeMessage = it }
+                cmd.params.filterKeys { it.startsWith("virtualserver_") }.forEach { (k, v) -> serverVars[k] = v }
+            }
             "channellist", "notifychannelcreated" -> for (g in cmd.groups) {
                 val id = g["cid"]?.toIntOrNull() ?: continue
                 channels[id] = channelFrom(g, channels[id] ?: Channel(id, 0, 0, "Channel $id"))

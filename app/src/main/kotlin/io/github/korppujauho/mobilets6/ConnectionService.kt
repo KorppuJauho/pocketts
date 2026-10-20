@@ -34,6 +34,35 @@ class ConnectionService : Service() {
         fun stop(context: Context) {
             context.stopService(Intent(context, ConnectionService::class.java))
         }
+
+        private const val MESSAGES = "messages"
+        private var nextMessageId = 100
+
+        /** A private message or a poke while the app isn't on screen. */
+        fun notifyMessage(context: Context, title: String, text: String) {
+            val nm = context.getSystemService(NotificationManager::class.java)
+            if (nm.getNotificationChannel(MESSAGES) == null) {
+                nm.createNotificationChannel(
+                    NotificationChannel(MESSAGES, context.getString(R.string.notification_messages), NotificationManager.IMPORTANCE_HIGH)
+                )
+            }
+            val open = PendingIntent.getActivity(
+                context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            val n = Notification.Builder(context, MESSAGES)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(Notification.BigTextStyle().bigText(text))
+                .setContentIntent(open)
+                .setAutoCancel(true)
+                .build()
+            try {
+                nm.notify(nextMessageId++, n)
+            } catch (_: SecurityException) {
+                // Notifications not allowed
+            }
+        }
     }
 
     private var wakeLock: PowerManager.WakeLock? = null

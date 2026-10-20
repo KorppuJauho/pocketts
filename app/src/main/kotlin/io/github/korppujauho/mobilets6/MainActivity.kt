@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.ServerModel
 import io.github.korppujauho.mobilets6.ui.ConnectScreen
 import io.github.korppujauho.mobilets6.ui.MobileTsTheme
@@ -33,6 +34,16 @@ class MainActivity : ComponentActivity() {
         )
         if (Build.VERSION.SDK_INT >= 33) askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
         setContent { MobileTsTheme { App() } }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Session.foreground = true
+    }
+
+    override fun onStop() {
+        Session.foreground = false
+        super.onStop()
     }
 }
 
@@ -65,6 +76,13 @@ private object SessionActions : ServerActions {
     override fun toggleMic() = Session.toggleMic()
     override fun toggleSound() = Session.toggleSound()
     override fun openSettings() {}
-    override fun openServerInfo() {}
-    override fun openPerson(client: ServerModel.Client) {}
+    override fun send(key: Chat.Key, text: String) = Session.send(key, text)
+    override fun openPrivate(person: ServerModel.Client) = Session.openPrivate(person)
+    override fun closePrivate(uid: String) = Session.closePrivate(uid)
+    override fun poke(person: ServerModel.Client, text: String) = Session.poke(person, text)
+    override fun dismissPoke(id: Long) = Session.dismissPoke(id)
+    override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
+    override fun viewing(key: Chat.Key?) {
+        Session.viewing = key
+    }
 }

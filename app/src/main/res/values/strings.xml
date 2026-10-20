@@ -13,4 +13,5 @@
     <string name="cancel">Cancel</string>
     <string name="away">away</string>
     <string name="notification_channel">Connection</string>
+    <string name="notification_messages">Messages and pokes</string>
 </resources>
