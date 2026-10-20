@@ -200,8 +200,15 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
         buttons = { PillButton("Close", PillKind.PRIMARY, onClick = onDismiss) },
     ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                val banner = v["virtualserver_hostbanner_gfx_url"].orEmpty()
-                if (banner.startsWith("https://", ignoreCase = true)) {
+                // The server's banner: a web address, or a picture in the server's own files (as channel banners)
+                val bannerUrl = v["virtualserver_hostbanner_gfx_url"].orEmpty().trim()
+                val banner: Any? = when {
+                    bannerUrl.startsWith("https://", ignoreCase = true) -> bannerUrl
+                    bannerUrl.startsWith("ts3image://", ignoreCase = true) ->
+                        io.github.korppujauho.pocketts.proto.Pictures.channelPicture(bannerUrl)?.let { io.github.korppujauho.pocketts.TsFile.picture(state.serverKey, it) }
+                    else -> null
+                }
+                if (banner != null) {
                     val link = v["virtualserver_hostbanner_url"].orEmpty().takeIf { it.startsWith("https://", ignoreCase = true) }
                     coil3.compose.AsyncImage(
                         banner, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.FillWidth,

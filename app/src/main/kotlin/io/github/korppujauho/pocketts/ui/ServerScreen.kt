@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.StarBorder
@@ -195,8 +196,12 @@ fun ServerScreen(
                 ViewSwitch(view, unread = unread) { view = it }
                 when (view) {
                     View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
-                        TsIcon(state.serverIcon, state.serverKey, 18.dp)
-                        if (state.serverIcon > 0) androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+                        // The server's own icon, else a plain server one (as channels have the note)
+                        if (state.serverIcon > 0) TsIcon(state.serverIcon, state.serverKey, 18.dp)
+                        else androidx.compose.material3.Icon(
+                            androidx.compose.material.icons.Icons.Filled.Dns, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp),
+                        )
+                        androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
                         ServerName(state.serverName.ifEmpty { "Connecting to ${state.address}…" }) { serverInfo = true }
                     }) {
                         if (state.phase == Session.Phase.CONNECTING) {
