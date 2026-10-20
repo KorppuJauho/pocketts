@@ -163,6 +163,28 @@ private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Un
 @Composable
 fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit) {
     val kind = state.sharing ?: return
+    var big by remember { mutableStateOf(false) }
+    val mirror = kind == Streams.Kind.CAMERA && state.shareFront
+    // Tapping the small picture shows it large: what the others see
+    if (big) state.localVideo?.let { track ->
+        Dialog(onDismissRequest = { big = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+            Box(Modifier.fillMaxSize().background(Color.Black).clickable { big = false }) {
+                VideoView(track, egl, Modifier.fillMaxSize(), mirror = mirror)
+                Row(
+                    Modifier.fillMaxWidth().background(Color(0x66000000)).padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        if (kind == Streams.Kind.CAMERA) "Your camera" else "Your screen",
+                        color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f),
+                    )
+                    if (kind == Streams.Kind.CAMERA) Text("Flip", color = Color.White, fontSize = 15.sp, modifier = Modifier.clickable(onClick = onFlip).padding(8.dp))
+                    Text("×", color = Color.White, fontSize = 28.sp, modifier = Modifier.clickable { big = false }.padding(horizontal = 8.dp))
+                }
+            }
+        }
+    }
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
             .border(1.dp, Ts.green.copy(alpha = 0.5f), RoundedCornerShape(12.dp)).padding(10.dp),
@@ -170,8 +192,11 @@ fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         state.localVideo?.let {
-            VideoView(it, egl, Modifier.size(width = 72.dp, height = 54.dp).clip(RoundedCornerShape(6.dp)),
-                mirror = kind == Streams.Kind.CAMERA && state.shareFront, fill = true)
+            Box(Modifier.size(width = 72.dp, height = 54.dp).clip(RoundedCornerShape(6.dp))) {
+                VideoView(it, egl, Modifier.fillMaxSize(), mirror = mirror, fill = true)
+                // Over the picture (a video surface doesn't take taps itself)
+                Box(Modifier.fillMaxSize().clickable { big = true })
+            }
         }
         Column(Modifier.weight(1f)) {
             Text(

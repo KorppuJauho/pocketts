@@ -1,8 +1,9 @@
 package io.github.korppujauho.mobilets6.proto
 
 /**
- * The chat as WebTS and the TeamSpeak app keep it: a conversation per channel, one per person (private, kept by
- * their identity so a reconnect continues it) and the server's, with join and leave lines in the channel's.
+ * The chat as WebTS and the TeamSpeak app keep it: a conversation per channel and one per person (private, kept by
+ * their identity so a reconnect continues it), with join and leave lines in the channel's. Messages to the whole
+ * server are left out, as the TeamSpeak 6 app has no server chat.
  *
  * [handle] must see each command before [ServerModel.apply] does: a move's line needs where the person was.
  */
@@ -11,7 +12,6 @@ class Chat(private val keep: Int = 300) {
     sealed interface Key {
         data class Channel(val id: Int) : Key
         data class Private(val uid: String) : Key
-        data object Server : Key
     }
 
     /** A line's pieces: plain text, or a name or channel shown bold. */
@@ -105,7 +105,7 @@ class Chat(private val keep: Int = 300) {
                         else if (uid !in privateNames) privateNames[uid] = model.clients.values.firstOrNull { it.uid == uid }?.nickname ?: "Private chat"
                         Key.Private(uid)
                     }
-                    3 -> Key.Server
+                    3 -> return Result(emptySet()) // to the whole server: no such chat any more
                     else -> if (here > 0) Key.Channel(here) else return Result(emptySet())
                 }
                 val entry = Entry(nextId++, now(), from, fromName, fromUid, text = g["msg"].orEmpty(), outgoing = outgoing)

@@ -70,6 +70,14 @@ fun AppHeader(right: @Composable () -> Unit = {}) {
     Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
 }
 
+/** The settings gear in the header's corner. */
+@Composable
+fun SettingsGear(onClick: () -> Unit) {
+    androidx.compose.material3.IconButton(onClick = onClick) {
+        Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Ts.text)
+    }
+}
+
 /** WebTS's red "exit" style button. */
 @Composable
 fun ExitButton(text: String, onClick: () -> Unit) {
@@ -137,7 +145,7 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
 /** The bar with the microphone, sound and settings buttons (and "Hold to talk" in push-to-talk mode). */
 @Composable
 fun ControlsBar(
-    micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit, onSettings: () -> Unit,
+    micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit,
     ptt: (@Composable () -> Unit)? = null,
     sharing: Boolean = false,
     onShare: (() -> Unit)? = null,
@@ -162,7 +170,6 @@ fun ControlsBar(
                 Icon(Icons.Filled.ScreenShare, contentDescription = "Share", tint = if (sharing) Color.White else Ts.text)
             }
         }
-        ControlButton(Icons.Filled.Settings, "Settings", onClick = onSettings)
     }
 }
 

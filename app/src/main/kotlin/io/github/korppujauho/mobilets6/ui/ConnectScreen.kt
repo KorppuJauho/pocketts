@@ -58,7 +58,10 @@ fun ConnectScreen(
     favorites: List<Favorite>,
     error: String?,
     actions: ConnectActions,
+    voice: io.github.korppujauho.mobilets6.VoiceSettings = io.github.korppujauho.mobilets6.VoiceSettings(),
+    settingsActions: SettingsActions? = null,
 ) {
+    var settings by remember { mutableStateOf(false) }
     var nick by remember { mutableStateOf(nickname) }
     var addr by remember { mutableStateOf(address) }
     var pw by remember { mutableStateOf(password) }
@@ -68,7 +71,7 @@ fun ConnectScreen(
     val known = favorites.any { io.github.korppujauho.mobilets6.Favorites.same(it.address, addr) }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-        AppHeader()
+        AppHeader { if (settingsActions != null) SettingsGear { settings = true } }
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -88,9 +91,10 @@ fun ConnectScreen(
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     TsField(nick, { nick = it }, "Nickname")
                     TsField(addr, { addr = it }, "Server address", placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
-                    TsField(pw, { pw = it }, "Server password (only if it has one)", password = true, imeAction = ImeAction.Go)
-                    CheckRow("Remember the password on this phone", remember) { remember = it }
-                    if (!known) CheckRow("Save to favourites", favorite) { favorite = it }
+                    TsField(pw, { pw = it }, "Server password", password = true, imeAction = ImeAction.Go)
+                    CheckRow("Remember the password", remember) { remember = it }
+                    // Always there; ticked (and fixed) for a server that already is a favourite
+                    CheckRow(if (known) "In favourites" else "Save to favourites", favorite || known, enabled = !known) { favorite = it }
                     error?.let { Text(it, color = Color(0xFFF87171), fontSize = 14.sp) }
                     PrimaryButton(
                         "Connect", enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
@@ -100,6 +104,9 @@ fun ConnectScreen(
         }
     }
 
+    if (settings && settingsActions != null) {
+        SettingsDialog(voice, nick, settingsActions, onDismiss = { settings = false })
+    }
     editing?.let { f ->
         FavoriteDialog(f, onSave = { actions.saveFavorite(f, it); editing = null }, onDelete = { actions.removeFavorite(f); editing = null }) {
             editing = null
@@ -116,10 +123,8 @@ private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit
                 .clickable { actions.connectFavorite(f) }.padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
             Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (f.name.isNotBlank()) Text(f.address, color = Ts.muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         FavButton("✎", Ts.text, onEdit)
-        FavButton(if (f.auto) "★" else "☆", if (f.auto) Color(0xFFFACC15) else Ts.text) { actions.toggleAuto(f) }
         FavButton("×", Ts.text) { actions.removeFavorite(f) }
     }
 }
@@ -135,10 +140,13 @@ private fun FavButton(text: String, color: Color, onClick: () -> Unit) {
 }
 
 @Composable
-fun CheckRow(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }, verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
-        Text(text, color = Ts.text, fontSize = 14.sp)
+fun CheckRow(text: String, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable(enabled = enabled) { onChange(!checked) }, verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(
+            checked, onChange, enabled = enabled,
+            colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted, disabledCheckedColor = Ts.accent.copy(alpha = 0.5f)),
+        )
+        Text(text, color = if (enabled) Ts.text else Ts.muted, fontSize = 14.sp)
     }
 }
 
@@ -159,7 +167,7 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 TsField(name, { name = it }, "Name in your lists", placeholder = address)
                 TsField(address, { address = it }, "Server address", keyboard = KeyboardType.Uri)
                 TsField(nick, { nick = it }, "Your nickname on this server")
-                TsField(pw, { pw = it }, "Server password (kept on this phone only)", password = true)
+                TsField(pw, { pw = it }, "Server password", password = true)
                 CheckRow("Connect automatically when the app opens", auto) { auto = it }
                 if (onDelete != null) Text(
                     "Delete", color = Ts.red, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,

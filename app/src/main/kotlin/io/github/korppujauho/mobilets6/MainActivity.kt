@@ -100,6 +100,7 @@ class MainActivity : ComponentActivity() {
         }
         current = this
         favorites.value = Favorites.load(this)
+        Session.load(this)
         if (savedInstanceState == null && Session.state.value.phase == Session.Phase.IDLE && !Session.autoConnected) {
             Session.autoConnected = true
             favorites.value.firstOrNull { it.auto }?.let { connectFavorite(applicationContext, it) }
@@ -167,7 +168,7 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
     val settings = remember { Settings(ctx) }
     ConnectScreen(
         settings.nickname, settings.address, settings.serverPassword, favs, state.error,
-        object : ConnectActions {
+        actions = object : ConnectActions {
             override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {
                 settings.serverPassword = if (remember) password else ""
                 if (favorite) saveFavorites(ctx, favs + Favorite(address, password = if (remember) password else ""))
@@ -179,6 +180,7 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
             override fun removeFavorite(f: Favorite) = saveFavorites(ctx, favs - f)
             override fun toggleAuto(f: Favorite) = saveFavorites(ctx, favs.map { it.copy(auto = if (it == f) !f.auto else false) })
         },
+        voice = state.voice, settingsActions = AppSettingsActions(ctx),
     )
 }
 

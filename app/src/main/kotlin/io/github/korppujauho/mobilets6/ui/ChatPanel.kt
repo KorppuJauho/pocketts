@@ -103,7 +103,6 @@ fun ChatPanel(
         ) {
             val channelKey = Chat.Key.Channel(state.ownChannel)
             ChatTab("#", state.ownChannelName.ifEmpty { "Channel" }, view is Chat.Key.Channel, channelKey in state.unread) { onView(channelKey) }
-            ChatTab("", "Server", view == Chat.Key.Server, Chat.Key.Server in state.unread) { onView(Chat.Key.Server) }
             for (t in state.privateTabs) {
                 val key = Chat.Key.Private(t.uid)
                 ChatTab("@", t.name, view == key, key in state.unread, onClose = { onCloseTab(t.uid) }) { onView(key) }
@@ -114,12 +113,10 @@ fun ChatPanel(
         val entries = state.chat[key].orEmpty()
         Messages(entries, emptyText = when (key) {
             is Chat.Key.Channel -> "No messages in this channel yet."
-            is Chat.Key.Server -> "No messages to the whole server yet."
             is Chat.Key.Private -> "No messages yet."
         }, state)
         val target = when (key) {
             is Chat.Key.Channel -> state.ownChannelName.ifEmpty { "the channel" }
-            is Chat.Key.Server -> "everyone on the server"
             is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name ?: "them"
         }
         MessageBox(
