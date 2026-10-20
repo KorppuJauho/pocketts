@@ -45,7 +45,7 @@ data class VoiceSettings(
                 turnUrl = p.getString("turnUrl", d.turnUrl).orEmpty(),
                 turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
                 turnPassword = try {
-                    p.getSecret("turnPassword", TURN_PASSWORD) ?: d.turnPassword
+                    secretPrefs(context).getSecret("turnPassword", TURN_PASSWORD, old = p) ?: d.turnPassword
                 } catch (e: SecretBox.Unreadable) {
                     AppLog.log("The relay password can't be read: ${e.message}")
                     d.turnPassword
@@ -71,10 +71,11 @@ data class VoiceSettings(
             .putBoolean("volumeKeysPtt", volumeKeysPtt)
             .putString("turnUrl", turnUrl.trim())
             .putString("turnUser", turnUser.trim())
-            .putSecret("turnPassword", TURN_PASSWORD, turnPassword) // encrypted on this phone (see Secrets)
+            .remove("turnPassword") // kept with the other secrets (see secretPrefs)
             .putBoolean("relayOnly", relayOnly)
             .putBoolean("cameraRotateLock", cameraRotateLock)
             .putBoolean("overlayPtt", overlayPtt)
             .apply()
+        secretPrefs(context).edit().putSecret("turnPassword", TURN_PASSWORD, turnPassword).apply()
     }
 }

@@ -47,9 +47,11 @@
   pasted, or as the .ini file a TeamSpeak app saves (chosen with Android's file picker).
 - The identity and the passwords the app keeps (the remembered server password, favourites' passwords and the relay
   password) are encrypted with a key that stays in the phone's Android Keystore. Ones saved by an earlier version are
-  encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened (for
-  example after moving to a new phone), the app says so and keeps it instead of quietly making a new one; Settings
-  then offers Import or New identity.
+  encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened, the app
+  says so and keeps it instead of quietly making a new one; Settings then offers Import or New identity.
+- Moving to a new phone with Android's copy of app data brings the nickname, favourites and settings, but not the
+  identity and passwords: they can't be opened on another phone. Export the identity first and import it on the new
+  phone to stay the same user; otherwise the new phone makes a new identity.
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel: in a box on the server screen with their sound (on/off, volume), a
     small window, and full screen turned the way the picture is (wide: sideways, tall: upright)
