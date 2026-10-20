@@ -26,6 +26,8 @@ data class VoiceSettings(
     val voiceGain: Float get() = Math.pow(10.0, voiceVolumeDb / 20.0).toFloat()
 
     companion object {
+        private const val TURN_PASSWORD = "voice/turnPassword"
+
         fun load(context: Context): VoiceSettings {
             val p = context.getSharedPreferences("voice", Context.MODE_PRIVATE)
             val d = VoiceSettings()
@@ -42,7 +44,12 @@ data class VoiceSettings(
                 volumeKeysPtt = p.getBoolean("volumeKeysPtt", d.volumeKeysPtt),
                 turnUrl = p.getString("turnUrl", d.turnUrl).orEmpty(),
                 turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
-                turnPassword = p.getString("turnPassword", d.turnPassword).orEmpty(),
+                turnPassword = try {
+                    p.getSecret("turnPassword", TURN_PASSWORD) ?: d.turnPassword
+                } catch (e: SecretBox.Unreadable) {
+                    AppLog.log("The relay password can't be read: ${e.message}")
+                    d.turnPassword
+                },
                 relayOnly = p.getBoolean("relayOnly", d.relayOnly),
                 cameraRotateLock = p.getBoolean("cameraRotateLock", d.cameraRotateLock),
                 overlayPtt = p.getBoolean("overlayPtt", d.overlayPtt),
@@ -64,7 +71,7 @@ data class VoiceSettings(
             .putBoolean("volumeKeysPtt", volumeKeysPtt)
             .putString("turnUrl", turnUrl.trim())
             .putString("turnUser", turnUser.trim())
-            .putString("turnPassword", turnPassword)
+            .putSecret("turnPassword", TURN_PASSWORD, turnPassword) // encrypted on this phone (see Secrets)
             .putBoolean("relayOnly", relayOnly)
             .putBoolean("cameraRotateLock", cameraRotateLock)
             .putBoolean("overlayPtt", overlayPtt)

@@ -66,6 +66,12 @@ interface SettingsActions {
     fun exportIdentity() {}
     /** Takes an identity exported from a TeamSpeak app; null when it worked, else why not. */
     fun importIdentity(text: String): String? = null
+    /** The same from a file a TeamSpeak app saved (its .ini export). */
+    fun importIdentityFile(uri: android.net.Uri): String? = null
+    /** Why the saved identity can't be used, when it can't. */
+    fun identityProblem(): String? = null
+    /** Lets go of the saved identity: a new one is made at the next connect. */
+    fun forgetIdentity() {}
 }
 
 /** Who we are on the server, for the profile picture in Settings. */
@@ -227,11 +233,26 @@ private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
 private fun Identity(actions: SettingsActions) {
     var importing by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
+    var problem by remember { mutableStateOf(actions.identityProblem()) }
+    val done = { error: String? ->
+        status = error ?: "Imported. It's used from the next connect."
+        if (error == null) problem = null
+        importing = false
+    }
+    val pickFile = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) done(actions.importIdentityFile(uri)) }
     Group("TeamSpeak identity") {
         Desc("Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.")
+        problem?.let { Desc(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton("Export…") { actions.exportIdentity() }
+            if (problem == null) SecondaryButton("Export…") { actions.exportIdentity() }
             SecondaryButton("Import…") { importing = true }
+            if (problem != null) SecondaryButton("New identity") {
+                actions.forgetIdentity()
+                problem = null
+                status = "A new identity is made at the next connect."
+            }
         }
         status?.let { Desc(it) }
     }
@@ -243,16 +264,13 @@ private fun Identity(actions: SettingsActions) {
             title = { Text("Import an identity", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Desc("Paste the identity a TeamSpeak app exported. It replaces this phone's own from the next connect.")
+                    Desc("Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone's own from the next connect.")
                     TsField(text, { text = it }, "Identity", singleLine = false)
+                    SecondaryButton("Choose a file…") { pickFile.launch(arrayOf("*/*")) }
                 }
             },
             confirmButton = {
-                androidx.compose.material3.TextButton(onClick = {
-                    val error = actions.importIdentity(text)
-                    status = error ?: "Imported. It's used from the next connect."
-                    importing = false
-                }) { Text("Import", color = Ts.accent) }
+                androidx.compose.material3.TextButton(onClick = { done(actions.importIdentity(text)) }) { Text("Import", color = Ts.accent) }
             },
             dismissButton = { androidx.compose.material3.TextButton(onClick = { importing = false }) { Text("Cancel", color = Ts.muted) } },
         )

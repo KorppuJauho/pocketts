@@ -3,6 +3,7 @@ package io.github.korppujauho.mobilets6.proto
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 /** Checks against published values and hand-made cases. */
@@ -68,6 +69,23 @@ class BasicsTest {
         assertEquals(id.uid, back.uid)
         assertEquals(id.keyOffset, back.keyOffset)
         assertEquals(id.privateScalar, back.privateScalar)
+    }
+
+    @Test
+    fun identityImportForms() {
+        val id = Identity.generate(securityLevel = 0)
+        val exported = id.export()
+        // A TeamSpeak app's .ini export (Windows line ends, a byte order mark, other fields around it)
+        val ini = "﻿[Identity]\r\nid=Main\r\nidentity=\"$exported\"\r\nnickname=Jamie\r\nphonetic_nickname=\r\n"
+        val forms = listOf(exported, "  $exported\n", "\"$exported\"", ini, ini.replace("\r\n", "\n"), "IDENTITY = $exported")
+        for (form in forms) {
+            val back = Identity.import(form)
+            assertEquals(id.uid, back.uid, form)
+            assertEquals(id.keyOffset, back.keyOffset, form)
+        }
+        for (bad in listOf("", "[Identity]\nid=Main\nnickname=Jamie\n", "hello", "\"\"", "identity=\"\"")) {
+            assertFailsWith<IllegalArgumentException>(bad) { Identity.import(bad) }
+        }
     }
 
     @Test

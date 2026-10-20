@@ -43,7 +43,13 @@
 - Away, with a message (tap yourself).
 - Warnings (such as a refused password) show on a background of their own, can be closed, and go away by themselves.
 - A favourite can have its own file transfer port (its Advanced part), for servers where it isn't the usual one.
-- The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General).
+- The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General):
+  pasted, or as the .ini file a TeamSpeak app saves (chosen with Android's file picker).
+- The identity and the passwords the app keeps (the remembered server password, favourites' passwords and the relay
+  password) are encrypted with a key that stays in the phone's Android Keystore. Ones saved by an earlier version are
+  encrypted the first time they're read, so nothing is lost on update. If the saved identity can't be opened (for
+  example after moving to a new phone), the app says so and keeps it instead of quietly making a new one; Settings
+  then offers Import or New identity.
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel: in a box on the server screen with their sound (on/off, volume), a
     small window, and full screen turned the way the picture is (wide: sideways, tall: upright)

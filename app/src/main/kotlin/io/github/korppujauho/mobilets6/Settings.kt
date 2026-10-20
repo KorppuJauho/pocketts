@@ -15,9 +15,15 @@ class Settings(private val context: Context) {
         get() = prefs.getString("address", "").orEmpty()
         set(v) = prefs.edit().putString("address", v).apply()
 
+    /** Encrypted on this phone (see [Secrets]), as are the identity and the other passwords. */
     var serverPassword: String
-        get() = prefs.getString("serverPassword", "").orEmpty()
-        set(v) = prefs.edit().putString("serverPassword", v).apply()
+        get() = try {
+            prefs.getSecret("serverPassword", "settings/serverPassword").orEmpty()
+        } catch (e: SecretBox.Unreadable) {
+            AppLog.log("The remembered server password can't be read: ${e.message}")
+            ""
+        }
+        set(v) = prefs.edit().putSecret("serverPassword", "settings/serverPassword", v).apply()
 
     /** How loud each person is for us, by their identity (1 = as is). */
     fun volumes(): Map<String, Float> =
@@ -29,28 +35,59 @@ class Settings(private val context: Context) {
         p.apply()
     }
 
-    /** Takes an identity exported by a TeamSpeak app (used from the next connect); null when it worked, else why not. */
+    /** Takes an identity exported by a TeamSpeak app, or its .ini file (used from the next connect); null when it worked, else why not. */
     fun importIdentity(text: String): String? = try {
-        val id = Identity.import(text.trim())
-        prefs.edit().putString("identity", id.export()).apply()
+        val id = Identity.import(text)
+        prefs.edit().putSecret("identity", IDENTITY, id.export()).apply()
         AppLog.log("Imported an identity (security level ${id.securityLevel})")
         null
     } catch (e: Exception) {
         "That isn't a TeamSpeak identity."
     }
 
-    /** Kept in TeamSpeak's own export format, so it can be moved to and from other TeamSpeak apps later. */
+    /** Why the saved identity can't be used, when it can't (it's then left as it is, not replaced by a new one). */
+    fun identityProblem(): String? = try {
+        prefs.getSecret("identity", IDENTITY)
+        null
+    } catch (e: SecretBox.Unreadable) {
+        UNREADABLE
+    }
+
+    /** Lets go of the saved identity: a new one is made at the next connect. */
+    fun forgetIdentity() {
+        prefs.edit().remove("identity").apply()
+        AppLog.log("Let go of the saved identity; a new one is made at the next connect")
+    }
+
+    /**
+     * Kept in TeamSpeak's own export format (encrypted on this phone), so it can be moved to and from other TeamSpeak
+     * apps. Throws [IdentityUnreadable] when the saved one can't be decrypted: that one is kept, not silently replaced.
+     */
     fun identity(): Identity {
-        prefs.getString("identity", null)?.let { saved ->
+        val saved = try {
+            prefs.getSecret("identity", IDENTITY)
+        } catch (e: SecretBox.Unreadable) {
+            AppLog.log("The saved identity can't be decrypted, keeping it and not making a new one: ${e.message}")
+            throw IdentityUnreadable()
+        }
+        saved?.let {
             try {
-                return Identity.import(saved)
+                return Identity.import(it)
             } catch (e: Exception) {
                 AppLog.log("The saved identity couldn't be read, making a new one: ${e.message}")
             }
         }
         val id = Identity.generate(securityLevel = 8)
-        prefs.edit().putString("identity", id.export()).apply()
+        prefs.edit().putSecret("identity", IDENTITY, id.export()).apply()
         AppLog.log("Made a new identity (security level ${id.securityLevel})")
         return id
+    }
+
+    class IdentityUnreadable : Exception(UNREADABLE)
+
+    private companion object {
+        const val IDENTITY = "settings/identity"
+        const val UNREADABLE = "The saved identity can't be opened on this phone. Import yours in Settings › General › " +
+            "TeamSpeak identity, or make a new one there."
     }
 }

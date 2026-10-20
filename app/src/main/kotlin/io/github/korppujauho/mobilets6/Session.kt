@@ -243,7 +243,12 @@ object Session : TsClient.Listener {
         watchNetwork()
         ConnectionService.start(app, "Connecting to $address")
         worker.execute {
-            val identity = Settings(app).identity() // made on first use, which takes a moment
+            val identity = try {
+                Settings(app).identity() // made on first use, which takes a moment
+            } catch (e: Settings.IdentityUnreadable) {
+                finish(e.message)
+                return@execute
+            }
             val target = ServerAddress.resolve(typed, AndroidDns) { AppLog.log(it) }
             AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()

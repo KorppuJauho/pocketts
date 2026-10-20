@@ -326,7 +326,11 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun removeAvatar() = Session.removeAvatar()
     override fun exportIdentity() {
         val activity = MainActivity.current ?: return
-        val text = Settings(context).identity().export()
+        val text = try {
+            Settings(context).identity().export()
+        } catch (e: Settings.IdentityUnreadable) {
+            return // Settings shows why
+        }
         val send = android.content.Intent(android.content.Intent.ACTION_SEND)
             .setType("text/plain")
             .putExtra(android.content.Intent.EXTRA_TEXT, text)
@@ -334,4 +338,23 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
         activity.startActivity(android.content.Intent.createChooser(send, "Export the identity"))
     }
     override fun importIdentity(text: String): String? = Settings(context).importIdentity(text)
+    override fun importIdentityFile(uri: android.net.Uri): String? = try {
+        val text = context.contentResolver.openInputStream(uri)?.use { input ->
+            // An identity file is small: past 64 KB it isn't one
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(8192)
+            while (out.size() < 64 * 1024) {
+                val n = input.read(buf)
+                if (n < 0) break
+                out.write(buf, 0, n)
+            }
+            out.toString(Charsets.UTF_8.name())
+        }
+        if (text == null) "That file can't be opened." else importIdentity(text)
+    } catch (e: Exception) {
+        AppLog.log("Couldn't read the identity file: ${e.javaClass.simpleName}")
+        "That file can't be opened."
+    }
+    override fun identityProblem(): String? = Settings(context).identityProblem()
+    override fun forgetIdentity() = Settings(context).forgetIdentity()
 }

@@ -75,6 +75,9 @@ class WebTsVectorsTest {
         assertEquals(BigInteger(t.s("scalar"), 16), imported.privateScalar)
         assertEquals(t.s("uid"), imported.uid)
         assertEquals(t.s("exported"), imported.export())
+        // The same in the .ini file a TeamSpeak app saves
+        val ini = "[Identity]\nid=Main\nidentity=\"${t.s("exported")}\"\nnickname=Jamie\n"
+        assertEquals(t.s("uid"), Identity.import(ini).uid)
     }
 
     @Test
