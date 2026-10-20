@@ -24,6 +24,15 @@ class StreamsTest {
     }
 
     @Test
+    fun noVideoOrientation() {
+        val sdp = listOf(
+            "v=0", "m=video 9 UDP/TLS/RTP/SAVPF 96", "a=extmap:3 urn:3gpp:video-orientation",
+            "a=extmap:4 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time", "a=rtpmap:96 H264/90000", "",
+        )
+        assertEquals((sdp - sdp[2]).joinToString("\r\n"), Streams.withoutVideoOrientation(sdp.joinToString("\r\n")))
+    }
+
+    @Test
     fun viewerRelabel() {
         val offer = s("offer")
         // A VP8 we can play: nothing changes

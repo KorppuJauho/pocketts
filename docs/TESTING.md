@@ -24,6 +24,7 @@ permissions guests may not have.
 - [ ] PC: move into the phone's channel. Phone: the chat shows "… joined coming from …".
 - [ ] A password-protected channel asks for the password; a wrong one is refused.
 - [ ] Spacers (if the server has any) look like they do in the TeamSpeak app.
+- [ ] Channel banners (if the server has any) sit like in the TeamSpeak app: from the left, centred up and down.
 - [ ] Icons and group badges match what the TeamSpeak app shows.
 
 ## 3. Hearing (Phone + PC)
@@ -57,6 +58,7 @@ permissions guests may not have.
 - [ ] **Bold** text (`[b]` from the PC, or `**bold**`) shows bold.
 - [ ] Private message: on the phone, tap the PC user › Chat. The PC gets it, and its reply arrives in the phone's @tab.
 - [ ] Unread red dot on a tab, and on "Chat", when a message arrives in a tab you're not looking at.
+- [ ] Read it (open the tab): the dots go away and stay away. People joining or leaving don't make a dot.
 - [ ] **Poke**: the PC pokes the phone and a card appears. Poke the PC from the phone's person menu.
 - [ ] With the app in the background, a private message and a poke come as **notifications**.
 - [ ] Tap the server name: server info (welcome message, users, channels, website).
@@ -90,9 +92,9 @@ permissions guests may not have.
 
 ## 8. Favourites and settings (Phone)
 - [ ] When connecting, tick "Save to favourites": it shows in the Favourites list.
-- [ ] ✎ edit a favourite: name, nickname there, password, connect automatically.
-- [ ] Connect automatically (in ✎): close the app (swipe it away), open it, and it connects by itself.
-- [ ] ✎ › Delete is on the left of Cancel and Save, and removes the favourite.
+- [ ] The edit button (pencil) on a favourite: name, nickname there, password, connect automatically.
+- [ ] Connect automatically (in the edit window): close the app (swipe it away), open it, and it connects by itself.
+- [ ] In the edit window, Delete is on the left of Cancel and Save, and removes the favourite.
 - [ ] On the server: ★ menu › switch to another favourite.
 - [ ] Settings › Nickname: the PC sees the new name.
 - [ ] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.

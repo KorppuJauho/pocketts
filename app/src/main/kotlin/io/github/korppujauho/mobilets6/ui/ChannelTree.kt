@@ -1,6 +1,13 @@
 package io.github.korppujauho.mobilets6.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,7 +55,6 @@ import androidx.compose.ui.unit.sp
 import io.github.korppujauho.mobilets6.proto.ServerModel
 import io.github.korppujauho.mobilets6.proto.Pictures
 import io.github.korppujauho.mobilets6.TsFile
-import coil3.compose.AsyncImage
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
@@ -130,23 +136,62 @@ private fun ChannelBox(
 @Composable
 private fun ChannelTitle(ch: ServerModel.Channel, server: String, onClick: () -> Unit) {
     val spacer = ch.spacer
-    // A banner as the TeamSpeak app shows it: behind the row from the left, fading out to the right, a shade behind the name
     val banner: Any? = ch.bannerUrl.takeIf { it.isNotEmpty() }?.let { url ->
         if (url.startsWith("https://", ignoreCase = true)) url
         else Pictures.channelPicture(url)?.let { TsFile.picture(server, it) }
     }
     Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-        if (banner != null) {
-            AsyncImage(
-                banner, contentDescription = null, contentScale = ContentScale.FillHeight, alignment = Alignment.CenterStart,
-                modifier = Modifier.matchParentSize().drawWithContent {
-                    drawContent()
-                    drawRect(Brush.horizontalGradient(0.7f to Color.Transparent, 1f to Ts.card))
-                },
-            )
-            Box(Modifier.matchParentSize().background(Brush.horizontalGradient(0f to Ts.card.copy(alpha = 0.9f), 0.45f to Ts.card.copy(alpha = 0.4f), 1f to Color.Transparent)))
-        }
+        if (banner != null) Banner(banner, spacer?.align)
         ChannelTitleRow(ch, spacer, server, onClick)
+    }
+}
+
+/**
+ * A banner as the TeamSpeak app (and WebTS) shows it: the picture at its own size (at most 500 wide), from the left,
+ * centred up and down and cut to the row (not squeezed into it), fading out on its right, with a shade behind the
+ * name.
+ */
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.Banner(model: Any, align: ServerModel.Spacer.Align?) {
+    // At its own size: loaded whole (not to the size it's drawn at, which waits for a drawing)
+    val context = coil3.compose.LocalPlatformContext.current
+    val request = androidx.compose.runtime.remember(model) {
+        coil3.request.ImageRequest.Builder(context).data(model).size(coil3.size.Size.ORIGINAL).build()
+    }
+    val painter = coil3.compose.rememberAsyncImagePainter(request)
+    val state by painter.state.collectAsState()
+    val picture = (state as? coil3.compose.AsyncImagePainter.State.Success)?.painter ?: return
+    val natural = picture.intrinsicSize
+    if (!(natural.width > 0f && natural.height > 0f)) return
+    val width = minOf(natural.width, 500f).dp
+    val height = width * (natural.height / natural.width)
+    Box(Modifier.matchParentSize().clipToBounds()) {
+        androidx.compose.foundation.Image(
+            picture, contentDescription = null, contentScale = ContentScale.FillBounds,
+            modifier = Modifier.wrapContentSize(Alignment.CenterStart, unbounded = true).size(width, height)
+                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                .drawWithContent {
+                    drawContent()
+                    val fade = (1f - 48.dp.toPx() / size.width).coerceIn(0f, 1f)
+                    drawRect(Brush.horizontalGradient(0f to Color.Black, fade to Color.Black, 1f to Color.Transparent), blendMode = BlendMode.DstIn)
+                },
+        )
+        Box(
+            Modifier.matchParentSize().drawBehind {
+                val dark = Ts.card.copy(alpha = 0.9f)
+                val mid = Ts.card.copy(alpha = 0.55f)
+                val brush = when (align) {
+                    ServerModel.Spacer.Align.CENTER -> Brush.horizontalGradient(
+                        0f to Color.Transparent, 0.4f to Ts.card.copy(alpha = 0.75f), 0.6f to Ts.card.copy(alpha = 0.75f), 1f to Color.Transparent,
+                    )
+                    ServerModel.Spacer.Align.RIGHT -> Brush.horizontalGradient(
+                        0f to Color.Transparent, 0.5f to mid, 1f to dark, startX = this.size.width - 220.dp.toPx(), endX = this.size.width,
+                    )
+                    else -> Brush.horizontalGradient(0f to dark, 0.5f to mid, 1f to Color.Transparent, startX = 0f, endX = 220.dp.toPx())
+                }
+                drawRect(brush)
+            },
+        )
     }
 }
 

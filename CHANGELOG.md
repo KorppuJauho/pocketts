@@ -36,7 +36,7 @@
   way up and saved again, which leaves out what the camera wrote in them (such as where the photo was taken).
 - Your own profile picture (Settings > General), fitted inside 320 × 320, or removed.
 - Favourites as in WebTS: name, address, the nickname used there, the password (kept on this phone only), and one
-  that connects automatically when the app opens (set in its ✎). The list shows a favourite's name when it has one.
+  that connects automatically when the app opens (set in its edit window). The list shows a favourite's name when it has one.
   The star menu on the server screen switches servers or adds the one you're on.
 - A lost connection (Wi-Fi to mobile data, a dead spot) reconnects by itself, keeping the chat; sooner when a
   network comes back.
