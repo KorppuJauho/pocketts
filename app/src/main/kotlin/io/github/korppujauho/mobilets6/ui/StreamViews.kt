@@ -1,6 +1,13 @@
 package io.github.korppujauho.mobilets6.ui
 
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.FlipCameraAndroid
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -189,89 +196,102 @@ private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Un
     }
 }
 
-/** WebTS's share bar: our own picture small, what's shared and to how many, flip and stop. */
+/**
+ * WebTS's share bar: a green box with your own picture small (tap: bigger, inside the box, at most half the screen;
+ * tap again: small), a live dot with what's shared and how many watch, and round buttons to switch the camera, turn
+ * or lock the picture, and Stop.
+ */
 @Composable
 fun ShareBar(state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit, onRotateLock: (Boolean) -> Unit = {}) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
-    val mirror = kind == Streams.Kind.CAMERA && state.shareFront && !state.shareBoth
-    val flip = if (state.shareBoth) "Swap" else "Flip"
-    // Tapping the small picture shows it large: what the others see
-    if (big) state.localVideo?.let { track ->
-        Dialog(onDismissRequest = { big = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-            Box(Modifier.fillMaxSize().background(Color.Black).clickable { big = false }) {
-                VideoView(track, egl, Modifier.fillMaxSize(), mirror = mirror)
-                Row(
-                    Modifier.fillMaxWidth().background(Color(0x66000000)).padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        if (kind == Streams.Kind.CAMERA) "Your camera" else "Your screen",
-                        color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, modifier = Modifier.weight(1f),
-                    )
-                    if (kind == Streams.Kind.CAMERA) {
-                        RotateButton(state.rotateLocked, Color.White) { onRotateLock(!state.rotateLocked) }
-                        Text(flip, color = Color.White, fontSize = 15.sp, modifier = Modifier.clickable(onClick = onFlip).padding(8.dp))
-                    }
-                    Text("×", color = Color.White, fontSize = 28.sp, modifier = Modifier.clickable { big = false }.padding(horizontal = 8.dp))
-                }
-            }
+    var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height
+    val camera = kind == Streams.Kind.CAMERA
+    val mirror = camera && state.shareFront && !state.shareBoth
+    val track = state.localVideo
+
+    @Composable
+    fun Preview(modifier: Modifier) {
+        if (track == null) return
+        Box(modifier.clip(RoundedCornerShape(8.dp)).background(Color.Black).border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp))) {
+            VideoView(track, egl, Modifier.fillMaxSize(), mirror = mirror, fill = !big, onSize = { w, h -> aspect = w.toFloat() / h })
+            // Over the picture (a video surface doesn't take taps itself)
+            Box(Modifier.fillMaxSize().clickable { big = !big })
         }
     }
-    Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
-            .border(1.dp, Ts.green.copy(alpha = 0.5f), RoundedCornerShape(12.dp)).padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(ShareGreen.copy(alpha = 0.15f))
+            .border(1.dp, ShareGreen, RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        state.localVideo?.let {
-            Box(Modifier.size(width = 72.dp, height = 54.dp).clip(RoundedCornerShape(6.dp))) {
-                VideoView(it, egl, Modifier.fillMaxSize(), mirror = mirror, fill = true)
-                // Over the picture (a video surface doesn't take taps itself)
-                Box(Modifier.fillMaxSize().clickable { big = true })
+        if (big) {
+            val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.5f).dp
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
+                Preview(Modifier.fillMaxWidth().height(minOf(maxWidth / aspect, maxHeight)))
             }
         }
-        Column(Modifier.weight(1f)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (!big) Preview(Modifier.size(width = 72.dp, height = minOf(72.dp / aspect, 128.dp)))
+            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LiveDot()
+                val what = when {
+                    !camera -> "Screen"
+                    state.shareBoth -> "Both cameras"
+                    else -> "Camera"
+                }
+                Text(
+                    if (!state.shareLive) "$what · starting…" else "$what · ${state.viewers} watching",
+                    color = Color(0xFF4ADE80), fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
+                )
+            }
+            if (camera) {
+                RoundButton(
+                    Icons.Filled.FlipCameraAndroid, if (state.shareBoth) "Swap the cameras" else "Switch camera", Ts.text, onFlip,
+                )
+                RoundButton(
+                    if (state.rotateLocked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
+                    if (state.rotateLocked) "Turn locked (tap to follow the phone)" else "Turn follows the phone (tap to lock)",
+                    if (state.rotateLocked) Color(0xFFFBBF24) else Ts.text,
+                ) { onRotateLock(!state.rotateLocked) }
+            }
             Text(
-                when {
-                    kind == Streams.Kind.SCREEN -> "Sharing your screen"
-                    state.shareBoth -> "Sharing both cameras"
-                    else -> "Sharing your camera"
-                },
-                color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-            )
-            Text(
-                when {
-                    !state.shareLive -> "Starting…"
-                    state.viewers == 0 -> "Nobody watching yet"
-                    state.viewers == 1 -> "1 watching"
-                    else -> "${state.viewers} watching"
-                },
-                color = Ts.muted, fontSize = 12.sp,
+                "Stop", color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                modifier = Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(Ts.redButton.copy(alpha = 0.15f))
+                    .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(onClick = onStop)
+                    .wrapContentHeight(Alignment.CenterVertically).padding(horizontal = 18.dp),
             )
         }
-        if (kind == Streams.Kind.CAMERA) {
-            RotateButton(state.rotateLocked, Ts.text) { onRotateLock(!state.rotateLocked) }
-            SecondaryButton(flip, onClick = onFlip)
-        }
-        Text(
-            "Stop", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-            modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Ts.redButton).clickable(onClick = onStop)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-        )
     }
 }
 
-/** WebTS's rotate button: the camera's picture follows how the phone is held, or (locked) keeps its turn. */
+private val ShareGreen = Color(0xFF23A559)
+
+/** WebTS's round share button. */
 @Composable
-private fun RotateButton(locked: Boolean, tint: Color, onClick: () -> Unit) {
-    Icon(
-        if (locked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
-        contentDescription = if (locked) "Turn locked (tap to follow the phone)" else "Turn follows the phone (tap to lock)",
-        tint = if (locked) Ts.amber else tint,
-        modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onClick).padding(6.dp).size(22.dp),
+private fun RoundButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color, onClick: () -> Unit) {
+    Box(
+        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(20.dp))
+    }
+}
+
+/** The red "live" dot, with a ring that grows and fades as in WebTS. */
+@Composable
+private fun LiveDot() {
+    val pulse = androidx.compose.animation.core.rememberInfiniteTransition(label = "live")
+    val t by pulse.animateFloat(
+        0f, 1f,
+        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween<Float>(1600)),
+        label = "ring",
     )
+    Box(Modifier.size(9.dp).drawBehind {
+        val ring = (t / 0.7f).coerceAtMost(1f)
+        drawCircle(Color(0xFFEF4444).copy(alpha = 0.6f * (1f - ring)), radius = size.minDimension / 2 + 7.dp.toPx() * ring)
+        drawCircle(Color(0xFFEF4444))
+    })
 }
 
 /** The watched stream's picture size, for the small window's shape. */

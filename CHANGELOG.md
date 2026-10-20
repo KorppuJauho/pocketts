@@ -45,7 +45,7 @@
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel, full screen with their sound
   - share your camera (front or back, 480p or 720p, flip while sharing) or your screen; tap your small picture to
-    see it large
+    make it bigger inside the share bar (WebTS's green bar with a live dot and round buttons)
   - the camera's picture stays upright for viewers however the phone is held, also with auto-rotate off (as in
     WebTS); the rotate button locks the current turn instead
   - both cameras at once on phones that can: the back camera big and the front camera small in a corner (Swap

@@ -85,6 +85,7 @@ permissions guests may not have.
 - [ ] **Both cameras** (Share › Camera › Both, only shown if the phone can do it): the PC sees the back camera with
       the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [ ] HD and data saver both work.
+- [ ] The share bar looks like WebTS's. Tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
 - [ ] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
 - [ ] Phone screen off while sharing the camera: the PC keeps seeing it.
 - [ ] On mobile data instead of Wi-Fi. If it doesn't connect, a relay (TURN) server may be needed (Settings › General).
