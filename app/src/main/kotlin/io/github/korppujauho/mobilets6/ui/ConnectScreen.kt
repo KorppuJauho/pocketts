@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -125,19 +127,20 @@ private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit
         ) {
             Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        FavButton("✎", Ts.text, onEdit)
-        FavButton("×", Ts.text) { actions.removeFavorite(f) }
+        FavButton(androidx.compose.material.icons.Icons.Rounded.Edit, "Edit", onEdit)
+        FavButton(androidx.compose.material.icons.Icons.Rounded.Close, "Remove") { actions.removeFavorite(f) }
     }
 }
 
 @Composable
-private fun FavButton(text: String, color: Color, onClick: () -> Unit) {
-    Text(
-        text, color = color, fontSize = 18.sp,
-        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(Ts.card).clickable(onClick = onClick)
-            .padding(top = 7.dp),
-        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-    )
+private fun FavButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    androidx.compose.foundation.layout.Box(
+        Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)).background(Ts.card)
+            .border(1.dp, Ts.buttonBorder, RoundedCornerShape(8.dp)).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.material3.Icon(icon, contentDescription = label, tint = Ts.muted, modifier = Modifier.size(18.dp))
+    }
 }
 
 @Composable

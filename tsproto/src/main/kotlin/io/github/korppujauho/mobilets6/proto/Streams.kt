@@ -163,6 +163,16 @@ object Streams {
         }.joinToString(eol)
     }
 
+    /**
+     * Without the header extension that says how a picture is turned (urn:3gpp:video-orientation): the TeamSpeak app
+     * accepts it but doesn't turn the picture, so a phone camera showed on its side. Without it the sender turns the
+     * picture itself before it's sent.
+     */
+    fun withoutVideoOrientation(sdp: String): String {
+        val eol = if (sdp.contains("\r\n")) "\r\n" else "\n"
+        return sdp.split(Regex("\r?\n")).filterNot { it.startsWith("a=extmap:") && it.contains("urn:3gpp:video-orientation") }.joinToString(eol)
+    }
+
     /** Does the offer have a video format other than H.264 among [playable] (e.g. "VP8", "VP9", "AV1")? */
     fun offerHasOther(sdp: String, playable: Collection<String>): Boolean =
         listOf("AV1", "VP9", "VP8").any { name ->

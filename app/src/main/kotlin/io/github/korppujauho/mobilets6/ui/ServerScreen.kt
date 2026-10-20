@@ -149,7 +149,10 @@ fun ServerScreen(
                 )
                 if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock)
                 state.stream.message?.let { ErrorLine(it) }
-                ViewSwitch(view, unread = state.unread.isNotEmpty()) { view = it }
+                val unread = state.unread.any { k ->
+                    if (k is Chat.Key.Private) state.privateTabs.any { it.uid == k.uid } else k == Chat.Key.Channel(state.ownChannel)
+                }
+                ViewSwitch(view, unread = unread) { view = it }
                 when (view) {
                     View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
                         TsIcon(state.serverIcon, state.serverKey, 18.dp)

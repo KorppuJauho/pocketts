@@ -36,7 +36,7 @@
   way up and saved again, which leaves out what the camera wrote in them (such as where the photo was taken).
 - Your own profile picture (Settings > General), fitted inside 320 × 320, or removed.
 - Favourites as in WebTS: name, address, the nickname used there, the password (kept on this phone only), and one
-  that connects automatically when the app opens (set in its ✎). The list shows a favourite's name when it has one.
+  that connects automatically when the app opens (set in its edit window). The list shows a favourite's name when it has one.
   The star menu on the server screen switches servers or adds the one you're on.
 - A lost connection (Wi-Fi to mobile data, a dead spot) reconnects by itself, keeping the chat; sooner when a
   network comes back.
@@ -45,7 +45,7 @@
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel, full screen with their sound
   - share your camera (front or back, 480p or 720p, flip while sharing) or your screen; tap your small picture to
-    see it large
+    make it bigger inside the share bar (WebTS's green bar with a live dot and round buttons)
   - the camera's picture stays upright for viewers however the phone is held, also with auto-rotate off (as in
     WebTS); the rotate button locks the current turn instead
   - both cameras at once on phones that can: the back camera big and the front camera small in a corner (Swap

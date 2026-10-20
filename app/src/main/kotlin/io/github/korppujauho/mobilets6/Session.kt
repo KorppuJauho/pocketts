@@ -524,9 +524,8 @@ object Session : TsClient.Listener {
         val message = result.message
         if (result.changed.isNotEmpty() || message != null) {
             val view = viewing
-            // Unread: lines in a conversation not on screen (our own messages don't count)
-            val fresh = result.changed.filter { it != view && !(message != null && message.second.outgoing && message.first == it) }
-            if (fresh.isNotEmpty()) _state.update { it.copy(unread = it.unread + fresh) }
+            // Unread: a message in a conversation not on screen (not our own, not join and leave lines)
+            if (message != null && !message.second.outgoing && message.first != view) _state.update { it.copy(unread = it.unread + message.first) }
             if (message != null && !message.second.outgoing) messageArrived(message.first, message.second)
             publishChat()
         }

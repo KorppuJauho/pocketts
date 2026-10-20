@@ -84,7 +84,10 @@ class StreamEngine(
             .setAudioDeviceModule(JavaAudioDeviceModule.builder(context.applicationContext).createAudioDeviceModule())
             .createPeerConnectionFactory()
     }
-    private val decoders by lazy { DefaultVideoDecoderFactory(egl.eglBaseContext).supportedCodecs.toList() }
+    private val decoders by lazy {
+        factory // loads WebRTC's library first
+        DefaultVideoDecoderFactory(egl.eglBaseContext).supportedCodecs.toList()
+    }
 
     @Volatile var state = State()
         private set
@@ -223,8 +226,8 @@ class StreamEngine(
             val sdp = Streams.withOfferSessionVersion(Streams.restoreH264(pc.localDescription.description, w.original), offerSdp)
             send(Streams.answer(streamId, w.streamerId, sdp, rc("answer")))
             update { it.copy(watchStatus = "Connecting…") }
-        } catch (e: Exception) {
-            log("Watching failed: ${e.message}")
+        } catch (e: Throwable) {
+            log("Watching failed: $e")
             endWatch("The stream couldn't be opened.")
         }
     }
@@ -431,15 +434,15 @@ class StreamEngine(
             val local = offer(pc)
             setLocal(pc, local)
             applyLimits(pc)
-            val relabel = Streams.relabelShareOfferH264(Streams.withoutStrayPayloadLines(pc.localDescription.description))
+            val relabel = Streams.relabelShareOfferH264(Streams.withoutVideoOrientation(Streams.withoutStrayPayloadLines(pc.localDescription.description)))
             v.original = relabel.original
             send(Streams.accept(id, clid, relabel.sdp, rc("accept")))
             v.offerSent = true
             v.outgoing.forEach { send(Streams.candidate(id, clid, it.sdp, it.sdpMid, it.sdpMLineIndex, rc("ice"))) }
             v.outgoing.clear()
             update { it.copy(viewers = viewers.size) }
-        } catch (e: Exception) {
-            log("Couldn't offer the share to $clid: ${e.message}")
+        } catch (e: Throwable) {
+            log("Couldn't offer the share to $clid: $e")
             dropViewer(clid)
         }
     }
@@ -496,7 +499,7 @@ class StreamEngine(
                     val local = offer(v.pc, restart = true)
                     setLocal(v.pc, local)
                     applyLimits(v.pc)
-                    val relabel = Streams.relabelShareOfferH264(Streams.withoutStrayPayloadLines(v.pc.localDescription.description))
+                    val relabel = Streams.relabelShareOfferH264(Streams.withoutVideoOrientation(Streams.withoutStrayPayloadLines(v.pc.localDescription.description)))
                     v.original = relabel.original
                     v.answered = false
                     send(Streams.reconnectOffer(id, s.from, relabel.sdp, rc("reoffer")))
