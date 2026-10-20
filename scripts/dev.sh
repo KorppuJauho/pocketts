@@ -30,6 +30,7 @@ gradle() {
   # Host networking, so the tests reach a test server published on this machine.
   docker run --rm -t --network host --cpus "$CPUS" --memory 6g \
     -v "$ROOT":/work -v mobilets6-gradle:/gradle -v mobilets6-out:/out \
+    -e ANDROID_USER_HOME=/gradle/android-user \
     -e MOBILETS6_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
     "$IMAGE" ./gradlew --no-daemon --console=plain "$@"
 }
