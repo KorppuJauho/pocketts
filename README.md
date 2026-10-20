@@ -3,8 +3,10 @@
 A TeamSpeak client for Android. Type a nickname and a server address, and the app connects straight to the
 TeamSpeak server: no bridge, tunnel or proxy in between. It works with TeamSpeak 6 and TeamSpeak 3 servers.
 
-**Status: early.** It connects, shows the channels and who is in them, lets you change channels, and plays voice.
-Talking (microphone, push-to-talk), chat and the rest are coming next.
+**Status: early.** It connects, shows the channels and who is in them (in WebTS's style), lets you change channels,
+and plays voice. Talking (microphone, push-to-talk), chat and the rest are coming next.
+
+<img src="docs/screenshots/server.png" width="280" alt="The server view: channels and the people in them">
 
 The TeamSpeak connection is a Kotlin version of the one in [WebTS](https://github.com/KorppuJauho/webts), the
 self-hosted web client for TeamSpeak.
@@ -18,6 +20,7 @@ WSL). There's no need to install Java or the Android SDK.
 ACCEPT_ANDROID_SDK_LICENSE=yes scripts/dev.sh image   # the build image: Java and the Android SDK (once)
 scripts/dev.sh test                                   # tests
 scripts/dev.sh apk                                    # a test build in dist/
+scripts/dev.sh screenshots                            # pictures of the screens (example data) in docs/screenshots/
 ```
 
 The build image accepts the Android SDK license, which is why that variable has to be set.

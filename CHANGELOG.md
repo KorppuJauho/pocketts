@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Server names work as in TeamSpeak apps: the server's DNS entry first, then TeamSpeak's name service (TSDNS), then
+  the name itself on port 9987.
+- WebTS's look: its colours, header, control buttons (microphone and sound on/off), the server box, channels as boxes
+  with the people inside, a "YOU" badge, a glow for whoever is talking, mute, "can't talk here" and AFK marks, and
+  channel spacers drawn as TeamSpeak draws them.
+- Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
+
 - Connects straight to a TeamSpeak server with a nickname, an address and an optional server password. The
   TeamSpeak identity is created on first use and kept, in the format TeamSpeak apps export.
 - Shows the channel tree and who is in each channel, with talking, away and muted states. Tap a channel to join it;

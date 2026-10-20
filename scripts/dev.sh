@@ -4,6 +4,7 @@
 #   scripts/dev.sh image              build the build image (Java + Android SDK)
 #   scripts/dev.sh test               unit tests
 #   scripts/dev.sh apk                debug APK -> dist/
+#   scripts/dev.sh screenshots        pictures of the screens (example data) -> docs/screenshots/
 #   scripts/dev.sh ts-server up|down  start/stop the TeamSpeak test server container (TS_CONTAINER)
 #   scripts/dev.sh it                 tests against that server (TS_TEST_SERVER)
 #   scripts/dev.sh devserver up|down  the page phones install test builds from and send their log to (DEV_PORT)
@@ -42,6 +43,9 @@ case "${1:-}" in
   test)
     gradle :tsproto:test
     ;;
+  screenshots)
+    gradle :app:recordRoborazziDebug
+    ;;
   apk)
     gradle :app:assembleDebug
     mkdir -p "$ROOT/dist"
@@ -79,7 +83,7 @@ case "${1:-}" in
     gradle "$@"
     ;;
   *)
-    sed -n '2,15p' "$0"
+    sed -n '2,16p' "$0"
     exit 1
     ;;
 esac

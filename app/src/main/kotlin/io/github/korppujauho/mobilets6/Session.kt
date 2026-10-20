@@ -3,6 +3,7 @@ package io.github.korppujauho.mobilets6
 import android.content.Context
 import io.github.korppujauho.mobilets6.proto.Command
 import io.github.korppujauho.mobilets6.proto.Commands
+import io.github.korppujauho.mobilets6.proto.ServerAddress
 import io.github.korppujauho.mobilets6.proto.ServerModel
 import io.github.korppujauho.mobilets6.proto.TsClient
 import java.util.concurrent.Executors
@@ -24,6 +25,9 @@ object Session : TsClient.Listener {
         val ownId: Int = 0,
         val ownChannel: Int = 0,
         val talking: Set<Int> = emptySet(),
+        val cannotTalk: Set<Int> = emptySet(), // people without the talk power for their channel
+        val inputMuted: Boolean = false,
+        val outputMuted: Boolean = false,
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -38,21 +42,22 @@ object Session : TsClient.Listener {
     fun connect(context: Context, address: String, nickname: String, serverPassword: String) {
         app = context.applicationContext
         if (_state.value.phase != Phase.IDLE) return
-        val target = Settings.parseAddress(address) ?: run {
+        val typed = ServerAddress.parse(address) ?: run {
             _state.update { it.copy(error = "That doesn't look like a server address") }
             return
         }
-        _state.value = UiState(phase = Phase.CONNECTING, address = address)
+        _state.value = UiState(phase = Phase.CONNECTING, address = address, inputMuted = _state.value.inputMuted, outputMuted = _state.value.outputMuted)
         ConnectionService.start(app, "Connecting to $address")
         worker.execute {
             val identity = Settings(app).identity() // made on first use, which takes a moment
-            AppLog.log("Connecting to ${target.first}:${target.second}")
+            val target = ServerAddress.resolve(typed, AndroidDns) { AppLog.log(it) }
+            AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()
-            player = VoicePlayer(::setTalking)
+            player = VoicePlayer(::setTalking).also { it.muted = _state.value.outputMuted }
             client = TsClient(this) { AppLog.log(it) }.also {
                 it.connect(
                     TsClient.Options(
-                        host = target.first, port = target.second, identity = identity,
+                        host = target.host, port = target.port, identity = identity,
                         nickname = nickname.ifBlank { "MobileTS6 user" }, serverPassword = serverPassword,
                     )
                 )
@@ -76,10 +81,29 @@ object Session : TsClient.Listener {
 
     fun clearError() = _state.update { it.copy(error = null) }
 
+    /** Our microphone on/off, as the others see it. */
+    fun toggleMic() {
+        val muted = !_state.value.inputMuted
+        _state.update { it.copy(inputMuted = muted) }
+        client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
+    }
+
+    /** Our sound on/off: nothing is played, and the others see it. */
+    fun toggleSound() {
+        val muted = !_state.value.outputMuted
+        _state.update { it.copy(outputMuted = muted) }
+        player?.muted = muted
+        client?.sendCommand(Commands.build("clientupdate", "client_output_muted" to muted))
+    }
+
     // ====== From the connection (its own thread) ======
 
     override fun onConnected(clientId: Int) {
         AppLog.log("Connected as client $clientId")
+        val s = _state.value
+        if (s.inputMuted || s.outputMuted) {
+            client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to s.inputMuted, "client_output_muted" to s.outputMuted))
+        }
         publish(Phase.CONNECTED)
         ConnectionService.start(app, "Connected to ${model.serverName.ifEmpty { _state.value.address }}")
     }
@@ -110,7 +134,8 @@ object Session : TsClient.Listener {
         player?.release()
         player = null
         client = null
-        _state.value = UiState(phase = Phase.IDLE, error = reason, address = _state.value.address)
+        val s = _state.value
+        _state.value = UiState(phase = Phase.IDLE, error = reason, address = s.address, inputMuted = s.inputMuted, outputMuted = s.outputMuted)
         if (::app.isInitialized) ConnectionService.stop(app)
     }
 
@@ -125,6 +150,7 @@ object Session : TsClient.Listener {
             it.copy(
                 phase = phase, serverName = model.serverName, tree = tree,
                 ownId = model.ownClientId, ownChannel = me?.channel ?: 0,
+                cannotTalk = model.clients.values.filter { c -> !model.canTalk(c) }.map { c -> c.id }.toSet(),
             )
         }
     }

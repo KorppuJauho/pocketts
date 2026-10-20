@@ -2,6 +2,13 @@ package io.github.korppujauho.mobilets6.proto
 
 /** What we know about the server: channels, who is where, who is talking. Fed with every command (on one thread). */
 class ServerModel {
+    private companion object {
+        val SPACER = Regex("""^\[([^\]]*)spacer[^\]]*](.*)$""")
+        val LINES = mapOf(
+            "---" to Spacer.Line.DASHED, "..." to Spacer.Line.DOTTED, "-.-" to Spacer.Line.DASHED,
+            "___" to Spacer.Line.SOLID, "-.." to Spacer.Line.DOTTED, "" to Spacer.Line.SOLID,
+        )
+    }
 
     data class Channel(
         val id: Int,
@@ -14,7 +21,31 @@ class ServerModel {
         val codec: Int = 4,
         val neededTalkPower: Int = 0,
         val maxClients: Int = -1,
-    )
+        val permanent: Boolean = true,
+        val semiPermanent: Boolean = false,
+        val iconId: Long = 0,
+        val description: String = "",
+    ) {
+        /** A spacer as TeamSpeak decides it: a top-level permanent channel named `[<kind>spacer<anything>]<text>`. */
+        val spacer: Spacer? get() {
+            if (parent != 0 || !permanent) return null
+            val m = SPACER.matchEntire(name) ?: return null
+            val kind = m.groupValues[1]
+            val text = m.groupValues[2]
+            val align = when (kind) { "c" -> Spacer.Align.CENTER; "r" -> Spacer.Align.RIGHT; else -> Spacer.Align.LEFT }
+            val line = LINES[text]
+            return Spacer(align, if (line != null) "" else text, repeat = kind == "*" && line == null, line = line)
+        }
+
+        /** The name without a spacer's [...spacer...] prefix. */
+        val displayName: String get() = name.replace(Regex("""^\[.*spacer.*]""", RegexOption.IGNORE_CASE), "")
+    }
+
+    /** How a spacer channel is drawn: text placed left/centre/right (or repeated across), or a line. */
+    data class Spacer(val align: Align, val text: String, val repeat: Boolean, val line: Line?) {
+        enum class Align { LEFT, CENTER, RIGHT }
+        enum class Line { SOLID, DASHED, DOTTED }
+    }
 
     data class Client(
         val id: Int,
@@ -32,6 +63,14 @@ class ServerModel {
         val isTalker: Boolean = false,
         val prioritySpeaker: Boolean = false,
         val talking: Boolean = false,
+        val serverGroups: List<Int> = emptyList(),
+        val channelGroup: Int = 0,
+        val iconId: Long = 0,
+        val avatar: String = "", // the avatar's hash ("" = none)
+        val description: String = "",
+        val country: String = "",
+        val platform: String = "",
+        val version: String = "",
     )
 
     /** A channel with its sub-channels and the people in it, in the server's order. */
@@ -121,11 +160,11 @@ class ServerModel {
         return true
     }
 
-    /** Whether we can be heard in our channel. */
-    fun canTalk(): Boolean {
-        val me = ownClient ?: return false
-        val ch = channels[me.channel] ?: return true
-        return me.isTalker || me.talkPower >= ch.neededTalkPower
+    /** Whether [client] (by default we) can be heard in their channel. */
+    fun canTalk(client: Client? = ownClient): Boolean {
+        val c = client ?: return false
+        val ch = channels[c.channel] ?: return true
+        return c.isTalker || c.talkPower >= ch.neededTalkPower
     }
 
     fun tree(): List<Node> {
@@ -166,7 +205,14 @@ class ServerModel {
         codec = g["channel_codec"]?.toIntOrNull() ?: old.codec,
         neededTalkPower = g["channel_needed_talk_power"]?.toIntOrNull() ?: old.neededTalkPower,
         maxClients = g["channel_maxclients"]?.toIntOrNull() ?: old.maxClients,
+        permanent = g["channel_flag_permanent"]?.let { it == "1" } ?: old.permanent,
+        semiPermanent = g["channel_flag_semi_permanent"]?.let { it == "1" } ?: old.semiPermanent,
+        iconId = g["channel_icon_id"]?.let { unsignedId(it) } ?: old.iconId,
+        description = g["channel_description"] ?: old.description,
     )
+
+    /** Icon ids come as signed or unsigned 32-bit numbers; always unsigned here. */
+    private fun unsignedId(s: String): Long? = s.toLongOrNull()?.let { if (it < 0) it + (1L shl 32) else it }
 
     private fun clientFrom(g: Map<String, String>, old: Client) = old.copy(
         nickname = g["client_nickname"] ?: old.nickname,
@@ -181,5 +227,13 @@ class ServerModel {
         talkPower = g["client_talk_power"]?.toIntOrNull() ?: old.talkPower,
         isTalker = g["client_is_talker"]?.let { it == "1" } ?: old.isTalker,
         prioritySpeaker = g["client_is_priority_speaker"]?.let { it == "1" } ?: old.prioritySpeaker,
+        serverGroups = g["client_servergroups"]?.split(',')?.mapNotNull { it.trim().toIntOrNull() } ?: old.serverGroups,
+        channelGroup = g["client_channel_group_id"]?.toIntOrNull() ?: old.channelGroup,
+        iconId = g["client_icon_id"]?.let { unsignedId(it) } ?: old.iconId,
+        avatar = g["client_flag_avatar"] ?: old.avatar,
+        description = g["client_description"] ?: old.description,
+        country = g["client_country"] ?: old.country,
+        platform = g["client_platform"] ?: old.platform,
+        version = g["client_version"] ?: old.version,
     )
 }
