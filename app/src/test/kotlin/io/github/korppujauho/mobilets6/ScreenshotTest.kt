@@ -40,7 +40,8 @@ class ScreenshotTest {
             "Jamie", "ts.example.com", "", listOf(
                 Favorite("ts.example.com", "Friends", auto = true),
                 Favorite("voice.example.org:9988"),
-            ), null, Example.noConnect,
+                Favorite("192.0.2.10:9987", "Test server"),
+            ), null, Example.noConnect, settingsActions = Example.noSettings,
         )
     }
 

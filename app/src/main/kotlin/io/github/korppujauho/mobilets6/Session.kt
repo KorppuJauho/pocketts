@@ -151,6 +151,12 @@ object Session : TsClient.Listener {
             if (value != null) _state.update { it.copy(unread = it.unread - value) }
         }
 
+    /** The saved settings, for the screens before any connection. */
+    fun load(context: Context) {
+        app = context.applicationContext
+        if (_state.value.phase == Phase.IDLE) _state.update { it.copy(voice = VoiceSettings.load(app), micAllowed = micPermitted()) }
+    }
+
     /** The favourite marked to connect when the app opens has been tried (once per app start). */
     @Volatile var autoConnected = false
 
@@ -350,7 +356,6 @@ object Session : TsClient.Listener {
         if (msg.isEmpty()) return
         when (key) {
             is Chat.Key.Channel -> c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to key.id, "msg" to msg))
-            is Chat.Key.Server -> c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 3, "target" to 0, "msg" to msg))
             is Chat.Key.Private -> c.post {
                 val person = model.clients.values.firstOrNull { it.uid == key.uid && it.id != model.ownClientId } ?: run {
                     _state.update { it.copy(error = "${chat.privateNames[key.uid] ?: "They"} left the server") }

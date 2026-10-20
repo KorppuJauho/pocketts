@@ -61,7 +61,7 @@ class ChatTest {
         assertEquals(listOf("Hi you", "Hey"), chat.entries(Key.Private("alex=")).map { it.text })
         assertTrue(chat.entries(Key.Private("alex=")).last().outgoing)
         assertEquals("Alex", chat.privateNames["alex="])
-        assertEquals(listOf("Server wide"), chat.entries(Key.Server).map { it.text })
+        assertTrue(chat.keys().none { it !is Key.Channel && it !is Key.Private }) // nothing for the whole server
         assertNotNull(poke)
         assertEquals("Look", poke.text)
     }

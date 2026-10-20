@@ -131,12 +131,13 @@ fun ServerScreen(
                         }                    }
                 }
                 ExitButton("Disconnect") { actions.disconnect() }
+                SettingsGear { settings = 0 }
             }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val ptt = state.voice.activation == io.github.korppujauho.mobilets6.VoiceSettings.Activation.PTT
                 ControlsBar(
                     micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
-                    onMic = actions::toggleMic, onSound = actions::toggleSound, onSettings = { settings = 0 },
+                    onMic = actions::toggleMic, onSound = actions::toggleSound,
                     ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
                     sharing = state.stream.sharing != null,
                     onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
