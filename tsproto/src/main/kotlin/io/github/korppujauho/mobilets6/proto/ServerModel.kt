@@ -3,6 +3,8 @@ package io.github.korppujauho.mobilets6.proto
 /** What we know about the server: channels, who is where, who is talking. Fed with every command (on one thread). */
 class ServerModel {
     private companion object {
+        val BANNER = Regex("""^(https|ts3image)://\S{1,500}$""", RegexOption.IGNORE_CASE)
+        val MYTS_AVATAR = Regex("""^(?:\d+,)?(https://storage\.googleapis\.com/ts-sys-myts-avatars/[A-Za-z0-9-]{1,64}/[0-9]{1,20})$""")
         val SPACER = Regex("""^\[([^\]]*)spacer[^\]]*](.*)$""")
         val LINES = mapOf(
             "---" to Spacer.Line.DASHED, "..." to Spacer.Line.DOTTED, "-.-" to Spacer.Line.DASHED,
@@ -25,6 +27,8 @@ class ServerModel {
         val semiPermanent: Boolean = false,
         val iconId: Long = 0,
         val description: String = "",
+        val bannerUrl: String = "", // https:// or ts3image:// ("" = none)
+        val bannerMode: Int = 0,
     ) {
         /** A spacer as TeamSpeak decides it: a top-level permanent channel named `[<kind>spacer<anything>]<text>`. */
         val spacer: Spacer? get() {
@@ -67,11 +71,16 @@ class ServerModel {
         val channelGroup: Int = 0,
         val iconId: Long = 0,
         val avatar: String = "", // the avatar's hash ("" = none)
+        val avatarName: String = "", // the avatar file's name, when the server says it
+        val myTeamSpeakAvatar: String = "", // a myTeamSpeak picture's address ("" = none)
         val description: String = "",
         val country: String = "",
         val platform: String = "",
         val version: String = "",
     )
+
+    /** A server or channel group: its name and icon, and its place in the order. */
+    data class Group(val id: Int, val name: String, val iconId: Long, val sortId: Int)
 
     /** A channel with its sub-channels and the people in it, in the server's order. */
     data class Node(val channel: Channel, val clients: List<Client>, val children: List<Node>)
@@ -87,6 +96,8 @@ class ServerModel {
     val serverVars = HashMap<String, String>()
 
     val channels = LinkedHashMap<Int, Channel>()
+    val serverGroups = HashMap<Int, Group>()
+    val channelGroups = HashMap<Int, Group>()
     val clients = LinkedHashMap<Int, Client>()
 
     val ownClient: Client? get() = clients[ownClientId]
@@ -94,7 +105,7 @@ class ServerModel {
 
     fun clear() {
         serverName = ""; welcomeMessage = ""; ownClientId = 0
-        serverVars.clear(); channels.clear(); clients.clear()
+        serverVars.clear(); channels.clear(); clients.clear(); serverGroups.clear(); channelGroups.clear()
     }
 
     /** Returns true when something shown changed. */
@@ -105,11 +116,27 @@ class ServerModel {
                 serverName = cmd["virtualserver_name"].orEmpty()
                 welcomeMessage = cmd["virtualserver_welcomemessage"].orEmpty()
                 cmd.params.filterKeys { it.startsWith("virtualserver_") }.forEach { (k, v) -> serverVars[k] = v }
+                cmd["virtualserver_uptime"]?.let { serverVars["received_at"] = System.currentTimeMillis().toString() }
+            }
+            "notifyservergrouplist", "servergrouplist" -> readGroups(serverGroups, "sgid", cmd)
+            "notifychannelgrouplist", "channelgrouplist" -> readGroups(channelGroups, "cgid", cmd)
+            "notifyservergroupclientadded", "notifyservergroupclientdeleted" -> for (g in cmd.groups) {
+                val id = g["clid"]?.toIntOrNull() ?: continue
+                val sgid = g["sgid"]?.toIntOrNull() ?: continue
+                val c = clients[id] ?: continue
+                val others = c.serverGroups.filter { it != sgid }
+                clients[id] = c.copy(serverGroups = if (cmd.name == "notifyservergroupclientadded") others + sgid else others)
+            }
+            "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
+                val id = g["clid"]?.toIntOrNull() ?: continue
+                val c = clients[id] ?: continue
+                clients[id] = c.copy(channelGroup = g["cgid"]?.toIntOrNull() ?: c.channelGroup)
             }
             "notifyserverupdated" -> {
                 cmd["virtualserver_name"]?.let { serverName = it }
                 cmd["virtualserver_welcomemessage"]?.let { welcomeMessage = it }
                 cmd.params.filterKeys { it.startsWith("virtualserver_") }.forEach { (k, v) -> serverVars[k] = v }
+                cmd["virtualserver_uptime"]?.let { serverVars["received_at"] = System.currentTimeMillis().toString() }
             }
             "channellist", "notifychannelcreated" -> for (g in cmd.groups) {
                 val id = g["cid"]?.toIntOrNull() ?: continue
@@ -158,6 +185,27 @@ class ServerModel {
             else -> return false
         }
         return true
+    }
+
+    private fun readGroups(into: MutableMap<Int, Group>, idKey: String, cmd: Command) {
+        for (g in cmd.groups) {
+            val id = g[idKey]?.toIntOrNull() ?: continue
+            if (id <= 0) continue
+            into[id] = Group(id, g["name"].orEmpty(), g["iconid"]?.let { unsignedId(it) } ?: 0, g["sortid"]?.toIntOrNull() ?: 0)
+        }
+    }
+
+    /**
+     * A person's badges as the TeamSpeak app shows them: their channel group's icon, their server groups' icons (in the
+     * server's order), then their own icon. Icon ids; under 1000 are TeamSpeak's built-in ones.
+     */
+    fun badges(c: Client): List<Long> {
+        val out = ArrayList<Long>()
+        channelGroups[c.channelGroup]?.iconId?.takeIf { it > 0 }?.let { out.add(it) }
+        c.serverGroups.mapNotNull { serverGroups[it] }.sortedWith(compareBy<Group> { it.sortId }.thenBy { it.id })
+            .forEach { if (it.iconId > 0) out.add(it.iconId) }
+        if (c.iconId > 0) out.add(c.iconId)
+        return out.distinct()
     }
 
     /** Talking as seen from the voice itself (some servers send no talk status). */
@@ -217,6 +265,8 @@ class ServerModel {
         semiPermanent = g["channel_flag_semi_permanent"]?.let { it == "1" } ?: old.semiPermanent,
         iconId = g["channel_icon_id"]?.let { unsignedId(it) } ?: old.iconId,
         description = g["channel_description"] ?: old.description,
+        bannerUrl = g["channel_banner_gfx_url"]?.let { v -> v.takeIf { BANNER.matches(it) }.orEmpty() } ?: old.bannerUrl,
+        bannerMode = g["channel_banner_mode"]?.toIntOrNull() ?: old.bannerMode,
     )
 
     /** Icon ids come as signed or unsigned 32-bit numbers; always unsigned here. */
@@ -243,5 +293,8 @@ class ServerModel {
         country = g["client_country"] ?: old.country,
         platform = g["client_platform"] ?: old.platform,
         version = g["client_version"] ?: old.version,
+        avatarName = g["client_base64HashClientUID"]?.takeIf { Regex("^[a-p]{32,128}$").matches(it) } ?: old.avatarName,
+        // Only the one place myTeamSpeak keeps pictures is accepted
+        myTeamSpeakAvatar = g["client_myteamspeak_avatar"]?.let { MYTS_AVATAR.matchEntire(it.trim())?.groupValues?.get(1).orEmpty() } ?: old.myTeamSpeakAvatar,
     )
 }

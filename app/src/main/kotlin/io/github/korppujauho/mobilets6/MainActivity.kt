@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppLog.start()
+        ServerFiles.install(applicationContext)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
@@ -134,6 +135,9 @@ private object SessionActions : ServerActions {
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
+    override fun sendPicture(uri: android.net.Uri) {
+        MainActivity.current?.let { Session.sendPicture(it.applicationContext, uri) }
+    }
     override fun viewing(key: Chat.Key?) {
         Session.viewing = key
     }
@@ -150,4 +154,6 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun micLevel() = Session.micLevel()
     override fun micTest(on: Boolean) = Session.micTest(on)
     override fun playTestSound() = TestSound.play(Session.state.value.voice)
+    override fun setAvatar(uri: android.net.Uri) = Session.setAvatar(context, uri)
+    override fun removeAvatar() = Session.removeAvatar()
 }

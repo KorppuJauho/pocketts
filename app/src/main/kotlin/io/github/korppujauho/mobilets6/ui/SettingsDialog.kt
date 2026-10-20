@@ -58,7 +58,12 @@ interface SettingsActions {
     fun micLevel(): Pair<Float, Boolean>
     fun micTest(on: Boolean)
     fun playTestSound()
+    fun setAvatar(uri: android.net.Uri) {}
+    fun removeAvatar() {}
 }
+
+/** Who we are on the server, for the profile picture in Settings. */
+data class SelfInfo(val person: io.github.korppujauho.mobilets6.proto.ServerModel.Client?, val server: String, val avatarStatus: String?)
 
 /** WebTS's Settings: General, Playback and Capture, saved with "Save & Apply". */
 @Composable
@@ -68,9 +73,10 @@ fun SettingsDialog(
     actions: SettingsActions,
     onDismiss: () -> Unit,
     startTab: Int = 0,
+    self: SelfInfo? = null,
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        SettingsContent(voice, nickname, actions, onDismiss, startTab, Modifier.fillMaxWidth(0.94f).fillMaxHeight(0.88f))
+        SettingsContent(voice, nickname, actions, onDismiss, startTab, Modifier.fillMaxWidth(0.94f).fillMaxHeight(0.88f), self)
     }
 }
 
@@ -82,6 +88,7 @@ fun SettingsContent(
     onDismiss: () -> Unit,
     startTab: Int = 0,
     modifier: Modifier = Modifier,
+    self: SelfInfo? = null,
 ) {
     var tab by rememberSaveable { mutableStateOf(startTab) }
     var v by remember { mutableStateOf(voice) }
@@ -118,7 +125,10 @@ fun SettingsContent(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 when (tab) {
-                    0 -> General(v, nick, { nick = it }) { v = it }
+                    0 -> {
+                        if (self != null) ProfilePicture(self, actions)
+                        General(v, nick, { nick = it }) { v = it }
+                    }
                     1 -> Playback(v, actions) { v = it }
                     else -> Capture(v, actions) { v = it }
                 }
@@ -173,6 +183,27 @@ private fun RangeEnds(left: String, right: String) {
     Row(Modifier.fillMaxWidth().offset(y = (-6).dp)) {
         Text(left, color = Ts.muted, fontSize = 12.sp, modifier = Modifier.weight(1f))
         Text(right, color = Ts.muted, fontSize = 12.sp)
+    }
+}
+
+/** WebTS's profile picture: the picture as others see it, Change… and Remove. */
+@Composable
+private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
+    val pick = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(),
+    ) { uri -> if (uri != null) actions.setAvatar(uri) }
+    Group("Profile picture") {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            PersonAvatar(self.person, self.server, 88)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Change…") {
+                    pick.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }
+                if (self.person?.avatar?.isNotEmpty() == true) SecondaryButton("Remove") { actions.removeAvatar() }
+            }
+        }
+        self.avatarStatus?.let { Desc(it) }
+        Desc("Others see it on this server. It's made to fit 320 × 320.")
     }
 }
 

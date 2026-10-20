@@ -49,6 +49,7 @@ import kotlin.math.roundToInt
 @Composable
 fun PersonSheet(
     person: ServerModel.Client,
+    server: String,
     isSelf: Boolean,
     volume: Float,
     onVolume: (Float) -> Unit,
@@ -62,7 +63,7 @@ fun PersonSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Avatar(talking = false, size = 96)
+            PersonAvatar(person, server, 96)
             Text(person.nickname, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, textAlign = TextAlign.Center)
             if (person.description.isNotEmpty()) Text(person.description, color = Ts.muted, fontSize = 14.sp, textAlign = TextAlign.Center)
             if (person.away) Text(
@@ -153,13 +154,25 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
                 Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                val banner = v["virtualserver_hostbanner_gfx_url"].orEmpty()
+                if (banner.startsWith("https://", ignoreCase = true)) {
+                    val link = v["virtualserver_hostbanner_url"].orEmpty().takeIf { it.startsWith("https://", ignoreCase = true) }
+                    coil3.compose.AsyncImage(
+                        banner, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.FillWidth,
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp).clip(RoundedCornerShape(10.dp))
+                            .then(if (link != null) Modifier.clickable { uri.openUri(link) } else Modifier),
+                    )
+                }
                 val welcome = v["virtualserver_welcomemessage"].orEmpty().trim()
                 if (welcome.isNotEmpty()) InfoBox { Text(formatted(welcome), color = Ts.text, fontSize = 14.sp) }
                 val max = v["virtualserver_maxclients"]?.toIntOrNull() ?: 0
                 val stats = buildList {
                     add("Users" to if (max > 0) "${state.clientCount} / $max" else "${state.clientCount}")
                     add("Channels" to "${state.channelCount}")
-                    v["virtualserver_uptime"]?.toLongOrNull()?.let { add("Uptime" to span(it * 1000)) }
+                    v["virtualserver_uptime"]?.toLongOrNull()?.let {
+                        val since = v["received_at"]?.toLongOrNull()?.let { at -> System.currentTimeMillis() - at } ?: 0
+                        add("Uptime" to span(it * 1000 + since))
+                    }
                     v["virtualserver_created"]?.toLongOrNull()?.takeIf { it > 0 }?.let {
                         add("Created" to "${span(System.currentTimeMillis() - it * 1000)} ago")
                     }

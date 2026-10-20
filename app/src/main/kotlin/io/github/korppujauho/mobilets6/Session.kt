@@ -4,6 +4,7 @@ import android.content.Context
 import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.Command
 import io.github.korppujauho.mobilets6.proto.Commands
+import io.github.korppujauho.mobilets6.proto.FileTransfer
 import io.github.korppujauho.mobilets6.proto.MessageText
 import io.github.korppujauho.mobilets6.proto.ServerAddress
 import io.github.korppujauho.mobilets6.proto.ServerModel
@@ -44,7 +45,13 @@ object Session : TsClient.Listener {
         val voice: VoiceSettings = VoiceSettings(),
         val micAllowed: Boolean = false, // the microphone permission
         val pttHeld: Boolean = false,
+        val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
+        val serverIcon: Long = 0,
+        val sendingPicture: Boolean = false,
+        val avatarStatus: String? = null, // the profile picture's last change, as words
     ) {
+        /** Files on this server (for pictures). */
+        val serverKey: String get() = address
         val ownChannelName: String get() = findChannel(tree, ownChannel)?.displayName.orEmpty()
 
         fun client(id: Int): ServerModel.Client? = findClient(tree, id)
@@ -77,6 +84,7 @@ object Session : TsClient.Listener {
     private lateinit var app: Context
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "session").apply { isDaemon = true } }
     private var client: TsClient? = null
+    @Volatile private var files: FileTransfer? = null
     private var player: VoicePlayer? = null
     private var sender: MicSender? = null
     private var route: AudioRoute? = null
@@ -116,6 +124,7 @@ object Session : TsClient.Listener {
             chat.clear()
             startAudio()
             client = TsClient(this) { AppLog.log(it) }.also {
+                files = FileTransfer(it)
                 it.connect(
                     TsClient.Options(
                         host = target.host, port = target.port, identity = identity,
@@ -298,8 +307,76 @@ object Session : TsClient.Listener {
         if (s.inputMuted || s.outputMuted) {
             client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to s.inputMuted, "client_output_muted" to s.outputMuted))
         }
+        // The groups (for their icons) and the rest of the server's info; refused ones just stay out
+        for ((i, cmd) in listOf("servergrouplist", "channelgrouplist", "servergetvariables").withIndex()) {
+            client?.sendCommand(Commands.build(cmd, "return_code" to "quiet-$i"))
+        }
         publish(Phase.CONNECTED)
         ConnectionService.start(app, "Connected to ${model.serverName.ifEmpty { _state.value.address }}")
+    }
+
+    // ====== Files: pictures, avatars, icons ======
+
+    /** A file from the server's files (blocking; for pictures on screen). */
+    fun downloadFile(server: String, cid: Int, path: String, maxBytes: Long): ByteArray {
+        val f = files
+        if (f == null || server != _state.value.serverKey || _state.value.phase != Phase.CONNECTED) throw IllegalStateException("not connected")
+        return f.download(cid, path, maxBytes)
+    }
+
+    /** Sends a picture into our channel's chat: into the channel's files (/webTS), then the line TeamSpeak shows. */
+    fun sendPicture(context: Context, uri: android.net.Uri) {
+        val c = client ?: return
+        val f = files ?: return
+        val cid = _state.value.ownChannel
+        _state.update { it.copy(sendingPicture = true) }
+        worker.execute {
+            try {
+                val p = ServerFiles.prepareChatPicture(context, uri)
+                val name = io.github.korppujauho.mobilets6.proto.Pictures.pictureName(p.type, java.util.UUID.randomUUID().toString().take(6))
+                f.createDirectory(cid, io.github.korppujauho.mobilets6.proto.Pictures.PICTURE_FOLDER)
+                f.upload(cid, "${io.github.korppujauho.mobilets6.proto.Pictures.PICTURE_FOLDER}/$name", p.bytes)
+                c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to io.github.korppujauho.mobilets6.proto.Pictures.pictureMessage(name, cid)))
+                AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
+            } catch (e: FileTransfer.Error) {
+                _state.update { it.copy(error = "The picture wasn't sent: ${e.message}" + if (e.code == 2568) " (no permission in this channel)" else "") }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "The picture wasn't sent: ${e.message}") }
+            } finally {
+                _state.update { it.copy(sendingPicture = false) }
+            }
+        }
+    }
+
+    /** A new profile picture: uploaded as the server's /avatar, then everyone is told (its MD5). */
+    fun setAvatar(context: Context, uri: android.net.Uri) {
+        val c = client ?: return
+        val f = files ?: return
+        _state.update { it.copy(avatarStatus = "Uploading…") }
+        worker.execute {
+            try {
+                val data = ServerFiles.prepareAvatar(context, uri)
+                f.upload(0, io.github.korppujauho.mobilets6.proto.Pictures.AVATAR_UPLOAD_NAME, data, overwrite = true)
+                c.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to io.github.korppujauho.mobilets6.proto.Pictures.avatarFlag(data)))
+                _state.update { it.copy(avatarStatus = "Profile picture set.") }
+            } catch (e: FileTransfer.Error) {
+                _state.update {
+                    it.copy(avatarStatus = when (e.code) {
+                        2565 -> "The server allows only smaller profile pictures."
+                        2568 -> "This server doesn't allow you a profile picture."
+                        else -> "The profile picture wasn't set: ${e.message}"
+                    })
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(avatarStatus = "The profile picture wasn't set: ${e.message}") }
+            }
+        }
+    }
+
+    /** No profile picture: the flag is cleared, so nobody shows it (the file itself can't be deleted). */
+    fun removeAvatar() {
+        client?.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to ""))
+        _state.update { it.copy(avatarStatus = "Profile picture removed.") }
     }
 
     override fun onCommand(cmd: Command) {
@@ -307,11 +384,12 @@ object Session : TsClient.Listener {
             // See everyone on the server, not only our own channel; a new channel gets subscribed too.
             "channellistfinished" -> client?.sendCommand("channelsubscribeall")
             "notifychannelcreated" -> client?.sendCommand(Commands.build("channelsubscribe", "cid" to cmd["cid"]))
-            "error" -> if (cmd["id"] != "0") {
+            "error" -> if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") } != true) {
                 AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
                 if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }
             }
         }
+        files?.onCommand(cmd)
         val result = chat.handle(cmd, model) // before the model: a move's line needs where they were
         val changed = model.apply(cmd)
         result.poke?.let { poked(it) }
@@ -340,6 +418,8 @@ object Session : TsClient.Listener {
     }
 
     private fun finish(reason: String?) {
+        files?.onDisconnected()
+        files = null
         stopAudio()
         client = null
         val s = _state.value
@@ -395,6 +475,8 @@ object Session : TsClient.Listener {
                 ownId = model.ownClientId, ownChannel = me?.channel ?: 0,
                 cannotTalk = model.clients.values.filter { c -> !model.canTalk(c) }.map { c -> c.id }.toSet(),
                 server = HashMap(model.serverVars),
+                badges = model.clients.values.associate { c -> c.id to model.badges(c) },
+                serverIcon = model.serverVars["virtualserver_icon_id"]?.toLongOrNull()?.let { v -> if (v < 0) v + (1L shl 32) else v } ?: 0,
                 channelCount = model.channels.size,
                 clientCount = model.clients.values.count { c -> c.type == 0 },
             )

@@ -101,5 +101,16 @@ const cmd = {
   hashedPassword: crypto.hashPassword("salainen sana ä"),
 };
 
-writeFileSync(out, JSON.stringify({ eax, keyNonce, identities, tsExport, license: licenseVec, cmd }, null, 2) + "\n");
+// Where avatars and icons are in the server's files (WebTS's src/pictures.ts)
+const pictures = await import(pathToFileURL(path.join(webts, "src/pictures.ts")).href);
+const files = {
+  uid: a.uid,
+  avatarNames: pictures.avatarFileNames(a.uid),
+  serverNamed: pictures.avatarFileNames(a.uid, "abcdefghijklmnopabcdefghijklmnop"),
+  icon: pictures.iconFileName(3000000000),
+  builtinIcon: pictures.iconFileName(300),
+  pictureMessage: pictures.pictureMessage("2026-10-12_18-35-01_a7k3f9.jpg", 5),
+};
+
+writeFileSync(out, JSON.stringify({ eax, keyNonce, identities, tsExport, license: licenseVec, cmd, files }, null, 2) + "\n");
 console.log(`Wrote ${out}`);

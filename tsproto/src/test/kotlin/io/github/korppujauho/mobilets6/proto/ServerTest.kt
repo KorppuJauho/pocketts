@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -18,7 +19,9 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 class ServerTest {
     private val server = System.getenv("TS_TEST_SERVER").orEmpty()
 
-    private class Peer(val name: String) : TsClient.Listener {
+    private val ftPort = System.getenv("TS_TEST_FT_PORT").orEmpty().toIntOrNull()
+
+    private inner class Peer(val name: String) : TsClient.Listener {
         val lock = ReentrantLock()
         val changed = lock.newCondition()
         val model = ServerModel()
@@ -29,11 +32,13 @@ class ServerTest {
         var connected = false
         var disconnected: String? = "not yet"
         val client = TsClient(this) { println("[$name] $it") }
+        val files = FileTransfer(client, ftPort)
 
         private fun update(block: () -> Unit) = lock.withLock { block(); changed.signalAll() }
 
         override fun onConnected(clientId: Int) = update { connected = true }
         override fun onCommand(cmd: Command) = update {
+            files.onCommand(cmd)
             model.apply(cmd)
             when (cmd.name) {
                 "channellistfinished" -> client.sendCommand("channelsubscribeall")
@@ -41,7 +46,7 @@ class ServerTest {
                 "notifychannelcreated" -> client.sendCommand(Commands.build("channelsubscribe", "cid" to cmd["cid"]))
                 "notifytextmessage" -> messages.add(cmd)
                 "notifyclientpoke" -> pokes.add(cmd)
-                "error" -> if (cmd["id"] != "0") errors.add(cmd)
+                "error" -> if (cmd["id"] != "0" && cmd["return_code"]?.startsWith("ft-") != true) errors.add(cmd)
             }
         }
         override fun onVoice(voice: TsClient.Voice) = update { voices.add(voice) }
@@ -122,6 +127,41 @@ class ServerTest {
         val text = "Hei | kaikki / ä ö ${'$'}run"
         a.client.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to home, "msg" to text))
         b.await("B gets the message") { b.messages.any { it["msg"] == text && it["invokerid"] == aId.toString() } }
+
+        // A picture in the channel's files, and its chat line; B finds it from the line and downloads it
+        val picture = ByteArray(5000) { (it * 31 + 7).toByte() }.also {
+            byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a).copyInto(it)
+        }
+        val pictureName = Pictures.pictureName(Pictures.Type.PNG, "t$run")
+        try {
+            a.files.createDirectory(home, Pictures.PICTURE_FOLDER)
+            a.files.upload(home, "${Pictures.PICTURE_FOLDER}/$pictureName", picture)
+            a.client.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to home, "msg" to Pictures.pictureMessage(pictureName, home)))
+            b.await("B gets the picture line") { b.messages.any { Pictures.channelPictures(it["msg"].orEmpty()).first.any { p -> p.name == pictureName } } }
+            val line = b.messages.first { Pictures.channelPictures(it["msg"].orEmpty()).first.isNotEmpty() }
+            val ref = Pictures.channelPictures(line["msg"]!!).first.single()
+            assertContentEquals(picture, b.files.download(ref.cid, ref.path, Pictures.PICTURE_MAX_BYTES))
+            println("Picture sent and received through the channel's files")
+        } catch (e: FileTransfer.Error) {
+            println("Pictures not allowed here (${e.code}: ${e.message})")
+        }
+
+        // An avatar: A puts one up, B sees the flag and finds the file by A's identity
+        val avatar = picture.copyOf(2000)
+        try {
+            a.files.upload(0, Pictures.AVATAR_UPLOAD_NAME, avatar, overwrite = true)
+            val flag = Pictures.avatarFlag(avatar)
+            a.client.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to flag))
+            b.await("B sees A's avatar") { b.model.clients[aId]?.avatar == flag }
+            val who = b.model.clients[aId]!!
+            val got = Pictures.avatarFileNames(who.uid, who.avatarName).firstNotNullOfOrNull { name ->
+                try { b.files.download(0, name, Pictures.AVATAR_MAX_BYTES) } catch (_: FileTransfer.Error) { null }
+            }
+            assertContentEquals(avatar, got)
+            println("Avatar set and found")
+        } catch (e: FileTransfer.Error) {
+            println("Avatars not allowed here (${e.code}: ${e.message})")
+        }
 
         // A private message and a poke, from B to A
         val private = "Vain sinulle ${'$'}run"

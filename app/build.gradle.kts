@@ -62,6 +62,11 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons)
     implementation(libs.activity.compose)
+    // Pictures: avatars, the server's icons (mostly SVG on TeamSpeak 6), pictures in the chat (also animated)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
+    implementation(libs.coil.network)
 
     // Screenshots of the screens, made on the build machine (scripts/dev.sh screenshots)
     testImplementation(libs.junit4)

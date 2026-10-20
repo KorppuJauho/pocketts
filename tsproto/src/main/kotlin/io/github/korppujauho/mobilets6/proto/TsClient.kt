@@ -89,9 +89,12 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     @Volatile var clientId = 0
         private set
 
+    /** The server's address (for file transfers), once connecting has started. */
+    val serverAddress: InetAddress? get() = server?.address
+
     private lateinit var opts: Options
     private var socket: DatagramSocket? = null
-    private var server: InetSocketAddress? = null
+    @Volatile private var server: InetSocketAddress? = null
     private var ticker: ScheduledFuture<*>? = null
     private var pinger: ScheduledFuture<*>? = null
 

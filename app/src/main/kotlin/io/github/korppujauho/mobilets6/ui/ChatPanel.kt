@@ -60,6 +60,26 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.korppujauho.mobilets6.Session
+import io.github.korppujauho.mobilets6.TsFile
+import io.github.korppujauho.mobilets6.proto.Pictures
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.core.content.FileProvider
+import coil3.compose.AsyncImage
 import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.MessageText
 import java.util.Date
@@ -72,6 +92,7 @@ fun ChatPanel(
     onView: (Chat.Key) -> Unit,
     onCloseTab: (String) -> Unit,
     onSend: (Chat.Key, String) -> Unit,
+    onPicture: (Uri) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Panel(modifier, header = {
@@ -95,13 +116,16 @@ fun ChatPanel(
             is Chat.Key.Channel -> "No messages in this channel yet."
             is Chat.Key.Server -> "No messages to the whole server yet."
             is Chat.Key.Private -> "No messages yet."
-        })
+        }, state)
         val target = when (key) {
             is Chat.Key.Channel -> state.ownChannelName.ifEmpty { "the channel" }
             is Chat.Key.Server -> "everyone on the server"
             is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name ?: "them"
         }
-        MessageBox("Message to $target…", enabled = state.phase == Session.Phase.CONNECTED) { onSend(key, it) }
+        MessageBox(
+            "Message to $target…", enabled = state.phase == Session.Phase.CONNECTED,
+            pictures = key is Chat.Key.Channel, sendingPicture = state.sendingPicture, onPicture = onPicture,
+        ) { onSend(key, it) }
     }
 }
 
@@ -121,7 +145,9 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
 }
 
 @Composable
-private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String) {
+private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, state: Session.UiState) {
+    var viewing by remember { mutableStateOf<Any?>(null) }
+    viewing?.let { PictureViewer(it) { viewing = null } }
     val list = rememberLazyListState()
     LaunchedEffect(entries.size) { if (entries.isNotEmpty()) list.animateScrollToItem(entries.size - 1) }
     if (entries.isEmpty()) {
@@ -140,7 +166,7 @@ private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String) {
     ) {
         items(entries, key = { it.id }) { e ->
             val time = timeFormat.format(Date(e.time))
-            if (e.event != null) EventLine(time, e.event!!) else MessageLine(time, e)
+            if (e.event != null) EventLine(time, e.event!!) else MessageLine(time, e, state) { viewing = it }
         }
     }
 }
@@ -162,20 +188,66 @@ private fun EventLine(time: String, parts: List<Chat.Part>) {
 }
 
 @Composable
-private fun MessageLine(time: String, e: Chat.Entry) {
-    Text(
-        buildAnnotatedString {
-            withStyle(SpanStyle(color = Ts.faint, fontSize = 12.sp)) { append(time) }
-            append("  ")
-            withStyle(SpanStyle(color = Ts.sender, fontWeight = FontWeight.Bold)) { append(e.senderName.ifEmpty { "System" } + ":") }
-            append("  ")
-            append(formatted(e.text))
-        },
-        color = Ts.text, fontSize = 15.sp,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))
+private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onPicture: (Any) -> Unit) {
+    val (pictures, rest) = remember(e.text) { Pictures.channelPictures(e.text) }
+    val text = remember(rest) { formatted(rest) }
+    val sender = state.clientByUid(e.senderUid) ?: state.client(e.senderId)
+    val uri = LocalUriHandler.current
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))
             .drawBehind { drawLine(Ts.accent, Offset(1f, 0f), Offset(1f, size.height), strokeWidth = 2.dp.toPx()) }
             .padding(horizontal = 10.dp, vertical = 6.dp),
-    )
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(
+            buildAnnotatedString {
+                withStyle(SpanStyle(color = Ts.faint, fontSize = 12.sp)) { append(time) }
+                append("  ")
+                appendInlineContent("avatar", "•")
+                append(" ")
+                withStyle(SpanStyle(color = Ts.sender, fontWeight = FontWeight.Bold)) { append(e.senderName.ifEmpty { "System" } + ":") }
+                append("  ")
+                append(text)
+            },
+            inlineContent = mapOf(
+                "avatar" to InlineTextContent(Placeholder(20.sp, 20.sp, PlaceholderVerticalAlign.TextCenter)) {
+                    PersonAvatar(sender, state.serverKey, 20)
+                },
+            ),
+            color = Ts.text, fontSize = 15.sp,
+        )
+        // Pictures from the channel's files, as the TeamSpeak app shows them
+        for (p in pictures) {
+            val file = TsFile.picture(state.serverKey, p)
+            AsyncImage(
+                file, contentDescription = p.name, contentScale = ContentScale.Fit,
+                modifier = Modifier.heightIn(max = 260.dp).clip(RoundedCornerShape(6.dp)).clickable { onPicture(file) },
+            )
+        }
+        // A preview of the first link: a direct picture, else a small "Open" card
+        val link = remember(rest) { MessageText.parse(rest).firstNotNullOfOrNull { it.link } }
+        if (link != null) {
+            if (Regex("""\.(jpe?g|gif|png|webp)(\?.*)?$""", RegexOption.IGNORE_CASE).containsMatchIn(link)) {
+                AsyncImage(
+                    link, contentDescription = null, contentScale = ContentScale.Fit,
+                    modifier = Modifier.heightIn(max = 260.dp).clip(RoundedCornerShape(6.dp)).clickable { onPicture(link) },
+                )
+            } else {
+                val host = remember(link) { runCatching { java.net.URI(link).host }.getOrNull() }
+                if (host != null) {
+                    Row(
+                        Modifier.clip(RoundedCornerShape(6.dp)).background(Ts.card).clickable { uri.openUri(link) }
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Icon(Icons.Filled.Link, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(16.dp))
+                        Text("Open: $host", color = Ts.text, fontSize = 13.sp)
+                    }
+                }
+            }
+        }
+    }
 }
 
 /** A message's styles and links (tapping a link opens it in the browser). */
@@ -203,8 +275,33 @@ fun formatted(text: String): AnnotatedString = buildAnnotatedString {
 }
 
 @Composable
-private fun MessageBox(placeholder: String, enabled: Boolean, onSend: (String) -> Unit) {
+private fun MessageBox(
+    placeholder: String,
+    enabled: Boolean,
+    pictures: Boolean,
+    sendingPicture: Boolean,
+    onPicture: (Uri) -> Unit,
+    onSend: (String) -> Unit,
+) {
     var text by rememberSaveable { mutableStateOf("") }
+    var pending by remember { mutableStateOf<Uri?>(null) }
+    var menu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) pending = uri }
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> if (ok) pending = photoUri }
+    pending?.let { uri ->
+        Row(
+            Modifier.fillMaxWidth().background(Ts.panel).padding(horizontal = 12.dp).padding(top = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            AsyncImage(uri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)))
+            Text("Picture ready to send", color = Ts.text, fontSize = 14.sp, modifier = Modifier.weight(1f))
+            PrimaryButton("Send") { onPicture(uri); pending = null }
+            Text("×", color = Ts.muted, fontSize = 22.sp, modifier = Modifier.clickable { pending = null }.padding(horizontal = 4.dp))
+        }
+    }
     fun send() {
         if (text.isNotBlank()) {
             onSend(text)
@@ -216,6 +313,29 @@ private fun MessageBox(placeholder: String, enabled: Boolean, onSend: (String) -
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        if (pictures) Box {
+            Box(
+                Modifier.size(46.dp).clip(RoundedCornerShape(8.dp)).background(Ts.input)
+                    .clickable(enabled = enabled && !sendingPicture) { menu = true },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (sendingPicture) CircularProgressIndicator(color = Ts.accent, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                else Icon(Icons.Filled.Image, contentDescription = "Send a picture", tint = Ts.text)
+            }
+            DropdownMenu(menu, onDismissRequest = { menu = false }, containerColor = Ts.card) {
+                DropdownMenuItem(text = { Text("Choose a picture", color = Ts.text) }, onClick = {
+                    menu = false
+                    pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                })
+                DropdownMenuItem(text = { Text("Take a photo", color = Ts.text) }, onClick = {
+                    menu = false
+                    val dir = java.io.File(context.cacheDir, "photos").apply { mkdirs() }
+                    val file = java.io.File(dir, "photo-${System.currentTimeMillis()}.jpg")
+                    photoUri = FileProvider.getUriForFile(context, context.packageName + ".files", file)
+                    camera.launch(photoUri!!)
+                })
+            }
+        }
         Box(
             Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(Ts.input).padding(horizontal = 16.dp, vertical = 13.dp),
         ) {

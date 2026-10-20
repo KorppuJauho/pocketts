@@ -30,6 +30,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Photos taken for the chat or a profile picture are written here first -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_files" />
+        </provider>
+
         <!-- Keeps the connection (and voice) going with the screen off or another app open. -->
         <service
             android:name=".ConnectionService"

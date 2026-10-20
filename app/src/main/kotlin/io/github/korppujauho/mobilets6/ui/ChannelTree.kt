@@ -45,6 +45,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.korppujauho.mobilets6.proto.ServerModel
+import io.github.korppujauho.mobilets6.proto.Pictures
+import io.github.korppujauho.mobilets6.TsFile
+import coil3.compose.AsyncImage
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 
 /** One channel box in the list: the channel, its people, and how deep it is. */
 data class ChannelItem(val node: ServerModel.Node, val depth: Int)
@@ -62,6 +69,8 @@ data class TreeContext(
     val ownId: Int,
     val ownChannel: Int,
     val talking: Set<Int>,
+    val server: String = "",
+    val badges: Map<Int, List<Long>> = emptyMap(),
     val canTalk: (ServerModel.Client) -> Boolean,
 )
 
@@ -111,14 +120,36 @@ private fun ChannelBox(
             if (sub) drawRect(Color(0x0DFFFFFF), size = Size(2.dp.toPx(), size.height)) // a sub-channel's edge
         },
     ) {
-        ChannelTitle(ch) { onChannel(ch) }
+        ChannelTitle(ch, ctx.server) { onChannel(ch) }
         for (c in item.node.clients) PersonRow(c, ctx) { onPerson(c) }
     }
 }
 
 @Composable
-private fun ChannelTitle(ch: ServerModel.Channel, onClick: () -> Unit) {
+private fun ChannelTitle(ch: ServerModel.Channel, server: String, onClick: () -> Unit) {
     val spacer = ch.spacer
+    // A banner as the TeamSpeak app shows it: behind the row from the left, fading out to the right, a shade behind the name
+    val banner: Any? = ch.bannerUrl.takeIf { it.isNotEmpty() }?.let { url ->
+        if (url.startsWith("https://", ignoreCase = true)) url
+        else Pictures.channelPicture(url)?.let { TsFile.picture(server, it) }
+    }
+    Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+        if (banner != null) {
+            AsyncImage(
+                banner, contentDescription = null, contentScale = ContentScale.FillHeight, alignment = Alignment.CenterStart,
+                modifier = Modifier.matchParentSize().drawWithContent {
+                    drawContent()
+                    drawRect(Brush.horizontalGradient(0.7f to Color.Transparent, 1f to Ts.card))
+                },
+            )
+            Box(Modifier.matchParentSize().background(Brush.horizontalGradient(0f to Ts.card.copy(alpha = 0.9f), 0.45f to Ts.card.copy(alpha = 0.4f), 1f to Color.Transparent)))
+        }
+        ChannelTitleRow(ch, spacer, server, onClick)
+    }
+}
+
+@Composable
+private fun ChannelTitleRow(ch: ServerModel.Channel, spacer: ServerModel.Spacer?, server: String, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -127,7 +158,9 @@ private fun ChannelTitle(ch: ServerModel.Channel, onClick: () -> Unit) {
             SpacerTitle(spacer)
             return@Row
         }
-        Icon(Icons.Filled.MusicNote, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp))
+        // The channel's own icon from the server, else the plain note
+        if (ch.iconId > 0) TsIcon(ch.iconId, server, 18.dp)
+        else Icon(Icons.Filled.MusicNote, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(6.dp))
         Text(
             ch.displayName, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
@@ -182,7 +215,7 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
     ) {
         Box(Modifier.width(2.dp).height(34.dp).background(if (talking) Ts.talking else Color.Transparent))
         Spacer(Modifier.width(25.dp))
-        Avatar(talking)
+        PersonAvatar(c, ctx.server, 24, talking)
         Spacer(Modifier.width(8.dp))
         Text(
             c.nickname,
@@ -206,6 +239,7 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
             }
             if (c.away) Tag("AFK", Ts.afk, Ts.afkBg, Ts.afkBorder)
             if (self) Tag("YOU", Ts.you, Ts.afkBg.copy(alpha = 0f), Ts.youBorder)
+            for (icon in ctx.badges[c.id].orEmpty()) TsIcon(icon, ctx.server) // their groups' icons and their own
         }
     }
 }

@@ -85,6 +85,7 @@ object Example {
         override fun setVolume(person: ServerModel.Client, volume: Float) {}
         override fun viewing(key: Chat.Key?) {}
         override fun setPtt(held: Boolean) {}
+        override fun sendPicture(uri: android.net.Uri) {}
     }
 
     val noSettings = object : SettingsActions {
@@ -110,18 +111,19 @@ object Example {
                 "|cid=11 cpid=0 channel_order=4 channel_name=[spacer2]---" +
                 "|cid=5 cpid=0 channel_order=11 channel_name=AFK channel_needed_talk_power=99",
         )
+        cmd("notifyservergrouplist sgid=6 name=Admin iconid=100 sortid=1|sgid=8 name=Guest iconid=0 sortid=9")
         fun person(id: Int, cid: Int, nick: String, extra: String = "") =
             cmd("notifycliententerview ctid=$cid clid=$id client_nickname=$nick client_type=0 client_talk_power=75 $extra")
         person(1, 1, "Lee")
         person(2, 1, "Noa", "client_input_muted=1")
         person(3, 1, "Jamie")
         person(4, 1, "Riley")
-        person(5, 2, "Alex")
+        person(5, 2, "Alex", "client_servergroups=6")
         person(8, 6, "Sam", "client_output_muted=1")
         person(9, 6, "Robin")
-        person(10, 3, "Kai", "client_talk_power=0")
-        person(11, 4, "Mia")
-        person(12, 5, "Quinn", "client_away=1 client_talk_power=0")
+        person(10, 3, "Kai", "client_talk_power=0 client_servergroups=6")
+        person(11, 4, "Mia", "client_servergroups=6")
+        person(12, 5, "Quinn", "client_away=1 client_talk_power=0 client_servergroups=6")
         return m
     }
 
@@ -162,6 +164,7 @@ object Example {
             talking = setOf(4, 9),
             cannotTalk = m.clients.values.filter { !m.canTalk(it) }.map { it.id }.toSet(),
             micAllowed = true,
+            badges = m.clients.values.associate { it.id to m.badges(it) },
         )
     }
 }

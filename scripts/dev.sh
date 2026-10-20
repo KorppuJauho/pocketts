@@ -13,6 +13,7 @@
 # This machine's own settings go in dev.env next to this repo's README (never committed), for example:
 #   TS_CONTAINER=my-teamspeak-test      an existing TeamSpeak test server container
 #   TS_TEST_SERVER=127.0.0.1:9987       where the tests connect to it
+#   TS_TEST_FT_PORT=30033               its file transfer port, when published under another number
 #   DEV_PORT=8686
 set -euo pipefail
 
@@ -29,7 +30,7 @@ gradle() {
   # Host networking, so the tests reach a test server published on this machine.
   docker run --rm -t --network host --cpus "$CPUS" --memory 6g \
     -v "$ROOT":/work -v mobilets6-gradle:/gradle -v mobilets6-out:/out \
-    -e MOBILETS6_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" \
+    -e MOBILETS6_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
     "$IMAGE" ./gradlew --no-daemon --console=plain "$@"
 }
 

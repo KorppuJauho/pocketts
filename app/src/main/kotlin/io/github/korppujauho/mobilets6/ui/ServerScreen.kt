@@ -52,6 +52,7 @@ interface ServerActions {
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
+    fun sendPicture(uri: android.net.Uri)
     /** The conversation on screen (null when the chat isn't showing). */
     fun viewing(key: Chat.Key?)
 }
@@ -96,6 +97,8 @@ fun ServerScreen(
                 ViewSwitch(view, unread = state.unread.isNotEmpty()) { view = it }
                 when (view) {
                     View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
+                        TsIcon(state.serverIcon, state.serverKey, 18.dp)
+                        if (state.serverIcon > 0) androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
                         ServerName(state.serverName.ifEmpty { "Connecting to ${state.address}…" }) { serverInfo = true }
                     }) {
                         if (state.phase == Session.Phase.CONNECTING) {
@@ -104,7 +107,7 @@ fun ServerScreen(
                             state.error?.let { ErrorLine(it) }
                             ChannelTree(
                                 items,
-                                TreeContext(state.ownId, state.ownChannel, state.talking) { it.id !in state.cannotTalk },
+                                TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges) { it.id !in state.cannotTalk },
                                 onChannel = { ch ->
                                     if (ch.id == state.ownChannel || ch.spacer != null) return@ChannelTree
                                     if (ch.hasPassword) askPassword = ch else actions.join(ch)
@@ -119,6 +122,7 @@ fun ServerScreen(
                         onView = { chatKey = it },
                         onCloseTab = actions::closePrivate,
                         onSend = actions::send,
+                        onPicture = actions::sendPicture,
                         modifier = Modifier.fillMaxWidth().weight(1f),
                     )
                 }
@@ -135,7 +139,10 @@ fun ServerScreen(
         }
     }
     settings?.let { tab ->
-        if (settingsActions != null) SettingsDialog(state.voice, nickname, settingsActions, onDismiss = { settings = null }, startTab = tab)
+        if (settingsActions != null) SettingsDialog(
+            state.voice, nickname, settingsActions, onDismiss = { settings = null }, startTab = tab,
+            self = SelfInfo(state.client(state.ownId), state.serverKey, state.avatarStatus),
+        )
     }
 
     askPassword?.let { ch ->
@@ -151,7 +158,7 @@ fun ServerScreen(
     }
     person?.let { p ->
         PersonSheet(
-            p, isSelf = p.id == state.ownId, volume = state.volumes[p.uid] ?: 1f,
+            p, state.serverKey, isSelf = p.id == state.ownId, volume = state.volumes[p.uid] ?: 1f,
             onVolume = { actions.setVolume(p, it) },
             onPoke = { person = null; pokeTarget = p },
             onChat = {
