@@ -1,5 +1,6 @@
 package io.github.korppujauho.mobilets6
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -88,11 +89,21 @@ object Secrets {
 }
 
 /**
- * The secret saved under [name] (null when none). One saved before sealing existed is sealed now, so it's in plain
- * text only until the first time it's read. Throws [SecretBox.Unreadable] when it can't be opened; the saved value is
- * then left as it is.
+ * Where the secrets are saved: a file of their own, which Android leaves out when it copies the app's data to a new
+ * phone (res/xml/data_extraction_rules.xml), since the key they're sealed with stays on this one.
  */
-fun SharedPreferences.getSecret(name: String, label: String): String? {
+fun secretPrefs(context: Context): SharedPreferences = context.getSharedPreferences("secrets", Context.MODE_PRIVATE)
+
+/**
+ * The secret saved under [name] (null when none). One an earlier version kept in [old] is moved here first, and one
+ * saved before sealing existed is sealed now, so it's in plain text only until the first time it's read. Throws
+ * [SecretBox.Unreadable] when it can't be opened; the saved value is then left as it is.
+ */
+fun SharedPreferences.getSecret(name: String, label: String, old: SharedPreferences? = null): String? {
+    if (old != null && old.contains(name)) {
+        if (!contains(name)) edit().putString(name, old.getString(name, null)).commit()
+        old.edit().remove(name).apply()
+    }
     val stored = getString(name, null) ?: return null
     val box = Secrets.box
     val plain = box.open(stored, label)

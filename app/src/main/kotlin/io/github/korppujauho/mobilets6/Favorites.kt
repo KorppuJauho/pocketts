@@ -22,25 +22,38 @@ data class Favorite(
 object Favorites {
     private fun prefs(c: Context) = c.getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
-    private const val PASSWORD = "favorites/password"
+    private const val PASSWORD = "favorites/password" // one in the list, as an earlier version kept it
+    private const val PASSWORDS = "favorites/passwords"
 
-    /** The passwords are encrypted on this phone (see [Secrets]); ones saved before that are encrypted now. */
+    /**
+     * The passwords are kept apart from the list, encrypted with the other secrets (see [secretPrefs]): the list comes
+     * along when the app's data is copied to a new phone, the passwords don't. Ones an earlier version kept in the list
+     * are moved there now.
+     */
     fun load(c: Context): List<Favorite> = try {
         val a = JSONArray(prefs(c).getString("list", "[]"))
-        var unsealed = false
+        val inList = (0 until a.length()).any { a.getJSONObject(it).has("password") }
+        val passwords = if (inList) JSONArray() else passwords(c)
         val list = (0 until a.length()).map { i ->
             val o = a.getJSONObject(i)
-            val stored = o.optString("password")
-            if (stored.isNotEmpty() && !SecretBox.isSealed(stored)) unsealed = true
             Favorite(
-                o.optString("address"), o.optString("name"), o.optString("nickname"), password(stored), o.optBoolean("auto"),
+                o.optString("address"), o.optString("name"), o.optString("nickname"),
+                if (inList) password(o.optString("password")) else passwords.optString(i), o.optBoolean("auto"),
                 o.optInt("filePort", 0).takeIf { it in 1..65535 },
             )
         }.filter { it.address.isNotBlank() }
-        if (unsealed) save(c, list)
+        if (inList) save(c, list)
         list
     } catch (_: Exception) {
         emptyList()
+    }
+
+    /** The passwords, in the list's order. */
+    private fun passwords(c: Context): JSONArray = try {
+        JSONArray(secretPrefs(c).getSecret("favorites", PASSWORDS) ?: "[]")
+    } catch (e: SecretBox.Unreadable) {
+        AppLog.log("The favourites' passwords can't be read: ${e.message}")
+        JSONArray()
     }
 
     private fun password(stored: String) = try {
@@ -57,9 +70,13 @@ object Favorites {
         list.forEachIndexed { i, f ->
             a.put(
                 JSONObject().put("address", f.address.trim()).put("name", f.name.trim()).put("nickname", f.nickname.trim())
-                    .put("password", sealOrPlain(f.password, PASSWORD)).put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
+                    .put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
             )
         }
+        val secrets = secretPrefs(c).edit()
+        if (list.all { it.password.isEmpty() }) secrets.remove("favorites")
+        else secrets.putSecret("favorites", PASSWORDS, JSONArray(list.map { it.password }).toString())
+        secrets.commit()
         prefs(c).edit().putString("list", a.toString()).apply()
     }
 
