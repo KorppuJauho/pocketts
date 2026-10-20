@@ -53,9 +53,9 @@ createServer((req, res) => {
       .join("");
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
     return res.end(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MobileTS6 test builds</title>
+<title>PocketTS test builds</title>
 <style>body{font:16px system-ui,sans-serif;margin:24px;line-height:1.5}a{font-size:1.2em}li{margin:12px 0}</style>
-<h1>MobileTS6 test builds</h1><p>Tap the newest one to download, then open it to install.</p>
+<h1>PocketTS test builds</h1><p>Tap the newest one to download, then open it to install.</p>
 <ul>${list || "<li>No builds yet</li>"}</ul>`);
   }
 

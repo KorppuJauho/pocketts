@@ -13,11 +13,11 @@ val devEnv: Map<String, String> = rootProject.file("dev.env").takeIf { it.exists
     ?: emptyMap()
 
 android {
-    namespace = "io.github.korppujauho.mobilets6"
+    namespace = "io.github.korppujauho.pocketts"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "io.github.korppujauho.mobilets6"
+        applicationId = "io.github.korppujauho.pocketts"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

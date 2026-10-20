@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MobileTS6"
+rootProject.name = "PocketTS"
 include(":tsproto", ":app")

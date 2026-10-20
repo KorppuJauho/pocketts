@@ -1,4 +1,4 @@
-# MobileTS6
+# PocketTS
 
 A TeamSpeak client for Android. Type a nickname and a server address, and the app connects straight to the
 TeamSpeak server: no bridge, tunnel or proxy in between. It works with TeamSpeak 6 and TeamSpeak 3 servers.

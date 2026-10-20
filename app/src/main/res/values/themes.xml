@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Dark from the first frame (WebTS's page colour), before the app draws itself. -->
-    <style name="Theme.MobileTS6" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.PocketTS" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
