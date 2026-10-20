@@ -14,6 +14,21 @@ import io.github.korppujauho.pocketts.ui.ServerScreen
 import io.github.korppujauho.pocketts.ui.View
 import io.github.korppujauho.pocketts.ui.SettingsActions
 import io.github.korppujauho.pocketts.ui.SettingsContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import org.junit.Rule
@@ -89,6 +104,32 @@ class ScreenshotTest {
     fun personPopup() = popup("popup-person") {
         val s = Example.state()
         io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {})
+    }
+
+    /** The app icon as launchers cut it (rounded square, circle), its themed one-colour version, and the notification icon. */
+    @Test
+    fun appIcon() = shot("app-icon") {
+        Row(
+            Modifier.fillMaxSize().background(Color(0xFF6B7280)),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconTile(RoundedCornerShape(24), Color(0xFF1B1D22), R.drawable.ic_launcher_foreground)
+            IconTile(CircleShape, Color(0xFF1B1D22), R.drawable.ic_launcher_foreground)
+            IconTile(CircleShape, Color(0xFFD7E3FF), R.drawable.ic_launcher_monochrome, tint = Color(0xFF1B3A7A))
+            Image(painterResource(R.drawable.ic_notification), null, Modifier.size(32.dp), colorFilter = ColorFilter.tint(Color.White))
+        }
+    }
+
+    // A launcher shows the middle 72 of an adaptive icon's 108 dp: drawn at 108 * 4/3 of the tile and cut to it
+    @Composable
+    private fun IconTile(shape: androidx.compose.ui.graphics.Shape, background: Color, icon: Int, tint: Color? = null) {
+        Box(Modifier.size(84.dp).clip(shape).background(background), contentAlignment = Alignment.Center) {
+            Image(
+                painterResource(icon), null, Modifier.requiredSize(126.dp),
+                colorFilter = tint?.let { ColorFilter.tint(it) },
+            )
+        }
     }
 
     @Test

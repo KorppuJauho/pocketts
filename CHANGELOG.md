@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A new app icon: a headset peeking out of a blue pocket, with a one-colour version for Android's themed icons and a
+  matching notification icon. The header shows it too.
 - Exporting the identity warns first that the file is you on every server, then saves it as a file you choose (in
   the .ini format TeamSpeak apps open) instead of sharing it to an app. Import hides the identity while it's pasted.
 - Sounds for events, made for the app (simple tones, not TeamSpeak's): connecting and disconnecting, switching channel,
