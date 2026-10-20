@@ -24,15 +24,56 @@ class ConnectionService : Service() {
         private const val ACTION_SHOW = "show"
         private const val ACTION_DISCONNECT = "disconnect"
         private const val EXTRA_TEXT = "text"
+        private const val EXTRA_CAMERA = "camera"
+        private const val EXTRA_PROJECTION = "projection"
 
-        fun start(context: Context, text: String) {
+        /** Runs once the service is in the foreground with its new kinds (screen sharing must wait for that). */
+        @Volatile var onForeground: (() -> Unit)? = null
+
+        fun start(
+            context: Context,
+            text: String,
+            // By default what's being shared now (so other updates don't drop the camera or the screen)
+            camera: Boolean = Session.state.value.stream.sharing == io.github.korppujauho.mobilets6.proto.Streams.Kind.CAMERA,
+            projection: Boolean = Session.state.value.stream.sharing == io.github.korppujauho.mobilets6.proto.Streams.Kind.SCREEN,
+        ) {
             context.startForegroundService(
                 Intent(context, ConnectionService::class.java).setAction(ACTION_SHOW).putExtra(EXTRA_TEXT, text)
+                    .putExtra(EXTRA_CAMERA, camera).putExtra(EXTRA_PROJECTION, projection)
             )
         }
 
         fun stop(context: Context) {
             context.stopService(Intent(context, ConnectionService::class.java))
+        }
+
+        private const val MESSAGES = "messages"
+        private var nextMessageId = 100
+
+        /** A private message or a poke while the app isn't on screen. */
+        fun notifyMessage(context: Context, title: String, text: String) {
+            val nm = context.getSystemService(NotificationManager::class.java)
+            if (nm.getNotificationChannel(MESSAGES) == null) {
+                nm.createNotificationChannel(
+                    NotificationChannel(MESSAGES, context.getString(R.string.notification_messages), NotificationManager.IMPORTANCE_HIGH)
+                )
+            }
+            val open = PendingIntent.getActivity(
+                context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            val n = Notification.Builder(context, MESSAGES)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(Notification.BigTextStyle().bigText(text))
+                .setContentIntent(open)
+                .setAutoCancel(true)
+                .build()
+            try {
+                nm.notify(nextMessageId++, n)
+            } catch (_: SecurityException) {
+                // Notifications not allowed
+            }
         }
     }
 
@@ -47,7 +88,25 @@ class ConnectionService : Service() {
             return START_NOT_STICKY
         }
         val text = intent?.getStringExtra(EXTRA_TEXT) ?: getString(R.string.app_name)
-        startForeground(ID, notification(text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        // The microphone may be used in the background only with its permission granted (and the service saying so)
+        val mic = checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val camera = intent?.getBooleanExtra(EXTRA_CAMERA, false) == true &&
+            checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val projection = intent?.getBooleanExtra(EXTRA_PROJECTION, false) == true
+        val types = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK or
+            (if (mic) ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0) or
+            (if (camera) ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA else 0) or
+            (if (projection) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION else 0)
+        try {
+            startForeground(ID, notification(text), types)
+        } catch (e: Exception) {
+            AppLog.log("Foreground with kinds $types refused, playback only: $e")
+            startForeground(ID, notification(text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        }
+        onForeground?.let { run ->
+            onForeground = null
+            run()
+        }
         if (wakeLock == null) {
             wakeLock = (getSystemService(POWER_SERVICE) as PowerManager)
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MobileTS6:connection").apply { acquire() }

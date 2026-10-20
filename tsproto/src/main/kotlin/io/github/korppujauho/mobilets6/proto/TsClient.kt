@@ -89,9 +89,16 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     @Volatile var clientId = 0
         private set
 
+    /** The last end was the network's (no answer, network error), not the server's (kick, ban, refusal) nor ours. */
+    @Volatile var lostConnection = false
+        private set
+
+    /** The server's address (for file transfers), once connecting has started. */
+    val serverAddress: InetAddress? get() = server?.address
+
     private lateinit var opts: Options
     private var socket: DatagramSocket? = null
-    private var server: InetSocketAddress? = null
+    @Volatile private var server: InetSocketAddress? = null
     private var ticker: ScheduledFuture<*>? = null
     private var pinger: ScheduledFuture<*>? = null
 
@@ -142,6 +149,11 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         }
     }
 
+    /** Runs [block] on the connection's thread (where the listener is called), after what was asked before. */
+    fun post(block: () -> Unit) {
+        exec.execute(block)
+    }
+
     fun sendCommand(cmd: String) {
         exec.execute { if (state == State.CONNECTED) sendCommandNow(cmd) }
     }
@@ -166,6 +178,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         if (state != State.DISCONNECTED) return
         opts = options
         state = State.CONNECTING
+        lostConnection = false
         clientId = 0
         cryptoReady = false
         ivStruct = null
@@ -219,8 +232,9 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         }
     }
 
-    private fun fail(reason: String) {
+    private fun fail(reason: String, network: Boolean = true) {
         log("Disconnected: $reason")
+        lostConnection = network
         finish(reason)
     }
 
@@ -473,7 +487,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             "error" -> if (state == State.CONNECTING && cmd["id"] != "0") {
                 // While connecting, an error answers clientinit: wrong password, banned, and so on.
                 listener.onCommand(cmd)
-                return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})")
+                return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})", network = false)
             }
         }
         listener.onCommand(cmd)
@@ -564,7 +578,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             Crypto.xorInto(iv, beta, beta.size, 10)
             startEncryption(iv)
         } catch (e: Exception) {
-            fail("Handshake failed: ${e.message}")
+            fail("Handshake failed: ${e.message}", network = false)
         }
     }
 

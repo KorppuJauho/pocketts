@@ -3,12 +3,19 @@ package io.github.korppujauho.mobilets6
 import androidx.compose.runtime.Composable
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.roborazziSystemPropertyOutputDirectory
+import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.Commands
 import io.github.korppujauho.mobilets6.proto.ServerModel
+import io.github.korppujauho.mobilets6.ui.ConnectActions
 import io.github.korppujauho.mobilets6.ui.ConnectScreen
 import io.github.korppujauho.mobilets6.ui.MobileTsTheme
 import io.github.korppujauho.mobilets6.ui.ServerActions
 import io.github.korppujauho.mobilets6.ui.ServerScreen
+import io.github.korppujauho.mobilets6.ui.View
+import io.github.korppujauho.mobilets6.ui.SettingsActions
+import io.github.korppujauho.mobilets6.ui.SettingsContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -29,15 +36,42 @@ class ScreenshotTest {
 
     @Test
     fun connect() = shot("connect") {
-        ConnectScreen("Jamie", {}, "ts.example.com", {}, "", {}, null) {}
+        ConnectScreen(
+            "Jamie", "ts.example.com", "", listOf(
+                Favorite("ts.example.com", "Friends", auto = true),
+                Favorite("voice.example.org:9988"),
+            ), null, Example.noConnect,
+        )
     }
 
     @Test
     fun server() = shot("server") { ServerScreen(Example.state(), Example.noActions) }
 
     @Test
+    fun chat() = shot("chat") { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+
+    @Test
+    fun poked() = shot("poke") {
+        ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions)
+    }
+
+    @Test
+    fun pushToTalk() = shot("push-to-talk") {
+        val s = Example.state()
+        ServerScreen(
+            s.copy(voice = VoiceSettings(activation = VoiceSettings.Activation.PTT), micAllowed = true, pttHeld = true, talking = s.talking + 3),
+            Example.noActions,
+        )
+    }
+
+    @Test
+    fun settings() = shot("settings-capture") {
+        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
     fun serverConnecting() = shot("server-connecting") {
-        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com"), Example.noActions)
+        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com", reconnecting = 2), Example.noActions)
     }
 }
 
@@ -49,8 +83,39 @@ object Example {
         override fun toggleMic() {}
         override fun toggleSound() {}
         override fun openSettings() {}
-        override fun openServerInfo() {}
-        override fun openPerson(client: ServerModel.Client) {}
+        override fun send(key: Chat.Key, text: String) {}
+        override fun openPrivate(person: ServerModel.Client) {}
+        override fun closePrivate(uid: String) {}
+        override fun poke(person: ServerModel.Client, text: String) {}
+        override fun dismissPoke(id: Long) {}
+        override fun setVolume(person: ServerModel.Client, volume: Float) {}
+        override fun viewing(key: Chat.Key?) {}
+        override fun setPtt(held: Boolean) {}
+        override fun sendPicture(uri: android.net.Uri) {}
+        override fun setAway(away: Boolean, message: String) {}
+        override fun switchTo(f: Favorite) {}
+        override fun addFavorite(f: Favorite) {}
+        override fun watch(person: ServerModel.Client) {}
+        override fun stopWatching() {}
+        override fun shareCamera(front: Boolean, hd: Boolean) {}
+        override fun shareScreen() {}
+        override fun stopShare() {}
+        override fun flipCamera() {}
+    }
+
+    val noConnect = object : ConnectActions {
+        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {}
+        override fun connectFavorite(f: Favorite) {}
+        override fun saveFavorite(old: Favorite?, new: Favorite) {}
+        override fun removeFavorite(f: Favorite) {}
+        override fun toggleAuto(f: Favorite) {}
+    }
+
+    val noSettings = object : SettingsActions {
+        override fun save(voice: VoiceSettings, nickname: String) {}
+        override fun micLevel() = 0.022f to true
+        override fun micTest(on: Boolean) {}
+        override fun playTestSound() {}
     }
 
     fun model(): ServerModel {
@@ -69,19 +134,45 @@ object Example {
                 "|cid=11 cpid=0 channel_order=4 channel_name=[spacer2]---" +
                 "|cid=5 cpid=0 channel_order=11 channel_name=AFK channel_needed_talk_power=99",
         )
+        cmd("notifyservergrouplist sgid=6 name=Admin iconid=100 sortid=1|sgid=8 name=Guest iconid=0 sortid=9")
         fun person(id: Int, cid: Int, nick: String, extra: String = "") =
             cmd("notifycliententerview ctid=$cid clid=$id client_nickname=$nick client_type=0 client_talk_power=75 $extra")
         person(1, 1, "Lee")
         person(2, 1, "Noa", "client_input_muted=1")
         person(3, 1, "Jamie")
-        person(4, 1, "Riley")
-        person(5, 2, "Alex")
+        person(4, 1, "Riley", "client_is_streaming=1")
+        person(5, 2, "Alex", "client_servergroups=6 client_is_streaming=1")
         person(8, 6, "Sam", "client_output_muted=1")
         person(9, 6, "Robin")
-        person(10, 3, "Kai", "client_talk_power=0")
-        person(11, 4, "Mia")
-        person(12, 5, "Quinn", "client_away=1 client_talk_power=0")
+        person(10, 3, "Kai", "client_talk_power=0 client_servergroups=6")
+        person(11, 4, "Mia", "client_servergroups=6")
+        person(12, 5, "Quinn", "client_away=1 client_talk_power=0 client_servergroups=6")
         return m
+    }
+
+    const val T0 = 1_760_000_000_000L // a fixed time for the example lines
+
+    fun chatState(): Session.UiState {
+        val m = model()
+        val chat = Chat()
+        var t = T0
+        chat.now = { t.also { t += 45_000 } }
+        fun feed(s: String) { val c = Commands.parse(s); chat.handle(c, m); m.apply(c) }
+        fun say(id: Int, name: String, msg: String) =
+            feed(Commands.build("notifytextmessage", "targetmode" to 2, "msg" to msg, "invokerid" to id, "invokername" to name))
+        say(4, "Riley", "Anyone up for a match later tonight?")
+        say(3, "Jamie", "Count me in, after 8 pm")
+        feed("notifyclientmoved ctid=1 reasonid=0 clid=5")
+        say(4, "Riley", "Nice! I will set up a **lobby** at 8: https://example.com/lobby")
+        feed(Commands.build("notifyclientleftview", "cfid" to 1, "ctid" to 0, "reasonid" to 8, "reasonmsg" to "see you", "clid" to 2))
+        feed("notifytextmessage targetmode=1 msg=Psst invokerid=9 invokername=Robin invokeruid=robin=")
+        val s = state()
+        return s.copy(
+            tree = m.tree(),
+            chat = chat.keys().associateWith { chat.entries(it) },
+            privateTabs = chat.privateNames.map { (uid, name) -> Session.PrivateTab(uid, name) },
+            unread = setOf(Chat.Key.Private("robin=")),
+        )
     }
 
     fun state(): Session.UiState {
@@ -95,6 +186,8 @@ object Example {
             ownChannel = 1,
             talking = setOf(4, 9),
             cannotTalk = m.clients.values.filter { !m.canTalk(it) }.map { it.id }.toSet(),
+            micAllowed = true,
+            badges = m.clients.values.associate { it.id to m.badges(it) },
         )
     }
 }

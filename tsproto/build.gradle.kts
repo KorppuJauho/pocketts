@@ -23,6 +23,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     environment("TS_TEST_SERVER", System.getenv("TS_TEST_SERVER") ?: "")
+    environment("TS_TEST_FT_PORT", System.getenv("TS_TEST_FT_PORT") ?: "")
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true
