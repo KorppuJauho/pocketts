@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.ServerModel
+import io.github.korppujauho.mobilets6.ui.ConnectActions
 import io.github.korppujauho.mobilets6.ui.ConnectScreen
 import io.github.korppujauho.mobilets6.ui.MobileTsTheme
 import io.github.korppujauho.mobilets6.ui.ServerActions
@@ -67,6 +68,11 @@ class MainActivity : ComponentActivity() {
             askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         current = this
+        favorites.value = Favorites.load(this)
+        if (savedInstanceState == null && Session.state.value.phase == Session.Phase.IDLE && !Session.autoConnected) {
+            Session.autoConnected = true
+            favorites.value.firstOrNull { it.auto }?.let { connectFavorite(applicationContext, it) }
+        }
         setContent { MobileTsTheme { App() } }
     }
 
@@ -90,30 +96,59 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** The favourites, shared by the screens (they change from both). */
+private val favorites = kotlinx.coroutines.flow.MutableStateFlow<List<Favorite>>(emptyList())
+
 @Composable
 private fun App() {
     val state by Session.state.collectAsState()
+    val favs by favorites.collectAsState()
     val ctx = LocalContext.current
     val settings = remember { Settings(ctx) }
-    if (state.phase == Session.Phase.IDLE) Connect(state) else ServerScreen(state, SessionActions, AppSettingsActions(ctx), settings.nickname)
+    if (state.phase == Session.Phase.IDLE) {
+        Connect(state, favs)
+    } else {
+        ServerScreen(state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs)
+    }
+}
+
+/** Connects (the microphone is asked for once; talking starts when it's allowed). */
+private fun connect(context: Context, address: String, nickname: String, password: String) {
+    Settings(context).let {
+        it.nickname = nickname
+        it.address = address
+    }
+    MainActivity.current?.ensureMic()
+    Session.connect(context, address, nickname, password)
+}
+
+private fun connectFavorite(context: Context, f: Favorite) =
+    connect(context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password)
+
+private fun saveFavorites(context: Context, list: List<Favorite>) {
+    Favorites.save(context, list)
+    favorites.value = Favorites.load(context)
 }
 
 @Composable
-private fun Connect(state: Session.UiState) {
+private fun Connect(state: Session.UiState, favs: List<Favorite>) {
     val ctx = LocalContext.current
     val settings = remember { Settings(ctx) }
-    var nickname by remember { mutableStateOf(settings.nickname) }
-    var address by remember { mutableStateOf(settings.address) }
-    var password by remember { mutableStateOf(settings.serverPassword) }
     ConnectScreen(
-        nickname, { nickname = it }, address, { address = it }, password, { password = it }, state.error,
-    ) {
-        settings.nickname = nickname.trim()
-        settings.address = address.trim()
-        settings.serverPassword = password
-        MainActivity.current?.ensureMic() // asked once; talking starts when it's allowed
-        Session.connect(ctx, address, nickname.trim(), password)
-    }
+        settings.nickname, settings.address, settings.serverPassword, favs, state.error,
+        object : ConnectActions {
+            override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {
+                settings.serverPassword = if (remember) password else ""
+                if (favorite) saveFavorites(ctx, favs + Favorite(address, password = if (remember) password else ""))
+                connect(ctx, address, nickname, password)
+            }
+            override fun connectFavorite(f: Favorite) = connectFavorite(ctx, f)
+            override fun saveFavorite(old: Favorite?, new: Favorite) =
+                saveFavorites(ctx, favs.map { if (it == old) new else if (new.auto) it.copy(auto = false) else it })
+            override fun removeFavorite(f: Favorite) = saveFavorites(ctx, favs - f)
+            override fun toggleAuto(f: Favorite) = saveFavorites(ctx, favs.map { it.copy(auto = if (it == f) !f.auto else false) })
+        },
+    )
 }
 
 private object SessionActions : ServerActions {
@@ -141,6 +176,15 @@ private object SessionActions : ServerActions {
     override fun viewing(key: Chat.Key?) {
         Session.viewing = key
     }
+    override fun setAway(away: Boolean, message: String) = Session.setAway(away, message)
+    override fun switchTo(f: Favorite) {
+        val ctx = MainActivity.current?.applicationContext ?: return
+        Session.switchTo { connectFavorite(ctx, f) }
+    }
+    override fun addFavorite(f: Favorite) {
+        val ctx = MainActivity.current?.applicationContext ?: return
+        saveFavorites(ctx, favorites.value.map { if (f.auto) it.copy(auto = false) else it } + f)
+    }
 }
 
 private class AppSettingsActions(private val context: Context) : SettingsActions {
@@ -156,4 +200,14 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun playTestSound() = TestSound.play(Session.state.value.voice)
     override fun setAvatar(uri: android.net.Uri) = Session.setAvatar(context, uri)
     override fun removeAvatar() = Session.removeAvatar()
+    override fun exportIdentity() {
+        val activity = MainActivity.current ?: return
+        val text = Settings(context).identity().export()
+        val send = android.content.Intent(android.content.Intent.ACTION_SEND)
+            .setType("text/plain")
+            .putExtra(android.content.Intent.EXTRA_TEXT, text)
+            .putExtra(android.content.Intent.EXTRA_SUBJECT, "TeamSpeak identity")
+        activity.startActivity(android.content.Intent.createChooser(send, "Export the identity"))
+    }
+    override fun importIdentity(text: String): String? = Settings(context).importIdentity(text)
 }

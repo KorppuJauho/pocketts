@@ -49,6 +49,9 @@ object Session : TsClient.Listener {
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
         val avatarStatus: String? = null, // the profile picture's last change, as words
+        val reconnecting: Int = 0, // the try, while getting a lost connection back (0 = not)
+        val away: Boolean = false,
+        val awayMessage: String = "",
     ) {
         /** Files on this server (for pictures). */
         val serverKey: String get() = address
@@ -100,12 +103,45 @@ object Session : TsClient.Listener {
             if (value != null) _state.update { it.copy(unread = it.unread - value) }
         }
 
+    /** The favourite marked to connect when the app opens has been tried (once per app start). */
+    @Volatile var autoConnected = false
+
+    /** Leaves this server and then runs [next] (connecting to another). */
+    fun switchTo(next: () -> Unit) {
+        if (_state.value.phase == Phase.IDLE) {
+            next()
+            return
+        }
+        pendingSwitch = next
+        disconnect()
+    }
+
+    @Volatile private var pendingSwitch: (() -> Unit)? = null
+
     /** Whether the app is on screen; away, private messages and pokes also come as notifications. */
     @Volatile var foreground = false
+
+    /** What the last connect asked for, to get a lost connection back. */
+    private data class Target(val address: String, val nickname: String, val password: String)
+    private var target: Target? = null
+    private var retries = 0
+    @Volatile private var wasConnected = false // only a connection that worked is tried again
+    private val retryTimer = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "reconnect").apply { isDaemon = true } }
+    private var retryTask: java.util.concurrent.ScheduledFuture<*>? = null
+    private var network: android.net.ConnectivityManager.NetworkCallback? = null
 
     fun connect(context: Context, address: String, nickname: String, serverPassword: String) {
         app = context.applicationContext
         if (_state.value.phase != Phase.IDLE) return
+        retries = 0
+        wasConnected = false
+        target = Target(address, nickname, serverPassword)
+        start(keepChat = false)
+    }
+
+    /** Connects to [target]; a reconnect keeps the chat and the pokes. */
+    private fun start(keepChat: Boolean) {
+        val (address, nickname, serverPassword) = target ?: return
         val typed = ServerAddress.parse(address) ?: run {
             _state.update { it.copy(error = "That doesn't look like a server address") }
             return
@@ -114,14 +150,18 @@ object Session : TsClient.Listener {
         _state.value = UiState(
             phase = Phase.CONNECTING, address = address, inputMuted = prev.inputMuted, outputMuted = prev.outputMuted,
             volumes = Settings(app).volumes(), voice = VoiceSettings.load(app), micAllowed = micPermitted(),
+            reconnecting = if (keepChat) retries else 0,
+            chat = if (keepChat) prev.chat else emptyMap(), privateTabs = if (keepChat) prev.privateTabs else emptyList(),
+            pokes = if (keepChat) prev.pokes else emptyList(), away = prev.away && keepChat, awayMessage = prev.awayMessage,
         )
+        watchNetwork()
         ConnectionService.start(app, "Connecting to $address")
         worker.execute {
             val identity = Settings(app).identity() // made on first use, which takes a moment
             val target = ServerAddress.resolve(typed, AndroidDns) { AppLog.log(it) }
             AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()
-            chat.clear()
+            if (!keepChat) chat.clear()
             startAudio()
             client = TsClient(this) { AppLog.log(it) }.also {
                 files = FileTransfer(it)
@@ -136,6 +176,12 @@ object Session : TsClient.Listener {
     }
 
     fun disconnect() {
+        target = null // we leave: no reconnecting
+        retryTask?.cancel(false)
+        if (_state.value.reconnecting > 0 && client == null) {
+            finish(null)
+            return
+        }
         val c = client
         if (c == null) {
             finish(null)
@@ -304,6 +350,10 @@ object Session : TsClient.Listener {
     override fun onConnected(clientId: Int) {
         AppLog.log("Connected as client $clientId")
         val s = _state.value
+        retries = 0
+        wasConnected = true
+        if (s.reconnecting > 0) _state.update { it.copy(reconnecting = 0) }
+        if (s.away) client?.sendCommand(Commands.build("clientupdate", "client_away" to true, "client_away_message" to s.awayMessage))
         if (s.inputMuted || s.outputMuted) {
             client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to s.inputMuted, "client_output_muted" to s.outputMuted))
         }
@@ -414,10 +464,59 @@ object Session : TsClient.Listener {
 
     override fun onDisconnected(reason: String?) {
         AppLog.log("Disconnected" + (reason?.let { ": $it" } ?: ""))
+        // Lost (no answer, or the network itself went: a failed try while reconnecting counts too)
+        val lost = client?.lostConnection == true || _state.value.reconnecting > 0
+        if (lost && wasConnected && target != null && retries < 20) {
+            // The network went away (Wi-Fi to mobile data, a tunnel...): try again, sooner when a network comes back
+            files?.onDisconnected()
+            files = null
+            stopAudio()
+            client = null
+            retries++
+            _state.update { it.copy(phase = Phase.CONNECTING, reconnecting = retries, error = reason, talking = emptySet()) }
+            ConnectionService.start(app, "Reconnecting to ${_state.value.address}…")
+            scheduleRetry(minOf(30L, 2L * retries))
+            return
+        }
         finish(reason)
     }
 
+    private fun scheduleRetry(seconds: Long) {
+        retryTask?.cancel(false)
+        retryTask = retryTimer.schedule({ retryNow() }, seconds, java.util.concurrent.TimeUnit.SECONDS)
+    }
+
+    private fun retryNow() {
+        if (target == null || client != null || _state.value.reconnecting == 0) return
+        AppLog.log("Reconnecting (try $retries)")
+        start(keepChat = true)
+    }
+
+    /** A network coming back hurries a waiting reconnect. */
+    private fun watchNetwork() {
+        if (network != null) return
+        val cm = app.getSystemService(android.net.ConnectivityManager::class.java) ?: return
+        val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(n: android.net.Network) {
+                if (_state.value.reconnecting > 0 && client == null) scheduleRetry(1)
+            }
+        }
+        try {
+            cm.registerDefaultNetworkCallback(cb)
+            network = cb
+        } catch (_: Exception) {
+        }
+    }
+
+    /** Away (with a message) or back, as the others see it. */
+    fun setAway(away: Boolean, message: String = "") {
+        _state.update { it.copy(away = away, awayMessage = if (away) message else "") }
+        client?.sendCommand(Commands.build("clientupdate", "client_away" to away, "client_away_message" to if (away) message else ""))
+    }
+
     private fun finish(reason: String?) {
+        retryTask?.cancel(false)
+        target = null
         files?.onDisconnected()
         files = null
         stopAudio()
@@ -428,6 +527,10 @@ object Session : TsClient.Listener {
             volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed,
         )
         if (::app.isInitialized) ConnectionService.stop(app)
+        pendingSwitch?.let { next ->
+            pendingSwitch = null
+            android.os.Handler(android.os.Looper.getMainLooper()).post { next() }
+        }
     }
 
     private fun setTalking(clientId: Int, talking: Boolean) {

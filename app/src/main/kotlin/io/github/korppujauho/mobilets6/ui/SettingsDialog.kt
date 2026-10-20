@@ -60,6 +60,10 @@ interface SettingsActions {
     fun playTestSound()
     fun setAvatar(uri: android.net.Uri) {}
     fun removeAvatar() {}
+    /** Shares the identity (TeamSpeak's export format) to wherever the person chooses. */
+    fun exportIdentity() {}
+    /** Takes an identity exported from a TeamSpeak app; null when it worked, else why not. */
+    fun importIdentity(text: String): String? = null
 }
 
 /** Who we are on the server, for the profile picture in Settings. */
@@ -128,6 +132,7 @@ fun SettingsContent(
                     0 -> {
                         if (self != null) ProfilePicture(self, actions)
                         General(v, nick, { nick = it }) { v = it }
+                        Identity(actions)
                     }
                     1 -> Playback(v, actions) { v = it }
                     else -> Capture(v, actions) { v = it }
@@ -204,6 +209,42 @@ private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
         }
         self.avatarStatus?.let { Desc(it) }
         Desc("Others see it on this server. It's made to fit 320 × 320.")
+    }
+}
+
+@Composable
+private fun Identity(actions: SettingsActions) {
+    var importing by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf<String?>(null) }
+    Group("TeamSpeak identity") {
+        Desc("Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("Export…") { actions.exportIdentity() }
+            SecondaryButton("Import…") { importing = true }
+        }
+        status?.let { Desc(it) }
+    }
+    if (importing) {
+        var text by remember { mutableStateOf("") }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { importing = false },
+            containerColor = Ts.panel,
+            title = { Text("Import an identity", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Desc("Paste the identity a TeamSpeak app exported. It replaces this phone's own from the next connect.")
+                    TsField(text, { text = it }, "Identity", singleLine = false)
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    val error = actions.importIdentity(text)
+                    status = error ?: "Imported. It's used from the next connect."
+                    importing = false
+                }) { Text("Import", color = Ts.accent) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { importing = false }) { Text("Cancel", color = Ts.muted) } },
+        )
     }
 }
 

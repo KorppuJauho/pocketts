@@ -56,6 +56,9 @@ fun PersonSheet(
     onPoke: () -> Unit,
     onChat: () -> Unit,
     onDismiss: () -> Unit,
+    away: Boolean = false,
+    awayMessage: String = "",
+    onAway: (Boolean, String) -> Unit = { _, _ -> },
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Ts.panel) {
         Column(
@@ -71,7 +74,17 @@ fun PersonSheet(
                 color = Ts.afk, fontSize = 14.sp,
             )
             if (isSelf) {
-                Text("This is you.", color = Ts.muted, fontSize = 14.sp)
+                // Away, as the TeamSpeak app sets it: others see AFK and the message
+                var msg by remember { mutableStateOf(awayMessage) }
+                TsField(msg, { msg = it.take(80) }, "Away message (optional)")
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (away) {
+                        SecondaryButton("I'm back", Modifier.weight(1f)) { onAway(false, ""); onDismiss() }
+                        SecondaryButton("Update message", Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                    } else {
+                        SecondaryButton("Set away", Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                    }
+                }
                 return@Column
             }
             var v by remember { mutableFloatStateOf(volume) }

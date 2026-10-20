@@ -34,6 +34,13 @@
 - Sending pictures to the channel chat: choose one or take a photo, see it, then send. Photos are turned the right
   way up and saved again, which leaves out what the camera wrote in them (such as where the photo was taken).
 - Your own profile picture (Settings > General), fitted inside 320 × 320, or removed.
+- Favourites as in WebTS: name, address, the nickname used there, the password (kept on this phone only), and one
+  that connects automatically when the app opens. The star menu on the server screen switches servers or adds the
+  one you're on.
+- A lost connection (Wi-Fi to mobile data, a dead spot) reconnects by itself, keeping the chat; sooner when a
+  network comes back.
+- Away, with a message (tap yourself).
+- The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General).
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
 - Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
 

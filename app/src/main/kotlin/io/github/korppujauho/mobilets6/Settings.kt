@@ -29,6 +29,16 @@ class Settings(private val context: Context) {
         p.apply()
     }
 
+    /** Takes an identity exported by a TeamSpeak app (used from the next connect); null when it worked, else why not. */
+    fun importIdentity(text: String): String? = try {
+        val id = Identity.import(text.trim())
+        prefs.edit().putString("identity", id.export()).apply()
+        AppLog.log("Imported an identity (security level ${id.securityLevel})")
+        null
+    } catch (e: Exception) {
+        "That isn't a TeamSpeak identity."
+    }
+
     /** Kept in TeamSpeak's own export format, so it can be moved to and from other TeamSpeak apps later. */
     fun identity(): Identity {
         prefs.getString("identity", null)?.let { saved ->

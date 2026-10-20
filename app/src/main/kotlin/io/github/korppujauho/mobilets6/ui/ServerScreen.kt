@@ -21,6 +21,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,10 @@ interface ServerActions {
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
     fun sendPicture(uri: android.net.Uri)
+    fun setAway(away: Boolean, message: String)
+    /** Another server from the favourites (this one is left). */
+    fun switchTo(f: io.github.korppujauho.mobilets6.Favorite)
+    fun addFavorite(f: io.github.korppujauho.mobilets6.Favorite)
     /** The conversation on screen (null when the chat isn't showing). */
     fun viewing(key: Chat.Key?)
 }
@@ -69,7 +74,10 @@ fun ServerScreen(
     startView: View = View.CHANNELS,
     startChat: Chat.Key = Chat.Key.Channel(0),
     startSettings: Int? = null,
+    favorites: List<io.github.korppujauho.mobilets6.Favorite> = emptyList(),
 ) {
+    var serversMenu by remember { mutableStateOf(false) }
+    var addingFavorite by remember { mutableStateOf<io.github.korppujauho.mobilets6.Favorite?>(null) }
     var settings by remember { mutableStateOf(startSettings) }
     var view by rememberSaveable { mutableStateOf(startView) }
     var chatKey by remember { mutableStateOf(startChat) }
@@ -86,7 +94,35 @@ fun ServerScreen(
 
     Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
         Column(Modifier.fillMaxSize()) {
-            AppHeader { ExitButton("Disconnect") { actions.disconnect() } }
+            AppHeader {
+                // WebTS's menu: the favourites (one tap switches), and adding the server you're on
+                androidx.compose.foundation.layout.Box {
+                    androidx.compose.material3.IconButton(onClick = { serversMenu = true }) {
+                        androidx.compose.material3.Icon(
+                            androidx.compose.material.icons.Icons.Filled.Star, contentDescription = "Servers", tint = Ts.text,
+                        )
+                    }
+                    androidx.compose.material3.DropdownMenu(serversMenu, onDismissRequest = { serversMenu = false }, containerColor = Ts.card) {
+                        for (f in favorites) {
+                            val here = io.github.korppujauho.mobilets6.Favorites.same(f.address, state.address)
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text((if (here) "● " else "★ ") + f.label, color = Ts.text) },
+                                enabled = !here,
+                                onClick = { serversMenu = false; actions.switchTo(f) },
+                            )
+                        }
+                        if (favorites.none { io.github.korppujauho.mobilets6.Favorites.same(it.address, state.address) }) {
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text("☆ Add to favourites", color = Ts.text) },
+                                onClick = {
+                                    serversMenu = false
+                                    addingFavorite = io.github.korppujauho.mobilets6.Favorite(state.address, state.serverName, nickname)
+                                },
+                            )
+                        }                    }
+                }
+                ExitButton("Disconnect") { actions.disconnect() }
+            }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val ptt = state.voice.activation == io.github.korppujauho.mobilets6.VoiceSettings.Activation.PTT
                 ControlsBar(
@@ -102,7 +138,7 @@ fun ServerScreen(
                         ServerName(state.serverName.ifEmpty { "Connecting to ${state.address}…" }) { serverInfo = true }
                     }) {
                         if (state.phase == Session.Phase.CONNECTING) {
-                            Loading("Connecting…")
+                            Loading(if (state.reconnecting > 0) "Connection lost. Reconnecting… (try ${state.reconnecting})" else "Connecting…")
                         } else {
                             state.error?.let { ErrorLine(it) }
                             ChannelTree(
@@ -168,7 +204,12 @@ fun ServerScreen(
                 view = View.CHAT
             },
             onDismiss = { person = null },
+            away = state.away, awayMessage = state.awayMessage,
+            onAway = { a, m -> actions.setAway(a, m) },
         )
+    }
+    addingFavorite?.let { f ->
+        FavoriteDialog(f, onSave = { actions.addFavorite(it); addingFavorite = null }, onDelete = null) { addingFavorite = null }
     }
     pokeTarget?.let { p ->
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })

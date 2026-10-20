@@ -6,6 +6,7 @@ import com.github.takahirom.roborazzi.roborazziSystemPropertyOutputDirectory
 import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.Commands
 import io.github.korppujauho.mobilets6.proto.ServerModel
+import io.github.korppujauho.mobilets6.ui.ConnectActions
 import io.github.korppujauho.mobilets6.ui.ConnectScreen
 import io.github.korppujauho.mobilets6.ui.MobileTsTheme
 import io.github.korppujauho.mobilets6.ui.ServerActions
@@ -35,7 +36,12 @@ class ScreenshotTest {
 
     @Test
     fun connect() = shot("connect") {
-        ConnectScreen("Jamie", {}, "ts.example.com", {}, "", {}, null) {}
+        ConnectScreen(
+            "Jamie", "ts.example.com", "", listOf(
+                Favorite("ts.example.com", "Friends", auto = true),
+                Favorite("voice.example.org:9988"),
+            ), null, Example.noConnect,
+        )
     }
 
     @Test
@@ -65,7 +71,7 @@ class ScreenshotTest {
 
     @Test
     fun serverConnecting() = shot("server-connecting") {
-        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com"), Example.noActions)
+        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com", reconnecting = 2), Example.noActions)
     }
 }
 
@@ -86,6 +92,17 @@ object Example {
         override fun viewing(key: Chat.Key?) {}
         override fun setPtt(held: Boolean) {}
         override fun sendPicture(uri: android.net.Uri) {}
+        override fun setAway(away: Boolean, message: String) {}
+        override fun switchTo(f: Favorite) {}
+        override fun addFavorite(f: Favorite) {}
+    }
+
+    val noConnect = object : ConnectActions {
+        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {}
+        override fun connectFavorite(f: Favorite) {}
+        override fun saveFavorite(old: Favorite?, new: Favorite) {}
+        override fun removeFavorite(f: Favorite) {}
+        override fun toggleAuto(f: Favorite) {}
     }
 
     val noSettings = object : SettingsActions {

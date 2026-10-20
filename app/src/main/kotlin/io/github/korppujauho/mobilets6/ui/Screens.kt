@@ -234,39 +234,6 @@ fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> 
     }
 }
 
-/** The connect screen: nickname, address, password. */
-@Composable
-fun ConnectScreen(
-    nickname: String, onNickname: (String) -> Unit,
-    address: String, onAddress: (String) -> Unit,
-    password: String, onPassword: (String) -> Unit,
-    error: String?,
-    onConnect: () -> Unit,
-) {
-    Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-        AppHeader()
-        Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-        ) {
-            Panel(Modifier.fillMaxWidth(), header = {
-                Text("Connect to a server", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-            }) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    TsField(nickname, onNickname, "Nickname")
-                    TsField(address, onAddress, "Server address", placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
-                    TsField(password, onPassword, "Server password (only if it has one)", password = true, imeAction = ImeAction.Go)
-                    error?.let { Text(it, color = Color(0xFFF87171), fontSize = 14.sp) }
-                    PrimaryButton(
-                        "Connect", enabled = nickname.isNotBlank() && address.isNotBlank(),
-                        modifier = Modifier.fillMaxWidth(), onClick = onConnect,
-                    )
-                }
-            }
-        }
-    }
-}
-
 /** The server name in the panel header: tapping it opens the server info. */
 @Composable
 fun ServerName(name: String, onClick: () -> Unit) {

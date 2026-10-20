@@ -3,8 +3,14 @@
 A TeamSpeak client for Android. Type a nickname and a server address, and the app connects straight to the
 TeamSpeak server: no bridge, tunnel or proxy in between. It works with TeamSpeak 6 and TeamSpeak 3 servers.
 
-**Status: early.** It connects, shows the channels and who is in them (in WebTS's style), lets you change channels,
-and plays voice. Talking (microphone, push-to-talk), chat and the rest are coming next.
+**Status: early, being tested.** It works and looks like WebTS:
+- channels and who is in them, with avatars, icons and badges
+- voice: voice activation, push-to-talk (with a floating button), echo and noise removal, and it keeps working with
+  the screen off
+- chat: channel, server and private, with pictures, pokes and join/leave lines
+- favourites, settings, and reconnecting by itself
+
+Screen and camera streams aren't there yet.
 
 <img src="docs/screenshots/server.png" width="280" alt="The server view: channels and the people in them">
 
