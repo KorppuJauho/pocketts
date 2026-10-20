@@ -27,7 +27,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.RecordVoiceOver
@@ -93,6 +95,31 @@ fun SettingsGear(onClick: () -> Unit) {
 fun HeaderButton(icon: ImageVector, label: String, onClick: () -> Unit) {
     androidx.compose.material3.IconButton(onClick = onClick, modifier = Modifier.size(40.dp)) {
         Icon(icon, contentDescription = label, tint = Ts.text, modifier = Modifier.size(22.dp))
+    }
+}
+
+/**
+ * A warning (a refused password, a share that couldn't start): on a background of its own, closed with its button
+ * or by itself after a few seconds.
+ */
+@Composable
+fun WarningBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, inset: androidx.compose.ui.unit.Dp = 15.dp) {
+    androidx.compose.runtime.LaunchedEffect(text) {
+        kotlinx.coroutines.delay(6000)
+        onDismiss()
+    }
+    val shape = RoundedCornerShape(10.dp)
+    Row(
+        modifier.fillMaxWidth().padding(horizontal = inset).shadow(8.dp, shape).clip(shape).background(Color(0xFF3A1D20))
+            .border(1.dp, Ts.red.copy(alpha = 0.6f), shape).padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.Warning, contentDescription = null, tint = Color(0xFFF87171), modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(10.dp))
+        Text(text, color = Color(0xFFFECACA), fontSize = 14.sp, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
+        androidx.compose.material3.IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
+            Icon(Icons.Filled.Close, contentDescription = "Close", tint = Color(0xFFFECACA), modifier = Modifier.size(20.dp))
+        }
     }
 }
 

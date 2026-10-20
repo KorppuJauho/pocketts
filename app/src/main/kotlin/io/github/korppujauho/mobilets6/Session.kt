@@ -4,6 +4,7 @@ import android.content.Context
 import io.github.korppujauho.mobilets6.proto.Chat
 import io.github.korppujauho.mobilets6.proto.Command
 import io.github.korppujauho.mobilets6.proto.Commands
+import io.github.korppujauho.mobilets6.proto.Crypto
 import io.github.korppujauho.mobilets6.proto.FileTransfer
 import io.github.korppujauho.mobilets6.proto.MessageText
 import io.github.korppujauho.mobilets6.proto.ServerAddress
@@ -125,23 +126,29 @@ object Session : TsClient.Listener {
     fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
     fun setWatchVolume(volume: Float) = engine?.setWatchVolume(volume)
 
+    /** The warning on screen was closed (or its time ran out). */
+    fun clearError() {
+        _state.update { it.copy(error = null) }
+        engine?.clearMessage()
+    }
+
     /** The camera's turn locked or following the phone; remembered for the next share. */
     fun setRotateLock(on: Boolean) {
         updateVoice(_state.value.voice.copy(cameraRotateLock = on))
         engine?.setRotateLock(on)
     }
 
-    fun shareCamera(front: Boolean, hd: Boolean) {
+    fun shareCamera(front: Boolean, quality: Int) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         // The service says "camera" before the camera opens (Android's rule for using it in the background)
         ConnectionService.start(app, "Sharing your camera", camera = true)
-        streams().shareCamera(front, hd, name)
+        streams().shareCamera(front, quality, name)
     }
 
-    fun shareBothCameras(hd: Boolean) {
+    fun shareBothCameras(quality: Int) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         ConnectionService.start(app, "Sharing your cameras", camera = true)
-        streams().shareBothCameras(hd, name)
+        streams().shareBothCameras(quality, name)
     }
 
     /** Screen sharing, with Android's permission ([projection]); the service must say "screen" before it starts. */
@@ -271,10 +278,8 @@ object Session : TsClient.Listener {
 
     fun joinChannel(channelId: Int, password: String = "") {
         val c = client ?: return
-        c.sendCommand(Commands.build("clientmove", "cid" to channelId, "clid" to c.clientId, "cpw" to password.ifEmpty { null }))
+        c.sendCommand(Commands.build("clientmove", "cid" to channelId, "clid" to c.clientId, "cpw" to Crypto.hashPassword(password).ifEmpty { null }))
     }
-
-    fun clearError() = _state.update { it.copy(error = null) }
 
     /** Our microphone on/off, as the others see it. */
     fun toggleMic() {

@@ -62,13 +62,16 @@ interface ServerActions {
     fun addFavorite(f: io.github.korppujauho.mobilets6.Favorite)
     fun watch(person: ServerModel.Client)
     fun stopWatching()
-    fun shareCamera(front: Boolean, hd: Boolean)
+    /** The camera at [quality]: the picture's height, 480, 720 or 1080. */
+    fun shareCamera(front: Boolean, quality: Int)
     /** Asks Android for the screen, then shares it. */
     fun shareScreen()
     fun stopShare()
     fun flipCamera()
     /** Both cameras at once (asked for first if needed). */
-    fun shareBothCameras(hd: Boolean) {}
+    fun shareBothCameras(quality: Int) {}
+    /** The warning on screen was closed. */
+    fun dismissError() {}
     fun setRotateLock(on: Boolean) {}
     fun setWatchMuted(muted: Boolean) {}
     fun setWatchVolume(volume: Float) {}
@@ -181,7 +184,6 @@ fun ServerScreen(
                         actions::pictureInPicture,
                     )
                 }
-                state.stream.message?.let { ErrorLine(it) }
                 val unread = state.unread.any { k ->
                     if (k is Chat.Key.Private) state.privateTabs.any { it.uid == k.uid } else k == Chat.Key.Channel(state.ownChannel)
                 }
@@ -195,7 +197,6 @@ fun ServerScreen(
                         if (state.phase == Session.Phase.CONNECTING) {
                             Loading(if (state.reconnecting > 0) "Connection lost. Reconnecting… (try ${state.reconnecting})" else "Connecting…")
                         } else {
-                            state.error?.let { ErrorLine(it) }
                             ChannelTree(
                                 items,
                                 TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
@@ -220,6 +221,9 @@ fun ServerScreen(
             }
         }
         PokeCards(state.pokes, actions::dismissPoke, Modifier.align(Alignment.TopCenter).padding(top = 56.dp))
+        (state.stream.message ?: state.error.takeIf { state.phase == Session.Phase.CONNECTED })?.let {
+            WarningBanner(it, actions::dismissError, Modifier.align(Alignment.TopCenter).padding(top = 52.dp))
+        }
         if (state.voice.activation == io.github.korppujauho.mobilets6.VoiceSettings.Activation.PTT && state.voice.floatingPtt &&
             state.phase == Session.Phase.CONNECTED
         ) {
@@ -273,8 +277,8 @@ fun ServerScreen(
     if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
     if (shareDialog) {
         ShareDialog(
-            onCamera = { front, hd -> shareDialog = false; actions.shareCamera(front, hd) },
-            onBoth = { hd -> shareDialog = false; actions.shareBothCameras(hd) },
+            onCamera = { front, quality -> shareDialog = false; actions.shareCamera(front, quality) },
+            onBoth = { quality -> shareDialog = false; actions.shareBothCameras(quality) },
             canBoth = canBoth,
             onScreen = { shareDialog = false; actions.shareScreen() },
             onDismiss = { shareDialog = false },

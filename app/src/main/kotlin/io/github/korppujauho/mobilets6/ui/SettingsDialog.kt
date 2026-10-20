@@ -2,6 +2,7 @@ package io.github.korppujauho.mobilets6.ui
 
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -116,14 +117,19 @@ fun SettingsContent(
                     modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onDismiss).padding(4.dp),
                 )
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            // Scrolls sideways if a narrow screen can't fit them all
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 14.dp).padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
                 listOf("General", "Playback", "Capture", "Advanced").forEachIndexed { i, name ->
                     val active = i == tab
                     Text(
-                        name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
+                        name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                        maxLines = 1, softWrap = false,
                         modifier = Modifier.clickable { tab = i }
                             .drawBehind { if (active) drawLine(Ts.accent, Offset(0f, size.height), Offset(size.width, size.height), 2.dp.toPx()) }
-                            .padding(horizontal = 9.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
                     )
                 }
             }

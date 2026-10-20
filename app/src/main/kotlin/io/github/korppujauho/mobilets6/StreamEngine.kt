@@ -57,6 +57,7 @@ class StreamEngine(
         val shareBoth: Boolean = false, // both cameras at once
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
+        val lockedTurn: Int = 0, // the turn kept while locked (the phone's, from the screen's upright, when locked)
         val watchVolume: Float = 1f, // the watched stream's sound, 0 - 1
         val viewers: Int = 0,
         val localVideo: VideoTrack? = null,
@@ -307,40 +308,52 @@ class StreamEngine(
     private var dual: DualCamera? = null
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
-    fun shareCamera(front: Boolean, hd: Boolean, name: String) = exec.execute {
+    fun shareCamera(front: Boolean, quality: Int, name: String) = exec.execute {
         if (state.sharing != null) return@execute
         val cams = Camera2Enumerator(context)
         val device = cams.deviceNames.firstOrNull { cams.isFrontFacing(it) == front } ?: cams.deviceNames.firstOrNull() ?: run {
             log("No camera")
             return@execute
         }
-        bitrate = if (hd) 2500 else 1000
+        bitrate = when { quality >= 1080 -> 4500; quality >= 720 -> 2500; else -> 1000 }
         update { it.copy(shareFront = cams.isFrontFacing(device), shareBoth = false) }
         turn.start(settings().cameraRotateLock)
-        startCapture(cams.createCapturer(device, null), false, if (hd) 1280 else 640, if (hd) 720 else 480, Streams.Kind.CAMERA, name) {
+        startCapture(cams.createCapturer(device, null), false, widthFor(quality), quality, Streams.Kind.CAMERA, name) {
             turn.observer(it) { state.shareFront }
         }
     }
 
     /** Both cameras at once: the back one big, the front one small in a corner (Flip swaps them). */
-    fun shareBothCameras(hd: Boolean, name: String) = exec.execute {
+    fun shareBothCameras(quality: Int, name: String) = exec.execute {
         if (state.sharing != null) return@execute
         val ids = DualCamera.pair(context) ?: run {
             update { it.copy(message = "This phone can't use both cameras at the same time.") }
             return@execute
         }
-        bitrate = if (hd) 3000 else 1200
+        bitrate = when { quality >= 1080 -> 5000; quality >= 720 -> 3000; else -> 1200 }
         update { it.copy(shareFront = false, shareBoth = true) }
         turn.start(settings().cameraRotateLock)
         val cam = DualCamera(context, egl.eglBaseContext, ids) { front -> turn.extra(front) }
         dual = cam
-        startCapture(cam, false, if (hd) 1280 else 640, if (hd) 720 else 480, Streams.Kind.CAMERA, name)
+        startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name)
+    }
+
+    // 16:9 for HD and Full HD, 4:3 for the data saver (as cameras offer them)
+    private fun widthFor(height: Int) = when {
+        height >= 1080 -> 1920
+        height >= 720 -> 1280
+        else -> 640
+    }
+
+    /** The warning about a share was closed. */
+    fun clearMessage() = exec.execute {
+        if (state.message != null) update { it.copy(message = null) }
     }
 
     /** The camera's turn locked, or following how the phone is held. */
     fun setRotateLock(on: Boolean) = exec.execute {
         turn.lock(on)
-        update { it.copy(rotateLocked = on) }
+        update { it.copy(rotateLocked = on, lockedTurn = turn.extra(false)) }
     }
 
     /** Starts sharing the screen, with the permission Android gave ([projection]: its result). */
@@ -367,7 +380,7 @@ class StreamEngine(
             capturer = cap; source = src; helper = help
             track = factory.createVideoTrack("share", src)
             sharePending = true
-            update { it.copy(sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked) }
+            update { it.copy(sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked, lockedTurn = turn.extra(false)) }
             send(Streams.setup(name, kind, bitrate, audio = false, returnCode = rc("setup")))
             log("Share starting: $kind ${w}x$h")
         } catch (e: Exception) {

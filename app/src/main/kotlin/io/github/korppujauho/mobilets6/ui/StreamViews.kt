@@ -2,6 +2,7 @@ package io.github.korppujauho.mobilets6.ui
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Close
@@ -75,15 +76,18 @@ fun VideoView(
 ) {
     var renderer by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
     val turnNow = androidx.compose.runtime.rememberUpdatedState(turn)
+    val report = androidx.compose.runtime.rememberUpdatedState(onSize)
+    var shape by remember { mutableStateOf<Float?>(null) } // the picture's width / height, as shown
+    Box(modifier, contentAlignment = Alignment.Center) {
     AndroidView(
         factory = { ctx ->
             SurfaceViewRenderer(ctx).apply {
-                init(egl.eglBaseContext, onSize?.let { report ->
-                    object : RendererCommon.RendererEvents {
-                        override fun onFirstFrameRendered() {}
-                        override fun onFrameResolutionChanged(w: Int, h: Int, rotation: Int) {
-                            if (rotation % 180 == 0) report(w, h) else report(h, w)
-                        }
+                init(egl.eglBaseContext, object : RendererCommon.RendererEvents {
+                    override fun onFirstFrameRendered() {}
+                    override fun onFrameResolutionChanged(w: Int, h: Int, rotation: Int) {
+                        val (sw, sh) = if (rotation % 180 == 0) w to h else h to w
+                        if (sw > 0 && sh > 0) shape = sw.toFloat() / sh
+                        report.value?.invoke(sw, sh)
                     }
                 })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
@@ -93,8 +97,9 @@ fun VideoView(
             }
         },
         update = { it.setMirror(mirror) },
-        modifier = modifier,
+        modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
     )
+    }
     DisposableEffect(track, renderer) {
         val r = renderer
         // The same pictures with the extra turn as their label (the renderer turns them)
@@ -245,12 +250,13 @@ private fun FullScreenPlayer(
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
 fun ShareDialog(
-    onCamera: (front: Boolean, hd: Boolean) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
-    onBoth: (hd: Boolean) -> Unit = {}, canBoth: Boolean = false,
+    onCamera: (front: Boolean, quality: Int) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
+    onBoth: (quality: Int) -> Unit = {}, canBoth: Boolean = false,
 ) {
     var screen by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(0) } // front, back, both
-    var hd by remember { mutableStateOf(true) }
+    var quality by remember { mutableStateOf(720) }
+    val qualities = listOf(480, 720, 1080)
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Ts.panel,
@@ -264,7 +270,15 @@ fun ShareDialog(
                     Segments(if (canBoth) listOf("Front", "Back", "Both") else listOf("Front", "Back"), camera) { camera = it }
                     if (camera == 2) Text("The back camera big, the front one small in the corner. Swap switches them.", color = Ts.muted, fontSize = 13.sp)
                     Text("Quality", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    Segments(listOf("Data saver (480p)", "HD (720p)"), if (hd) 1 else 0) { hd = it == 1 }
+                    Segments(listOf("480p", "720p", "1080p"), qualities.indexOf(quality)) { quality = qualities[it] }
+                    Text(
+                        when (quality) {
+                            480 -> "Data saver: the least data, for mobile networks."
+                            720 -> "HD: sharp, and light enough for most connections."
+                            else -> "Full HD: the sharpest, needs a good connection on both ends."
+                        },
+                        color = Ts.muted, fontSize = 13.sp,
+                    )
                 } else {
                     Text("Android asks once more before it starts. Everything on your screen is shown, notifications too.", color = Ts.muted, fontSize = 13.sp)
                 }
@@ -275,8 +289,8 @@ fun ShareDialog(
             TextButton(onClick = {
                 when {
                     screen -> onScreen()
-                    camera == 2 -> onBoth(hd)
-                    else -> onCamera(camera == 0, hd)
+                    camera == 2 -> onBoth(quality)
+                    else -> onCamera(camera == 0, quality)
                 }
             }) { Text("Start", color = Ts.accent, fontWeight = FontWeight.SemiBold) }
         },
@@ -318,7 +332,8 @@ fun ShareBar(
     val camera = kind == Streams.Kind.CAMERA
     val mirror = camera && state.shareFront && !state.shareBoth
     // A mirrored picture turns the other way (the mirror is applied after the turn)
-    val previewTurn = if (mirror) screenTurn else (360 - screenTurn) % 360
+    val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
+    val previewTurn = if (mirror) sent else (360 - sent) % 360
     val track = state.localVideo
 
     @Composable
@@ -386,7 +401,7 @@ fun ShareBar(
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Preview(Modifier.size(width = 72.dp, height = minOf(72.dp / aspect, 128.dp)))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Status(Modifier.fillMaxWidth())
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { Status(Modifier.padding(end = 4.dp)) }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
                         Buttons()
                     }

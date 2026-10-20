@@ -41,12 +41,13 @@
 - A lost connection (Wi-Fi to mobile data, a dead spot) reconnects by itself, keeping the chat; sooner when a
   network comes back.
 - Away, with a message (tap yourself).
+- Warnings (such as a refused password) show on a background of their own, can be closed, and go away by themselves.
 - A favourite can have its own file transfer port (its Advanced part), for servers where it isn't the usual one.
 - The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General).
 - Screen and camera streams (TeamSpeak 6's), as in WebTS:
   - WATCH someone streaming in your channel: in a box on the server screen with their sound (on/off, volume), a
     small window, and full screen turned the way the picture is (wide: sideways, tall: upright)
-  - share your camera (front or back, 480p or 720p, flip while sharing) or your screen; tap your small picture to
+  - share your camera (front or back, 480p, 720p or 1080p, flip while sharing) or your screen; tap your small picture to
     make it bigger inside the share bar (WebTS's green bar with a live dot and round buttons)
   - the camera's picture stays upright for viewers however the phone is held, also with auto-rotate off (as in
     WebTS); the rotate button locks the current turn instead. Your preview stays the right way up to you, and the
