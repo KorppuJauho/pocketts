@@ -106,11 +106,7 @@ fun ServerScreen(
             AppHeader {
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
-                    androidx.compose.material3.IconButton(onClick = { serversMenu = true }) {
-                        androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Filled.Star, contentDescription = "Servers", tint = Ts.text,
-                        )
-                    }
+                    HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, "Servers") { serversMenu = true }
                     androidx.compose.material3.DropdownMenu(serversMenu, onDismissRequest = { serversMenu = false }, containerColor = Ts.card) {
                         for (f in favorites) {
                             val here = io.github.korppujauho.mobilets6.Favorites.same(f.address, state.address)
@@ -131,6 +127,7 @@ fun ServerScreen(
                         }                    }
                 }
                 ExitButton("Disconnect") { actions.disconnect() }
+                androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp))
                 SettingsGear { settings = 0 }
             }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

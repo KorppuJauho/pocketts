@@ -59,12 +59,12 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AppHeader(right: @Composable () -> Unit = {}) {
     Row(
-        Modifier.fillMaxWidth().background(Ts.header).padding(horizontal = 20.dp, vertical = 12.dp),
+        Modifier.fillMaxWidth().height(44.dp).background(Ts.header).padding(start = 16.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Dns, contentDescription = null, tint = Ts.brand, modifier = Modifier.size(24.dp))
-        Spacer(Modifier.width(10.dp))
-        Text("MobileTS6", color = Ts.bright, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+        Icon(Icons.Filled.Dns, contentDescription = null, tint = Ts.brand, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(8.dp))
+        Text("MobileTS6", color = Ts.bright, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
         right()
     }
     Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
@@ -73,8 +73,14 @@ fun AppHeader(right: @Composable () -> Unit = {}) {
 /** The settings gear in the header's corner. */
 @Composable
 fun SettingsGear(onClick: () -> Unit) {
-    androidx.compose.material3.IconButton(onClick = onClick) {
-        Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = Ts.text)
+    HeaderButton(Icons.Filled.Settings, "Settings", onClick)
+}
+
+/** A small icon button for the header. */
+@Composable
+fun HeaderButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+    androidx.compose.material3.IconButton(onClick = onClick, modifier = Modifier.size(40.dp)) {
+        Icon(icon, contentDescription = label, tint = Ts.text, modifier = Modifier.size(22.dp))
     }
 }
 
@@ -85,7 +91,7 @@ fun ExitButton(text: String, onClick: () -> Unit) {
         text, color = Ts.red, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
         modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Ts.red.copy(alpha = 0.15f))
             .border(1.dp, Ts.red.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 7.dp),
+            .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 5.dp),
     )
 }
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -169,17 +170,18 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 TsField(nick, { nick = it }, "Your nickname on this server")
                 TsField(pw, { pw = it }, "Server password", password = true)
                 CheckRow("Connect automatically when the app opens", auto) { auto = it }
-                if (onDelete != null) Text(
-                    "Delete", color = Ts.red, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-                    modifier = Modifier.clickable(onClick = onDelete).padding(vertical = 6.dp),
-                )
             }
         },
+        // Delete on the left of the same row as Cancel and Save
         confirmButton = {
-            TextButton(onClick = { onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto)) }, enabled = address.isNotBlank()) {
-                Text("Save", color = Ts.accent, fontWeight = FontWeight.SemiBold)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (onDelete != null) TextButton(onClick = onDelete) { Text("Delete", color = Ts.red, fontWeight = FontWeight.SemiBold) }
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) }
+                TextButton(onClick = { onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto)) }, enabled = address.isNotBlank()) {
+                    Text("Save", color = Ts.accent, fontWeight = FontWeight.SemiBold)
+                }
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = Ts.muted) } },
     )
 }
