@@ -22,17 +22,32 @@ data class Favorite(
 object Favorites {
     private fun prefs(c: Context) = c.getSharedPreferences("favorites", Context.MODE_PRIVATE)
 
+    private const val PASSWORD = "favorites/password"
+
+    /** The passwords are encrypted on this phone (see [Secrets]); ones saved before that are encrypted now. */
     fun load(c: Context): List<Favorite> = try {
         val a = JSONArray(prefs(c).getString("list", "[]"))
-        (0 until a.length()).map { i ->
+        var unsealed = false
+        val list = (0 until a.length()).map { i ->
             val o = a.getJSONObject(i)
+            val stored = o.optString("password")
+            if (stored.isNotEmpty() && !SecretBox.isSealed(stored)) unsealed = true
             Favorite(
-                o.optString("address"), o.optString("name"), o.optString("nickname"), o.optString("password"), o.optBoolean("auto"),
+                o.optString("address"), o.optString("name"), o.optString("nickname"), password(stored), o.optBoolean("auto"),
                 o.optInt("filePort", 0).takeIf { it in 1..65535 },
             )
         }.filter { it.address.isNotBlank() }
+        if (unsealed) save(c, list)
+        list
     } catch (_: Exception) {
         emptyList()
+    }
+
+    private fun password(stored: String) = try {
+        Secrets.box.open(stored, PASSWORD)
+    } catch (e: SecretBox.Unreadable) {
+        AppLog.log("A favourite's password can't be read: ${e.message}")
+        ""
     }
 
     fun save(c: Context, list: List<Favorite>) {
@@ -42,7 +57,7 @@ object Favorites {
         list.forEachIndexed { i, f ->
             a.put(
                 JSONObject().put("address", f.address.trim()).put("name", f.name.trim()).put("nickname", f.nickname.trim())
-                    .put("password", f.password).put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
+                    .put("password", sealOrPlain(f.password, PASSWORD)).put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
             )
         }
         prefs(c).edit().putString("list", a.toString()).apply()

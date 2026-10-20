@@ -109,9 +109,12 @@ class Identity(val privateScalar: BigInteger, val keyOffset: Long) {
             return if (securityLevel > 0) id.improvedTo(securityLevel) else id
         }
 
-        /** Reads an identity exported by a TeamSpeak client (or by [export]). */
+        /**
+         * Reads an identity exported by a TeamSpeak client (or by [export]): the bare "<offset>V<data>", the same in
+         * quotes, or the whole .ini file a TeamSpeak app saves (its identity="..." line).
+         */
         fun import(exported: String): Identity {
-            val m = Regex("""^(\d+)V([\w/+=]+)$""").matchEntire(exported.trim())
+            val m = Regex("""^(\d+)V([\w/+=]+)$""").matchEntire(identityText(exported))
                 ?: throw IllegalArgumentException("Not a TeamSpeak identity")
             val offset = m.groupValues[1].toLong()
             val data = Base64.getDecoder().decode(m.groupValues[2])
@@ -120,6 +123,13 @@ class Identity(val privateScalar: BigInteger, val keyOffset: Long) {
             Crypto.xorInto(data, OBFUSCATION_KEY, minOf(100, data.size))
             val text = String(data, Charsets.UTF_8).substringBefore('\u0000')
             return fromDer(Base64.getDecoder().decode(text), offset)
+        }
+
+        /** The "<offset>V<data>" part of what was pasted or picked: an .ini file's identity line, or the text itself. */
+        private fun identityText(text: String): String {
+            val t = text.trim().removePrefix("﻿").trim()
+            Regex("""(?im)^\s*identity\s*=\s*"?(\d+V[\w/+=]+)"?\s*$""").find(t)?.let { return it.groupValues[1] }
+            return t.removeSurrounding("\"").trim()
         }
 
         private fun hashedPart(data: ByteArray): ByteArray {

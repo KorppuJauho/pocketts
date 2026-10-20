@@ -112,6 +112,10 @@ permissions guests may not have.
 - [ ] Settings › Nickname: the PC sees the new name.
 - [ ] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.
 - [ ] Settings › Identity › Export: share it, for example to notes. Import it again: no complaint.
+- [ ] Settings › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
+  "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
+- [ ] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
+  the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.
