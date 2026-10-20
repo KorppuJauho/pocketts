@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.ScreenShare
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -138,6 +139,8 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
 fun ControlsBar(
     micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit, onSettings: () -> Unit,
     ptt: (@Composable () -> Unit)? = null,
+    sharing: Boolean = false,
+    onShare: (() -> Unit)? = null,
 ) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
@@ -150,6 +153,15 @@ fun ControlsBar(
             "Sound", off = soundOff, onClick = onSound,
         )
         ptt?.invoke()
+        if (onShare != null) {
+            Box(
+                Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Color(0xFF23A559) else Ts.button)
+                    .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(onClick = onShare),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Filled.ScreenShare, contentDescription = "Share", tint = if (sharing) Color.White else Ts.text)
+            }
+        }
         ControlButton(Icons.Filled.Settings, "Settings", onClick = onSettings)
     }
 }

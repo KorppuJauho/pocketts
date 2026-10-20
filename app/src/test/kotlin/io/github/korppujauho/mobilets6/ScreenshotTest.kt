@@ -95,6 +95,12 @@ object Example {
         override fun setAway(away: Boolean, message: String) {}
         override fun switchTo(f: Favorite) {}
         override fun addFavorite(f: Favorite) {}
+        override fun watch(person: ServerModel.Client) {}
+        override fun stopWatching() {}
+        override fun shareCamera(front: Boolean, hd: Boolean) {}
+        override fun shareScreen() {}
+        override fun stopShare() {}
+        override fun flipCamera() {}
     }
 
     val noConnect = object : ConnectActions {
@@ -134,8 +140,8 @@ object Example {
         person(1, 1, "Lee")
         person(2, 1, "Noa", "client_input_muted=1")
         person(3, 1, "Jamie")
-        person(4, 1, "Riley")
-        person(5, 2, "Alex", "client_servergroups=6")
+        person(4, 1, "Riley", "client_is_streaming=1")
+        person(5, 2, "Alex", "client_servergroups=6 client_is_streaming=1")
         person(8, 6, "Sam", "client_output_muted=1")
         person(9, 6, "Robin")
         person(10, 3, "Kai", "client_talk_power=0 client_servergroups=6")

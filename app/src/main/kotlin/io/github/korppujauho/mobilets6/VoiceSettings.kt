@@ -14,6 +14,10 @@ data class VoiceSettings(
     val autoGainControl: Boolean = false,
     val floatingPtt: Boolean = true, // the round push-to-talk button
     val volumeKeysPtt: Boolean = false, // volume buttons talk while held (app on screen)
+    val turnUrl: String = "", // a relay (TURN) server for streams, e.g. turn:relay.example.com:3478
+    val turnUser: String = "",
+    val turnPassword: String = "",
+    val relayOnly: Boolean = false, // streams only through the relay
 ) {
     enum class Activation { VAD, PTT, CONTINUOUS }
 
@@ -34,6 +38,10 @@ data class VoiceSettings(
                 autoGainControl = p.getBoolean("autoGainControl", d.autoGainControl),
                 floatingPtt = p.getBoolean("floatingPtt", d.floatingPtt),
                 volumeKeysPtt = p.getBoolean("volumeKeysPtt", d.volumeKeysPtt),
+                turnUrl = p.getString("turnUrl", d.turnUrl).orEmpty(),
+                turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
+                turnPassword = p.getString("turnPassword", d.turnPassword).orEmpty(),
+                relayOnly = p.getBoolean("relayOnly", d.relayOnly),
             )
         }
     }
@@ -50,6 +58,10 @@ data class VoiceSettings(
             .putBoolean("autoGainControl", autoGainControl)
             .putBoolean("floatingPtt", floatingPtt)
             .putBoolean("volumeKeysPtt", volumeKeysPtt)
+            .putString("turnUrl", turnUrl.trim())
+            .putString("turnUser", turnUser.trim())
+            .putString("turnPassword", turnPassword)
+            .putBoolean("relayOnly", relayOnly)
             .apply()
     }
 }

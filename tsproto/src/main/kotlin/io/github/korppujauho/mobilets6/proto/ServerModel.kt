@@ -73,6 +73,7 @@ class ServerModel {
         val avatar: String = "", // the avatar's hash ("" = none)
         val avatarName: String = "", // the avatar file's name, when the server says it
         val myTeamSpeakAvatar: String = "", // a myTeamSpeak picture's address ("" = none)
+        val streaming: Boolean = false, // sharing their screen or camera
         val description: String = "",
         val country: String = "",
         val platform: String = "",
@@ -97,6 +98,8 @@ class ServerModel {
 
     val channels = LinkedHashMap<Int, Channel>()
     val serverGroups = HashMap<Int, Group>()
+    /** Running streams: whose (client id) and its id. */
+    val streams = HashMap<Int, String>()
     val channelGroups = HashMap<Int, Group>()
     val clients = LinkedHashMap<Int, Client>()
 
@@ -105,11 +108,16 @@ class ServerModel {
 
     fun clear() {
         serverName = ""; welcomeMessage = ""; ownClientId = 0
-        serverVars.clear(); channels.clear(); clients.clear(); serverGroups.clear(); channelGroups.clear()
+        serverVars.clear(); channels.clear(); clients.clear(); serverGroups.clear(); channelGroups.clear(); streams.clear()
     }
 
     /** Returns true when something shown changed. */
     fun apply(cmd: Command): Boolean {
+        Regex("^(sgid|cgid)=(\\d+)$").matchEntire(cmd.name)?.let { m ->
+            val first = cmd.groups.first() + (m.groupValues[1] to m.groupValues[2])
+            readGroups(if (m.groupValues[1] == "sgid") serverGroups else channelGroups, m.groupValues[1], Command(cmd.name, listOf(first) + cmd.groups.drop(1)))
+            return true
+        }
         when (cmd.name) {
             "initserver" -> {
                 ownClientId = cmd["aclid"]?.toIntOrNull() ?: 0
@@ -126,6 +134,17 @@ class ServerModel {
                 val c = clients[id] ?: continue
                 val others = c.serverGroups.filter { it != sgid }
                 clients[id] = c.copy(serverGroups = if (cmd.name == "notifyservergroupclientadded") others + sgid else others)
+            }
+            "notifystreaminfo", "notifystreamstarted" -> {
+                val id = cmd["id"] ?: cmd["stream_id"] ?: return false
+                val clid = cmd["clid"]?.toIntOrNull() ?: return false
+                streams[clid] = id
+                clients[clid]?.let { clients[clid] = it.copy(streaming = true) }
+            }
+            "notifystreamstopped" -> {
+                val clid = cmd["clid"]?.toIntOrNull() ?: streams.entries.firstOrNull { it.value == cmd["id"] }?.key ?: return false
+                streams.remove(clid)
+                clients[clid]?.let { clients[clid] = it.copy(streaming = false) }
             }
             "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
                 val id = g["clid"]?.toIntOrNull() ?: continue
@@ -165,7 +184,7 @@ class ServerModel {
                     clients[id] = clientFrom(g, Client(id, target, "Client $id")).copy(channel = target)
                 }
             }
-            "notifyclientleftview" -> for (g in cmd.groups) g["clid"]?.toIntOrNull()?.let { clients.remove(it) }
+            "notifyclientleftview" -> for (g in cmd.groups) g["clid"]?.toIntOrNull()?.let { clients.remove(it); streams.remove(it) }
             "notifyclientmoved" -> {
                 var target = 0
                 for (g in cmd.groups) {
@@ -285,6 +304,7 @@ class ServerModel {
         talkPower = g["client_talk_power"]?.toIntOrNull() ?: old.talkPower,
         isTalker = g["client_is_talker"]?.let { it == "1" } ?: old.isTalker,
         prioritySpeaker = g["client_is_priority_speaker"]?.let { it == "1" } ?: old.prioritySpeaker,
+        streaming = g["client_is_streaming"]?.let { it == "1" } ?: old.streaming,
         serverGroups = g["client_servergroups"]?.split(',')?.mapNotNull { it.trim().toIntOrNull() } ?: old.serverGroups,
         channelGroup = g["client_channel_group_id"]?.toIntOrNull() ?: old.channelGroup,
         iconId = g["client_icon_id"]?.let { unsignedId(it) } ?: old.iconId,

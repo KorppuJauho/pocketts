@@ -58,6 +58,13 @@ interface ServerActions {
     /** Another server from the favourites (this one is left). */
     fun switchTo(f: io.github.korppujauho.mobilets6.Favorite)
     fun addFavorite(f: io.github.korppujauho.mobilets6.Favorite)
+    fun watch(person: ServerModel.Client)
+    fun stopWatching()
+    fun shareCamera(front: Boolean, hd: Boolean)
+    /** Asks Android for the screen, then shares it. */
+    fun shareScreen()
+    fun stopShare()
+    fun flipCamera()
     /** The conversation on screen (null when the chat isn't showing). */
     fun viewing(key: Chat.Key?)
 }
@@ -75,7 +82,9 @@ fun ServerScreen(
     startChat: Chat.Key = Chat.Key.Channel(0),
     startSettings: Int? = null,
     favorites: List<io.github.korppujauho.mobilets6.Favorite> = emptyList(),
+    egl: org.webrtc.EglBase? = null,
 ) {
+    var shareDialog by remember { mutableStateOf(false) }
     var serversMenu by remember { mutableStateOf(false) }
     var addingFavorite by remember { mutableStateOf<io.github.korppujauho.mobilets6.Favorite?>(null) }
     var settings by remember { mutableStateOf(startSettings) }
@@ -129,7 +138,11 @@ fun ServerScreen(
                     micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
                     onMic = actions::toggleMic, onSound = actions::toggleSound, onSettings = { settings = 0 },
                     ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
+                    sharing = state.stream.sharing != null,
+                    onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
                 )
+                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare)
+                state.stream.message?.let { ErrorLine(it) }
                 ViewSwitch(view, unread = state.unread.isNotEmpty()) { view = it }
                 when (view) {
                     View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
@@ -143,7 +156,7 @@ fun ServerScreen(
                             state.error?.let { ErrorLine(it) }
                             ChannelTree(
                                 items,
-                                TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges) { it.id !in state.cannotTalk },
+                                TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
                                 onChannel = { ch ->
                                     if (ch.id == state.ownChannel || ch.spacer != null) return@ChannelTree
                                     if (ch.hasPassword) askPassword = ch else actions.join(ch)
@@ -215,6 +228,17 @@ fun ServerScreen(
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })
     }
     if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
+    if (shareDialog) {
+        ShareDialog(
+            onCamera = { front, hd -> shareDialog = false; actions.shareCamera(front, hd) },
+            onScreen = { shareDialog = false; actions.shareScreen() },
+            onDismiss = { shareDialog = false },
+        )
+    }
+    if (state.stream.watching != 0 && egl != null) {
+        val who = state.client(state.stream.watching)?.nickname ?: "Stream"
+        StreamPlayer(state.stream, "$who's stream", egl, actions::stopWatching)
+    }
 }
 
 /** "Channels" and "Chat" on a phone. */

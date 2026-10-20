@@ -8,9 +8,8 @@ TeamSpeak server: no bridge, tunnel or proxy in between. It works with TeamSpeak
 - voice: voice activation, push-to-talk (with a floating button), echo and noise removal, and it keeps working with
   the screen off
 - chat: channel, server and private, with pictures, pokes and join/leave lines
+- screen and camera streams: watch others', share your camera or screen
 - favourites, settings, and reconnecting by itself
-
-Screen and camera streams aren't there yet.
 
 <img src="docs/screenshots/server.png" width="280" alt="The server view: channels and the people in them">
 
