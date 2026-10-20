@@ -83,6 +83,10 @@ class BasicsTest {
             assertEquals(id.uid, back.uid, form)
             assertEquals(id.keyOffset, back.keyOffset, form)
         }
+        // Our own .ini file opens again (as it does in TeamSpeak apps)
+        val own = id.exportIni("PocketTS", "Jamie \"J\"\nnext")
+        assertEquals(id.uid, Identity.import(own).uid)
+        assertTrue(own.startsWith("[Identity]\r\nid=PocketTS\r\n") && "nickname=Jamie  J  next\r\n" in own, own)
         for (bad in listOf("", "[Identity]\nid=Main\nnickname=Jamie\n", "hello", "\"\"", "identity=\"\"")) {
             assertFailsWith<IllegalArgumentException>(bad) { Identity.import(bad) }
         }

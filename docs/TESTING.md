@@ -141,7 +141,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
 - [ ] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
       itself after a few seconds.
-- [ ] Settings › Identity › Export: share it, for example to notes. Import it again: no complaint.
+- [ ] Settings › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
+      sharing to apps). Import it again (Choose a file): no complaint, and the identity field hides what's pasted.
 - [ ] Settings › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
 - [ ] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and

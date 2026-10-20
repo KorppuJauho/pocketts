@@ -93,6 +93,12 @@ class Identity(val privateScalar: BigInteger, val keyOffset: Long) {
         return "${keyOffset}V" + Base64.getEncoder().encodeToString(inner)
     }
 
+    /** The .ini file TeamSpeak apps save and open: this identity under [name], with the [nickname] used with it. */
+    fun exportIni(name: String, nickname: String): String {
+        fun clean(s: String) = s.replace(Regex("""[\r\n"]"""), " ").trim()
+        return "[Identity]\r\nid=${clean(name)}\r\nidentity=\"${export()}\"\r\nnickname=${clean(nickname)}\r\nphonetic_nickname=\r\n"
+    }
+
     companion object {
         // The export format's scrambling key: these characters as text (not as hex), of which the first 100 are used.
         private val OBFUSCATION_KEY: ByteArray = (
