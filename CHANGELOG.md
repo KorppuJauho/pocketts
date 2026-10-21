@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Profile pictures are uploaded as PNG, as the TeamSpeak 6 app does: a JPEG one was saved on the server but the
+  TeamSpeak 6 app didn't show it.
 - Channel passwords can be remembered: tick "Remember the password" when joining, and next time the channel joins with
   one tap. They're kept encrypted on the phone, per server. A refused password (mistyped, or changed on the server)
   shows the usual warning, is forgotten, and the password is asked again. Settings > Advanced > Channel passwords

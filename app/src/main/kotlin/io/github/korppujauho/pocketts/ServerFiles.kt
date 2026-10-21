@@ -144,10 +144,13 @@ object ServerFiles {
         return Prepared(out, if (png) Pictures.Type.PNG else Pictures.Type.JPG)
     }
 
-    /** A profile picture: inside 320 × 320, as JPEG (as the TeamSpeak app and WebTS make them). */
+    /**
+     * A profile picture: inside 320 × 320, as PNG. The TeamSpeak 6 app saves its own as PNG, and a JPEG one, though
+     * stored on the server all right, wasn't shown there.
+     */
     fun prepareAvatar(context: Context, uri: Uri): ByteArray {
         val raw = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
-        return encode(decode(raw, Pictures.AVATAR_MAX_SIDE), Bitmap.CompressFormat.JPEG, 90)
+        return encode(decode(raw, Pictures.AVATAR_MAX_SIDE), Bitmap.CompressFormat.PNG, 100)
     }
 
     private fun decode(raw: ByteArray, maxSide: Int): Bitmap =

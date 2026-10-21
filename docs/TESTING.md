@@ -173,6 +173,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
 - [x] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
+- [ ] Settings › General › Profile picture › Change…: the PC (TeamSpeak 6) shows the new picture, also after it
+      reconnects.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.
