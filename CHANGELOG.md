@@ -2,11 +2,13 @@
 
 ## Unreleased
 
+- The server name has an icon like the channels: the server's own, or a plain server icon. Server info shows the
+  server's banner also when it's a picture in the server's files.
 - A new app icon: a headset peeking out of a blue pocket, with a one-colour version for Android's themed icons and a
   matching notification icon. The header shows it too.
 - Exporting the identity warns first that the file is you on every server, then saves it as a file you choose (in
   the .ini format TeamSpeak apps open) instead of sharing it to an app. Import hides the identity while it's pasted.
-- Sounds for events, made for the app (simple tones, not TeamSpeak's): connecting and disconnecting, switching channel,
+- Sounds for events, made for the app (low, soft tones in the style of chat apps, not TeamSpeak's own): connecting and disconnecting, switching channel,
   people coming and going in your channel, messages, pokes, the microphone and sound buttons, and streams starting
   and stopping. On/off and volume in Settings > Playback.
 - Popups and the person menu have a new rounded look, with an icon, pill buttons and softer fields.
