@@ -140,7 +140,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] **Both cameras** (Share › Camera › Both, only shown if the phone can do it; not on the Galaxy A56): the PC
       sees the back camera with the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [x] HD and data saver both work.
-- [ ] 1080p (Full HD) works, and the PC's picture is sharper than at 720p.
+- [x] 1080p (Full HD) works, and the PC's picture is sharper than at 720p.
 - [x] The share bar: tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
 - [x] Small picture: "Camera", the eye and the number of viewers on one line, on the right above the buttons.
 - [x] Auto-rotate **off**, sharing the camera, phone held sideways: the round buttons' icons turn to stay upright
@@ -202,6 +202,6 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
 - [x] Disconnect from the notification's button.
 - [x] Swipe the app away from recent apps: it leaves the server.
-- [ ] A busy server (many people or channels): connecting shows everyone's avatars, with no "client is flooding"
+- [x] A busy server (many people or channels): connecting shows everyone's avatars, with no "client is flooding"
       warning.
 - [ ] An hour connected in the background: battery use looks reasonable (Settings › Battery).
