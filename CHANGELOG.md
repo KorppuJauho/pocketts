@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Reworked sounds for switching channel, being moved, people joining and leaving, messages in and out, and streams
+  starting and stopping: low, short and soft, in the style of the sound buttons' (no sliding pitch, which stuttered).
+- Settings > General > "Keep the screen on": the screen stays on while connected and the app is open. While you share
+  or watch a stream, it stays on anyway.
+- A ring light when sharing the front camera: the share bar's sun button turns the screen to full brightness with a
+  white frame around it, lighting your face.
 - A camera stream without "Stream sound" sends no sound at all: the microphone went out on its sound line anyway.
 - A lost connection is noticed within seconds: at once when the phone's network goes or changes (Wi-Fi off,
   airplane mode), else after 10 seconds without a word from the server (it was 30, and took about a minute).

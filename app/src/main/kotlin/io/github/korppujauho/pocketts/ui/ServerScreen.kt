@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.zIndex
 import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.rounded.Lock
@@ -137,7 +139,31 @@ fun ServerScreen(
     }
     val iconTurn by androidx.compose.animation.core.animateFloatAsState(iconAngle.floatValue, label = "icons")
     androidx.compose.runtime.CompositionLocalProvider(LocalIconTurn provides iconTurn) {
+    // The screen stays on while connected (when chosen), and always while a stream is shared or watched
+    val keepOn = state.voice.keepScreenOn || state.stream.sharing != null || state.stream.watching != 0
+    val hostView = androidx.compose.ui.platform.LocalView.current
+    DisposableEffect(keepOn) {
+        hostView.keepScreenOn = keepOn
+        onDispose { hostView.keepScreenOn = false }
+    }
+    // The ring light: sharing the front camera, the screen at full brightness with a white frame lights your face
+    var ringLight by rememberSaveable { mutableStateOf(false) }
+    val frontCamera = state.stream.sharing == io.github.korppujauho.pocketts.proto.Streams.Kind.CAMERA && state.stream.shareFront && !state.stream.shareBoth
+    val lightOn = ringLight && frontCamera
+    val window = (androidx.compose.ui.platform.LocalContext.current as? android.app.Activity)?.window
+    DisposableEffect(lightOn, window) {
+        window?.attributes = window?.attributes?.apply {
+            screenBrightness = if (lightOn) 1f else android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        }
+        onDispose {
+            window?.attributes = window?.attributes?.apply { screenBrightness = android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE }
+        }
+    }
     Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
+        if (lightOn) {
+            // On top of everything (zIndex), and it takes no taps
+            Box(Modifier.zIndex(10f).fillMaxSize().border(22.dp, Color.White, RoundedCornerShape(28.dp)))
+        }
         Column(Modifier.fillMaxSize()) {
             AppHeader {
                 ExitButton("Disconnect") { actions.disconnect() }
@@ -191,7 +217,12 @@ fun ServerScreen(
                     sharing = state.stream.sharing != null,
                     onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
                 )
-                if (egl != null) ShareBar(state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn)
+                if (egl != null) {
+                    ShareBar(
+                        state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
+                        light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
+                    )
+                }
                 if (state.stream.watching != 0 && egl != null && !pip) {
                     val who = state.client(state.stream.watching)?.nickname ?: "Stream"
                     WatchCard(

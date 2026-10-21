@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.automirrored.rounded.ScreenShare
@@ -434,6 +435,8 @@ private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Un
 fun ShareBar(
     state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit, onRotateLock: (Boolean) -> Unit = {},
     screenTurn: Int = 0,
+    light: Boolean? = null, // the ring light, when it can be had (the front camera): on or off
+    onLight: (Boolean) -> Unit = {},
 ) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
@@ -491,6 +494,12 @@ fun ShareBar(
                 if (state.rotateLocked) "Turn locked (tap to follow the phone)" else "Turn follows the phone (tap to lock)",
                 if (state.rotateLocked) Color(0xFFFBBF24) else Ts.text,
             ) { onRotateLock(!state.rotateLocked) }
+            if (light != null) {
+                RoundButton(
+                    Icons.Filled.LightMode, if (light) "Ring light on (tap for off)" else "Ring light: a bright white screen lights your face",
+                    if (light) Color(0xFFFBBF24) else Ts.text,
+                ) { onLight(!light) }
+            }
         }
         Text(
             "Stop", color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
