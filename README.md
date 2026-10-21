@@ -27,6 +27,13 @@ Your TeamSpeak identity and saved passwords are encrypted on the phone. No accou
 
 **Status:** early, being tested. See the [changelog](CHANGELOG.md).
 
+## Known limitations
+
+- **No myTeamSpeak features.** Pictures shared through myTeamSpeak by the TeamSpeak app can't be shown in PocketTS.
+- **Pictures go to the server's own files.** PocketTS can't upload pictures to TeamSpeak's picture service. The
+  pictures you send are saved in the channel's files on the server (file transfer), so you need permission to upload
+  files in that channel. TeamSpeak app users see them as usual.
+
 ## Support
 
 PocketTS is free and stays free. If you'd like to say thanks, you can
