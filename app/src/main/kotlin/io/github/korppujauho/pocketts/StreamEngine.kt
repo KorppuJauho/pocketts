@@ -373,9 +373,11 @@ class StreamEngine(
 
     /** The stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
     fun refreshSound() = exec.execute {
-        val s = sound ?: return@execute
+        if (sound == null) return@execute
         val paused = soundPaused()
-        s.setEnabled(!paused) // a silent track keeps going: viewers keep the sound line
+        // The microphone muted, not the track: muted, it still delivers (silence) at full time. A track switched off
+        // sent nothing, so each pause dropped out of the sound's timeline and viewers heard it that much later.
+        madeAudio?.setMicrophoneMute(paused)
         if (state.soundPaused != paused) {
             log(if (paused) "Stream sound quiet" else "Stream sound on")
             update { it.copy(soundPaused = paused) }
@@ -432,7 +434,8 @@ class StreamEngine(
                     mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
                 }
                 soundSource = factory.createAudioSource(constraints)
-                sound = factory.createAudioTrack("share-sound", soundSource).also { it.setEnabled(!soundPaused()) }
+                sound = factory.createAudioTrack("share-sound", soundSource)
+                madeAudio?.setMicrophoneMute(soundPaused())
             }
             sharePending = true
             update {
