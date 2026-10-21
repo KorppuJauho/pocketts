@@ -7,7 +7,7 @@ machine, so the time is enough for the log to be found.
 **Where each test happens:**
 - **Phone**: PocketTS on the Android phone.
 - **PC**: the TeamSpeak app on a computer, on the same server.
-- **2nd phone**: a second phone with PocketTS, or WebTS in a browser (optional).
+- **2nd phone**: a second phone with PocketTS (optional).
 
 Ticked items have been tested on the phone (Samsung Galaxy A56, Android 16) with the test builds of 20 October 2026.
 
@@ -114,7 +114,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       sees the back camera with the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [x] HD and data saver both work.
 - [ ] 1080p (Full HD) works, and the PC's picture is sharper than at 720p.
-- [x] The share bar looks like WebTS's. Tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
+- [x] The share bar: tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
 - [ ] Small picture: "Camera", the eye and the number of viewers on one line, on the right above the buttons.
 - [x] Auto-rotate **off**, sharing the camera, phone held sideways: the round buttons' icons turn to stay upright
       (the buttons stay where they are).

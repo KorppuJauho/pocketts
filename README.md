@@ -1,58 +1,47 @@
 # PocketTS
 
-A TeamSpeak client for Android. Type a nickname and a server address, and the app connects straight to the
-TeamSpeak server: no bridge, tunnel or proxy in between. It works with TeamSpeak 6 and TeamSpeak 3 servers.
+> **Made with AI assistance.** PocketTS is written with the help of an AI coding assistant. Every change is tested
+> by hand on a real phone before it goes in.
 
-**Status: early, being tested.** It works and looks like WebTS:
-- channels and who is in them, with avatars, icons and badges
-- voice: voice activation, push-to-talk (with a floating button), echo and noise removal, and it keeps working with
-  the screen off
-- chat: channel and private, with pictures, pokes and join/leave lines, and a history kept (encrypted) on the phone
-  for 90 days
-- screen and camera streams: watch others', share your camera or screen
-- favourites, settings, and reconnecting by itself
+A free, unofficial TeamSpeak client for Android. Type a nickname and a server address to join. It works with
+TeamSpeak 6 and TeamSpeak 3 servers.
 
-<img src="docs/screenshots/server.png" width="280" alt="The server view: channels and the people in them">
+<p>
+  <img src="docs/screenshots/server.png" width="200" alt="The server view: channels and the people in them">
+  <img src="docs/screenshots/chat.png" width="200" alt="The channel chat">
+  <img src="docs/screenshots/popup-person.png" width="200" alt="A person's menu: volume, poke and private chat">
+</p>
 
-The TeamSpeak connection is a Kotlin version of the one in [WebTS](https://github.com/KorppuJauho/webts), the
-self-hosted web client for TeamSpeak.
+## What it does
 
-## Building
+- **Voice:** voice activation, push-to-talk (also a floating button over other apps), echo and noise removal. Keeps
+  working with the screen off.
+- **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
+  password.
+- **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
+- **Streams:** watch others' screen and camera streams (also in a small window over other apps), and share your own
+  camera or screen.
+- **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 
-Everything builds in Docker, so the only things needed are Docker and a Bash shell (on Windows: Docker inside
-WSL). There's no need to install Java or the Android SDK.
+Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking.
 
-```bash
-ACCEPT_ANDROID_SDK_LICENSE=yes scripts/dev.sh image   # the build image: Java and the Android SDK (once)
-scripts/dev.sh test                                   # tests
-scripts/dev.sh apk                                    # a test build in dist/
-scripts/dev.sh screenshots                            # pictures of the screens (example data) in docs/screenshots/
-```
+**Status:** early, being tested. See the [changelog](CHANGELOG.md).
 
-The build image accepts the Android SDK license, which is why that variable has to be set.
+## Support
 
-### Testing on a phone
+PocketTS is free and stays free. If you'd like to say thanks, you can
+[buy me a coffee](https://buymeacoffee.com/jauho).
 
-`scripts/dev.sh devserver up` starts a small page on port 8686. Open `http://<this computer's address>:8686` on the
-phone, tap the newest build and install it. Android asks once to allow installing apps from the browser.
+## Building it yourself
 
-Test builds send their log to that page (`dist/phone.log`) when `DEV_LOG_URL` is set in `dev.env`. Release builds
-never do.
-
-### Tests against a real server
-
-`scripts/dev.sh it` connects two clients to a TeamSpeak server and checks the following:
-
-- they see each other and each other's channel moves
-- one hears exactly what the other sends
-- chat messages arrive
-- both leave cleanly
-
-Put the test server's address in `dev.env` as `TS_TEST_SERVER=host:port`. If the server runs in a container, add
-`TS_CONTAINER=<name>` as well, so `scripts/dev.sh ts-server up` and `down` can start and stop it.
-
-`dev.env` holds this computer's own settings and is never committed.
+See [DEVELOPING.md](DEVELOPING.md).
 
 ## License
 
-[Open Software License 3.0](LICENSE).
+[GNU General Public License v3.0](LICENSE). You're welcome to fork PocketTS, change it and share your version, as
+long as you share its source code under the same license.
+
+The PocketTS name and icon are mine. If you release your own version as an app (in an app store or as your own
+downloads), give it a different name and icon so nobody mistakes it for PocketTS.
+
+PocketTS isn't affiliated with or endorsed by TeamSpeak Systems GmbH. TeamSpeak is their trademark.

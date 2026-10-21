@@ -254,7 +254,7 @@ object Example {
             tree = m.tree(),
             ownId = 3,
             ownChannel = 1,
-            talking = setOf(4, 9),
+            talking = setOf(1, 4), // only your own channel's talking can be seen
             cannotTalk = m.clients.values.filter { !m.canTalk(it) }.map { it.id }.toSet(),
             micAllowed = true,
             badges = m.clients.values.associate { it.id to m.badges(it) },
