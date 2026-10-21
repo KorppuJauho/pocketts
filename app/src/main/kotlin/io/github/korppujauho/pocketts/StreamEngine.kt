@@ -394,6 +394,7 @@ class StreamEngine(
     /** The camera's turn locked, or following how the phone is held. */
     fun setRotateLock(on: Boolean) = exec.execute {
         turn.lock(on)
+        log("Rotate ${if (on) "locked at ${turn.extra(false)}°" else "follows the phone"}")
         update { it.copy(rotateLocked = on, lockedTurn = turn.extra(false)) }
     }
 
@@ -465,14 +466,14 @@ class StreamEngine(
         endShare()
     }
 
-    // While sharing: every 30 s, how the stream keeps time, in the phone's log. The sound captured should keep
+    // While sharing: every 10 s, how the stream keeps time, in the phone's log. The sound captured should keep
     // up with the clock and the camera's frames with the encoder's; a gap growing shows which side drifts.
     private val ticker = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "stream-stats").apply { isDaemon = true } }
     private var statsTask: java.util.concurrent.ScheduledFuture<*>? = null
 
     private fun startStats() {
         statsTask?.cancel(false)
-        statsTask = ticker.scheduleWithFixedDelay({ exec.execute { logStats() } }, 30, 30, java.util.concurrent.TimeUnit.SECONDS)
+        statsTask = ticker.scheduleWithFixedDelay({ exec.execute { logStats() } }, 10, 10, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     private fun logStats() {
@@ -488,7 +489,11 @@ class StreamEngine(
                     s.type == "media-source" && m["kind"] == "video" -> parts.add("camera ${m["frames"]} frames")
                     s.type == "outbound-rtp" && m["kind"] == "audio" -> parts.add("sound ${m["packetsSent"]} packets")
                     s.type == "outbound-rtp" && m["kind"] == "video" ->
-                        parts.add("video ${m["framesEncoded"]} encoded at ${m["framesPerSecond"]} fps (limit ${m["qualityLimitationReason"]})")
+                        parts.add(
+                            "video ${m["frameWidth"]}x${m["frameHeight"]}, ${m["framesEncoded"]} encoded, ${m["framesSent"]} sent at " +
+                                "${m["framesPerSecond"]} fps (limit ${m["qualityLimitationReason"]}), encoding %.1f s".format((m["totalEncodeTime"] as? Number)?.toDouble() ?: -1.0) +
+                                ", send delay %.1f s".format((m["totalPacketSendDelay"] as? Number)?.toDouble() ?: -1.0)
+                        )
                     s.type == "remote-inbound-rtp" -> parts.add("${m["kind"]} round trip ${m["roundTripTime"]} s")
                 }
             }
