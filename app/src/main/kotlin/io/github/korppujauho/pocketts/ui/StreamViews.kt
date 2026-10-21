@@ -83,9 +83,6 @@ fun VideoView(
     val report = androidx.compose.runtime.rememberUpdatedState(onSize)
     var shape by remember { mutableStateOf<Float?>(null) } // the picture's width / height, as shown
     Box(modifier, contentAlignment = Alignment.Center) {
-    // A renderer of its own for small (filled) and big (whole picture): one resized between them kept the old
-    // shape's crop and stretched it
-    androidx.compose.runtime.key(fill) {
     AndroidView(
         factory = { ctx ->
             SurfaceViewRenderer(ctx).apply {
@@ -110,7 +107,6 @@ fun VideoView(
         modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
         onRelease = { it.release() },
     )
-    }
     }
     DisposableEffect(track, renderer) {
         val r = renderer
@@ -359,17 +355,18 @@ fun ShareBar(
     var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height, as shown
     val camera = kind == Streams.Kind.CAMERA
     // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera), turned back
-    // by the turn added for them (the front camera's goes the other way)
+    // by the turn added for them
     val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
-    val front = camera && state.shareFront && !state.shareBoth
-    val previewTurn = if (front) sent else (360 - sent) % 360
+    val previewTurn = (360 - sent) % 360
     val track = state.localVideo
 
     @Composable
     fun Preview(modifier: Modifier) {
         if (track == null) return
         Box(modifier.clip(RoundedCornerShape(8.dp)).background(Color.Black).border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp))) {
-            VideoView(track, egl, Modifier.fillMaxSize(), fill = !big, onSize = { w, h -> aspect = w.toFloat() / h }, turn = previewTurn)
+            // Small and big alike, the whole picture in its own shape (the small box already has that shape): switching
+            // only resizes the view, as turning the phone does. A view filled or made anew for it came out stretched.
+            VideoView(track, egl, Modifier.fillMaxSize(), onSize = { w, h -> aspect = w.toFloat() / h }, turn = previewTurn)
             // Over the picture (a video surface doesn't take taps itself)
             Box(Modifier.fillMaxSize().clickable { big = !big })
         }

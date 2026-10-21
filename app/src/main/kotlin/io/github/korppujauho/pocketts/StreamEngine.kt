@@ -376,7 +376,10 @@ class StreamEngine(
         val s = sound ?: return@execute
         val paused = soundPaused()
         s.setEnabled(!paused) // a silent track keeps going: viewers keep the sound line
-        if (state.soundPaused != paused) update { it.copy(soundPaused = paused) }
+        if (state.soundPaused != paused) {
+            log(if (paused) "Stream sound quiet" else "Stream sound on")
+            update { it.copy(soundPaused = paused) }
+        }
     }
 
     // 16:9 for HD and Full HD, 4:3 for the data saver (as cameras offer them)
