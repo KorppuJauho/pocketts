@@ -158,8 +158,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] With stream sound on: talk in the channel (voice activation or push-to-talk): the stream goes quiet meanwhile
       (the bar's microphone is crossed out), so the PC doesn't hear you twice.
 - [x] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
-- [ ] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
-      (21 Oct: the PC heard the phone's microphone through the stream anyway: fixed, to test again.)
+- [x] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
+      (Fixed 21 Oct: it carried the microphone before.)
 - [x] The channel voice still works normally while a stream with sound is on (both use the microphone), with
       echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
 
@@ -194,10 +194,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       Wipe, then reconnect: the server sees a new person (new unique id, no groups).
 
 ## 9. Staying connected (Phone)
-- [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…" within a few seconds, then it's back
+- [x] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…" within a few seconds, then it's back
       with the chat kept. (21 Oct: worked, but the loss took about a minute to notice.)
-- [ ] Airplane mode for 30 seconds: "Connection lost" within a few seconds; then off: it reconnects.
-- [ ] Right after a lost connection, if the server still has the old one: "The server still has your old connection:
+- [x] Airplane mode for 30 seconds: "Connection lost" within a few seconds; then off: it reconnects.
+- [x] Right after a lost connection, if the server still has the old one: "The server still has your old connection:
       waiting for it to let go", then it connects as soon as the server drops the old one.
 - [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
 - [x] Disconnect from the notification's button.
