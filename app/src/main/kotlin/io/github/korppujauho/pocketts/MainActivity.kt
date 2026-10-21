@@ -136,6 +136,7 @@ class MainActivity : ComponentActivity() {
             favorites.value.firstOrNull { it.auto }?.let { connectFavorite(applicationContext, it) }
         }
         TalkOverlay.start(this)
+        HeadsetButton.start(this)
         io.github.korppujauho.pocketts.ui.StreamSize.onChange = { runOnUiThread { current?.updatePip() } }
         addOnPictureInPictureModeChangedListener { info ->
             inPip.value = info.isInPictureInPictureMode

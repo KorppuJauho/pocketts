@@ -355,6 +355,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Check("Volume buttons are push-to-talk", v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
         Desc("In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).")
     }
+    Group {
+        Check("Headset button is push-to-talk", v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
+        Desc("In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it's on, the button doesn't play or pause music.")
+    }
 }
 
 @Composable
