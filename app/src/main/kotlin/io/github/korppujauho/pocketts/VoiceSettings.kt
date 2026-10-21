@@ -21,6 +21,7 @@ data class VoiceSettings(
     val turnPassword: String = "",
     val relayOnly: Boolean = false, // streams only through the relay
     val cameraRotateLock: Boolean = false, // the camera stream's turn is locked (else it follows how the phone is held)
+    val cameraSound: Boolean = false, // the camera stream carries what the microphone hears
     val overlayPtt: Boolean = false, // the push-to-talk button stays on screen over other apps
     val uiSounds: Boolean = true, // sounds for events (people coming and going, messages, pokes, streams, the buttons)
     val uiSoundVolume: Float = 0.6f, // their volume, 0 - 1
@@ -58,6 +59,7 @@ data class VoiceSettings(
                 },
                 relayOnly = p.getBoolean("relayOnly", d.relayOnly),
                 cameraRotateLock = p.getBoolean("cameraRotateLock", d.cameraRotateLock),
+                cameraSound = p.getBoolean("cameraSound", d.cameraSound),
                 overlayPtt = p.getBoolean("overlayPtt", d.overlayPtt),
                 uiSounds = p.getBoolean("uiSounds", d.uiSounds),
                 uiSoundVolume = p.getFloat("uiSoundVolume", d.uiSoundVolume),
@@ -84,6 +86,7 @@ data class VoiceSettings(
             .remove("turnPassword") // kept with the other secrets (see secretPrefs)
             .putBoolean("relayOnly", relayOnly)
             .putBoolean("cameraRotateLock", cameraRotateLock)
+            .putBoolean("cameraSound", cameraSound)
             .putBoolean("overlayPtt", overlayPtt)
             .putBoolean("uiSounds", uiSounds)
             .putFloat("uiSoundVolume", uiSoundVolume)

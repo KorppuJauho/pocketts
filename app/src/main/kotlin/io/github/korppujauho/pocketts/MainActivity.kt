@@ -41,9 +41,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /** The camera: asked for first if needed. */
-    fun shareCamera(front: Boolean, quality: Int) = withCamera { Session.shareCamera(front, quality) }
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean) = withCamera { Session.shareCamera(front, quality, sound) }
 
-    fun shareBothCameras(quality: Int) = withCamera { Session.shareBothCameras(quality) }
+    fun shareBothCameras(quality: Int, sound: Boolean) = withCamera { Session.shareBothCameras(quality, sound) }
 
     private fun withCamera(start: () -> Unit) {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -277,8 +277,8 @@ private object SessionActions : ServerActions {
     override fun stopWatching() {
         Session.stopWatching()
     }
-    override fun shareCamera(front: Boolean, quality: Int) {
-        MainActivity.current?.shareCamera(front, quality)
+    override fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {
+        MainActivity.current?.shareCamera(front, quality, sound)
     }
     override fun shareScreen() {
         MainActivity.current?.shareScreen()
@@ -289,8 +289,8 @@ private object SessionActions : ServerActions {
     override fun flipCamera() {
         Session.flipCamera()
     }
-    override fun shareBothCameras(quality: Int) {
-        MainActivity.current?.shareBothCameras(quality)
+    override fun shareBothCameras(quality: Int, sound: Boolean) {
+        MainActivity.current?.shareBothCameras(quality, sound)
     }
     override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
     override fun setWatchMuted(muted: Boolean) {

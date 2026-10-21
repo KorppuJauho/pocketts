@@ -106,6 +106,7 @@ object Session : TsClient.Listener {
         return StreamEngine(
             app,
             sendNow = { client?.sendCommand(it) },
+            soundPaused = { streamSoundPaused() },
             settings = { _state.value.voice },
             onState = { st ->
                 val before = _state.value.stream
@@ -145,17 +146,26 @@ object Session : TsClient.Listener {
         engine?.setRotateLock(on)
     }
 
-    fun shareCamera(front: Boolean, quality: Int) {
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
+        if (_state.value.voice.cameraSound != sound) updateVoice(_state.value.voice.copy(cameraSound = sound))
         // The service says "camera" before the camera opens (Android's rule for using it in the background)
         ConnectionService.start(app, "Sharing your camera", camera = true)
-        streams().shareCamera(front, quality, name)
+        streams().shareCamera(front, quality, name, sound && micPermitted())
     }
 
-    fun shareBothCameras(quality: Int) {
+    fun shareBothCameras(quality: Int, sound: Boolean) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
+        if (_state.value.voice.cameraSound != sound) updateVoice(_state.value.voice.copy(cameraSound = sound))
         ConnectionService.start(app, "Sharing your cameras", camera = true)
-        streams().shareBothCameras(quality, name)
+        streams().shareBothCameras(quality, name, sound && micPermitted())
+    }
+
+    // The camera stream's sound is silent while the microphone is muted or we talk in the channel (else viewers
+    // would hear us twice, a moment apart)
+    private fun streamSoundPaused(): Boolean {
+        val s = _state.value
+        return s.inputMuted || !s.micAllowed || s.ownId in s.talking
     }
 
     /** Screen sharing, with Android's permission ([projection]); the service must say "screen" before it starts. */
@@ -364,6 +374,7 @@ object Session : TsClient.Listener {
         _state.update { it.copy(inputMuted = muted) }
         UiSounds.play(if (muted) Cue.MIC_OFF else Cue.MIC_ON, _state.value.voice, _state.value.outputMuted)
         sender?.muted = muted
+        engine?.refreshSound()
         client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
     }
 
@@ -863,6 +874,7 @@ object Session : TsClient.Listener {
 
     private fun setTalking(clientId: Int, talking: Boolean) {
         _state.update { s -> s.copy(talking = if (talking) s.talking + clientId else s.talking - clientId) }
+        if (clientId == _state.value.ownId) engine?.refreshSound()
     }
 
     private fun poked(p: Chat.Poke) {
