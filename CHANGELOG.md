@@ -2,8 +2,12 @@
 
 ## Unreleased
 
-- Profile pictures are uploaded as PNG, as the TeamSpeak 6 app does: a JPEG one was saved on the server but the
-  TeamSpeak 6 app didn't show it.
+- A profile picture too big for the server (its max avatar file size, 200 KB as it comes) is sent again smaller,
+  down to 96 × 96, before giving up with "This server allows only a very small profile picture, or none."
+- A file or picture sent from the TeamSpeak app through myTeamSpeak shows as one short line ("TeamSpeak images
+  aren't supported in PocketTS") instead of its raw note, in the chat and in notifications.
+- Pictures sent from the app go into the channel's /PocketTS folder (they went into /webTS). Pictures in any folder
+  still show.
 - Channel passwords can be remembered: tick "Remember the password" when joining, and next time the channel joins with
   one tap. They're kept encrypted on the phone, per server. A refused password (mistyped, or changed on the server)
   shows the usual warning, is forgotten, and the password is asked again. Settings > Advanced > Channel passwords

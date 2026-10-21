@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
@@ -212,7 +213,9 @@ private fun EventLine(time: String, parts: List<Chat.Part>) {
 
 @Composable
 private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onPicture: (Any) -> Unit) {
-    val (pictures, rest) = remember(e.text) { Pictures.channelPictures(e.text) }
+    // A file from the TeamSpeak app (through myTeamSpeak): one short line instead of its note
+    val tsFile = remember(e.text) { Pictures.teamSpeakFile(e.text) }
+    val (pictures, rest) = remember(e.text) { if (tsFile != null) emptyList<Pictures.ChannelPicture>() to "" else Pictures.channelPictures(e.text) }
     val text = remember(rest) { formatted(rest) }
     // A line from before has no client id: our own is ours today too
     val sender = state.clientByUid(e.senderUid) ?: state.client(if (e.outgoing && e.senderId == 0) state.ownId else e.senderId)
@@ -243,6 +246,15 @@ private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onP
             ),
             color = Ts.text, fontSize = 15.sp,
         )
+        if (tsFile != null) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Icon(
+                    if (tsFile.isImage) Icons.Filled.Image else Icons.Filled.AttachFile, contentDescription = null,
+                    tint = Ts.muted, modifier = Modifier.size(16.dp),
+                )
+                Text(tsFile.text, color = Ts.muted, fontSize = 13.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+            }
+        }
         // Pictures from the channel's files, as the TeamSpeak app shows them
         for (p in pictures) {
             val file = TsFile.picture(state.serverKey, p)

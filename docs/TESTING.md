@@ -113,6 +113,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
 - [x] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
       picture gets smaller and the text you type stays fully visible. Close the keyboard: everything is back.
+- [ ] The PC pastes a picture into the channel chat (TeamSpeak's own picture sharing): the phone shows one line,
+      "TeamSpeak images aren't supported in PocketTS", not a long string.
+- [ ] A picture sent from the phone is in the channel's files under /PocketTS (the PC's file browser).
 
 ## 7. Streams (Phone + PC)
 - [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.

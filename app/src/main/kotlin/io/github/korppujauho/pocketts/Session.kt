@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 /** The one connection the app has (or not), and what the screen shows about it. */
 object Session : TsClient.Listener {
     private const val WRONG_CHANNEL_PASSWORD = "781" // "invalid channel password"
+    private const val AVATAR_TOO_BIG = 2565 // over the server's max avatar file size
 
 
     enum class Phase { IDLE, CONNECTING, CONNECTED }
@@ -666,7 +667,7 @@ object Session : TsClient.Listener {
     }
 
     /**
-     * Sends a picture into our channel's chat: into the channel's files, then one message with the picture and
+     * Sends a picture into our channel's chat: into the channel's files (/PocketTS), then one message with the picture and
      * [text] (if any) under it, as the TeamSpeak app sends them.
      */
     fun sendPicture(context: Context, uri: android.net.Uri, text: String = "") {
@@ -702,14 +703,27 @@ object Session : TsClient.Listener {
         _state.update { it.copy(avatarStatus = "Uploading…") }
         worker.execute {
             try {
-                val data = ServerFiles.prepareAvatar(context, uri)
-                f.upload(0, io.github.korppujauho.pocketts.proto.Pictures.AVATAR_UPLOAD_NAME, data, overwrite = true)
+                // Over the server's size limit, the next smaller one is tried (as the TeamSpeak app asks for a smaller one)
+                val versions = ServerFiles.prepareAvatar(context, uri)
+                var sent: ByteArray? = null
+                for (data in versions) {
+                    try {
+                        f.upload(0, io.github.korppujauho.pocketts.proto.Pictures.AVATAR_UPLOAD_NAME, data, overwrite = true)
+                        sent = data
+                        break
+                    } catch (e: FileTransfer.Error) {
+                        if (e.code != AVATAR_TOO_BIG || data === versions.last()) throw e
+                        AppLog.log("Profile picture of ${data.size / 1024} KB too big for the server, trying a smaller one")
+                    }
+                }
+                val data = sent ?: return@execute
                 c.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to io.github.korppujauho.pocketts.proto.Pictures.avatarFlag(data)))
+                AppLog.log("Profile picture set (${data.size / 1024} KB)")
                 _state.update { it.copy(avatarStatus = "Profile picture set.") }
             } catch (e: FileTransfer.Error) {
                 _state.update {
                     it.copy(avatarStatus = when (e.code) {
-                        2565 -> "The server allows only smaller profile pictures."
+                        AVATAR_TOO_BIG -> "This server allows only a very small profile picture, or none."
                         2568 -> "This server doesn't allow you a profile picture."
                         else -> "The profile picture wasn't set: ${e.message}"
                     })
@@ -861,7 +875,10 @@ object Session : TsClient.Listener {
     private fun messageArrived(key: Chat.Key, e: Chat.Entry) {
         if (foreground || !::app.isInitialized) return
         // Away from the app: private messages come as notifications (channel chat doesn't, like the desktop app)
-        if (key is Chat.Key.Private) ConnectionService.notifyMessage(app, e.senderName, MessageText.plain(e.text))
+        if (key is Chat.Key.Private) {
+            val text = io.github.korppujauho.pocketts.proto.Pictures.teamSpeakFile(e.text)?.text ?: MessageText.plain(e.text)
+            ConnectionService.notifyMessage(app, e.senderName, text)
+        }
     }
 
     private fun updateGains() {

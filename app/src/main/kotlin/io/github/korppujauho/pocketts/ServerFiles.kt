@@ -145,12 +145,14 @@ object ServerFiles {
     }
 
     /**
-     * A profile picture: inside 320 × 320, as PNG. The TeamSpeak 6 app saves its own as PNG, and a JPEG one, though
-     * stored on the server all right, wasn't shown there.
+     * A profile picture as JPEG, best first: inside 320 × 320, then smaller ones for a server whose limit (the max
+     * avatar file size, 200 KB as it comes) refuses it. A 320 px photo is usually far under that.
      */
-    fun prepareAvatar(context: Context, uri: Uri): ByteArray {
+    fun prepareAvatar(context: Context, uri: Uri): List<ByteArray> {
         val raw = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
-        return encode(decode(raw, Pictures.AVATAR_MAX_SIDE), Bitmap.CompressFormat.PNG, 100)
+        return listOf(Pictures.AVATAR_MAX_SIDE to 90, 240 to 80, 160 to 75, 96 to 70).map { (side, quality) ->
+            encode(decode(raw, side), Bitmap.CompressFormat.JPEG, quality)
+        }
     }
 
     private fun decode(raw: ByteArray, maxSide: Int): Bitmap =

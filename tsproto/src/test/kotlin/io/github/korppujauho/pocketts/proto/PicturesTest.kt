@@ -7,6 +7,19 @@ import kotlin.test.assertNull
 
 class PicturesTest {
     @Test
+    fun teamSpeakFileNotes() {
+        val image = Pictures.teamSpeakFile("""{"msg_type":"ts.file.myts","file_name":"Screenshot 2026.png","size":12345}""")
+        assertEquals(Pictures.TeamSpeakFile("Screenshot 2026.png", true), image)
+        assertEquals("TeamSpeak images aren't supported in PocketTS", image?.text)
+        assertEquals(false, Pictures.teamSpeakFile("""{"msg_type":"ts.file.myts","file_name":"notes.zip"}""")?.isImage)
+        assertEquals(true, Pictures.teamSpeakFile("""{"msg_type":"ts.file.myts","body":"cat.JPG"}""")?.isImage)
+        // Ordinary messages, even ones that look a little like it
+        for (text in listOf("hello", """{"a":1}""", """{"msg_type":"other"}""", """{"msg_type":"ts.file" broken""", """say {"ts.file"}""")) {
+            assertEquals(null, Pictures.teamSpeakFile(text), text)
+        }
+    }
+
+    @Test
     fun channelPicturesInMessages() {
         val (pics, rest) = Pictures.channelPictures("Look [img]ts3image://cat.jpg?channel=5&path=/webTS[/img] nice")
         assertEquals(listOf(ChannelPicture(5, "/webTS", "cat.jpg")), pics)

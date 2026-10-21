@@ -76,7 +76,7 @@ class FileTransfer(
         return (cmd["id"]?.toIntOrNull() ?: 0) to cmd["msg"].orEmpty()
     }
 
-    /** A folder in a channel's files ("/webTS"); one that already exists is fine. */
+    /** A folder in a channel's files ("/PocketTS"); one that already exists is fine. */
     fun createDirectory(cid: Int, dirname: String, cpw: String = "") {
         val rc = "ft-${nextId()}"
         val (id, msg) = await(Commands.build("ftcreatedir", "cid" to cid, "cpw" to cpw, "dirname" to dirname, "return_code" to rc)) { answer(it, rc) }
