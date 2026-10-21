@@ -75,15 +75,15 @@ object UiSounds {
 
     // Notes (Hz)
     private const val F3 = 174.6
+    private const val G3 = 196.0
     private const val A3 = 220.0
     private const val B3 = 246.9
     private const val C4 = 261.6
     private const val D4 = 293.7
     private const val E4 = 329.6
     private const val G4 = 392.0
-    private const val B4 = 493.9
+    private const val A4 = 440.0
     private const val C5 = 523.3
-    private const val D5 = 587.3
     private const val E5 = 659.3
 
     private fun make(cue: Cue): ShortArray = render(
@@ -96,16 +96,19 @@ object UiSounds {
             Cue.CONNECTION_LOST -> listOf(Note(0, E4, ms = 320), Note(200, C4, ms = 320), Note(400, A3, A3 * 0.97, ms = 560))
             // Two low notes
             Cue.KICKED -> listOf(Note(0, A3, ms = 360, level = 0.6, decay = 3.0), Note(240, F3, ms = 560, level = 0.6, decay = 3.0))
-            // A rising "whoop" and a soft note: your new channel
-            Cue.CHANNEL_SWITCHED -> listOf(Note(0, E4, B4, ms = 200, decay = 3.0), Note(150, D5, ms = 420, level = 0.35))
-            // Two notes up: someone moved you
-            Cue.MOVED -> listOf(Note(0, G4, ms = 260), Note(150, C5, ms = 420))
-            // A bloop up / down: someone came into / left your channel
-            Cue.SOMEONE_JOINED -> listOf(Note(0, G4, D5, ms = 240, level = 0.45, decay = 3.5))
-            Cue.SOMEONE_LEFT -> listOf(Note(0, D5, G4, ms = 260, level = 0.42, decay = 3.5))
-            // A soft two-note pluck for a message in, a quiet tap for one sent
-            Cue.MESSAGE_IN -> listOf(Note(0, C5, ms = 260, level = 0.42, decay = 6.0), Note(70, E5, ms = 340, level = 0.38, decay = 6.0))
-            Cue.MESSAGE_OUT -> listOf(Note(0, G4, ms = 160, level = 0.22, decay = 8.0))
+            // Two soft notes up: you're in your new channel
+            Cue.CHANNEL_SWITCHED -> listOf(Note(0, C4, ms = 180, level = 0.42, decay = 6.0), Note(110, G4, ms = 300, level = 0.36, decay = 5.0))
+            // Up, down and up again: someone moved you
+            Cue.MOVED -> listOf(
+                Note(0, G4, ms = 150, level = 0.4, decay = 6.0), Note(110, C4, ms = 150, level = 0.4, decay = 6.0),
+                Note(220, G4, ms = 260, level = 0.34, decay = 5.0),
+            )
+            // A soft step up / down: someone came into / left your channel (rounder than the buttons' thocks)
+            Cue.SOMEONE_JOINED -> listOf(Note(0, A3, ms = 140, level = 0.38, decay = 7.0), Note(100, E4, ms = 240, level = 0.36, decay = 6.0))
+            Cue.SOMEONE_LEFT -> listOf(Note(0, E4, ms = 140, level = 0.38, decay = 7.0), Note(100, A3, ms = 260, level = 0.36, decay = 6.0))
+            // A soft two-note pluck for a message in, a quiet low tap for one sent
+            Cue.MESSAGE_IN -> listOf(Note(0, E4, ms = 150, level = 0.36, decay = 8.0), Note(80, A4, ms = 240, level = 0.32, decay = 7.0))
+            Cue.MESSAGE_OUT -> listOf(Note(0, D4, ms = 110, level = 0.24, decay = 10.0))
             // Two quick pairs: someone poked you
             Cue.POKE -> listOf(
                 Note(0, C5, ms = 150, decay = 6.0), Note(110, E5, ms = 200, decay = 6.0),
@@ -116,9 +119,15 @@ object UiSounds {
             Cue.MIC_ON -> listOf(Note(0, D4, ms = 90, level = 0.45, decay = 9.0), Note(80, G4, ms = 140, level = 0.45, decay = 9.0))
             Cue.SOUND_OFF -> listOf(Note(0, E4, ms = 90, level = 0.45, decay = 9.0), Note(80, B3, ms = 150, level = 0.45, decay = 9.0))
             Cue.SOUND_ON -> listOf(Note(0, B3, ms = 90, level = 0.45, decay = 9.0), Note(80, E4, ms = 150, level = 0.45, decay = 9.0))
-            // A slow rise with a soft note when a stream starts, a slow fall when it stops
-            Cue.STREAM_STARTED -> listOf(Note(0, C4, C5, ms = 340, level = 0.4, decay = 2.0), Note(280, E5, ms = 460, level = 0.3))
-            Cue.STREAM_STOPPED -> listOf(Note(0, C5, C4, ms = 380, level = 0.4, decay = 2.0))
+            // Three notes rising when a stream starts, falling when it stops
+            Cue.STREAM_STARTED -> listOf(
+                Note(0, G3, ms = 170, level = 0.36, decay = 6.0), Note(120, D4, ms = 170, level = 0.34, decay = 6.0),
+                Note(240, G4, ms = 320, level = 0.3, decay = 4.0),
+            )
+            Cue.STREAM_STOPPED -> listOf(
+                Note(0, G4, ms = 170, level = 0.34, decay = 6.0), Note(120, D4, ms = 170, level = 0.34, decay = 6.0),
+                Note(240, G3, ms = 340, level = 0.32, decay = 4.0),
+            )
         }
     )
 

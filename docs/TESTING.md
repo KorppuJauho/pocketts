@@ -162,6 +162,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       (21 Oct: the PC showed no sound line, but heard the voice: to check whether it was the channel voice.)
 - [x] The channel voice still works normally while a stream with sound is on (both use the microphone), with
       echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
+- [ ] Share the front camera: the share bar has a sun button. On: the screen goes to full brightness with a white
+      frame around it, and the buttons still work through it. Off, switching to the back camera or stopping: back to
+      normal brightness, no frame.
+- [ ] While sharing or watching a stream, the screen doesn't go dark by itself.
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.
@@ -192,6 +196,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       reconnects.
 - [x] Settings › Advanced › Identity shows Wipe, Export and Import (no dots). Wipe warns first; Cancel keeps it.
       Wipe, then reconnect: the server sees a new person (new unique id, no groups).
+- [ ] Settings › General › Keep the screen on: connected, the screen stays on; off, it goes dark as usual.
+- [ ] The reworked sounds (switching channel, being moved, joining and leaving, messages, streams) sound right on
+      the phone.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.

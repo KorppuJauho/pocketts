@@ -409,6 +409,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Desc("In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it's on, the button doesn't play or pause music.")
     }
     Group {
+        Check("Keep the screen on", v.keepScreenOn) { onChange(v.copy(keepScreenOn = it)) }
+        Desc("The screen doesn't go dark while you're connected and the app is open. While you share or watch a stream, it stays on anyway.")
+    }
+    Group {
         Check("Allow joining spacer channels", v.joinSpacers) { onChange(v.copy(joinSpacers = it)) }
         Desc("Tapping a spacer (a divider line or title in the channel list) joins it like any channel. Some servers use one as their AFK channel. Off, spacers can't be joined by a stray tap.")
     }
