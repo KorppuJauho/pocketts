@@ -87,7 +87,7 @@
 - Tapping the server name shows the server's info: welcome message, users, channels, age, website and version.
 - Screenshots of the screens are made with example data (`scripts/dev.sh screenshots`).
 
-- Connects straight to a TeamSpeak server with a nickname, an address and an optional server password. The
+- Connects to a TeamSpeak server with a nickname, an address and an optional server password. The
   TeamSpeak identity is created on first use and kept, in the format TeamSpeak apps export.
 - Shows the channel tree and who is in each channel, with talking, away and muted states. Tap a channel to join it;
   password-protected channels ask for the password.
