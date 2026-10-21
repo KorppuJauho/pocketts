@@ -184,7 +184,7 @@ class ScreenshotTest {
 /** An example server like the one in WebTS's screenshots. */
 object Example {
     val noActions = object : ServerActions {
-        override fun join(channel: ServerModel.Channel, password: String) {}
+        override fun join(channel: ServerModel.Channel, password: String, remember: Boolean) {}
         override fun disconnect() {}
         override fun toggleMic() {}
         override fun toggleSound() {}

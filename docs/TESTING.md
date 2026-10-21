@@ -34,6 +34,12 @@ permissions guests may not have.
       channels.
 - [ ] Channel banners fill their whole row (no empty strip under or beside them), aren't stretched, and fade out
       on the right.
+- [ ] Join a password-protected channel with "Remember the password" ticked. Go elsewhere and tap it again: it joins
+      straight away, without asking. Also after reconnecting.
+- [ ] Tick "Remember the password" with a wrong password: the "invalid password" warning shows and the password is
+      asked again (ticked). The right one joins, and from then on it joins without asking.
+- [ ] Change the channel's password on the PC: tapping the channel shows the warning and asks for the new one.
+- [ ] Settings › Advanced › Channel passwords › Forget saved passwords: the channel asks for its password again.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.

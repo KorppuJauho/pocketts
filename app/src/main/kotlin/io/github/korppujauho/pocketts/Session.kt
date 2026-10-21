@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 
 /** The one connection the app has (or not), and what the screen shows about it. */
 object Session : TsClient.Listener {
+    private const val WRONG_CHANNEL_PASSWORD = "781" // "invalid channel password"
+
 
     enum class Phase { IDLE, CONNECTING, CONNECTED }
 
@@ -50,6 +52,8 @@ object Session : TsClient.Listener {
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
+        val retryPassword: Int = 0, // a channel whose password was just refused: its password is asked again
+        val retryRemember: Boolean = false, // ... and whether that one was to be remembered
         val avatarStatus: String? = null, // the profile picture's last change, as words
         val reconnecting: Int = 0, // the try, while getting a lost connection back (0 = not)
         val stream: StreamEngine.State = StreamEngine.State(),
@@ -62,6 +66,7 @@ object Session : TsClient.Listener {
         val ownChannelName: String get() = findChannel(tree, ownChannel)?.displayName.orEmpty()
 
         fun client(id: Int): ServerModel.Client? = findClient(tree, id)
+        fun channel(id: Int): ServerModel.Channel? = findChannel(tree, id)
         fun clientByUid(uid: String): ServerModel.Client? = findClient(tree) { it.uid == uid && it.id != ownId }
 
         private companion object {
@@ -294,9 +299,53 @@ object Session : TsClient.Listener {
         c.disconnect()
     }
 
-    fun joinChannel(channelId: Int, password: String = "") {
+    // The last join asked for, until the server answers it (by its return code)
+    private class PendingJoin(val channel: Int, val password: String, val remember: Boolean, val code: String)
+    @Volatile private var pendingJoin: PendingJoin? = null
+    private var joins = 0
+
+    /** Joins a channel; with [remember], its [password] is saved (encrypted) once the server lets us in. */
+    fun joinChannel(channelId: Int, password: String = "", remember: Boolean = false) {
         val c = client ?: return
-        c.sendCommand(Commands.build("clientmove", "cid" to channelId, "clid" to c.clientId, "cpw" to Crypto.hashPassword(password).ifEmpty { null }))
+        val code = "join-${++joins}"
+        pendingJoin = PendingJoin(channelId, password, remember, code)
+        c.sendCommand(
+            Commands.build(
+                "clientmove", "cid" to channelId, "clid" to c.clientId, "cpw" to Crypto.hashPassword(password).ifEmpty { null },
+                "return_code" to code,
+            )
+        )
+    }
+
+    /** The password remembered for a channel on this server, if any. */
+    fun savedChannelPassword(channelId: Int): String? =
+        if (::app.isInitialized) ChannelPasswords(app).get(_state.value.address, channelId) else null
+
+    /** The refused channel's password is being asked again. */
+    fun passwordAsked() = _state.update { it.copy(retryPassword = 0) }
+
+    fun forgetChannelPasswords() {
+        if (::app.isInitialized) ChannelPasswords(app).clear()
+    }
+
+    // The server's answer to a join: a password that worked is kept (when asked to); a refused one is forgotten and
+    // asked again, so a mistyped or changed password gets replaced
+    private fun joinAnswered(join: PendingJoin, cmd: Command) {
+        if (!::app.isInitialized) return
+        val saved = ChannelPasswords(app)
+        val address = _state.value.address
+        val id = cmd["id"]
+        when {
+            id == "0" -> when {
+                join.password.isEmpty() -> {}
+                join.remember -> saved.put(address, join.channel, join.password)
+                else -> saved.remove(address, join.channel) // remembering was turned off
+            }
+            id == WRONG_CHANNEL_PASSWORD || cmd["msg"].orEmpty().contains("password", ignoreCase = true) -> {
+                saved.remove(address, join.channel)
+                _state.update { it.copy(retryPassword = join.channel, retryRemember = join.remember) }
+            }
+        }
     }
 
     /** Our microphone on/off, as the others see it. */
@@ -673,9 +722,15 @@ object Session : TsClient.Listener {
             // See everyone on the server, not only our own channel; a new channel gets subscribed too.
             "channellistfinished" -> client?.sendCommand("channelsubscribeall")
             "notifychannelcreated" -> client?.sendCommand(Commands.build("channelsubscribe", "cid" to cmd["cid"]))
-            "error" -> if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") } != true) {
-                AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
-                if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }
+            "error" -> {
+                pendingJoin?.takeIf { it.code == cmd["return_code"] }?.let {
+                    pendingJoin = null
+                    joinAnswered(it, cmd)
+                }
+                if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") } != true) {
+                    AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
+                    if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }
+                }
             }
         }
         files?.onCommand(cmd)

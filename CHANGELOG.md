@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Channel passwords can be remembered: tick "Remember the password" when joining, and next time the channel joins with
+  one tap. They're kept encrypted on the phone, per server. A refused password (mistyped, or changed on the server)
+  shows the usual warning, is forgotten, and the password is asked again. Settings > Advanced > Channel passwords
+  forgets them all.
 - Channel banners fill their row: as tall as it, in their own proportions (never stretched), with what doesn't fit cut
   off on the right, which fades out.
 - Settings fill nearly the whole screen and sit closer together (smaller checkboxes, sliders and gaps), so there's
