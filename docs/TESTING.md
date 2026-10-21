@@ -32,6 +32,8 @@ permissions guests may not have.
 - [ ] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): nothing happens. Turn on
       Settings › General › "Allow joining spacer channels": a tap now joins it, also after you've been in other
       channels.
+- [ ] Channel banners fill their whole row (no empty strip under or beside them), aren't stretched, and fade out
+      on the right.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.
@@ -161,6 +163,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
+- [ ] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.

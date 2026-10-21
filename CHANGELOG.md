@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Channel banners fill their row: as tall as it, in their own proportions (never stretched), with what doesn't fit cut
+  off on the right, which fades out.
+- Settings fill nearly the whole screen and sit closer together (smaller checkboxes, sliders and gaps), so there's
+  less scrolling.
 - Typing in the chat: while the keyboard is open, the control buttons and the Channels / Chat switch step aside (and an
   attached picture gets smaller), so the message box stays in view.
 - Spacer channels can be joined by tapping them when Settings > General > "Allow joining spacer channels" is on

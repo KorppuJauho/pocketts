@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.DeleteOutline
@@ -93,7 +95,11 @@ fun SettingsDialog(
     self: SelfInfo? = null,
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        SettingsContent(voice, nickname, actions, onDismiss, startTab, Modifier.fillMaxWidth(0.94f).fillMaxHeight(0.88f), self)
+        // Nearly the whole screen: more settings in view, less scrolling
+        SettingsContent(
+            voice, nickname, actions, onDismiss, startTab,
+            Modifier.fillMaxSize().windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing).padding(8.dp), self,
+        )
     }
 }
 
@@ -121,7 +127,7 @@ fun SettingsContent(
         Column(
             modifier.clip(RoundedCornerShape(12.dp)).background(Ts.panel),
         ) {
-            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("Settings", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                 androidx.compose.material3.Icon(
                     androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Ts.muted,
@@ -130,7 +136,7 @@ fun SettingsContent(
             }
             // Scrolls sideways if a narrow screen can't fit them all
             Row(
-                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 14.dp).padding(top = 10.dp),
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp).padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 listOf("General", "Playback", "Capture", "Advanced").forEachIndexed { i, name ->
@@ -146,8 +152,8 @@ fun SettingsContent(
             }
             Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.card))
             Column(
-                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 when (tab) {
                     0 -> {
@@ -163,7 +169,7 @@ fun SettingsContent(
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().background(Ts.card).padding(16.dp), horizontalArrangement = Arrangement.End) {
+            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
                 PrimaryButton("Save & Apply") { actions.save(v, nick.trim()); onDismiss() }
             }
         }
@@ -172,7 +178,7 @@ fun SettingsContent(
 
 @Composable
 private fun Group(label: String? = null, badge: String? = null, content: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (label != null) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             if (badge != null) ValueBadge(badge)
@@ -182,28 +188,33 @@ private fun Group(label: String? = null, badge: String? = null, content: @Compos
 }
 
 @Composable
-private fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 13.sp)
+private fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
 private fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }, verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
-        Text(text, color = Ts.text, fontSize = 14.sp)
+    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+            Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
+        }
+        Text(text, color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
 @Composable
 private fun Radio(text: String, selected: Boolean, onClick: () -> Unit) {
-    Row(Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(selected, onClick, colors = RadioButtonDefaults.colors(selectedColor = Ts.accent, unselectedColor = Ts.muted))
-        Text(text, color = Ts.text, fontSize = 14.sp)
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+            RadioButton(selected, onClick, colors = RadioButtonDefaults.colors(selectedColor = Ts.accent, unselectedColor = Ts.muted))
+        }
+        Text(text, color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
 @Composable
 private fun TsSlider(value: Float, range: ClosedFloatingPointRange<Float>, steps: Int, onChange: (Float) -> Unit) {
     Slider(
-        value, onChange, valueRange = range, // no tick marks (as WebTS); values are rounded by the caller
+        value, onChange, valueRange = range, // no tick marks; values are rounded by the caller
+        modifier = Modifier.height(32.dp),
         colors = SliderDefaults.colors(thumbColor = Ts.accent, activeTrackColor = Ts.accent, inactiveTrackColor = Ts.card),
     )
 }
