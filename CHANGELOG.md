@@ -3,7 +3,7 @@
 ## Unreleased
 
 - A picture for the channel chat shows as attached above the message box (with a button to remove it) and goes with
-  the usual Send button, together with any words typed, in one message. Taking a photo asks for the camera first
+  the usual Send button, with any words typed under it, in one message (as the TeamSpeak app sends them). Taking a photo asks for the camera first
   instead of closing the app.
 - The headset's button can be push-to-talk (Settings > General): one press starts talking, the next stops, also with
   the screen off.

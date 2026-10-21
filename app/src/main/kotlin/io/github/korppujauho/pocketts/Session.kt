@@ -608,8 +608,8 @@ object Session : TsClient.Listener {
     }
 
     /**
-     * Sends a picture into our channel's chat: into the channel's files, then one message with [text] (if any) and
-     * the picture under it, as TeamSpeak shows them.
+     * Sends a picture into our channel's chat: into the channel's files, then one message with the picture and
+     * [text] (if any) under it, as the TeamSpeak app sends them.
      */
     fun sendPicture(context: Context, uri: android.net.Uri, text: String = "") {
         val c = client ?: return
@@ -624,7 +624,7 @@ object Session : TsClient.Listener {
                 f.upload(cid, "${io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER}/$name", p.bytes)
                 val picture = io.github.korppujauho.pocketts.proto.Pictures.pictureMessage(name, cid)
                 val words = text.trim().take(1000 - picture.length)
-                val msg = if (words.isEmpty()) picture else "$words\n$picture"
+                val msg = if (words.isEmpty()) picture else "$picture\n$words"
                 c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to msg))
                 AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
             } catch (e: FileTransfer.Error) {

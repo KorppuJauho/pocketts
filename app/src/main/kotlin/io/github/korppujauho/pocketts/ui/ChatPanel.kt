@@ -229,8 +229,11 @@ private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onP
                 appendInlineContent("avatar", "•")
                 append(" ")
                 withStyle(SpanStyle(color = Ts.sender, fontWeight = FontWeight.Bold)) { append(e.senderName.ifEmpty { "System" } + ":") }
-                append("  ")
-                append(text)
+                // With pictures, the words go under them (as in the TeamSpeak app)
+                if (pictures.isEmpty()) {
+                    append("  ")
+                    append(text)
+                }
             },
             inlineContent = mapOf(
                 "avatar" to InlineTextContent(Placeholder(20.sp, 20.sp, PlaceholderVerticalAlign.TextCenter)) {
@@ -247,6 +250,7 @@ private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onP
                 modifier = Modifier.heightIn(max = 260.dp).clip(RoundedCornerShape(6.dp)).clickable { onPicture(file) },
             )
         }
+        if (pictures.isNotEmpty() && rest.isNotEmpty()) Text(text, color = Ts.text, fontSize = 15.sp)
         // A preview of the first link: a direct picture, else a small "Open" card
         val link = remember(rest) { MessageText.parse(rest).firstNotNullOfOrNull { it.link } }
         if (link != null) {
