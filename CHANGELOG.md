@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 (2026-10-21)
+
+The first release.
 
 - Release builds: signed with the release key and shrunk (about 23 MB instead of 86). Making the key and the release
   are `scripts/dev.sh keystore` and `scripts/dev.sh release` (see DEVELOPING.md).

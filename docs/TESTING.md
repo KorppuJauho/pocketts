@@ -199,5 +199,5 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Settings › General › Keep the screen on: connected, the screen stays on; off, it goes dark as usual.
 - [ ] The reworked sounds (switching channel, being moved, joining and leaving, messages, streams) sound right on
       the phone.
-- [ ] The release APK (`scripts/dev.sh release`) installs next to the test build and works: connect, talk, chat, a
+- [x] The release APK (`scripts/dev.sh release`) installs next to the test build and works: connect, talk, chat, a
       picture, a stream (watch and share), favourites, settings. Settings › General has "Check for updates".
