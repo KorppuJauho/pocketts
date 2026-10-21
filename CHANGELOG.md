@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The big share preview is drawn by a renderer of its own, fitted while drawing: it was still cut and stretched.
+  The front camera's preview also stays upright when the phone turns.
 - Camera streams can carry sound: tick "Stream sound" when sharing the camera (remembered). Viewers hear your
   microphone with the picture (echo removed, surroundings kept). It goes quiet while your microphone is muted and
   while you talk in the channel, so you're not heard twice; the share bar's microphone mark shows which. Without it,

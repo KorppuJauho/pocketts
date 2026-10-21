@@ -71,6 +71,91 @@ fun WatchButton(onClick: () -> Unit) {
     )
 }
 
+/**
+ * A video track drawn into an ordinary view (a TextureView): resized like the rest of the screen. A SurfaceView, drawn
+ * in a layer of its own, kept its old size when the view changed size, so the picture came out cut and stretched.
+ */
+private class TextureVideoView(
+    context: android.content.Context, eglContext: EglBase.Context, private val onShape: (Int, Int) -> Unit,
+) : android.view.TextureView(context), android.view.TextureView.SurfaceTextureListener, org.webrtc.VideoSink {
+    private val renderer = org.webrtc.EglRenderer("preview").apply { init(eglContext, EglBase.CONFIG_PLAIN, org.webrtc.GlRectDrawer()) }
+    private var lastWidth = 0
+    private var lastHeight = 0
+
+    init {
+        surfaceTextureListener = this
+    }
+
+    override fun onSurfaceTextureAvailable(st: android.graphics.SurfaceTexture, width: Int, height: Int) {
+        renderer.setLayoutAspectRatio(width / height.toFloat())
+        renderer.createEglSurface(st)
+    }
+
+    override fun onSurfaceTextureSizeChanged(st: android.graphics.SurfaceTexture, width: Int, height: Int) {
+        renderer.setLayoutAspectRatio(width / height.toFloat())
+    }
+
+    override fun onSurfaceTextureDestroyed(st: android.graphics.SurfaceTexture): Boolean {
+        val done = java.util.concurrent.CountDownLatch(1)
+        renderer.releaseEglSurface { done.countDown() }
+        done.await(2, java.util.concurrent.TimeUnit.SECONDS)
+        return true
+    }
+
+    override fun onSurfaceTextureUpdated(st: android.graphics.SurfaceTexture) {}
+
+    override fun onFrame(frame: org.webrtc.VideoFrame) {
+        val w = frame.rotatedWidth
+        val h = frame.rotatedHeight
+        if (w != lastWidth || h != lastHeight) {
+            lastWidth = w
+            lastHeight = h
+            io.github.korppujauho.pocketts.AppLog.log("Preview ${w}x$h")
+            post { onShape(w, h) }
+        }
+        renderer.onFrame(frame)
+    }
+
+    fun release() = renderer.release()
+}
+
+/** Our own share's picture: the whole of it, in its own shape, turned by [turn] more for what's shown here only. */
+@Composable
+private fun PreviewVideo(track: VideoTrack, egl: EglBase, modifier: Modifier, turn: Int, onSize: (Int, Int) -> Unit) {
+    var view by remember { mutableStateOf<TextureVideoView?>(null) }
+    var shape by remember { mutableStateOf<Float?>(null) }
+    val turnNow = androidx.compose.runtime.rememberUpdatedState(turn)
+    val report = androidx.compose.runtime.rememberUpdatedState(onSize)
+    Box(modifier, contentAlignment = Alignment.Center) {
+        AndroidView(
+            factory = { ctx ->
+                TextureVideoView(ctx, egl.eglBaseContext) { w, h ->
+                    shape = w.toFloat() / h
+                    report.value(w, h)
+                }.also { view = it }
+            },
+            modifier = shape?.let { Modifier.aspectRatio(it) } ?: Modifier.fillMaxSize(),
+            onRelease = { it.release() },
+        )
+    }
+    DisposableEffect(track, view) {
+        val v = view
+        // The same pictures with the extra turn as their label (the renderer turns them)
+        val sink = v?.let {
+            org.webrtc.VideoSink { f ->
+                val t = turnNow.value
+                if (t == 0) it.onFrame(f) else it.onFrame(org.webrtc.VideoFrame(f.buffer, (f.rotation + t) % 360, f.timestampNs))
+            }
+        }
+        if (sink != null) track.addSink(sink)
+        onDispose {
+            if (sink != null) {
+                try { track.removeSink(sink) } catch (_: Exception) {}
+            }
+        }
+    }
+}
+
 /** A video track on screen. */
 @Composable
 fun VideoView(
@@ -96,23 +181,16 @@ fun VideoView(
                     }
                 })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-                tag = fill
-                setEnableHardwareScaler(true)
+                // The picture is fitted while drawing: a hardware-scaled surface, cut to the view's shape when it's made,
+                // stayed that shape when the view changed
+                setEnableHardwareScaler(false)
                 setMirror(mirror)
                 renderer = this
             }
         },
-        update = {
-            it.setMirror(mirror)
-            // Small (filled) and big (whole picture) differ: the surface is sized for the way it's drawn, so a
-            // change must re-size it, or the picture stays stretched to the old shape
-            if (it.tag != fill) {
-                it.tag = fill
-                it.setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-                it.requestLayout()
-            }
-        },
+        update = { it.setMirror(mirror) },
         modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
+        onRelease = { it.release() },
     )
     }
     DisposableEffect(track, renderer) {
@@ -131,7 +209,7 @@ fun VideoView(
             }
         }
     }
-    DisposableEffect(Unit) { onDispose { renderer?.release() } }
+    // (each renderer is let go when its view goes: onRelease)
 }
 
 /**
@@ -361,7 +439,8 @@ fun ShareBar(
     var big by remember { mutableStateOf(false) }
     var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height, as shown
     val camera = kind == Streams.Kind.CAMERA
-    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera)
+    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera), turned back
+    // by the turn added for them
     val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
     val previewTurn = (360 - sent) % 360
     val track = state.localVideo
@@ -370,7 +449,8 @@ fun ShareBar(
     fun Preview(modifier: Modifier) {
         if (track == null) return
         Box(modifier.clip(RoundedCornerShape(8.dp)).background(Color.Black).border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp))) {
-            VideoView(track, egl, Modifier.fillMaxSize(), fill = !big, onSize = { w, h -> aspect = w.toFloat() / h }, turn = previewTurn)
+            // Small and big alike, the whole picture in its own shape (the small box already has that shape)
+            PreviewVideo(track, egl, Modifier.fillMaxSize(), previewTurn) { w, h -> aspect = w.toFloat() / h }
             // Over the picture (a video surface doesn't take taps itself)
             Box(Modifier.fillMaxSize().clickable { big = !big })
         }

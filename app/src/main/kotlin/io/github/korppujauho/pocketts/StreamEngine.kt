@@ -316,6 +316,7 @@ class StreamEngine(
     // ====== Sharing ======
 
     private class Viewer(val id: Int, val pc: PeerConnection) {
+        val joined = System.nanoTime()
         val pending = ArrayList<IceCandidate>()
         val outgoing = ArrayList<IceCandidate>()
         var answered = false
@@ -372,10 +373,15 @@ class StreamEngine(
 
     /** The stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
     fun refreshSound() = exec.execute {
-        val s = sound ?: return@execute
+        if (sound == null) return@execute
         val paused = soundPaused()
-        s.setEnabled(!paused) // a silent track keeps going: viewers keep the sound line
-        if (state.soundPaused != paused) update { it.copy(soundPaused = paused) }
+        // The microphone muted, not the track: muted, it still delivers (silence) at full time. A track switched off
+        // sent nothing, so each pause dropped out of the sound's timeline and viewers heard it that much later.
+        madeAudio?.setMicrophoneMute(paused)
+        if (state.soundPaused != paused) {
+            log(if (paused) "Stream sound quiet" else "Stream sound on")
+            update { it.copy(soundPaused = paused) }
+        }
     }
 
     // 16:9 for HD and Full HD, 4:3 for the data saver (as cameras offer them)
@@ -393,6 +399,7 @@ class StreamEngine(
     /** The camera's turn locked, or following how the phone is held. */
     fun setRotateLock(on: Boolean) = exec.execute {
         turn.lock(on)
+        log("Rotate ${if (on) "locked at ${turn.extra(false)}°" else "follows the phone"}")
         update { it.copy(rotateLocked = on, lockedTurn = turn.extra(false)) }
     }
 
@@ -427,7 +434,8 @@ class StreamEngine(
                     mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
                 }
                 soundSource = factory.createAudioSource(constraints)
-                sound = factory.createAudioTrack("share-sound", soundSource).also { it.setEnabled(!soundPaused()) }
+                sound = factory.createAudioTrack("share-sound", soundSource)
+                madeAudio?.setMicrophoneMute(soundPaused())
             }
             sharePending = true
             update {
@@ -464,7 +472,44 @@ class StreamEngine(
         endShare()
     }
 
+    // While sharing: every 10 s, how the stream keeps time, in the phone's log. The sound captured should keep
+    // up with the clock and the camera's frames with the encoder's; a gap growing shows which side drifts.
+    private val ticker = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "stream-stats").apply { isDaemon = true } }
+    private var statsTask: java.util.concurrent.ScheduledFuture<*>? = null
+
+    private fun startStats() {
+        statsTask?.cancel(false)
+        statsTask = ticker.scheduleWithFixedDelay({ exec.execute { logStats() } }, 10, 10, java.util.concurrent.TimeUnit.SECONDS)
+    }
+
+    private fun logStats() {
+        val v = viewers.values.firstOrNull() ?: return
+        val seconds = (System.nanoTime() - v.joined) / 1e9
+        v.pc.getStats { report ->
+            val parts = ArrayList<String>()
+            for (s in report.statsMap.values) {
+                val m = s.members
+                when {
+                    s.type == "media-source" && m["kind"] == "audio" ->
+                        parts.add("sound captured %.1f s".format((m["totalSamplesDuration"] as? Number)?.toDouble() ?: -1.0))
+                    s.type == "media-source" && m["kind"] == "video" -> parts.add("camera ${m["frames"]} frames")
+                    s.type == "outbound-rtp" && m["kind"] == "audio" -> parts.add("sound ${m["packetsSent"]} packets")
+                    s.type == "outbound-rtp" && m["kind"] == "video" ->
+                        parts.add(
+                            "video ${m["frameWidth"]}x${m["frameHeight"]}, ${m["framesEncoded"]} encoded, ${m["framesSent"]} sent at " +
+                                "${m["framesPerSecond"]} fps (limit ${m["qualityLimitationReason"]}), encoding %.1f s".format((m["totalEncodeTime"] as? Number)?.toDouble() ?: -1.0) +
+                                ", send delay %.1f s".format((m["totalPacketSendDelay"] as? Number)?.toDouble() ?: -1.0)
+                        )
+                    s.type == "remote-inbound-rtp" -> parts.add("${m["kind"]} round trip ${m["roundTripTime"]} s")
+                }
+            }
+            log("Share stats after %.0f s: ".format(seconds) + parts.joinToString(", "))
+        }
+    }
+
     private fun endShare() {
+        statsTask?.cancel(false)
+        statsTask = null
         shareId = null
         sharePending = false
         viewers.values.forEach { it.pc.dispose() }
@@ -620,6 +665,7 @@ class StreamEngine(
                     sharePending = false
                     shareId = id
                     update { it.copy(shareLive = true) }
+                    startStats()
                     log("Share live as $id")
                 }
                 val w = watch
