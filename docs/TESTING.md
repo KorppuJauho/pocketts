@@ -29,7 +29,7 @@ permissions guests may not have.
 - [x] Spacers (if the server has any) look like they do in the TeamSpeak app.
 - [x] Channel banners (if the server has any) sit like in the TeamSpeak app: from the left, centred up and down.
 - [x] Icons and group badges match what the TeamSpeak app shows.
-- [ ] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): nothing happens. Turn on
+- [x] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): nothing happens. Turn on
       Settings › General › "Allow joining spacer channels": a tap now joins it, also after you've been in other
       channels.
 - [ ] Channel banners fill their whole row (no empty strip under or beside them), aren't stretched, and fade out
@@ -56,6 +56,7 @@ permissions guests may not have.
 - [ ] **Headset button** (Settings › General, push-to-talk mode): press the button on wired headphones, then on
       Bluetooth ones: the PC hears you until you press again. Try it with the screen off too. With the option off,
       the button plays and pauses music again.
+      (Not tested yet: needs headphones with a button.)
 - [x] **Continuous transmission** works.
 - [x] Mic button off: the PC hears nothing and shows the phone's microphone as off.
 - [x] **Echo cancellation on**, loudspeaker: the PC doesn't hear its own voice back.
@@ -73,7 +74,7 @@ permissions guests may not have.
 - [x] **Poke**: the PC pokes the phone and a card appears. Poke the PC from the phone's person menu.
 - [x] With the app in the background, a private message and a poke come as **notifications**.
 - [x] Tap the server name: server info (welcome message, users, channels, website).
-- [ ] **Chat history**: write in the channel and privately with the PC, and let the PC join and leave. Disconnect,
+- [x] **Chat history**: write in the channel and privately with the PC, and let the PC join and leave. Disconnect,
       connect to the same server again: the channel's lines (with the join and leave lines) are back. When the PC
       user writes privately again, or you open a private chat with them, the old private lines are there too.
 - [ ] Swipe the app away while connected, open it and connect: the last lines are still there.
@@ -95,14 +96,14 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] Avatars from the PC users show in the tree, the chat and the person menu.
 - [x] Settings › General › Profile picture › Change: the PC shows the new avatar. Remove: it's gone.
 - [ ] PC sends a picture in channel chat: the phone shows it. Tap it for full screen and pinch to zoom.
-- [ ] Phone sends a picture (Choose a picture) and the PC sees it.
+- [x] Phone sends a picture (Choose a picture) and the PC sees it.
 - [ ] Phone sends a photo (Take a photo): it's the right way up on the PC.
 - [ ] A GIF from the phone moves on the PC.
-- [ ] Attach a picture: it shows above the message box with an X to remove it. Type a few words and tap Send: the
+- [x] Attach a picture: it shows above the message box with an X to remove it. Type a few words and tap Send: the
       picture and the words under it arrive as one message, on the PC too.
-- [ ] With the camera not allowed yet (Android settings › Apps › PocketTS › Permissions), choose "Take a photo":
+- [x] With the camera not allowed yet (Android settings › Apps › PocketTS › Permissions), choose "Take a photo":
       Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
-- [ ] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
+- [x] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
       picture gets smaller and the text you type stays fully visible. Close the keyboard: everything is back.
 
 ## 7. Streams (Phone + PC)
@@ -150,12 +151,12 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] On the server: ★ menu › switch to another favourite.
 - [x] Settings › Nickname: the PC sees the new name.
 - [x] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.
-- [ ] Popups (channel password, favourite, poke, share, server info, identity import) and the person menu have the
+- [x] Popups (channel password, favourite, poke, share, server info, identity import) and the person menu have the
       new rounded look, with pill buttons.
-- [ ] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
+- [x] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
 - [ ] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
       itself after a few seconds.
-- [ ] Settings › Advanced › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
+- [x] Settings › Advanced › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
       sharing to apps). Import it again (Choose a file): no complaint, and the identity field hides what's pasted.
 - [ ] Settings › Advanced › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
@@ -163,7 +164,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
-- [ ] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
+- [x] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.
