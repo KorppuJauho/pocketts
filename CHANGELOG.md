@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- A camera stream without "Stream sound" sends no sound at all: the microphone went out on its sound line anyway.
+- A lost connection is noticed within seconds: at once when the phone's network goes or changes (Wi-Fi off,
+  airplane mode), else after 10 seconds without a word from the server (it was 30, and took about a minute).
 - The big share preview is drawn by a renderer of its own, fitted while drawing: it was still cut and stretched.
   The front camera's preview also stays upright when the phone turns.
 - Camera streams can carry sound: tick "Stream sound" when sharing the camera (remembered). Viewers hear your

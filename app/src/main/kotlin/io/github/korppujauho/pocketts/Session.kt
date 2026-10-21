@@ -827,13 +827,28 @@ object Session : TsClient.Listener {
         start(keepChat = true)
     }
 
-    /** A network coming back hurries a waiting reconnect. */
+    /**
+     * The phone's network: when it goes or changes (Wi-Fi to mobile data, airplane mode), the connection is lost at
+     * once, instead of after the server's silence; a network coming back hurries a waiting reconnect.
+     */
+    @Volatile private var defaultNetwork: android.net.Network? = null
+
     private fun watchNetwork() {
         if (network != null) return
         val cm = app.getSystemService(android.net.ConnectivityManager::class.java) ?: return
         val cb = object : android.net.ConnectivityManager.NetworkCallback() {
             override fun onAvailable(n: android.net.Network) {
+                val before = defaultNetwork
+                defaultNetwork = n
+                // Another network took over: the connection went out the old one, and the server won't follow
+                if (before != null && before != n) client?.networkGone("The network changed")
                 if (_state.value.reconnecting > 0 && client == null) scheduleRetry(1)
+            }
+
+            override fun onLost(n: android.net.Network) {
+                if (n != defaultNetwork) return
+                defaultNetwork = null
+                client?.networkGone("The network went away")
             }
         }
         try {

@@ -104,9 +104,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 
 - [x] Avatars from the PC users show in the tree, the chat and the person menu.
 - [x] Settings › General › Profile picture › Change: the PC shows the new avatar. Remove: it's gone.
-- [ ] PC sends a picture in channel chat: the phone shows it. Tap it for full screen and pinch to zoom.
+- [x] PC sends a picture in channel chat: the phone shows it. Tap it for full screen and pinch to zoom.
 - [x] Phone sends a picture (Choose a picture) and the PC sees it.
-- [ ] Phone sends a photo (Take a photo): it's the right way up on the PC.
+- [x] Phone sends a photo (Take a photo): it's the right way up on the PC.
 - [ ] A GIF from the phone moves on the PC.
 - [x] Attach a picture: it shows above the message box with an X to remove it. Type a few words and tap Send: the
       picture and the words under it arrive as one message, on the PC too.
@@ -145,10 +145,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] Small picture: "Camera", the eye and the number of viewers on one line, on the right above the buttons.
 - [x] Auto-rotate **off**, sharing the camera, phone held sideways: the round buttons' icons turn to stay upright
       (the buttons stay where they are).
-- [ ] The same: your preview is the right way up to you, with the lock on and off.
+- [x] The same: your preview is the right way up to you, with the lock on and off.
 - [x] Phone shares its **screen** (Share › Screen, then allow): the PC can watch it.
 - [x] Phone screen off while sharing the camera: the PC keeps seeing it.
-- [ ] On mobile data instead of Wi-Fi (needs a server reachable from the internet: the test server is only on the
+- [x] On mobile data instead of Wi-Fi (needs a server reachable from the internet: the test server is only on the
       home network). If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
 - [x] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
@@ -159,7 +159,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       (the bar's microphone is crossed out), so the PC doesn't hear you twice.
 - [x] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
 - [ ] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
-      (21 Oct: the PC showed no sound line, but heard the voice: to check whether it was the channel voice.)
+      (21 Oct: the PC heard the phone's microphone through the stream anyway: fixed, to test again.)
 - [x] The channel voice still works normally while a stream with sound is on (both use the microphone), with
       echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
 
@@ -194,8 +194,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       Wipe, then reconnect: the server sees a new person (new unique id, no groups).
 
 ## 9. Staying connected (Phone)
-- [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.
-- [ ] Airplane mode for 30 seconds, then off: it reconnects.
+- [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…" within a few seconds, then it's back
+      with the chat kept. (21 Oct: worked, but the loss took about a minute to notice.)
+- [ ] Airplane mode for 30 seconds: "Connection lost" within a few seconds; then off: it reconnects.
 - [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
 - [x] Disconnect from the notification's button.
 - [x] Swipe the app away from recent apps: it leaves the server.

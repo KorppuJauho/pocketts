@@ -71,7 +71,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
         const val RESEND_AFTER_MS = 1000L
         const val GIVE_UP_MS = 30_000L
-        const val SILENCE_MS = 30_000L
+        const val SILENCE_MS = 10_000L // pings go every second, and the server answers each
 
         // A client version the servers accept.
         const val VERSION = "3.?.? [Build: 5680278000]"
@@ -151,6 +151,11 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
                 else -> {}
             }
         }
+    }
+
+    /** The phone's network went away or changed: the connection is lost now (not after the silence runs out). */
+    fun networkGone(reason: String) {
+        exec.execute { if (state == State.CONNECTING || state == State.CONNECTED) fail(reason) }
     }
 
     /** Runs [block] on the connection's thread (where the listener is called), after what was asked before. */
