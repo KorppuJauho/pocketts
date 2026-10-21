@@ -70,13 +70,13 @@ interface ServerActions {
     fun watch(person: ServerModel.Client)
     fun stopWatching()
     /** The camera at [quality]: the picture's height, 480, 720 or 1080. */
-    fun shareCamera(front: Boolean, quality: Int)
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean)
     /** Asks Android for the screen, then shares it. */
     fun shareScreen()
     fun stopShare()
     fun flipCamera()
     /** Both cameras at once (asked for first if needed). */
-    fun shareBothCameras(quality: Int) {}
+    fun shareBothCameras(quality: Int, sound: Boolean) {}
     /** The warning on screen was closed. */
     fun dismissError() {}
     fun setRotateLock(on: Boolean) {}
@@ -330,8 +330,9 @@ fun ServerScreen(
     if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
     if (shareDialog) {
         ShareDialog(
-            onCamera = { front, quality -> shareDialog = false; actions.shareCamera(front, quality) },
-            onBoth = { quality -> shareDialog = false; actions.shareBothCameras(quality) },
+            onCamera = { front, quality, sound -> shareDialog = false; actions.shareCamera(front, quality, sound) },
+            onBoth = { quality, sound -> shareDialog = false; actions.shareBothCameras(quality, sound) },
+            sound = state.voice.cameraSound,
             canBoth = canBoth,
             onScreen = { shareDialog = false; actions.shareScreen() },
             onDismiss = { shareDialog = false },

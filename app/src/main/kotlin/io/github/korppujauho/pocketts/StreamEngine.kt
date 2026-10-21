@@ -43,6 +43,8 @@ class StreamEngine(
     private val sendNow: (String) -> Unit,
     private val settings: () -> VoiceSettings,
     private val onState: (State) -> Unit,
+    /** Whether the stream's sound should be silent now: the microphone muted, or you talking in the channel. */
+    private val soundPaused: () -> Boolean = { false },
 ) {
     /** What the screen shows about streams. */
     data class State(
@@ -53,6 +55,8 @@ class StreamEngine(
         val watchMuted: Boolean = false,
         val sharing: Streams.Kind? = null,
         val shareLive: Boolean = false,
+        val shareSound: Boolean = false, // our camera stream carries the microphone
+        val soundPaused: Boolean = false, // ... silent just now (microphone muted, or talking in the channel)
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
@@ -73,13 +77,45 @@ class StreamEngine(
     }
 
     val egl: EglBase = EglBase.create()
-    private val factory: PeerConnectionFactory by lazy {
-        PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context.applicationContext).createInitializationOptions())
-        PeerConnectionFactory.builder()
+    // The factory, made on first use. Its microphone (a stream's sound) opens the way the voice's does: in call mode
+    // with echo cancellation, else as the ordinary microphone. Two different ones at once, Android gives the call
+    // one all the sound (the voice then hears nothing), and the call one alone hears only what's close to it.
+    private var made: PeerConnectionFactory? = null
+    private var madeAudio: JavaAudioDeviceModule? = null
+    private var madeEcho = false
+    private var initialized = false
+    private val factory: PeerConnectionFactory get() = made ?: makeFactory()
+
+    private fun makeFactory(): PeerConnectionFactory {
+        if (!initialized) {
+            PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context.applicationContext).createInitializationOptions())
+            initialized = true
+        }
+        val echo = settings().echoCancellation
+        val audio = JavaAudioDeviceModule.builder(context.applicationContext)
+            .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
+            .setUseHardwareAcousticEchoCanceler(echo)
+            .setUseHardwareNoiseSuppressor(false) // the surroundings are heard (as WebTS does it)
+            .createAudioDeviceModule()
+        val f = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(DefaultVideoEncoderFactory(egl.eglBaseContext, true, true))
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(egl.eglBaseContext))
-            .setAudioDeviceModule(JavaAudioDeviceModule.builder(context.applicationContext).createAudioDeviceModule())
+            .setAudioDeviceModule(audio)
             .createPeerConnectionFactory()
+        made = f
+        madeAudio = audio
+        madeEcho = echo
+        return f
+    }
+
+    // Echo cancellation changed since the factory was made: a new one, when nothing uses the old one
+    private fun factoryForSound() {
+        val f = made ?: return
+        if (madeEcho == settings().echoCancellation || state.watching != 0 || viewers.isNotEmpty()) return
+        f.dispose()
+        madeAudio?.release()
+        made = null
+        madeAudio = null
     }
     private val decoders by lazy {
         factory // loads WebRTC's library first
@@ -294,6 +330,8 @@ class StreamEngine(
     private var source: VideoSource? = null
     private var helper: SurfaceTextureHelper? = null
     private var track: VideoTrack? = null
+    private var soundSource: org.webrtc.AudioSource? = null
+    private var sound: org.webrtc.AudioTrack? = null
     private var bitrate = 2500
     private var fps = 30
     private val turn by lazy {
@@ -302,7 +340,7 @@ class StreamEngine(
     private var dual: DualCamera? = null
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
-    fun shareCamera(front: Boolean, quality: Int, name: String) = exec.execute {
+    fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
         val cams = Camera2Enumerator(context)
         val device = cams.deviceNames.firstOrNull { cams.isFrontFacing(it) == front } ?: cams.deviceNames.firstOrNull() ?: run {
@@ -312,13 +350,13 @@ class StreamEngine(
         bitrate = when { quality >= 1080 -> 4500; quality >= 720 -> 2500; else -> 1000 }
         update { it.copy(shareFront = cams.isFrontFacing(device), shareBoth = false) }
         turn.start(settings().cameraRotateLock)
-        startCapture(cams.createCapturer(device, null), false, widthFor(quality), quality, Streams.Kind.CAMERA, name) {
+        startCapture(cams.createCapturer(device, null), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
             turn.observer(it) { state.shareFront }
         }
     }
 
     /** Both cameras at once: the back one big, the front one small in a corner (Flip swaps them). */
-    fun shareBothCameras(quality: Int, name: String) = exec.execute {
+    fun shareBothCameras(quality: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
         val ids = DualCamera.pair(context) ?: run {
             update { it.copy(message = "This phone can't use both cameras at the same time.") }
@@ -329,7 +367,15 @@ class StreamEngine(
         turn.start(settings().cameraRotateLock)
         val cam = DualCamera(context, egl.eglBaseContext, ids) { front -> turn.extra(front) }
         dual = cam
-        startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name)
+        startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound)
+    }
+
+    /** The stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
+    fun refreshSound() = exec.execute {
+        val s = sound ?: return@execute
+        val paused = soundPaused()
+        s.setEnabled(!paused) // a silent track keeps going: viewers keep the sound line
+        if (state.soundPaused != paused) update { it.copy(soundPaused = paused) }
     }
 
     // 16:9 for HD and Full HD, 4:3 for the data saver (as cameras offer them)
@@ -363,20 +409,35 @@ class StreamEngine(
     }
 
     private fun startCapture(
-        cap: VideoCapturer, screen: Boolean, w: Int, h: Int, kind: Streams.Kind, name: String,
+        cap: VideoCapturer, screen: Boolean, w: Int, h: Int, kind: Streams.Kind, name: String, withSound: Boolean = false,
         observer: (org.webrtc.CapturerObserver) -> org.webrtc.CapturerObserver = { it },
     ) {
         try {
+            if (withSound) factoryForSound()
             val src = factory.createVideoSource(screen)
             val help = SurfaceTextureHelper.create("capture", egl.eglBaseContext)
             cap.initialize(help, context.applicationContext, observer(src.capturerObserver))
             cap.startCapture(w, h, fps)
             capturer = cap; source = src; helper = help
             track = factory.createVideoTrack("share", src)
+            if (withSound) {
+                val constraints = org.webrtc.MediaConstraints().apply {
+                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googEchoCancellation", "${settings().echoCancellation}"))
+                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googNoiseSuppression", "false"))
+                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
+                }
+                soundSource = factory.createAudioSource(constraints)
+                sound = factory.createAudioTrack("share-sound", soundSource).also { it.setEnabled(!soundPaused()) }
+            }
             sharePending = true
-            update { it.copy(sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked, lockedTurn = turn.extra(false)) }
-            send(Streams.setup(name, kind, bitrate, audio = false, returnCode = rc("setup")))
-            log("Share starting: $kind ${w}x$h")
+            update {
+                it.copy(
+                    sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked,
+                    lockedTurn = turn.extra(false), shareSound = sound != null, soundPaused = sound != null && soundPaused(),
+                )
+            }
+            send(Streams.setup(name, kind, bitrate, audio = sound != null, returnCode = rc("setup")))
+            log("Share starting: $kind ${w}x$h${if (sound != null) " with sound" else ""}")
         } catch (e: Exception) {
             log("Share failed to start: $e")
             releaseCapture()
@@ -419,6 +480,8 @@ class StreamEngine(
         dual = null
         track?.dispose(); track = null
         source?.dispose(); source = null
+        sound?.dispose(); sound = null
+        soundSource?.dispose(); soundSource = null
         helper?.dispose(); helper = null
     }
 
@@ -447,8 +510,11 @@ class StreamEngine(
         try {
             val video = pc.addTransceiver(t, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY, listOf("share")))
             preferH264(video)
-            // A sound line without a track: the TeamSpeak app never answers an offer with video only
-            pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY))
+            // The sound line: the microphone when the stream has sound, else one without a track (the TeamSpeak app
+            // never answers an offer with video only)
+            val withSound = sound
+            if (withSound != null) pc.addTransceiver(withSound, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY, listOf("share")))
+            else pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY))
             val local = offer(pc)
             setLocal(pc, local)
             applyLimits(pc)

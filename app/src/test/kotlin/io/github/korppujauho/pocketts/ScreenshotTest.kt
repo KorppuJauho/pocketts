@@ -203,7 +203,7 @@ object Example {
         override fun addFavorite(f: Favorite) {}
         override fun watch(person: ServerModel.Client) {}
         override fun stopWatching() {}
-        override fun shareCamera(front: Boolean, quality: Int) {}
+        override fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {}
         override fun shareScreen() {}
         override fun stopShare() {}
         override fun flipCamera() {}

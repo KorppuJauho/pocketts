@@ -152,6 +152,14 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
 - [ ] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
 - [ ] Share the front camera and tap the small preview to make it big: not stretched. Tap again: small, not stretched.
+- [ ] Share the camera with "Stream sound" ticked: the PC shows the stream has sound and hears the phone's
+      surroundings with the picture. The share bar shows a microphone.
+- [ ] With stream sound on: talk in the channel (voice activation or push-to-talk): the stream goes quiet meanwhile
+      (the bar's microphone is crossed out), so the PC doesn't hear you twice.
+- [ ] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
+- [ ] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
+- [ ] The channel voice still works normally while a stream with sound is on (both use the microphone), with
+      echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.

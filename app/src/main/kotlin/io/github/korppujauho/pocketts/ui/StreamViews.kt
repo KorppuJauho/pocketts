@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.automirrored.rounded.ScreenShare
 import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.animation.core.animateFloat
@@ -263,9 +265,10 @@ private fun FullScreenPlayer(
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
 fun ShareDialog(
-    onCamera: (front: Boolean, quality: Int) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
-    onBoth: (quality: Int) -> Unit = {}, canBoth: Boolean = false,
+    onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
+    onBoth: (quality: Int, sound: Boolean) -> Unit = { _, _ -> }, canBoth: Boolean = false, sound: Boolean = false,
 ) {
+    var withSound by remember { mutableStateOf(sound) }
     var screen by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(0) } // front, back, both
     var quality by remember { mutableStateOf(720) }
@@ -279,8 +282,8 @@ fun ShareDialog(
             PillButton("Start", PillKind.PRIMARY) {
                 when {
                     screen -> onScreen()
-                    camera == 2 -> onBoth(quality)
-                    else -> onCamera(camera == 0, quality)
+                    camera == 2 -> onBoth(quality, withSound)
+                    else -> onCamera(camera == 0, quality, withSound)
                 }
             }
         },
@@ -300,6 +303,23 @@ fun ShareDialog(
                             720 -> "HD: sharp, and light enough for most connections."
                             else -> "Full HD: the sharpest, needs a good connection on both ends."
                         },
+                        color = Ts.muted, fontSize = 13.sp,
+                    )
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { withSound = !withSound },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                            androidx.compose.material3.Checkbox(
+                                withSound, { withSound = it },
+                                colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
+                            )
+                        }
+                        Text("Stream sound", color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+                    }
+                    Text(
+                        if (withSound) "Viewers hear your microphone with the picture. It goes quiet while your microphone is muted and while you talk in the channel, so you're not heard twice."
+                        else "No sound with the picture: talk in the channel as usual.",
                         color = Ts.muted, fontSize = 13.sp,
                     )
                 } else {
@@ -366,6 +386,13 @@ fun ShareBar(
                 else -> "Camera"
             }
             Text(what, color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
+            if (state.shareSound) {
+                Icon(
+                    if (state.soundPaused) Icons.Filled.MicOff else Icons.Filled.Mic,
+                    contentDescription = if (state.soundPaused) "Stream sound quiet" else "Stream sound on",
+                    tint = ShareText, modifier = Modifier.size(16.dp),
+                )
+            }
             if (!state.shareLive) {
                 Text("starting…", color = ShareText, fontSize = 14.sp, maxLines = 1)
             } else {
