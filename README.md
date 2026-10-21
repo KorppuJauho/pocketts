@@ -3,8 +3,8 @@
 > **Made with AI assistance.** PocketTS is written with the help of an AI coding assistant. Every change is tested
 > by hand on a real phone before it goes in.
 
-A free, unofficial TeamSpeak client for Android. Type a nickname and a server address to join. It works with
-TeamSpeak 6 and TeamSpeak 3 servers.
+A free, unofficial TeamSpeak client for Android, made for TeamSpeak 6 servers. Type a nickname and a server address
+to join.
 
 <p>
   <img src="docs/screenshots/server.png" width="200" alt="The server view: channels and the people in them">
