@@ -23,9 +23,16 @@ to join.
   camera or screen.
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 
-Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking.
+Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking. The
+GitHub version asks GitHub once a day whether there's a newer version (you can turn that off in Settings).
 
-**Status:** early, being tested. See the [changelog](CHANGELOG.md).
+**Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
+[issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned.
+
+## Install
+
+Download the APK from [Releases](https://github.com/KorppuJauho/pocketts/releases) and open it on your phone
+(Android 10 or newer). Android asks once to allow installing apps from your browser.
 
 ## Known limitations
 
@@ -33,11 +40,6 @@ Your TeamSpeak identity and saved passwords are encrypted on the phone. No accou
 - **Pictures go to the server's own files.** PocketTS can't upload pictures to TeamSpeak's picture service. The
   pictures you send are saved in the channel's files on the server (file transfer), so you need permission to upload
   files in that channel. TeamSpeak app users see them as usual.
-
-## Support
-
-PocketTS is free and stays free. If you'd like to say thanks, you can
-[buy me a coffee](https://buymeacoffee.com/jauho).
 
 ## Building it yourself
 
@@ -52,3 +54,5 @@ The PocketTS name and icon are mine. If you release your own version as an app (
 downloads), give it a different name and icon so nobody mistakes it for PocketTS.
 
 PocketTS isn't affiliated with or endorsed by TeamSpeak Systems GmbH. TeamSpeak is their trademark.
+
+PocketTS is free and stays free. If you'd like to say thanks, you can [buy me a coffee](https://buymeacoffee.com/jauho).

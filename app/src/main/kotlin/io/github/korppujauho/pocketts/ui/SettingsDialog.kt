@@ -408,6 +408,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Check("Headset button is push-to-talk", v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
         Desc("In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it's on, the button doesn't play or pause music.")
     }
+    if (io.github.korppujauho.pocketts.UpdateCheck.enabled) Group {
+        Check("Check for updates", v.checkUpdates) { onChange(v.copy(checkUpdates = it)) }
+        Desc("Once a day, PocketTS asks GitHub whether a newer version is out, and says so on the connect screen. Nothing about you is sent.")
+    }
     Group {
         Check("Keep the screen on", v.keepScreenOn) { onChange(v.copy(keepScreenOn = it)) }
         Desc("The screen doesn't go dark while you're connected and the app is open. While you share or watch a stream, it stays on anyway.")

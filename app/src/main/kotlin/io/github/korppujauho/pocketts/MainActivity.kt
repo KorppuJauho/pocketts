@@ -137,6 +137,7 @@ class MainActivity : ComponentActivity() {
         }
         TalkOverlay.start(this)
         HeadsetButton.start(this)
+        UpdateCheck.start(this)
         io.github.korppujauho.pocketts.ui.StreamSize.onChange = { runOnUiThread { current?.updatePip() } }
         addOnPictureInPictureModeChangedListener { info ->
             inPip.value = info.isInPictureInPictureMode

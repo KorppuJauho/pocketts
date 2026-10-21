@@ -199,16 +199,5 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Settings › General › Keep the screen on: connected, the screen stays on; off, it goes dark as usual.
 - [ ] The reworked sounds (switching channel, being moved, joining and leaving, messages, streams) sound right on
       the phone.
-
-## 9. Staying connected (Phone)
-- [x] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…" within a few seconds, then it's back
-      with the chat kept. (21 Oct: worked, but the loss took about a minute to notice.)
-- [x] Airplane mode for 30 seconds: "Connection lost" within a few seconds; then off: it reconnects.
-- [x] Right after a lost connection, if the server still has the old one: "The server still has your old connection:
-      waiting for it to let go", then it connects as soon as the server drops the old one.
-- [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
-- [x] Disconnect from the notification's button.
-- [x] Swipe the app away from recent apps: it leaves the server.
-- [x] A busy server (many people or channels): connecting shows everyone's avatars, with no "client is flooding"
-      warning.
-- [ ] An hour connected in the background: battery use looks reasonable (Settings › Battery).
+- [ ] The release APK (`scripts/dev.sh release`) installs next to the test build and works: connect, talk, chat, a
+      picture, a stream (watch and share), favourites, settings. Settings › General has "Check for updates".

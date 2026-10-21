@@ -13,6 +13,7 @@ dev.env
 keystore.properties
 *.jks
 *.keystore
+*.jks
 
 # Editors and OS
 .idea/
