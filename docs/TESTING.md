@@ -29,6 +29,8 @@ permissions guests may not have.
 - [x] Spacers (if the server has any) look like they do in the TeamSpeak app.
 - [x] Channel banners (if the server has any) sit like in the TeamSpeak app: from the left, centred up and down.
 - [x] Icons and group badges match what the TeamSpeak app shows.
+- [ ] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): it asks "Join this channel?";
+      Join moves you there, also after you've been in other channels. Cancel does nothing.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.
@@ -97,6 +99,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       picture and the words under it arrive as one message, on the PC too.
 - [ ] With the camera not allowed yet (Android settings › Apps › PocketTS › Permissions), choose "Take a photo":
       Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
+- [ ] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
+      picture gets smaller and the text you type stays fully visible. Close the keyboard: everything is back.
 
 ## 7. Streams (Phone + PC)
 - [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.

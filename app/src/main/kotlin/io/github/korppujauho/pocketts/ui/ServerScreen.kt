@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.foundation.layout.ime
+import androidx.compose.material.icons.automirrored.rounded.Login
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.filled.CheckCircle
@@ -107,6 +109,7 @@ fun ServerScreen(
     var view by rememberSaveable { mutableStateOf(startView) }
     var chatKey by remember { mutableStateOf(startChat) }
     var askPassword by remember { mutableStateOf<ServerModel.Channel?>(null) }
+    var askSpacer by remember { mutableStateOf<ServerModel.Channel?>(null) }
     var person by remember { mutableStateOf<ServerModel.Client?>(null) }
     var pokeTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
@@ -175,7 +178,10 @@ fun ServerScreen(
             }
             Column(Modifier.fillMaxSize().padding(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val ptt = state.voice.activation == io.github.korppujauho.pocketts.VoiceSettings.Activation.PTT
-                ControlsBar(
+                // Typing in the chat: the keyboard needs the room, so the buttons and the switch step aside until it closes
+                val typing = view == View.CHAT &&
+                    androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+                if (!typing) ControlsBar(
                     micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
                     onMic = actions::toggleMic, onSound = actions::toggleSound,
                     ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
@@ -193,7 +199,7 @@ fun ServerScreen(
                 val unread = state.unread.any { k ->
                     if (k is Chat.Key.Private) state.privateTabs.any { it.uid == k.uid } else k == Chat.Key.Channel(state.ownChannel)
                 }
-                ViewSwitch(view, unread = unread) { view = it }
+                if (!typing) ViewSwitch(view, unread = unread) { view = it }
                 when (view) {
                     View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
                         // The server's own icon, else a plain server one (as channels have the note)
@@ -211,8 +217,10 @@ fun ServerScreen(
                                 items,
                                 TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
                                 onChannel = { ch ->
-                                    if (ch.id == state.ownChannel || ch.spacer != null) return@ChannelTree
-                                    if (ch.hasPassword) askPassword = ch else actions.join(ch)
+                                    if (ch.id == state.ownChannel) return@ChannelTree
+                                    // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake
+                                    if (ch.spacer != null) askSpacer = ch
+                                    else if (ch.hasPassword) askPassword = ch else actions.join(ch)
                                 },
                                 onPerson = { person = it },
                                 modifier = Modifier.fillMaxSize(),
@@ -251,6 +259,21 @@ fun ServerScreen(
         )
     }
 
+    askSpacer?.let { ch ->
+        val name = ch.spacer?.text?.trim()?.takeIf { it.isNotEmpty() && it.any(Char::isLetterOrDigit) }
+        TsDialog(
+            onDismiss = { askSpacer = null }, title = "Join this channel?",
+            icon = androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Login,
+            subtitle = name ?: "It's a spacer channel",
+            buttons = {
+                PillButton("Cancel") { askSpacer = null }
+                PillButton("Join", PillKind.PRIMARY) {
+                    askSpacer = null
+                    if (ch.hasPassword) askPassword = ch else actions.join(ch)
+                }
+            },
+        )
+    }
     askPassword?.let { ch ->
         var pw by remember { mutableStateOf("") }
         TsDialog(

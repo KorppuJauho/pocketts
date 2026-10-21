@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -329,8 +330,10 @@ private fun MessageBox(
         else android.widget.Toast.makeText(context, "Taking a photo needs the camera to be allowed.", android.widget.Toast.LENGTH_LONG).show()
     }
     pending?.let { uri ->
+        // Smaller while the keyboard is open, so the text stays in view
+        val keyboard = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
         Box(Modifier.fillMaxWidth().background(Ts.panel).padding(start = 12.dp, top = 12.dp)) {
-            Box(Modifier.size(84.dp)) {
+            Box(Modifier.size(if (keyboard) 56.dp else 84.dp)) {
                 AsyncImage(
                     uri, contentDescription = "The attached picture", contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).border(1.dp, Pop.edge, RoundedCornerShape(10.dp)),

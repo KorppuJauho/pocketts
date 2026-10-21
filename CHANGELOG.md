@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Typing in the chat: while the keyboard is open, the control buttons and the Channels / Chat switch step aside (and an
+  attached picture gets smaller), so the message box stays in view.
+- Spacer channels can be joined (some servers use one as their AFK channel): tapping one asks first, since spacers
+  are easy to tap by mistake.
 - A picture for the channel chat shows as attached above the message box (with a button to remove it) and goes with
   the usual Send button, with any words typed under it, in one message (as the TeamSpeak app sends them). Taking a photo asks for the camera first
   instead of closing the app.
