@@ -95,7 +95,8 @@ case "${1:-}" in
     if [ -e "$KEYSTORE" ]; then echo "$KEYSTORE already exists: not made again."; exit 1; fi
     mkdir -p "$(dirname "$KEYSTORE")"
     chmod 700 "$(dirname "$KEYSTORE")"
-    docker run --rm -it -v "$(dirname "$KEYSTORE")":/keys "$IMAGE" \
+    # As this user, so the key file is theirs (Docker would make it root's)
+    docker run --rm -it --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$(dirname "$KEYSTORE")":/keys "$IMAGE" \
       keytool -genkeypair -keystore "/keys/$(basename "$KEYSTORE")" -storetype PKCS12 -alias pocketts \
       -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=PocketTS"
     chmod 600 "$KEYSTORE"
