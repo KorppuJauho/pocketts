@@ -147,9 +147,9 @@ private fun ChannelTitle(ch: ServerModel.Channel, server: String, onClick: () ->
 }
 
 /**
- * A banner as the TeamSpeak app (and WebTS) shows it: the picture at its own size (at most 500 wide), from the left,
- * centred up and down and cut to the row (not squeezed into it), fading out on its right, with a shade behind the
- * name.
+ * A channel's banner: the picture filling the row from the left, in its own proportions (never stretched), so it's
+ * as tall as the row and whatever doesn't fit on the right is cut off. It fades out at the row's right end, with a
+ * shade behind the name.
  */
 @Composable
 private fun androidx.compose.foundation.layout.BoxScope.Banner(model: Any, align: ServerModel.Spacer.Align?) {
@@ -163,19 +163,29 @@ private fun androidx.compose.foundation.layout.BoxScope.Banner(model: Any, align
     val picture = (state as? coil3.compose.AsyncImagePainter.State.Success)?.painter ?: return
     val natural = picture.intrinsicSize
     if (!(natural.width > 0f && natural.height > 0f)) return
-    val width = minOf(natural.width, 500f).dp
-    val height = width * (natural.height / natural.width)
-    Box(Modifier.matchParentSize().clipToBounds()) {
-        androidx.compose.foundation.Image(
-            picture, contentDescription = null, contentScale = ContentScale.FillBounds,
-            modifier = Modifier.wrapContentSize(Alignment.CenterStart, unbounded = true).size(width, height)
+    val aspect = natural.width / natural.height
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.matchParentSize()) {
+        // Covers the row: as tall as it (or as wide, for a picture taller than the row's shape), the rest cut off
+        var height = maxHeight
+        var width = height * aspect
+        if (width < maxWidth) {
+            width = maxWidth
+            height = width / aspect
+        }
+        Box(
+            Modifier.matchParentSize().clipToBounds()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithContent {
                     drawContent()
                     val fade = (1f - 48.dp.toPx() / size.width).coerceIn(0f, 1f)
                     drawRect(Brush.horizontalGradient(0f to Color.Black, fade to Color.Black, 1f to Color.Transparent), blendMode = BlendMode.DstIn)
                 },
-        )
+        ) {
+            androidx.compose.foundation.Image(
+                picture, contentDescription = null, contentScale = ContentScale.FillBounds,
+                modifier = Modifier.wrapContentSize(Alignment.CenterStart, unbounded = true).size(width, height),
+            )
+        }
         Box(
             Modifier.matchParentSize().drawBehind {
                 val dark = Ts.card.copy(alpha = 0.9f)
