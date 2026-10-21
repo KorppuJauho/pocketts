@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.runtime.collectAsState
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -103,6 +104,7 @@ fun ConnectScreen(
                     // Always there; ticked (and fixed) for a server that already is a favourite
                     CheckRow(if (known) "In favourites" else "Save to favourites", favorite || known, enabled = !known) { favorite = it }
                     error?.let { WarningBanner(it, onDismissError, inset = 0.dp) }
+                    UpdateCard()
                     PrimaryButton(
                         "Connect", enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
                     ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
@@ -206,5 +208,22 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                     Text("Only if the server's pictures and avatars don't load: its file transfer is on another port.", color = Ts.muted, fontSize = 12.sp)
                 }
             }
+    }
+}
+
+/** A newer PocketTS on GitHub: Download opens its release page, Not now hides it until a later one. */
+@Composable
+private fun UpdateCard() {
+    val update by io.github.korppujauho.pocketts.UpdateCheck.available.collectAsState()
+    val r = update ?: return
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val uri = androidx.compose.ui.platform.LocalUriHandler.current
+    PopCard {
+        Text("PocketTS ${r.version} is out", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        Text("A newer version than this one (${io.github.korppujauho.pocketts.BuildConfig.VERSION_NAME}) is on GitHub.", color = Ts.muted, fontSize = 13.sp)
+        Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
+            PillButton("Not now") { io.github.korppujauho.pocketts.UpdateCheck.dismiss(context) }
+            PillButton("Download", PillKind.PRIMARY) { uri.openUri(r.url) }
+        }
     }
 }

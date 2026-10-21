@@ -45,3 +45,34 @@ never do.
 
 Put the test server's address in `dev.env` as `TS_TEST_SERVER=host:port`. If the server runs in a container, add
 `TS_CONTAINER=<name>` as well, so `scripts/dev.sh ts-server up` and `down` can start and stop it.
+
+## Releasing
+
+A release is a signed APK attached to a GitHub release. Test builds are a separate app (their ID ends in `.debug`),
+so both can be on one phone.
+
+### The release key (once)
+
+```bash
+scripts/dev.sh keystore
+```
+
+This asks for a password and makes the key at `~/.pocketts/release.keystore` (inside WSL on Windows; set
+`POCKETTS_KEYSTORE` in `dev.env` to keep it somewhere else). It never goes into the repo.
+
+**Back up the key file and its password somewhere safe.** Every update has to be signed with the same key: without
+it, people can't update to a new version and would have to uninstall first, which loses their settings.
+
+### A release
+
+1. In `app/build.gradle.kts`, raise `versionCode` by one and set `versionName` (for example `0.2.0`).
+2. Move the changelog's "Unreleased" lines under the new version.
+3. Run `scripts/dev.sh release`. It asks for the key's password and makes `dist/PocketTS-<version>.apk`, with its
+   SHA-256.
+4. Install it on a phone and try the basics: connect, talk, chat, a picture, a stream.
+5. On GitHub: Releases › Draft a new release, tag `v<version>` (for example `v0.2.0`). Paste the changelog lines and
+   the SHA-256, attach the APK, and publish.
+
+The GitHub version checks `releases/latest` once a day, so a published release reaches users who have update checks
+on. Pre-releases aren't offered.
+

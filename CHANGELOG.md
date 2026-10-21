@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Release builds: signed with the release key and shrunk (about 23 MB instead of 86). Making the key and the release
+  are `scripts/dev.sh keystore` and `scripts/dev.sh release` (see DEVELOPING.md).
+- The GitHub version checks for updates once a day and shows a card on the connect screen when a newer one is out
+  (Download opens its release page, Not now hides it until a later one). Off in Settings > General > Check for
+  updates. Test builds don't check.
 - Reworked sounds for switching channel, being moved, people joining and leaving, messages in and out, and streams
   starting and stopping: low, short and soft, in the style of the sound buttons' (no sliding pitch, which stuttered).
 - Settings > General > "Keep the screen on": the screen stays on while connected and the app is open. While you share

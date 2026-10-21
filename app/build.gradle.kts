@@ -26,15 +26,35 @@ android {
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
 
+    // The release key: its file and passwords come from scripts/dev.sh release (asked each time), never from git
+    val releaseKey = System.getenv("POCKETTS_KEYSTORE_FILE")?.let { file(it) }?.takeIf { it.exists() }
+    signingConfigs {
+        if (releaseKey != null) {
+            create("release") {
+                storeFile = releaseKey
+                storePassword = System.getenv("POCKETTS_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("POCKETTS_KEY_ALIAS") ?: "pocketts"
+                keyPassword = System.getenv("POCKETTS_KEY_PASSWORD") ?: System.getenv("POCKETTS_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             buildConfigField("String", "DEV_LOG_URL", "\"${devEnv["DEV_LOG_URL"].orEmpty()}\"")
+            buildConfigField("boolean", "UPDATE_CHECK", "false")
         }
         release {
-            isMinifyEnabled = false
+            // Smaller and faster: unused code and resources left out (proguard-rules.pro keeps what WebRTC needs)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (releaseKey != null) signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "DEV_LOG_URL", "\"\"")
+            // The GitHub release asks GitHub for newer versions (a Google Play build won't)
+            buildConfigField("boolean", "UPDATE_CHECK", "true")
         }
     }
 
