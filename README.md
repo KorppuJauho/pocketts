@@ -38,6 +38,10 @@ See [DEVELOPING.md](DEVELOPING.md).
 
 ## License
 
-[Open Software License 3.0](LICENSE).
+[GNU General Public License v3.0](LICENSE). You're welcome to fork PocketTS, change it and share your version, as
+long as you share its source code under the same license.
+
+The PocketTS name and icon are mine. If you release your own version as an app (in an app store or as your own
+downloads), give it a different name and icon so nobody mistakes it for PocketTS.
 
 PocketTS isn't affiliated with or endorsed by TeamSpeak Systems GmbH. TeamSpeak is their trademark.
