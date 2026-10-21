@@ -214,7 +214,13 @@ fun ServerScreen(
                         ServerName(state.serverName.ifEmpty { "Connecting to ${state.address}…" }) { serverInfo = true }
                     }) {
                         if (state.phase == Session.Phase.CONNECTING) {
-                            Loading(if (state.reconnecting > 0) "Connection lost. Reconnecting… (try ${state.reconnecting})" else "Connecting…")
+                            Loading(
+                                when {
+                                    state.waitingForOld -> "Reconnecting… The server still has your old connection: waiting for it to let go."
+                                    state.reconnecting > 0 -> "Connection lost. Reconnecting… (try ${state.reconnecting})"
+                                    else -> "Connecting…"
+                                }
+                            )
                         } else {
                             ChannelTree(
                                 items,

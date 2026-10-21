@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 /** The one connection the app has (or not), and what the screen shows about it. */
 object Session : TsClient.Listener {
     private const val WRONG_CHANNEL_PASSWORD = "781" // "invalid channel password"
+    private const val CLONE_STILL_ON = "521" // "too many clones already connected": our identity is still on
     private const val AVATAR_TOO_BIG = 2565 // over the server's max avatar file size
 
 
@@ -53,6 +54,7 @@ object Session : TsClient.Listener {
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
+        val waitingForOld: Boolean = false, // reconnecting, but the server still has our old connection
         val retryPassword: Int = 0, // a channel whose password was just refused: its password is asked again
         val retryRemember: Boolean = false, // ... and whether that one was to be remembered
         val avatarStatus: String? = null, // the profile picture's last change, as words
@@ -236,6 +238,7 @@ object Session : TsClient.Listener {
     private data class Target(val address: String, val nickname: String, val password: String, val filePort: Int? = null)
     private var target: Target? = null
     private var retries = 0
+    private var oldWaits = 0 // tries refused because the server still had our old connection
     @Volatile private var wasConnected = false // only a connection that worked is tried again
     private val retryTimer = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "reconnect").apply { isDaemon = true } }
     private var retryTask: java.util.concurrent.ScheduledFuture<*>? = null
@@ -245,6 +248,7 @@ object Session : TsClient.Listener {
         app = context.applicationContext
         if (_state.value.phase != Phase.IDLE) return
         retries = 0
+        oldWaits = 0
         wasConnected = false
         target = Target(address, nickname, serverPassword, filePort)
         start(keepChat = false)
@@ -592,6 +596,8 @@ object Session : TsClient.Listener {
         AppLog.log("Connected as client $clientId")
         val s = _state.value
         retries = 0
+        oldWaits = 0
+        if (s.waitingForOld) _state.update { it.copy(waitingForOld = false) }
         wasConnected = true
         if (s.reconnecting > 0) _state.update { it.copy(reconnecting = 0) }
         if (s.away) client?.sendCommand(Commands.build("clientupdate", "client_away" to true, "client_away_message" to s.awayMessage))
@@ -797,20 +803,34 @@ object Session : TsClient.Listener {
 
     override fun onDisconnected(reason: String?) {
         AppLog.log("Disconnected" + (reason?.let { ": $it" } ?: ""))
+        // The server still has our old connection, which it drops only after a while (the same identity may be on
+        // once): tried again every few seconds until it lets go, for up to two minutes
+        val oldStillThere = client?.refusal == CLONE_STILL_ON && oldWaits < 40
         // Lost (no answer, or the network itself went: a failed try while reconnecting counts too)
-        val lost = client?.lostConnection == true || _state.value.reconnecting > 0
-        if (lost && wasConnected && target != null && retries < 20) {
+        val lost = oldStillThere || client?.lostConnection == true || _state.value.reconnecting > 0
+        if (lost && (wasConnected || oldStillThere) && target != null && (retries < 20 || oldStillThere)) {
             // The network went away (Wi-Fi to mobile data, a tunnel...): try again, sooner when a network comes back
             files?.onDisconnected()
             files = null
             engine?.reset()
             stopAudio()
             client = null
-            retries++
-            if (retries == 1) sound(Cue.CONNECTION_LOST)
-            _state.update { it.copy(phase = Phase.CONNECTING, reconnecting = retries, error = reason, talking = emptySet()) }
+            if (oldStillThere) {
+                oldWaits++
+                if (retries == 0) retries = 1
+                AppLog.log("The server still has the old connection; trying again shortly")
+            } else {
+                retries++
+                if (retries == 1) sound(Cue.CONNECTION_LOST)
+            }
+            _state.update {
+                it.copy(
+                    phase = Phase.CONNECTING, reconnecting = retries, waitingForOld = oldStillThere,
+                    error = if (oldStillThere) null else reason, talking = emptySet(),
+                )
+            }
             ConnectionService.start(app, "Reconnecting to ${_state.value.address}…")
-            scheduleRetry(minOf(30L, 2L * retries))
+            scheduleRetry(if (oldStillThere) 3L else minOf(30L, 2L * retries))
             return
         }
         finish(reason)

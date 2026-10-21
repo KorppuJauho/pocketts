@@ -197,6 +197,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…" within a few seconds, then it's back
       with the chat kept. (21 Oct: worked, but the loss took about a minute to notice.)
 - [ ] Airplane mode for 30 seconds: "Connection lost" within a few seconds; then off: it reconnects.
+- [ ] Right after a lost connection, if the server still has the old one: "The server still has your old connection:
+      waiting for it to let go", then it connects as soon as the server drops the old one.
 - [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
 - [x] Disconnect from the notification's button.
 - [x] Swipe the app away from recent apps: it leaves the server.

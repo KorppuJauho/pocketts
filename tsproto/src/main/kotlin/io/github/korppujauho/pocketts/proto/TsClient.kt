@@ -93,6 +93,10 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     @Volatile var lostConnection = false
         private set
 
+    /** The server's error number when it refused the connection (such as "521": this identity is already on). */
+    @Volatile var refusal: String? = null
+        private set
+
     /** The server's address (for file transfers), once connecting has started. */
     val serverAddress: InetAddress? get() = server?.address
 
@@ -522,6 +526,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             }
             "error" -> if (state == State.CONNECTING && cmd["id"] != "0") {
                 // While connecting, an error answers clientinit: wrong password, banned, and so on.
+                refusal = cmd["id"]
                 listener.onCommand(cmd)
                 return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})", network = false)
             }
