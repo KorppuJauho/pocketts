@@ -89,7 +89,7 @@ class Settings(private val context: Context) {
 
     private companion object {
         const val IDENTITY = "settings/identity"
-        const val UNREADABLE = "The saved identity can't be opened on this phone. Import yours in Settings › General › " +
+        const val UNREADABLE = "The saved identity can't be opened on this phone. Import yours in Settings › Advanced › " +
             "TeamSpeak identity, or make a new one there."
     }
 }

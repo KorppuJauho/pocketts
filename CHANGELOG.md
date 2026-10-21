@@ -4,8 +4,9 @@
 
 - Typing in the chat: while the keyboard is open, the control buttons and the Channels / Chat switch step aside (and an
   attached picture gets smaller), so the message box stays in view.
-- Spacer channels can be joined (some servers use one as their AFK channel): tapping one asks first, since spacers
-  are easy to tap by mistake.
+- Spacer channels can be joined by tapping them when Settings > General > "Allow joining spacer channels" is on
+  (some servers use one as their AFK channel). It's off at first, so a stray tap on a divider doesn't move you.
+- The identity's import and export moved to Settings > Advanced.
 - A picture for the channel chat shows as attached above the message box (with a button to remove it) and goes with
   the usual Send button, with any words typed under it, in one message (as the TeamSpeak app sends them). Taking a photo asks for the camera first
   instead of closing the app.
@@ -66,7 +67,7 @@
 - Away, with a message (tap yourself).
 - Warnings (such as a refused password) show on a background of their own, can be closed, and go away by themselves.
 - A favourite can have its own file transfer port (its Advanced part), for servers where it isn't the usual one.
-- The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > General):
+- The TeamSpeak identity can be exported (shared) and imported from another TeamSpeak app (Settings > Advanced):
   pasted, or as the .ini file a TeamSpeak app saves (chosen with Android's file picker).
 - The identity and the passwords the app keeps (the remembered server password, favourites' passwords and the relay
   password) are encrypted with a key that stays in the phone's Android Keystore. Ones saved by an earlier version are

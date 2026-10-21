@@ -153,12 +153,14 @@ fun SettingsContent(
                     0 -> {
                         if (self != null) ProfilePicture(self, actions)
                         General(v, nick, { nick = it }) { v = it }
-                        Identity(actions)
                         ChatHistory(actions)
                     }
                     1 -> Playback(v, actions) { v = it }
                     2 -> Capture(v, actions) { v = it }
-                    else -> Advanced(v) { v = it }
+                    else -> {
+                        Advanced(v) { v = it }
+                        Identity(actions)
+                    }
                 }
             }
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(16.dp), horizontalArrangement = Arrangement.End) {
@@ -358,6 +360,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
     Group {
         Check("Headset button is push-to-talk", v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
         Desc("In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it's on, the button doesn't play or pause music.")
+    }
+    Group {
+        Check("Allow joining spacer channels", v.joinSpacers) { onChange(v.copy(joinSpacers = it)) }
+        Desc("Tapping a spacer (a divider line or title in the channel list) joins it like any channel. Some servers use one as their AFK channel. Off, spacers can't be joined by a stray tap.")
     }
 }
 

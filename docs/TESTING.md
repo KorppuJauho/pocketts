@@ -29,8 +29,9 @@ permissions guests may not have.
 - [x] Spacers (if the server has any) look like they do in the TeamSpeak app.
 - [x] Channel banners (if the server has any) sit like in the TeamSpeak app: from the left, centred up and down.
 - [x] Icons and group badges match what the TeamSpeak app shows.
-- [ ] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): it asks "Join this channel?";
-      Join moves you there, also after you've been in other channels. Cancel does nothing.
+- [ ] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): nothing happens. Turn on
+      Settings › General › "Allow joining spacer channels": a tap now joins it, also after you've been in other
+      channels.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.
@@ -152,9 +153,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
 - [ ] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
       itself after a few seconds.
-- [ ] Settings › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
+- [ ] Settings › Advanced › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
       sharing to apps). Import it again (Choose a file): no complaint, and the identity field hides what's pasted.
-- [ ] Settings › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
+- [ ] Settings › Advanced › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
 - [ ] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.

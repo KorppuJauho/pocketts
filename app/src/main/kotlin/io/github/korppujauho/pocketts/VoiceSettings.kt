@@ -15,6 +15,7 @@ data class VoiceSettings(
     val floatingPtt: Boolean = true, // the round push-to-talk button
     val volumeKeysPtt: Boolean = false, // volume buttons talk while held (app on screen)
     val headsetPtt: Boolean = false, // the headset's button starts and stops talking
+    val joinSpacers: Boolean = false, // tapping a spacer channel joins it (some servers' AFK channel is one)
     val turnUrl: String = "", // a relay (TURN) server for streams, e.g. turn:relay.example.com:3478
     val turnUser: String = "",
     val turnPassword: String = "",
@@ -46,6 +47,7 @@ data class VoiceSettings(
                 floatingPtt = p.getBoolean("floatingPtt", d.floatingPtt),
                 volumeKeysPtt = p.getBoolean("volumeKeysPtt", d.volumeKeysPtt),
                 headsetPtt = p.getBoolean("headsetPtt", d.headsetPtt),
+                joinSpacers = p.getBoolean("joinSpacers", d.joinSpacers),
                 turnUrl = p.getString("turnUrl", d.turnUrl).orEmpty(),
                 turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
                 turnPassword = try {
@@ -76,6 +78,7 @@ data class VoiceSettings(
             .putBoolean("floatingPtt", floatingPtt)
             .putBoolean("volumeKeysPtt", volumeKeysPtt)
             .putBoolean("headsetPtt", headsetPtt)
+            .putBoolean("joinSpacers", joinSpacers)
             .putString("turnUrl", turnUrl.trim())
             .putString("turnUser", turnUser.trim())
             .remove("turnPassword") // kept with the other secrets (see secretPrefs)
