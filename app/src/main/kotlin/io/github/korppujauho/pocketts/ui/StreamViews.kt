@@ -94,12 +94,22 @@ fun VideoView(
                     }
                 })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+                tag = fill
                 setEnableHardwareScaler(true)
                 setMirror(mirror)
                 renderer = this
             }
         },
-        update = { it.setMirror(mirror) },
+        update = {
+            it.setMirror(mirror)
+            // Small (filled) and big (whole picture) differ: the surface is sized for the way it's drawn, so a
+            // change must re-size it, or the picture stays stretched to the old shape
+            if (it.tag != fill) {
+                it.tag = fill
+                it.setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+                it.requestLayout()
+            }
+        },
         modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
     )
     }

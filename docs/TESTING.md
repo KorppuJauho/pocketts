@@ -151,6 +151,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       home network). If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
 - [ ] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
+- [ ] Share the front camera and tap the small preview to make it big: not stretched. Tap again: small, not stretched.
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.
@@ -177,8 +178,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
 - [x] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
-- [ ] Settings › General › Profile picture › Change…: the PC (TeamSpeak 6) shows the new picture, also after it
+- [ ] Settings › General › Profile picture › Change: the PC (TeamSpeak 6) shows the new picture, also after it
       reconnects.
+- [ ] Settings › Advanced › Identity shows Wipe, Export and Import (no dots). Wipe warns first; Cancel keeps it.
+      Wipe, then reconnect: the server sees a new person (new unique id, no groups).
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.

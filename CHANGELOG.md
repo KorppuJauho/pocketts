@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The big share preview isn't stretched any more (the picture kept the small preview's shape).
+- Settings > Advanced > Identity: Wipe (with a warning first), Export and Import. Buttons lost their "…".
 - Pictures (profile pictures and ones sent to the chat) are saved in plain sRGB colours, without a phone photo's
   embedded colour profile; with it, the TeamSpeak 6 app didn't show the profile picture.
 - Sharing the front camera: your preview shows exactly what viewers see (it was mirrored like a selfie camera).
