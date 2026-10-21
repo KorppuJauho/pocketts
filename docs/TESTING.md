@@ -93,6 +93,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Phone sends a picture (Choose a picture) and the PC sees it.
 - [ ] Phone sends a photo (Take a photo): it's the right way up on the PC.
 - [ ] A GIF from the phone moves on the PC.
+- [ ] Attach a picture: it shows above the message box with an X to remove it. Type a few words and tap Send: the
+      words and the picture arrive as one message, on the PC too.
+- [ ] With the camera not allowed yet (Android settings › Apps › PocketTS › Permissions), choose "Take a photo":
+      Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
 
 ## 7. Streams (Phone + PC)
 - [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.

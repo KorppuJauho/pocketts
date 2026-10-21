@@ -607,8 +607,11 @@ object Session : TsClient.Listener {
         return f.download(cid, path, maxBytes)
     }
 
-    /** Sends a picture into our channel's chat: into the channel's files (/webTS), then the line TeamSpeak shows. */
-    fun sendPicture(context: Context, uri: android.net.Uri) {
+    /**
+     * Sends a picture into our channel's chat: into the channel's files, then one message with [text] (if any) and
+     * the picture under it, as TeamSpeak shows them.
+     */
+    fun sendPicture(context: Context, uri: android.net.Uri, text: String = "") {
         val c = client ?: return
         val f = files ?: return
         val cid = _state.value.ownChannel
@@ -619,7 +622,10 @@ object Session : TsClient.Listener {
                 val name = io.github.korppujauho.pocketts.proto.Pictures.pictureName(p.type, java.util.UUID.randomUUID().toString().take(6))
                 f.createDirectory(cid, io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER)
                 f.upload(cid, "${io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER}/$name", p.bytes)
-                c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to io.github.korppujauho.pocketts.proto.Pictures.pictureMessage(name, cid)))
+                val picture = io.github.korppujauho.pocketts.proto.Pictures.pictureMessage(name, cid)
+                val words = text.trim().take(1000 - picture.length)
+                val msg = if (words.isEmpty()) picture else "$words\n$picture"
+                c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to msg))
                 AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
             } catch (e: FileTransfer.Error) {
                 _state.update { it.copy(error = "The picture wasn't sent: ${e.message}" + if (e.code == 2568) " (no permission in this channel)" else "") }

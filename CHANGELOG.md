@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- A picture for the channel chat shows as attached above the message box (with a button to remove it) and goes with
+  the usual Send button, together with any words typed, in one message. Taking a photo asks for the camera first
+  instead of closing the app.
 - The headset's button can be push-to-talk (Settings > General): one press starts talking, the next stops, also with
   the screen off.
 - Commands to the server are spaced out a little, so busy servers don't refuse them as flooding. When one still is

@@ -93,7 +93,7 @@ fun ChatPanel(
     onView: (Chat.Key) -> Unit,
     onCloseTab: (String) -> Unit,
     onSend: (Chat.Key, String) -> Unit,
-    onPicture: (Uri) -> Unit = {},
+    onPicture: (Uri, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     Panel(modifier, header = {
@@ -303,7 +303,7 @@ private fun MessageBox(
     enabled: Boolean,
     pictures: Boolean,
     sendingPicture: Boolean,
-    onPicture: (Uri) -> Unit,
+    onPicture: (Uri, String) -> Unit,
     onSend: (String) -> Unit,
 ) {
     var text by rememberSaveable { mutableStateOf("") }
@@ -313,23 +313,43 @@ private fun MessageBox(
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) pending = uri }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> if (ok) pending = photoUri }
+    fun takePhoto() {
+        val dir = java.io.File(context.cacheDir, "photos").apply { mkdirs() }
+        val file = java.io.File(dir, "photo-${System.currentTimeMillis()}.jpg")
+        photoUri = FileProvider.getUriForFile(context, context.packageName + ".files", file)
+        camera.launch(photoUri!!)
+    }
+    // The camera app may only be opened once the camera is allowed (the app also uses it for streams)
+    val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
+        if (ok) takePhoto()
+        else android.widget.Toast.makeText(context, "Taking a photo needs the camera to be allowed.", android.widget.Toast.LENGTH_LONG).show()
+    }
     pending?.let { uri ->
-        Row(
-            Modifier.fillMaxWidth().background(Ts.panel).padding(horizontal = 12.dp).padding(top = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            AsyncImage(uri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)))
-            Text("Picture ready to send", color = Ts.text, fontSize = 14.sp, modifier = Modifier.weight(1f))
-            PrimaryButton("Send") { onPicture(uri); pending = null }
-            Icon(
-                androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Don't send", tint = Ts.muted,
-                modifier = Modifier.clip(CircleShape).clickable { pending = null }.padding(4.dp),
-            )
+        Box(Modifier.fillMaxWidth().background(Ts.panel).padding(start = 12.dp, top = 12.dp)) {
+            Box(Modifier.size(84.dp)) {
+                AsyncImage(
+                    uri, contentDescription = "The attached picture", contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).border(1.dp, Pop.edge, RoundedCornerShape(10.dp)),
+                )
+                Box(
+                    Modifier.align(Alignment.TopEnd).padding(4.dp).size(24.dp).clip(CircleShape).background(Color(0xCC000000))
+                        .clickable { pending = null },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Remove the picture", tint = Color.White, modifier = Modifier.size(16.dp))
+                }
+            }
         }
     }
+    val canSend = enabled && (text.isNotBlank() || (pending != null && !sendingPicture))
     fun send() {
-        if (text.isNotBlank()) {
+        val picture = pending
+        if (picture != null) {
+            if (sendingPicture) return
+            onPicture(picture, text)
+            pending = null
+            text = ""
+        } else if (text.isNotBlank()) {
             onSend(text)
             text = ""
         }
@@ -355,10 +375,9 @@ private fun MessageBox(
                 })
                 DropdownMenuItem(text = { Text("Take a photo", color = Ts.text) }, onClick = {
                     menu = false
-                    val dir = java.io.File(context.cacheDir, "photos").apply { mkdirs() }
-                    val file = java.io.File(dir, "photo-${System.currentTimeMillis()}.jpg")
-                    photoUri = FileProvider.getUriForFile(context, context.packageName + ".files", file)
-                    camera.launch(photoUri!!)
+                    val allowed = androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) ==
+                        android.content.pm.PackageManager.PERMISSION_GRANTED
+                    if (allowed) takePhoto() else askCamera.launch(android.Manifest.permission.CAMERA)
                 })
             }
         }
@@ -377,11 +396,11 @@ private fun MessageBox(
             )
         }
         Box(
-            Modifier.size(46.dp).clip(RoundedCornerShape(8.dp)).background(if (text.isNotBlank()) Ts.accent else Ts.input)
-                .clickable(enabled = enabled && text.isNotBlank()) { send() },
+            Modifier.size(46.dp).clip(RoundedCornerShape(8.dp)).background(if (canSend) Ts.accent else Ts.input)
+                .clickable(enabled = canSend) { send() },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = if (text.isNotBlank()) Color.White else Ts.muted)
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = if (canSend) Color.White else Ts.muted)
         }
     }
 }
