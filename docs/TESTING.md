@@ -113,6 +113,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
 - [x] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
       picture gets smaller and the text you type stays fully visible. Close the keyboard: everything is back.
+- [ ] The PC pastes a picture into the channel chat (TeamSpeak's own picture sharing): the phone shows one line,
+      "TeamSpeak images aren't supported in PocketTS", not a long string.
+- [ ] A picture sent from the phone is in the channel's files under /PocketTS (the PC's file browser).
 
 ## 7. Streams (Phone + PC)
 - [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
@@ -147,6 +150,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] On mobile data instead of Wi-Fi (needs a server reachable from the internet: the test server is only on the
       home network). If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
+- [ ] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
+- [ ] Share the front camera and tap the small preview to make it big: not stretched. Tap again: small, not stretched.
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.
@@ -173,6 +178,10 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
 - [x] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
+- [ ] Settings › General › Profile picture › Change: the PC (TeamSpeak 6) shows the new picture, also after it
+      reconnects.
+- [ ] Settings › Advanced › Identity shows Wipe, Export and Import (no dots). Wipe warns first; Cancel keeps it.
+      Wipe, then reconnect: the server sees a new person (new unique id, no groups).
 
 ## 9. Staying connected (Phone)
 - [ ] Turn Wi-Fi off while connected (mobile data on): "Connection lost. Reconnecting…", then it's back with the chat kept.

@@ -240,7 +240,7 @@ private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             PersonAvatar(self.person, self.server, 88)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton("Change…") {
+                SecondaryButton("Change") {
                     pick.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
                 }
                 if (self.person?.avatar?.isNotEmpty() == true) SecondaryButton("Remove") { actions.removeAvatar() }
@@ -265,6 +265,7 @@ private fun Identity(actions: SettingsActions) {
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
     ) { uri -> if (uri != null) done(actions.importIdentityFile(uri)) }
     var warning by remember { mutableStateOf(false) }
+    var wiping by remember { mutableStateOf(false) }
     val saveFile = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: "Saved. Keep the file somewhere only you can reach." }
@@ -272,13 +273,9 @@ private fun Identity(actions: SettingsActions) {
         Desc("Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.")
         problem?.let { Desc(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (problem == null) SecondaryButton("Export…") { warning = true }
-            SecondaryButton("Import…") { importing = true }
-            if (problem != null) SecondaryButton("New identity") {
-                actions.forgetIdentity()
-                problem = null
-                status = "A new identity is made at the next connect."
-            }
+            SecondaryButton("Wipe") { wiping = true }
+            if (problem == null) SecondaryButton("Export") { warning = true }
+            SecondaryButton("Import") { importing = true }
         }
         status?.let { Desc(it) }
     }
@@ -303,6 +300,29 @@ private fun Identity(actions: SettingsActions) {
                 "Save it somewhere only you can reach, like this phone or a private drive. Don't send it in a chat or " +
                     "an email, and don't post it. A TeamSpeak app can open it, and so can PocketTS on another phone."
             )
+        }
+    }
+    // Wipe: what's lost first, with a way to keep a copy
+    if (wiping) {
+        TsDialog(
+            onDismiss = { wiping = false }, title = "Wipe your identity?", icon = androidx.compose.material.icons.Icons.Rounded.Warning,
+            tint = Ts.red, subtitle = "This can't be undone",
+            buttons = {
+                PillButton("Cancel") { wiping = false }
+                PillButton("Wipe", PillKind.DANGER) {
+                    actions.forgetIdentity()
+                    problem = null
+                    wiping = false
+                    status = "Wiped. A new identity is made at the next connect."
+                }
+            },
+        ) {
+            Desc(
+                "This phone's identity is deleted, and a new one is made the next time you connect. To every server " +
+                    "you're then someone new: your groups, permissions and anything given to your old identity (such " +
+                    "as admin rights) don't come along."
+            )
+            Desc("The only way back is an exported copy. If you might want it again, cancel and Export it first.")
         }
     }
     if (importing) {

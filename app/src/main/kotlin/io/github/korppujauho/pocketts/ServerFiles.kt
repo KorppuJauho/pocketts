@@ -144,10 +144,15 @@ object ServerFiles {
         return Prepared(out, if (png) Pictures.Type.PNG else Pictures.Type.JPG)
     }
 
-    /** A profile picture: inside 320 × 320, as JPEG (as the TeamSpeak app and WebTS make them). */
-    fun prepareAvatar(context: Context, uri: Uri): ByteArray {
+    /**
+     * A profile picture as JPEG, best first: inside 320 × 320, then smaller ones for a server whose limit (the max
+     * avatar file size, 200 KB as it comes) refuses it. A 320 px photo is usually far under that.
+     */
+    fun prepareAvatar(context: Context, uri: Uri): List<ByteArray> {
         val raw = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
-        return encode(decode(raw, Pictures.AVATAR_MAX_SIDE), Bitmap.CompressFormat.JPEG, 90)
+        return listOf(Pictures.AVATAR_MAX_SIDE to 90, 240 to 80, 160 to 75, 96 to 70).map { (side, quality) ->
+            encode(decode(raw, side), Bitmap.CompressFormat.JPEG, quality)
+        }
     }
 
     private fun decode(raw: ByteArray, maxSide: Int): Bitmap =
@@ -157,6 +162,9 @@ object ServerFiles {
             val scale = minOf(1.0, maxSide.toDouble() / maxOf(w, h))
             if (scale < 1.0) decoder.setTargetSize((w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1))
             decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            // Plain sRGB, as browsers and the TeamSpeak app make them: a phone photo's wide colours (Display P3) would
+            // otherwise go along as an embedded colour profile, which the TeamSpeak app didn't show as a profile picture
+            decoder.setTargetColorSpace(android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB))
         }
 
     private fun encode(b: Bitmap, format: Bitmap.CompressFormat, quality: Int): ByteArray =

@@ -87,18 +87,29 @@ fun VideoView(
                 init(egl.eglBaseContext, object : RendererCommon.RendererEvents {
                     override fun onFirstFrameRendered() {}
                     override fun onFrameResolutionChanged(w: Int, h: Int, rotation: Int) {
+                        io.github.korppujauho.pocketts.AppLog.log("Video ${w}x$h turned $rotation")
                         val (sw, sh) = if (rotation % 180 == 0) w to h else h to w
                         if (sw > 0 && sh > 0) shape = sw.toFloat() / sh
                         report.value?.invoke(sw, sh)
                     }
                 })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+                tag = fill
                 setEnableHardwareScaler(true)
                 setMirror(mirror)
                 renderer = this
             }
         },
-        update = { it.setMirror(mirror) },
+        update = {
+            it.setMirror(mirror)
+            // Small (filled) and big (whole picture) differ: the surface is sized for the way it's drawn, so a
+            // change must re-size it, or the picture stays stretched to the old shape
+            if (it.tag != fill) {
+                it.tag = fill
+                it.setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+                it.requestLayout()
+            }
+        },
         modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
     )
     }
@@ -330,17 +341,16 @@ fun ShareBar(
     var big by remember { mutableStateOf(false) }
     var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height, as shown
     val camera = kind == Streams.Kind.CAMERA
-    val mirror = camera && state.shareFront && !state.shareBoth
-    // A mirrored picture turns the other way (the mirror is applied after the turn)
+    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera)
     val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
-    val previewTurn = if (mirror) sent else (360 - sent) % 360
+    val previewTurn = (360 - sent) % 360
     val track = state.localVideo
 
     @Composable
     fun Preview(modifier: Modifier) {
         if (track == null) return
         Box(modifier.clip(RoundedCornerShape(8.dp)).background(Color.Black).border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp))) {
-            VideoView(track, egl, Modifier.fillMaxSize(), mirror = mirror, fill = !big, onSize = { w, h -> aspect = w.toFloat() / h }, turn = previewTurn)
+            VideoView(track, egl, Modifier.fillMaxSize(), fill = !big, onSize = { w, h -> aspect = w.toFloat() / h }, turn = previewTurn)
             // Over the picture (a video surface doesn't take taps itself)
             Box(Modifier.fillMaxSize().clickable { big = !big })
         }

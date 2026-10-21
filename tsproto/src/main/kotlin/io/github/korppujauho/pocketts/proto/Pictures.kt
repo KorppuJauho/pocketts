@@ -19,7 +19,7 @@ object Pictures {
     const val AVATAR_MAX_BYTES = 4L * 1024 * 1024
     const val PICTURE_MAX_BYTES = 16L * 1024 * 1024
     const val PICTURE_UPLOAD_MAX_BYTES = 15L * 1024 * 1024
-    const val PICTURE_FOLDER = "/webTS"
+    const val PICTURE_FOLDER = "/PocketTS" // where the pictures sent from the app go in a channel's files
     const val AVATAR_UPLOAD_NAME = "/avatar"
     const val AVATAR_MAX_SIDE = 320
 
@@ -80,6 +80,30 @@ object Pictures {
     }
 
     private val IMG = Regex("""\[img]\s*ts3image://([^\[\]?]+)\?([^\[\]]*)\s*\[/img]""", RegexOption.IGNORE_CASE)
+
+    /** A file sent from the TeamSpeak app through myTeamSpeak: its name, and whether it's a picture. */
+    data class TeamSpeakFile(val name: String, val isImage: Boolean) {
+        /** The one line shown instead of the note. */
+        val text: String get() = if (isImage) "TeamSpeak images aren't supported in PocketTS" else "TeamSpeak files aren't supported in PocketTS"
+    }
+
+    /**
+     * A file sent from the TeamSpeak app (such as a picture pasted in its chat) arrives as a small note,
+     * {"msg_type":"ts.file.myts","file_name":…}. The file itself is on myTeamSpeak, which the app can't reach, so the
+     * note is shown as one short line. Null for an ordinary message.
+     */
+    fun teamSpeakFile(msg: String): TeamSpeakFile? {
+        val text = msg.trim()
+        if (!text.startsWith("{") || !text.contains("\"ts.file")) return null
+        val note = try {
+            Json.parse(text) as? Map<*, *>
+        } catch (e: Exception) {
+            null
+        } ?: return null
+        if ((note["msg_type"] as? String)?.startsWith("ts.file") != true) return null
+        val name = listOf(note["file_name"], note["body"]).firstNotNullOfOrNull { (it as? String)?.trim()?.ifEmpty { null } }.orEmpty()
+        return TeamSpeakFile(name, Regex("""\.(jpe?g|png|gif|webp|bmp|heic|avif)$""", RegexOption.IGNORE_CASE).containsMatchIn(name))
+    }
 
     /** The channel pictures in a message, and the message's text without them. */
     fun channelPictures(msg: String): Pair<List<ChannelPicture>, String> {

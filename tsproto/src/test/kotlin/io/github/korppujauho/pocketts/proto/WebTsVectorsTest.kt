@@ -96,7 +96,7 @@ class WebTsVectorsTest {
         assertEquals(f["serverNamed"] as List<*>, Pictures.avatarFileNames(f.s("uid"), "abcdefghijklmnopabcdefghijklmnop"))
         assertEquals(f.s("icon"), Pictures.iconFileName(3000000000))
         assertEquals(null, Pictures.iconFileName(300))
-        assertEquals(f.s("pictureMessage"), Pictures.pictureMessage("2026-10-12_18-35-01_a7k3f9.jpg", 5))
+        assertEquals(f.s("pictureMessage"), Pictures.pictureMessage("2026-10-12_18-35-01_a7k3f9.jpg", 5, "/webTS")) // the same line, in its folder
     }
 
     @Test
