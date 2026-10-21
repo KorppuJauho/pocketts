@@ -13,6 +13,10 @@ class PicturesTest {
         assertEquals("Look  nice", rest)
         assertEquals("/webTS/cat.jpg", pics[0].path)
 
+        // A picture with words, as the app sends them: the picture first, the words under it
+        val sent = Pictures.pictureMessage("dog.jpg", 3) + "\nLook at this"
+        assertEquals(listOf(ChannelPicture(3, Pictures.PICTURE_FOLDER, "dog.jpg")) to "Look at this", Pictures.channelPictures(sent))
+
         // The TeamSpeak app's own form, with the folder at the root and an escaped name
         assertEquals(listOf(ChannelPicture(2, "/", "my pic.png")), Pictures.channelPictures("[IMG]ts3image://my%20pic.png?channel=2&path=/[/IMG]").first)
 

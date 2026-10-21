@@ -57,7 +57,7 @@ interface ServerActions {
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
-    fun sendPicture(uri: android.net.Uri)
+    fun sendPicture(uri: android.net.Uri, text: String)
     fun setAway(away: Boolean, message: String)
     /** Another server from the favourites (this one is left). */
     fun switchTo(f: io.github.korppujauho.pocketts.Favorite)
