@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.ui.layout.layout
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.collectAsState
@@ -161,17 +162,16 @@ private fun androidx.compose.foundation.layout.BoxScope.Banner(model: Any, align
     val painter = coil3.compose.rememberAsyncImagePainter(request)
     val state by painter.state.collectAsState()
     val picture = (state as? coil3.compose.AsyncImagePainter.State.Success)?.painter ?: return
+    BannerPicture(picture, align)
+}
+
+/** The banner once loaded, over the whole of the channel's title row. */
+@Composable
+internal fun androidx.compose.foundation.layout.BoxScope.BannerPicture(picture: androidx.compose.ui.graphics.painter.Painter, align: ServerModel.Spacer.Align?) {
     val natural = picture.intrinsicSize
     if (!(natural.width > 0f && natural.height > 0f)) return
     val aspect = natural.width / natural.height
-    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.matchParentSize()) {
-        // Covers the row: as tall as it (or as wide, for a picture taller than the row's shape), the rest cut off
-        var height = maxHeight
-        var width = height * aspect
-        if (width < maxWidth) {
-            width = maxWidth
-            height = width / aspect
-        }
+    Box(Modifier.matchParentSize()) {
         Box(
             Modifier.matchParentSize().clipToBounds()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
@@ -183,7 +183,20 @@ private fun androidx.compose.foundation.layout.BoxScope.Banner(model: Any, align
         ) {
             androidx.compose.foundation.Image(
                 picture, contentDescription = null, contentScale = ContentScale.FillBounds,
-                modifier = Modifier.wrapContentSize(Alignment.CenterStart, unbounded = true).size(width, height),
+                // Covers the row: as tall as it (or as wide, for a picture taller than the row's shape), the rest cut
+                // off. Worked out while laying out, as the row's height comes from its name (no SubcomposeLayout here:
+                // the row is measured by its intrinsic height, which that can't answer)
+                modifier = Modifier.layout { measurable, c ->
+                    if (!c.hasBoundedWidth || !c.hasBoundedHeight) return@layout layout(0, 0) {}
+                    var h = c.maxHeight
+                    var w = (h * aspect).toInt()
+                    if (w < c.maxWidth) {
+                        w = c.maxWidth
+                        h = (w / aspect).toInt()
+                    }
+                    val placeable = measurable.measure(androidx.compose.ui.unit.Constraints.fixed(maxOf(w, 1), maxOf(h, 1)))
+                    layout(c.maxWidth, c.maxHeight) { placeable.place(0, (c.maxHeight - placeable.height) / 2) }
+                },
             )
         }
         Box(

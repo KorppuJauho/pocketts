@@ -1,5 +1,10 @@
 package io.github.korppujauho.pocketts
 
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import io.github.korppujauho.pocketts.ui.BannerPicture
 import androidx.compose.runtime.Composable
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.roborazziSystemPropertyOutputDirectory
@@ -119,6 +124,39 @@ class ScreenshotTest {
             IconTile(CircleShape, Color(0xFFD7E3FF), R.drawable.ic_launcher_monochrome, tint = Color(0xFF1B3A7A))
             Image(painterResource(R.drawable.ic_notification), null, Modifier.size(32.dp), colorFilter = ColorFilter.tint(Color.White))
         }
+    }
+
+    /** Channel banners in their rows (as the channel list measures them): a wide one, a tall one, and a spacer's. */
+    @Test
+    fun channelBanners() = shot("channel-banners") {
+        Column(
+            Modifier.fillMaxSize().background(io.github.korppujauho.pocketts.ui.Ts.panel).padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            for ((name, picture, align) in listOf(
+                Triple("Wide banner", stripes(500, 60), null),
+                Triple("Tall banner", stripes(120, 200), null),
+                Triple("AFK", stripes(400, 48), ServerModel.Spacer.Align.CENTER),
+            )) {
+                Box(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).background(io.github.korppujauho.pocketts.ui.Ts.card)) {
+                    BannerPicture(picture, align)
+                    androidx.compose.material3.Text(name, color = Color.White, modifier = Modifier.padding(horizontal = 12.dp, vertical = 14.dp))
+                }
+            }
+        }
+    }
+
+    // Coloured diagonal stripes, so stretching or a gap would show
+    private fun stripes(w: Int, h: Int): androidx.compose.ui.graphics.painter.Painter {
+        val bitmap = androidx.compose.ui.graphics.ImageBitmap(w, h)
+        val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
+        val paint = androidx.compose.ui.graphics.Paint()
+        for (i in -h until w step 20) {
+            paint.color = if ((i / 20) % 2 == 0) Color(0xFF3B82F6) else Color(0xFF22C55E)
+            paint.strokeWidth = 10f
+            canvas.drawLine(androidx.compose.ui.geometry.Offset(i.toFloat(), h.toFloat()), androidx.compose.ui.geometry.Offset((i + h).toFloat(), 0f), paint)
+        }
+        return androidx.compose.ui.graphics.painter.BitmapPainter(bitmap)
     }
 
     // A launcher shows the middle 72 of an adaptive icon's 108 dp: drawn at 108 * 4/3 of the tile and cut to it
