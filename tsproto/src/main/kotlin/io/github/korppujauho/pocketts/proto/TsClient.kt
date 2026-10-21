@@ -71,7 +71,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
         const val RESEND_AFTER_MS = 1000L
         const val GIVE_UP_MS = 30_000L
-        const val SILENCE_MS = 30_000L
+        const val SILENCE_MS = 10_000L // pings go every second, and the server answers each
 
         // A client version the servers accept.
         const val VERSION = "3.?.? [Build: 5680278000]"
@@ -91,6 +91,10 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
     /** The last end was the network's (no answer, network error), not the server's (kick, ban, refusal) nor ours. */
     @Volatile var lostConnection = false
+        private set
+
+    /** The server's error number when it refused the connection (such as "521": this identity is already on). */
+    @Volatile var refusal: String? = null
         private set
 
     /** The server's address (for file transfers), once connecting has started. */
@@ -151,6 +155,11 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
                 else -> {}
             }
         }
+    }
+
+    /** The phone's network went away or changed: the connection is lost now (not after the silence runs out). */
+    fun networkGone(reason: String) {
+        exec.execute { if (state == State.CONNECTING || state == State.CONNECTED) fail(reason) }
     }
 
     /** Runs [block] on the connection's thread (where the listener is called), after what was asked before. */
@@ -517,6 +526,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             }
             "error" -> if (state == State.CONNECTING && cmd["id"] != "0") {
                 // While connecting, an error answers clientinit: wrong password, banned, and so on.
+                refusal = cmd["id"]
                 listener.onCommand(cmd)
                 return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})", network = false)
             }

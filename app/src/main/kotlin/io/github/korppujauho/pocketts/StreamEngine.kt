@@ -435,8 +435,9 @@ class StreamEngine(
                 }
                 soundSource = factory.createAudioSource(constraints)
                 sound = factory.createAudioTrack("share-sound", soundSource)
-                madeAudio?.setMicrophoneMute(soundPaused())
             }
+            // Without stream sound, the stream's microphone stays muted too (WebRTC would send it on the sound line)
+            madeAudio?.setMicrophoneMute(sound == null || soundPaused())
             sharePending = true
             update {
                 it.copy(
@@ -559,7 +560,13 @@ class StreamEngine(
             // never answers an offer with video only)
             val withSound = sound
             if (withSound != null) pc.addTransceiver(withSound, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY, listOf("share")))
-            else pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY))
+            else {
+                // WebRTC sends the recorded microphone on every sound line, with a track or without: this one sends nothing
+                val quiet = pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY))
+                val p = quiet.sender.parameters
+                p.encodings.forEach { it.active = false }
+                quiet.sender.parameters = p
+            }
             val local = offer(pc)
             setLocal(pc, local)
             applyLimits(pc)
