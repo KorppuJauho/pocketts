@@ -162,6 +162,9 @@ object ServerFiles {
             val scale = minOf(1.0, maxSide.toDouble() / maxOf(w, h))
             if (scale < 1.0) decoder.setTargetSize((w * scale).toInt().coerceAtLeast(1), (h * scale).toInt().coerceAtLeast(1))
             decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            // Plain sRGB, as browsers and the TeamSpeak app make them: a phone photo's wide colours (Display P3) would
+            // otherwise go along as an embedded colour profile, which the TeamSpeak app didn't show as a profile picture
+            decoder.setTargetColorSpace(android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB))
         }
 
     private fun encode(b: Bitmap, format: Bitmap.CompressFormat, quality: Int): ByteArray =

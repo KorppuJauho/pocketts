@@ -150,6 +150,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] On mobile data instead of Wi-Fi (needs a server reachable from the internet: the test server is only on the
       home network). If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
+- [ ] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.

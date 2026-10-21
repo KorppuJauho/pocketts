@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Pictures (profile pictures and ones sent to the chat) are saved in plain sRGB colours, without a phone photo's
+  embedded colour profile; with it, the TeamSpeak 6 app didn't show the profile picture.
+- Sharing the front camera: your preview shows exactly what viewers see (it was mirrored like a selfie camera).
 - A profile picture too big for the server (its max avatar file size, 200 KB as it comes) is sent again smaller,
   down to 96 × 96, before giving up with "This server allows only a very small profile picture, or none."
 - A file or picture sent from the TeamSpeak app through myTeamSpeak shows as one short line ("TeamSpeak images
