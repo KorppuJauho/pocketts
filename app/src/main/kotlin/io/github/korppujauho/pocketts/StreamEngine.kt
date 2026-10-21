@@ -68,13 +68,7 @@ class StreamEngine(
     private val counter = AtomicInteger(0)
     private fun rc(what: String) = "stream-$what-${counter.incrementAndGet()}"
 
-    // What each command was (by its return code), to send it again when the server asks to wait
-    private val sent = object : LinkedHashMap<String, String>() {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, String>?) = size > 200
-    }
-
     private fun send(cmd: String) {
-        Regex("""return_code=(\S+)""").find(cmd)?.groupValues?.get(1)?.let { synchronized(sent) { sent[it] = cmd } }
         sendNow(cmd)
     }
 
@@ -614,17 +608,6 @@ class StreamEngine(
             "error" -> {
                 val code = g["return_code"].orEmpty()
                 if (g["id"] == "0" || !code.startsWith("stream-")) return
-                // "client is flooding": the server says how long to wait; then the same command again
-                if (g["id"] == "524") {
-                    val again = synchronized(sent) { sent.remove(code) } ?: return
-                    val wait = Regex("""(\d+)\s*ms""").find(g["extra_msg"].orEmpty())?.groupValues?.get(1)?.toLongOrNull() ?: 5000
-                    log("Flood limit: $code again in ${wait}ms")
-                    exec.execute {
-                        Thread.sleep(wait + 300)
-                        send(again)
-                    }
-                    return
-                }
                 log("Refused: ${g["msg"]} ($code)")
                 when {
                     code.startsWith("stream-setup") -> {

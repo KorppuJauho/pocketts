@@ -129,6 +129,10 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
     private var disconnectReason: String? = null
 
+    // Commands out, kept under the server's flood limit
+    private val pacer = CommandPacer()
+    private var drainLater: ScheduledFuture<*>? = null
+
     // ====== API (any thread) ======
 
     fun connect(options: Options) {
@@ -155,7 +159,11 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     }
 
     fun sendCommand(cmd: String) {
-        exec.execute { if (state == State.CONNECTED) sendCommandNow(cmd) }
+        exec.execute {
+            if (state != State.CONNECTED) return@execute
+            pacer.add(cmd)
+            drain()
+        }
     }
 
     /** One Opus frame; [codec] should be the channel's (4 Opus Voice or 5 Opus Music). */
@@ -243,6 +251,8 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         state = State.DISCONNECTED
         ticker?.cancel(false); ticker = null
         pinger?.cancel(false); pinger = null
+        drainLater?.cancel(false); drainLater = null
+        pacer.clear()
         socket?.close(); socket = null
         listener.onDisconnected(reason ?: disconnectReason)
     }
@@ -284,6 +294,18 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         Crypto.INIT_MAC.copyInto(raw, 0)
         initPending = Pending(raw, now(), now())
         sendRaw(raw)
+    }
+
+    /** Sends the commands that may go now, and comes back when the next one may. */
+    private fun drain() {
+        if (state != State.CONNECTED) return
+        for (cmd in pacer.take(now())) sendCommandNow(cmd)
+        val wait = pacer.waitMs(now()) ?: return
+        if (drainLater != null) return
+        drainLater = exec.schedule({
+            drainLater = null
+            drain()
+        }, wait, TimeUnit.MILLISECONDS)
     }
 
     private fun sendCommandNow(cmd: String) {
@@ -467,6 +489,15 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             Commands.parse(String(data, Charsets.UTF_8))
         } catch (e: Exception) {
             log("Couldn't read a command: ${e.message}")
+            return
+        }
+
+        // "Client is flooding": the pacer sends that command again after the wait the server asked for
+        if (cmd.name == "error" && state == State.CONNECTED && pacer.onError(cmd, now())) {
+            log("Flood limit: a command goes again shortly")
+            drainLater?.cancel(false)
+            drainLater = null
+            drain()
             return
         }
 

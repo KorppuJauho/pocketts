@@ -48,6 +48,9 @@ permissions guests may not have.
 - [x] **Talk button over other apps** (Settings › General, push-to-talk mode): Android asks to allow it. Go to another
       app: the round button stays on screen. Hold it, and the PC hears you. Drag it somewhere else: it stays there.
       Back in the app, it goes away.
+- [ ] **Headset button** (Settings › General, push-to-talk mode): press the button on wired headphones, then on
+      Bluetooth ones: the PC hears you until you press again. Try it with the screen off too. With the option off,
+      the button plays and pauses music again.
 - [x] **Continuous transmission** works.
 - [x] Mic button off: the PC hears nothing and shows the phone's microphone as off.
 - [x] **Echo cancellation on**, loudspeaker: the PC doesn't hear its own voice back.
@@ -156,4 +159,6 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] The PC kicks the phone from the server: the app shows "Kicked…" and **doesn't** reconnect.
 - [x] Disconnect from the notification's button.
 - [x] Swipe the app away from recent apps: it leaves the server.
+- [ ] A busy server (many people or channels): connecting shows everyone's avatars, with no "client is flooding"
+      warning.
 - [ ] An hour connected in the background: battery use looks reasonable (Settings › Battery).
