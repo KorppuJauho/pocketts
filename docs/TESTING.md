@@ -9,7 +9,7 @@ machine, so the time is enough for the log to be found.
 - **PC**: the TeamSpeak app on a computer, on the same server.
 - **2nd phone**: a second phone with PocketTS (optional).
 
-Ticked items have been tested on the phone (Samsung Galaxy A56, Android 16) with the test builds of 20 October 2026.
+Ticked items have been tested on the phone (Samsung Galaxy A56, Android 16) with the test builds of 20 and 21 October 2026.
 
 Use the same server for all of them. A test server is fine, except that some things (pictures, streams) need
 permissions guests may not have.
@@ -24,7 +24,7 @@ permissions guests may not have.
 ## 2. Channels (Phone + PC)
 - [x] Phone: tap another channel to move there. PC: you see the phone move.
 - [x] PC: move into the phone's channel. Phone: the chat shows "… joined coming from …".
-- [ ] A password-protected channel asks for the password: the right one lets you in, a wrong one is refused.
+- [x] A password-protected channel asks for the password: the right one lets you in, a wrong one is refused.
       (Fixed after the 20 October test: the right password was refused too.)
 - [x] Spacers (if the server has any) look like they do in the TeamSpeak app.
 - [x] Channel banners (if the server has any) sit like in the TeamSpeak app: from the left, centred up and down.
@@ -32,15 +32,15 @@ permissions guests may not have.
 - [x] Tap a spacer channel (on a server that uses one as a channel, such as for AFK): nothing happens. Turn on
       Settings › General › "Allow joining spacer channels": a tap now joins it, also after you've been in other
       channels.
-- [ ] Channel banners fill their whole row (no empty strip under or beside them), aren't stretched, and fade out
+- [x] Channel banners fill their whole row (no empty strip under or beside them), aren't stretched, and fade out
       on the right.
-- [ ] Join a password-protected channel with "Remember the password" ticked. Go elsewhere and tap it again: it joins
+- [x] Join a password-protected channel with "Remember the password" ticked. Go elsewhere and tap it again: it joins
       straight away, without asking. Also after reconnecting.
-- [ ] Tick "Remember the password" with a wrong password: the "invalid password" warning shows and the password is
+- [x] Tick "Remember the password" with a wrong password: the "invalid password" warning shows and the password is
       asked again (ticked). The right one joins, and from then on it joins without asking.
-- [ ] Change the channel's password on the PC: tapping the channel shows the warning and asks for the new one.
-- [ ] Settings › Advanced › Channel passwords › Forget saved passwords: the channel asks for its password again.
-- [ ] As a server admin (allowed to skip channel passwords): a password-protected channel joins without asking.
+- [x] Change the channel's password on the PC: tapping the channel shows the warning and asks for the new one.
+- [x] Settings › Advanced › Channel passwords › Forget saved passwords: the channel asks for its password again.
+- [x] As a server admin (allowed to skip channel passwords): a password-protected channel joins without asking.
       As a normal user, it asks, with no warning first.
 
 ## 3. Hearing (Phone + PC)
@@ -85,18 +85,19 @@ permissions guests may not have.
 - [x] **Chat history**: write in the channel and privately with the PC, and let the PC join and leave. Disconnect,
       connect to the same server again: the channel's lines (with the join and leave lines) are back. When the PC
       user writes privately again, or you open a private chat with them, the old private lines are there too.
-- [ ] Swipe the app away while connected, open it and connect: the last lines are still there.
-- [ ] Another server: its chat starts empty (each server keeps its own).
-- [ ] The next day: yesterday's lines show the day after the time ("21:36 - Mon").
-- [ ] Close a private chat's tab and open it again from the person's menu: its lines are still there.
-- [ ] Settings › General › Clear chat history › Clear: the chat on screen empties, and after reconnecting it stays empty.
+- [x] Swipe the app away while connected, open it and connect: the last lines are still there.
+- [x] Another server: its chat starts empty (each server keeps its own).
+- [x] The next day: yesterday's lines show the day after the time ("21:36 - Mon").
+      (Works; the day is in the phone's language, e.g. Finnish.)
+- [x] Close a private chat's tab and open it again from the person's menu: its lines are still there.
+- [x] Settings › General › Clear chat history › Clear: the chat on screen empties, and after reconnecting it stays empty.
 
 ## 5b. Sounds (Phone + PC)
-- [ ] Settings › Playback › Sounds for events is on, the volume slider and "Play a sound" work.
-- [ ] Sounds: you connect and disconnect, you switch channel, the PC joins and leaves your channel, a message comes
+- [x] Settings › Playback › Sounds for events is on, the volume slider and "Play a sound" work.
+- [x] Sounds: you connect and disconnect, you switch channel, the PC joins and leaves your channel, a message comes
       in and goes out, the PC pokes you, the microphone and sound buttons, a stream in your channel starts and stops.
-- [ ] Sound button off: no event sounds (only the sound button's own click).
-- [ ] Sounds for events off: none at all.
+- [x] Sound button off: no event sounds (only the sound button's own click).
+- [x] Sounds for events off: none at all.
 
 ## 6. Pictures (Phone + PC)
 Sending pictures needs a server whose file transfer works for you (and the permission to upload).
@@ -113,9 +114,9 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       Android asks for the camera first, and the app doesn't close. Saying no shows a short note instead.
 - [x] Attach a picture, then tap the message box: with the keyboard open, the buttons and the switch go away, the
       picture gets smaller and the text you type stays fully visible. Close the keyboard: everything is back.
-- [ ] The PC pastes a picture into the channel chat (TeamSpeak's own picture sharing): the phone shows one line,
+- [x] The PC pastes a picture into the channel chat (TeamSpeak's own picture sharing): the phone shows one line,
       "TeamSpeak images aren't supported in PocketTS", not a long string.
-- [ ] A picture sent from the phone is in the channel's files under /PocketTS (the PC's file browser).
+- [x] A picture sent from the phone is in the channel's files under /PocketTS (the PC's file browser).
 
 ## 7. Streams (Phone + PC)
 - [x] PC shares its screen in the phone's channel: the phone shows the stream mark and **WATCH**.
@@ -123,7 +124,7 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] The sound button: on/off and the volume slider work.
 - [x] Full screen: a wide stream turns the app sideways (even with auto-rotate off), a tall one stays upright. Tap
       for the buttons; leave full screen and the app turns back.
-- [ ] Full screen shows the whole picture, with black bars where its shape differs from the screen's (nothing cut
+- [x] Full screen shows the whole picture, with black bars where its shape differs from the screen's (nothing cut
       off). The same in the blue box and the small window.
 - [x] While watching, go to the home screen: the stream keeps playing in a **small window** over other apps. Move it,
       tap it to open the app again. Close it with its ×: watching stops (the PC sees one viewer fewer).
@@ -135,13 +136,13 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       a moment.
 - [x] Tap the rotate button (it becomes a yellow lock): turning the phone no longer turns the picture. The lock is
       remembered for the next share.
-- [ ] With the lock on, turning the phone: your preview still looks like a camera's viewfinder (no sudden flip).
+- [x] With the lock on, turning the phone: your preview still looks like a camera's viewfinder (no sudden flip).
 - [ ] **Both cameras** (Share › Camera › Both, only shown if the phone can do it; not on the Galaxy A56): the PC
       sees the back camera with the front camera small in the corner. **Swap** switches them. Turning the phone keeps both upright.
 - [x] HD and data saver both work.
 - [ ] 1080p (Full HD) works, and the PC's picture is sharper than at 720p.
 - [x] The share bar: tap your small picture: it grows inside the bar (at most half the screen). Tap again: small.
-- [ ] Small picture: "Camera", the eye and the number of viewers on one line, on the right above the buttons.
+- [x] Small picture: "Camera", the eye and the number of viewers on one line, on the right above the buttons.
 - [x] Auto-rotate **off**, sharing the camera, phone held sideways: the round buttons' icons turn to stay upright
       (the buttons stay where they are).
 - [ ] The same: your preview is the right way up to you, with the lock on and off.
@@ -150,15 +151,16 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [ ] On mobile data instead of Wi-Fi (needs a server reachable from the internet: the test server is only on the
       home network). If it doesn't connect, a relay (TURN) server may be needed (Settings › Advanced).
 - [ ] Optional, 2nd phone: phone ↔ phone streams.
-- [ ] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
-- [ ] Share the front camera and tap the small preview to make it big: not stretched. Tap again: small, not stretched.
-- [ ] Share the camera with "Stream sound" ticked: the PC shows the stream has sound and hears the phone's
+- [x] Share the front camera: your preview isn't stretched, and it shows the same as the PC (not mirrored).
+- [x] Share the front camera and tap the small preview to make it big: not stretched. Tap again: small, not stretched.
+- [x] Share the camera with "Stream sound" ticked: the PC shows the stream has sound and hears the phone's
       surroundings with the picture. The share bar shows a microphone.
-- [ ] With stream sound on: talk in the channel (voice activation or push-to-talk): the stream goes quiet meanwhile
+- [x] With stream sound on: talk in the channel (voice activation or push-to-talk): the stream goes quiet meanwhile
       (the bar's microphone is crossed out), so the PC doesn't hear you twice.
-- [ ] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
+- [x] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
 - [ ] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
-- [ ] The channel voice still works normally while a stream with sound is on (both use the microphone), with
+      (21 Oct: the PC showed no sound line, but heard the voice: to check whether it was the channel voice.)
+- [x] The channel voice still works normally while a stream with sound is on (both use the microphone), with
       echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
 
 ## 8. Favourites and settings (Phone)
@@ -166,29 +168,29 @@ Sending pictures needs a server whose file transfer works for you (and the permi
 - [x] The edit button (pencil) on a favourite: name, nickname there, password, connect automatically.
 - [x] Connect automatically (in the edit window): close the app (swipe it away), open it, and it connects by itself.
 - [x] In the edit window, Delete is on the left of Cancel and Save, and removes the favourite.
-- [ ] Edit window › Advanced › File transfer port: set the test server's port. Avatars and pictures load there.
+- [x] Edit window › Advanced › File transfer port: set the test server's port. Avatars and pictures load there.
       (The test server's file transfer needs the PC's firewall to let the phone in on that port.)
 - [x] Server screen header: Disconnect, a gap, then the star and the gear on the right.
-- [ ] On the server: ★ menu › switch to another favourite.
+- [x] On the server: ★ menu › switch to another favourite.
 - [x] Settings › Nickname: the PC sees the new name.
 - [x] Tap yourself › Set away with a message: the PC shows you away. Then I'm back.
 - [x] Popups (channel password, favourite, poke, share, server info, identity import) and the person menu have the
       new rounded look, with pill buttons.
 - [x] Settings: the tab names (General, Playback, Capture, Advanced) each fit on one line.
-- [ ] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
+- [x] A warning (for example a wrong channel password) has its own background and a close button, and goes away by
       itself after a few seconds.
 - [x] Settings › Advanced › Identity › Export: a warning first, then Android asks where to save `pocketts-identity.ini` (no
       sharing to apps). Import it again (Choose a file): no complaint, and the identity field hides what's pasted.
-- [ ] Settings › Advanced › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
+- [x] Settings › Advanced › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
-- [ ] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
+- [x] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings
   come along, the passwords don't, and the new phone has a new identity unless you import the exported one.
 - [x] Settings fill almost the whole screen; each tab needs little scrolling, and the checkboxes are still easy to tap.
-- [ ] Settings › General › Profile picture › Change: the PC (TeamSpeak 6) shows the new picture, also after it
+- [x] Settings › General › Profile picture › Change: the PC (TeamSpeak 6) shows the new picture, also after it
       reconnects.
-- [ ] Settings › Advanced › Identity shows Wipe, Export and Import (no dots). Wipe warns first; Cancel keeps it.
+- [x] Settings › Advanced › Identity shows Wipe, Export and Import (no dots). Wipe warns first; Cancel keeps it.
       Wipe, then reconnect: the server sees a new person (new unique id, no groups).
 
 ## 9. Staying connected (Phone)
