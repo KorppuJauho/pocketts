@@ -77,20 +77,45 @@ class StreamEngine(
     }
 
     val egl: EglBase = EglBase.create()
-    private val factory: PeerConnectionFactory by lazy {
-        PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context.applicationContext).createInitializationOptions())
-        PeerConnectionFactory.builder()
+    // The factory, made on first use. Its microphone (a stream's sound) opens the way the voice's does: in call mode
+    // with echo cancellation, else as the ordinary microphone. Two different ones at once, Android gives the call
+    // one all the sound (the voice then hears nothing), and the call one alone hears only what's close to it.
+    private var made: PeerConnectionFactory? = null
+    private var madeAudio: JavaAudioDeviceModule? = null
+    private var madeEcho = false
+    private var initialized = false
+    private val factory: PeerConnectionFactory get() = made ?: makeFactory()
+
+    private fun makeFactory(): PeerConnectionFactory {
+        if (!initialized) {
+            PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context.applicationContext).createInitializationOptions())
+            initialized = true
+        }
+        val echo = settings().echoCancellation
+        val audio = JavaAudioDeviceModule.builder(context.applicationContext)
+            .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
+            .setUseHardwareAcousticEchoCanceler(echo)
+            .setUseHardwareNoiseSuppressor(false) // the surroundings are heard (as WebTS does it)
+            .createAudioDeviceModule()
+        val f = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(DefaultVideoEncoderFactory(egl.eglBaseContext, true, true))
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(egl.eglBaseContext))
-            // The stream's sound: echo removed (voices from the speaker stay out), but no noise removal, so the
-            // surroundings are heard (as WebTS does it)
-            .setAudioDeviceModule(
-                JavaAudioDeviceModule.builder(context.applicationContext)
-                    .setUseHardwareAcousticEchoCanceler(true)
-                    .setUseHardwareNoiseSuppressor(false)
-                    .createAudioDeviceModule()
-            )
+            .setAudioDeviceModule(audio)
             .createPeerConnectionFactory()
+        made = f
+        madeAudio = audio
+        madeEcho = echo
+        return f
+    }
+
+    // Echo cancellation changed since the factory was made: a new one, when nothing uses the old one
+    private fun factoryForSound() {
+        val f = made ?: return
+        if (madeEcho == settings().echoCancellation || state.watching != 0 || viewers.isNotEmpty()) return
+        f.dispose()
+        madeAudio?.release()
+        made = null
+        madeAudio = null
     }
     private val decoders by lazy {
         factory // loads WebRTC's library first
@@ -388,6 +413,7 @@ class StreamEngine(
         observer: (org.webrtc.CapturerObserver) -> org.webrtc.CapturerObserver = { it },
     ) {
         try {
+            if (withSound) factoryForSound()
             val src = factory.createVideoSource(screen)
             val help = SurfaceTextureHelper.create("capture", egl.eglBaseContext)
             cap.initialize(help, context.applicationContext, observer(src.capturerObserver))
@@ -396,7 +422,7 @@ class StreamEngine(
             track = factory.createVideoTrack("share", src)
             if (withSound) {
                 val constraints = org.webrtc.MediaConstraints().apply {
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googEchoCancellation", "true"))
+                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googEchoCancellation", "${settings().echoCancellation}"))
                     mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googNoiseSuppression", "false"))
                     mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
                 }

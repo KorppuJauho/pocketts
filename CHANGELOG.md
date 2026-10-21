@@ -5,7 +5,8 @@
 - Camera streams can carry sound: tick "Stream sound" when sharing the camera (remembered). Viewers hear your
   microphone with the picture (echo removed, surroundings kept). It goes quiet while your microphone is muted and
   while you talk in the channel, so you're not heard twice; the share bar's microphone mark shows which. Without it,
-  the stream has no sound and you talk in the channel as usual.
+  the stream has no sound and you talk in the channel as usual. The stream opens the microphone the same way the
+  voice does (call mode with echo cancellation, else the ordinary microphone), so both hear you, from as far away.
 - The big share preview isn't stretched any more (the picture kept the small preview's shape).
 - Settings > Advanced > Identity: Wipe (with a warning first), Export and Import. Buttons lost their "…".
 - Pictures (profile pictures and ones sent to the chat) are saved in plain sRGB colours, without a phone photo's

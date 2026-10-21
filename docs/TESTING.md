@@ -158,7 +158,8 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       (the bar's microphone is crossed out), so the PC doesn't hear you twice.
 - [ ] With stream sound on: the mute button mutes the stream's sound too; unmuting brings it back.
 - [ ] Without "Stream sound": the PC shows no sound for the stream and hears nothing from it.
-- [ ] The channel voice still works normally while a stream with sound is on (both use the microphone).
+- [ ] The channel voice still works normally while a stream with sound is on (both use the microphone), with
+      echo cancellation on and off: voice activation reacts, and the stream hears you from as far as the voice does.
 
 ## 8. Favourites and settings (Phone)
 - [x] When connecting, tick "Save to favourites": it shows in the Favourites list.
