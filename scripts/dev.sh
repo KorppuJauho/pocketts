@@ -4,6 +4,7 @@
 #   scripts/dev.sh image              build the build image (Java + Android SDK)
 #   scripts/dev.sh test               unit tests
 #   scripts/dev.sh apk                debug APK -> dist/
+#   scripts/dev.sh apk-shrunk         the release's shrinking with the test key and log -> dist/
 #   scripts/dev.sh screenshots        pictures of the screens (example data) -> docs/screenshots/
 #   scripts/dev.sh ts-server up|down  start/stop the TeamSpeak test server container (TS_CONTAINER)
 #   scripts/dev.sh it                 tests against that server (TS_TEST_SERVER)
@@ -59,6 +60,13 @@ case "${1:-}" in
     mkdir -p "$ROOT/dist"
     docker run --rm -v pocketts-out:/out -v "$ROOT/dist":/dist "$IMAGE" \
       bash -c 'cp /out/app/outputs/apk/debug/*.apk /dist/ && ls -l /dist'
+    ;;
+  apk-shrunk)
+    # The release's shrinking, with the test key and the test log: for finding what shrinking broke
+    gradle :app:assembleShrunk
+    mkdir -p "$ROOT/dist"
+    docker run --rm -v pocketts-out:/out -v "$ROOT/dist":/dist "$IMAGE" \
+      bash -c 'cp /out/app/outputs/apk/shrunk/app-shrunk.apk /dist/PocketTS-shrunk-$(date +%Y%m%d-%H%M).apk && ls /dist | tail -1'
     ;;
   ts-server)
     need TS_CONTAINER
@@ -117,7 +125,7 @@ case "${1:-}" in
     echo "dist/PocketTS-$VERSION.apk is ready to attach to the GitHub release."
     ;;
   *)
-    sed -n '2,20p' "$0"
+    sed -n '2,21p' "$0"
     exit 1
     ;;
 esac

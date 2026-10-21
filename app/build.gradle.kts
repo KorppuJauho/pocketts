@@ -56,6 +56,17 @@ android {
             // The GitHub release asks GitHub for newer versions (a Google Play build won't)
             buildConfigField("boolean", "UPDATE_CHECK", "true")
         }
+        // The release, shrunk the same way, but signed with the test key and sending its log like a test build:
+        // to find what shrinking broke (scripts/dev.sh apk-shrunk). An app of its own (".shrunk").
+        create("shrunk") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".shrunk"
+            versionNameSuffix = "-shrunk"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            buildConfigField("String", "DEV_LOG_URL", "\"${devEnv["DEV_LOG_URL"].orEmpty()}\"")
+            buildConfigField("boolean", "UPDATE_CHECK", "false")
+        }
     }
 
     buildFeatures {

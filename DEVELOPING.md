@@ -69,7 +69,10 @@ it, people can't update to a new version and would have to uninstall first, whic
 2. Move the changelog's "Unreleased" lines under the new version.
 3. Run `scripts/dev.sh release`. It asks for the key's password and makes `dist/PocketTS-<version>.apk`, with its
    SHA-256.
-4. Install it on a phone and try the basics: connect, talk, chat, a picture, a stream.
+4. Install it on a phone and try the basics: connect, talk, chat, a picture, a stream. If the release crashes where a
+   test build doesn't, shrinking removed something: `scripts/dev.sh apk-shrunk` makes the same shrunk app with the test
+   key, sending its log to the test page like a test build, so the error shows (a crash in native code leaves no
+   line: then look for a class the native code needs, see `app/proguard-rules.pro`).
 5. On GitHub: Releases › Draft a new release, tag `v<version>` (for example `v0.2.0`). Paste the changelog lines and
    the SHA-256, attach the APK, and publish.
 
