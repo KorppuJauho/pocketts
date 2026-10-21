@@ -83,6 +83,9 @@ fun VideoView(
     val report = androidx.compose.runtime.rememberUpdatedState(onSize)
     var shape by remember { mutableStateOf<Float?>(null) } // the picture's width / height, as shown
     Box(modifier, contentAlignment = Alignment.Center) {
+    // A renderer of its own for small (filled) and big (whole picture): one resized between them kept the old
+    // shape's crop and stretched it
+    androidx.compose.runtime.key(fill) {
     AndroidView(
         factory = { ctx ->
             SurfaceViewRenderer(ctx).apply {
@@ -96,24 +99,18 @@ fun VideoView(
                     }
                 })
                 setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-                tag = fill
-                setEnableHardwareScaler(true)
+                // The picture is fitted while drawing: a hardware-scaled surface, cut to the view's shape when it's made,
+                // stayed that shape when the view changed
+                setEnableHardwareScaler(false)
                 setMirror(mirror)
                 renderer = this
             }
         },
-        update = {
-            it.setMirror(mirror)
-            // Small (filled) and big (whole picture) differ: the surface is sized for the way it's drawn, so a
-            // change must re-size it, or the picture stays stretched to the old shape
-            if (it.tag != fill) {
-                it.tag = fill
-                it.setScalingType(if (fill) RendererCommon.ScalingType.SCALE_ASPECT_FILL else RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-                it.requestLayout()
-            }
-        },
+        update = { it.setMirror(mirror) },
         modifier = shape.let { a -> if (fill || a == null) Modifier.fillMaxSize() else Modifier.aspectRatio(a) },
+        onRelease = { it.release() },
     )
+    }
     }
     DisposableEffect(track, renderer) {
         val r = renderer
@@ -131,7 +128,7 @@ fun VideoView(
             }
         }
     }
-    DisposableEffect(Unit) { onDispose { renderer?.release() } }
+    // (each renderer is let go when its view goes: onRelease)
 }
 
 /**
@@ -361,9 +358,11 @@ fun ShareBar(
     var big by remember { mutableStateOf(false) }
     var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height, as shown
     val camera = kind == Streams.Kind.CAMERA
-    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera)
+    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera), turned back
+    // by the turn added for them (the front camera's goes the other way)
     val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
-    val previewTurn = (360 - sent) % 360
+    val front = camera && state.shareFront && !state.shareBoth
+    val previewTurn = if (front) sent else (360 - sent) % 360
     val track = state.localVideo
 
     @Composable
