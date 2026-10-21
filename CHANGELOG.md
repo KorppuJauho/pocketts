@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The headset's button can be push-to-talk (Settings > General): one press starts talking, the next stops, also with
+  the screen off.
+- Commands to the server are spaced out a little, so busy servers don't refuse them as flooding. When one still is
+  refused, it's sent again after the wait the server asks for.
 - The server name has an icon like the channels: the server's own, or a plain server icon. Server info shows the
   server's banner also when it's a picture in the server's files.
 - A new app icon: a headset peeking out of a blue pocket, with a one-colour version for Android's themed icons and a
