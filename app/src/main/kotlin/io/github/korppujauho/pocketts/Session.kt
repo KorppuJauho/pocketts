@@ -304,10 +304,14 @@ object Session : TsClient.Listener {
     @Volatile private var pendingJoin: PendingJoin? = null
     private var joins = 0
 
-    /** Joins a channel; with [remember], its [password] is saved (encrypted) once the server lets us in. */
-    fun joinChannel(channelId: Int, password: String = "", remember: Boolean = false) {
+    /**
+     * Joins a channel; with [remember], its [password] is saved (encrypted) once the server lets us in. A [quiet] one
+     * shows no warning when refused: it's the try without a password, which works for those allowed to skip
+     * channel passwords (a refusal then asks for the password).
+     */
+    fun joinChannel(channelId: Int, password: String = "", remember: Boolean = false, quiet: Boolean = false) {
         val c = client ?: return
-        val code = "join-${++joins}"
+        val code = (if (quiet) "quiet-join-" else "join-") + (++joins)
         pendingJoin = PendingJoin(channelId, password, remember, code)
         c.sendCommand(
             Commands.build(
@@ -344,6 +348,11 @@ object Session : TsClient.Listener {
             id == WRONG_CHANNEL_PASSWORD || cmd["msg"].orEmpty().contains("password", ignoreCase = true) -> {
                 saved.remove(address, join.channel)
                 _state.update { it.copy(retryPassword = join.channel, retryRemember = join.remember) }
+            }
+            // The quiet try's other refusals (a full channel, no permission) are shown as any other
+            join.code.startsWith("quiet-") -> {
+                AppLog.log("Server error $id: ${cmd["msg"]}")
+                _state.update { it.copy(error = cmd["msg"]) }
             }
         }
     }

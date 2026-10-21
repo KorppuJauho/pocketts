@@ -46,7 +46,7 @@ import io.github.korppujauho.pocketts.proto.ServerModel
 
 /** What the server screen can ask for. */
 interface ServerActions {
-    fun join(channel: ServerModel.Channel, password: String = "", remember: Boolean = false)
+    fun join(channel: ServerModel.Channel, password: String = "", remember: Boolean = false, quiet: Boolean = false)
     /** The password remembered for a channel on this server, if any. */
     fun savedPassword(channel: ServerModel.Channel): String? = null
     /** The refused password's channel is being asked again. */
@@ -224,8 +224,10 @@ fun ServerScreen(
                                     // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
                                     if (ch.spacer != null && !state.voice.joinSpacers) return@ChannelTree
                                     if (!ch.hasPassword) actions.join(ch)
-                                    // A remembered password joins straight away; if it's refused, it's asked again
-                                    else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) } ?: run { askPassword = ch }
+                                    // A remembered password joins straight away. Without one, joining is first tried without a
+                                    // password (as the TeamSpeak app does, for those allowed to skip it); a refusal asks for it
+                                    else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) }
+                                        ?: actions.join(ch, quiet = true)
                                 },
                                 onPerson = { person = it },
                                 modifier = Modifier.fillMaxSize(),

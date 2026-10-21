@@ -40,6 +40,8 @@ permissions guests may not have.
       asked again (ticked). The right one joins, and from then on it joins without asking.
 - [ ] Change the channel's password on the PC: tapping the channel shows the warning and asks for the new one.
 - [ ] Settings › Advanced › Channel passwords › Forget saved passwords: the channel asks for its password again.
+- [ ] As a server admin (allowed to skip channel passwords): a password-protected channel joins without asking.
+      As a normal user, it asks, with no warning first.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.

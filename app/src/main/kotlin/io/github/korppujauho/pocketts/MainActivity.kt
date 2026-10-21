@@ -239,7 +239,8 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
 }
 
 private object SessionActions : ServerActions {
-    override fun join(channel: ServerModel.Channel, password: String, remember: Boolean) = Session.joinChannel(channel.id, password, remember)
+    override fun join(channel: ServerModel.Channel, password: String, remember: Boolean, quiet: Boolean) =
+        Session.joinChannel(channel.id, password, remember, quiet)
     override fun savedPassword(channel: ServerModel.Channel) = Session.savedChannelPassword(channel.id)
     override fun passwordAsked() = Session.passwordAsked()
     override fun disconnect() = Session.disconnect()
