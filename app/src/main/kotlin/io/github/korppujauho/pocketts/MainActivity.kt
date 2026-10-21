@@ -239,7 +239,10 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
 }
 
 private object SessionActions : ServerActions {
-    override fun join(channel: ServerModel.Channel, password: String) = Session.joinChannel(channel.id, password)
+    override fun join(channel: ServerModel.Channel, password: String, remember: Boolean, quiet: Boolean) =
+        Session.joinChannel(channel.id, password, remember, quiet)
+    override fun savedPassword(channel: ServerModel.Channel) = Session.savedChannelPassword(channel.id)
+    override fun passwordAsked() = Session.passwordAsked()
     override fun disconnect() = Session.disconnect()
     override fun toggleMic() {
         if (!Session.state.value.micAllowed) {
@@ -360,4 +363,5 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun identityProblem(): String? = Settings(context).identityProblem()
     override fun forgetIdentity() = Settings(context).forgetIdentity()
     override fun clearChatHistory() = Session.clearChatHistory(context)
+    override fun forgetChannelPasswords() = ChannelPasswords(context).clear()
 }

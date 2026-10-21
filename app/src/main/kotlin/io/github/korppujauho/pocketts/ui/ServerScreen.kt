@@ -46,7 +46,11 @@ import io.github.korppujauho.pocketts.proto.ServerModel
 
 /** What the server screen can ask for. */
 interface ServerActions {
-    fun join(channel: ServerModel.Channel, password: String = "")
+    fun join(channel: ServerModel.Channel, password: String = "", remember: Boolean = false, quiet: Boolean = false)
+    /** The password remembered for a channel on this server, if any. */
+    fun savedPassword(channel: ServerModel.Channel): String? = null
+    /** The refused password's channel is being asked again. */
+    fun passwordAsked() {}
     fun disconnect()
     fun toggleMic()
     fun toggleSound()
@@ -108,6 +112,7 @@ fun ServerScreen(
     var view by rememberSaveable { mutableStateOf(startView) }
     var chatKey by remember { mutableStateOf(startChat) }
     var askPassword by remember { mutableStateOf<ServerModel.Channel?>(null) }
+    var rememberAgain by remember { mutableStateOf(false) }
     var person by remember { mutableStateOf<ServerModel.Client?>(null) }
     var pokeTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
@@ -218,7 +223,11 @@ fun ServerScreen(
                                     if (ch.id == state.ownChannel) return@ChannelTree
                                     // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
                                     if (ch.spacer != null && !state.voice.joinSpacers) return@ChannelTree
-                                    if (ch.hasPassword) askPassword = ch else actions.join(ch)
+                                    if (!ch.hasPassword) actions.join(ch)
+                                    // A remembered password joins straight away. Without one, joining is first tried without a
+                                    // password (as the TeamSpeak app does, for those allowed to skip it); a refusal asks for it
+                                    else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) }
+                                        ?: actions.join(ch, quiet = true)
                                 },
                                 onPerson = { person = it },
                                 modifier = Modifier.fillMaxSize(),
@@ -257,17 +266,43 @@ fun ServerScreen(
         )
     }
 
+    // A password just refused: asked again, with remembering as it was (so a new one replaces a mistyped one)
+    LaunchedEffect(state.retryPassword) {
+        val id = state.retryPassword
+        if (id == 0) return@LaunchedEffect
+        actions.passwordAsked()
+        val ch = state.channel(id) ?: return@LaunchedEffect
+        rememberAgain = state.retryRemember
+        askPassword = ch
+    }
     askPassword?.let { ch ->
         var pw by remember { mutableStateOf("") }
+        var keep by remember { mutableStateOf(rememberAgain) }
         TsDialog(
             onDismiss = { askPassword = null }, title = ch.displayName, icon = androidx.compose.material.icons.Icons.Rounded.Lock,
             subtitle = "This channel has a password",
             buttons = {
                 PillButton("Cancel") { askPassword = null }
-                PillButton("Join", PillKind.PRIMARY, enabled = pw.isNotEmpty()) { actions.join(ch, pw); askPassword = null }
+                PillButton("Join", PillKind.PRIMARY, enabled = pw.isNotEmpty()) {
+                    actions.join(ch, pw, remember = keep)
+                    askPassword = null
+                    rememberAgain = false
+                }
             },
         ) {
             TsField(pw, { pw = it }, "Channel password", password = true)
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { keep = !keep },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                    androidx.compose.material3.Checkbox(
+                        keep, { keep = it },
+                        colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
+                    )
+                }
+                Text("Remember the password", color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+            }
         }
     }
     person?.let { p ->

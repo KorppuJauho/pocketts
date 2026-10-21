@@ -79,6 +79,8 @@ interface SettingsActions {
     fun forgetIdentity() {}
     /** Forgets every server's chat history, and the lines on screen. */
     fun clearChatHistory() {}
+    /** Forgets every remembered channel password. */
+    fun forgetChannelPasswords() {}
 }
 
 /** Who we are on the server, for the profile picture in Settings. */
@@ -165,6 +167,7 @@ fun SettingsContent(
                     2 -> Capture(v, actions) { v = it }
                     else -> {
                         Advanced(v) { v = it }
+                        ChannelPasswordsGroup(actions)
                         Identity(actions)
                     }
                 }
@@ -317,6 +320,19 @@ private fun Identity(actions: SettingsActions) {
             TsField(text, { text = it }, "Identity", password = true)
             PillButton("Choose a file…", modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
         }
+    }
+}
+
+@Composable
+private fun ChannelPasswordsGroup(actions: SettingsActions) {
+    var forgotten by remember { mutableStateOf(false) }
+    Group("Channel passwords") {
+        Desc("Passwords you chose to remember join their channels with one tap. They're kept on this phone, encrypted.")
+        SecondaryButton("Forget saved passwords") {
+            actions.forgetChannelPasswords()
+            forgotten = true
+        }
+        if (forgotten) Desc("Forgotten.")
     }
 }
 
