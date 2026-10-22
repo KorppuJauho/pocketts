@@ -22,7 +22,8 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okio.Buffer
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 
 /**
  * A file in the server's files, for pictures on screen: an icon, an avatar (several possible names, tried in order),
@@ -52,9 +53,11 @@ data class TsFile(
 object ServerFiles {
     private lateinit var cacheDir: File
     private val missing = HashMap<String, Long>() // key -> until when it counts as missing
+    private val loading = HashMap<String, Any>() // key -> the lock its download is made under
 
     fun install(context: Context) {
         cacheDir = File(context.cacheDir, "server-files").apply { mkdirs() }
+        PictureSizes.load(context.cacheDir)
         SingletonImageLoader.setSafe { ctx: PlatformContext ->
             ImageLoader.Builder(ctx)
                 .components {
@@ -72,27 +75,33 @@ object ServerFiles {
         return File(cacheDir, h.take(40))
     }
 
-    /** The file's bytes (blocking). */
-    fun get(f: TsFile): ByteArray {
+    /**
+     * The file, in the cache (blocking). One download per file at a time: the chat and the full-screen picture asking
+     * for the same one get the same download.
+     */
+    fun get(f: TsFile): File {
         val cached = cacheFile(f.key)
-        if (cached.exists()) return cached.readBytes().also { cached.setLastModified(System.currentTimeMillis()) }
-        synchronized(missing) {
-            if ((missing[f.key] ?: 0) > System.currentTimeMillis()) throw IllegalStateException("not on the server")
-        }
-        var last: Exception? = null
-        for (path in f.paths) {
-            try {
-                val data = Session.downloadFile(f.server, f.cid, path, f.maxBytes)
-                if (Pictures.type(data, svgAllowed = f.cid == 0) == null) throw IllegalStateException("not a picture")
-                cached.writeBytes(data)
-                trim()
-                return data
-            } catch (e: Exception) {
-                last = e
+        val lock = synchronized(loading) { loading.getOrPut(f.key) { Any() } }
+        synchronized(lock) {
+            if (cached.exists()) return cached.also { it.setLastModified(System.currentTimeMillis()) }
+            synchronized(missing) {
+                if ((missing[f.key] ?: 0) > System.currentTimeMillis()) throw IllegalStateException("not on the server")
             }
+            var last: Exception? = null
+            for (path in f.paths) {
+                try {
+                    val data = Session.downloadFile(f.server, f.cid, path, f.maxBytes)
+                    if (Pictures.type(data, svgAllowed = f.cid == 0) == null) throw IllegalStateException("not a picture")
+                    cached.writeBytes(data)
+                    trim()
+                    return cached
+                } catch (e: Exception) {
+                    last = e
+                }
+            }
+            synchronized(missing) { missing[f.key] = System.currentTimeMillis() + 10 * 60_000 }
+            throw last ?: IllegalStateException("not found")
         }
-        synchronized(missing) { missing[f.key] = System.currentTimeMillis() + 10 * 60_000 }
-        throw last ?: IllegalStateException("not found")
     }
 
     /** Keeps the cache under 100 MB, the least recently used out first. */
@@ -108,11 +117,15 @@ object ServerFiles {
 
     private class Fetch(private val data: TsFile, private val options: Options) : Fetcher {
         override suspend fun fetch(): FetchResult {
-            val bytes = withContext(Dispatchers.IO) { get(data) }
+            // From the file, so a big picture is read as it's decoded (and made smaller), not first all into memory
+            val (file, head) = withContext(Dispatchers.IO) {
+                val file = get(data)
+                file to file.inputStream().use { input -> ByteArray(4096).let { it.copyOf(maxOf(0, input.read(it))) } }
+            }
             return SourceFetchResult(
-                source = ImageSource(Buffer().write(bytes), options.fileSystem),
-                mimeType = Pictures.type(bytes, svgAllowed = true)?.mime,
-                dataSource = DataSource.NETWORK,
+                source = ImageSource(file.toOkioPath(), FileSystem.SYSTEM),
+                mimeType = Pictures.type(head, svgAllowed = true)?.mime,
+                dataSource = DataSource.DISK,
             )
         }
 
