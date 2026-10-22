@@ -6,6 +6,8 @@
   in the share window, on by default). Some apps don't allow their sound to be recorded and stay silent. The
   channel's voices and the streams you watch are left out, so viewers don't hear the channel twice. The microphone
   isn't used for it, and it keeps playing while you talk.
+- Getting ready for Google Play: a [privacy policy](PRIVACY.md), and a Play version built with each release (the
+  same app and key, without the GitHub update check, since Play updates it).
 - **Admin functions:** with Settings › UI › Show admin functions on (off by default), a person's menu also offers
   Move (to a channel from the server's tree; admins need no channel password), Kick (from the channel or from the
   server, with a reason they see) and Ban (10 minutes to permanently, with a reason). A ban works as in the TeamSpeak

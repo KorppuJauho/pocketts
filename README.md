@@ -19,8 +19,9 @@ to join.
   camera (with your microphone) or screen (with what the phone plays).
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 
-Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking. The
-GitHub version asks GitHub once a day whether there's a newer version (you can turn that off in Settings).
+Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking (see the
+[privacy policy](PRIVACY.md)). The GitHub version asks GitHub once a day whether there's a newer version (you can turn
+that off in Settings).
 
 **Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
 [issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Security problems: please report them
