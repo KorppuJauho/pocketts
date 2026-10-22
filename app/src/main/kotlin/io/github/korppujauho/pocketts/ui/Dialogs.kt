@@ -51,7 +51,7 @@ import io.github.korppujauho.pocketts.proto.ServerModel
 import java.util.Date
 import kotlin.math.roundToInt
 
-/** WebTS's person menu: who it is, how loud they are for you, poke, chat. */
+/** WebTS's person menu: who it is, how loud they are for you, poke, chat; for admins also move, kick and ban. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonSheet(
@@ -66,6 +66,10 @@ fun PersonSheet(
     away: Boolean = false,
     awayMessage: String = "",
     onAway: (Boolean, String) -> Unit = { _, _ -> },
+    admin: Boolean = false,
+    onMove: () -> Unit = {},
+    onKick: () -> Unit = {},
+    onBan: () -> Unit = {},
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss, containerColor = Pop.bottom,
@@ -128,6 +132,7 @@ fun PersonSheet(
                 ActionTile(androidx.compose.material.icons.Icons.Rounded.NotificationsActive, "Poke", Modifier.weight(1f), onClick = onPoke)
                 ActionTile(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Chat, "Chat", Modifier.weight(1f), onClick = onChat)
             }
+            if (admin) AdminTiles(onMove, onKick, onBan)
         }
     }
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Admin functions:** with Settings › UI › Show admin functions on (off by default), a person's menu also offers
+  Move (to a channel from the server's tree; admins need no channel password), Kick (from the channel or from the
+  server, with a reason they see) and Ban (10 minutes to permanently, with a reason). A ban is on the person's
+  identity, not their address, and removes them at once. The server decides who may: without the permission the app
+  says "You don't have permission to …" instead of the server's raw error.
+- A new **UI** tab in Settings, before Advanced.
+
 ## 1.1.0 (2026-10-22)
 
 - **Several pictures at once:** choose up to 10 from the gallery. They show in a row above the message box, each can
