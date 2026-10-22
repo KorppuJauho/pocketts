@@ -1,17 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app's text. Names and numbers go in as placeholders (%1$s, %1$d) so translations can put them where their
+  language wants; counts use plurals. Log lines and TeamSpeak commands stay in the code, in English.
+-->
 <resources>
     <string name="app_name">PocketTS</string>
-    <string name="connect_intro">Connect to a TeamSpeak server.</string>
-    <string name="nickname">Nickname</string>
-    <string name="server_address">Server address</string>
-    <string name="server_password">Server password (if any)</string>
+
+    <!-- Shared -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
+    <string name="close">Close</string>
+    <string name="advanced">Advanced</string>
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
-    <string name="connecting_to">Connecting to %1$s…</string>
+    <string name="nickname">Nickname</string>
+    <string name="server_address">Server address</string>
+    <string name="server_password">Server password</string>
+    <string name="remember_password">Remember the password</string>
     <string name="channel_password">Channel password</string>
     <string name="join">Join</string>
-    <string name="cancel">Cancel</string>
     <string name="away">away</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">Favourites</string>
+    <string name="connect_title">Connect to a server</string>
+    <string name="favourites_in">In favourites</string>
+    <string name="favourites_save">Save to favourites</string>
+    <string name="favourite_edit">Edit favourite</string>
+    <string name="favourite_add">Add to favourites</string>
+    <string name="favourite_name">Name in your lists</string>
+    <string name="favourite_nickname">Your nickname on this server</string>
+    <string name="favourite_auto">Connect automatically when the app opens</string>
+    <string name="favourite_file_port">File transfer port</string>
+    <string name="favourite_file_port_hint">The server\'s own (usually 30033)</string>
+    <string name="favourite_file_port_desc">Only if the server\'s pictures and avatars don\'t load: its file transfer is on another port.</string>
+    <string name="update_title">PocketTS %1$s is out</string>
+    <string name="update_text">A newer version than this one (%1$s) is on GitHub.</string>
+    <string name="not_now">Not now</string>
+    <string name="download">Download</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">Settings</string>
+    <string name="hold_to_talk">Hold to talk</string>
+    <string name="microphone">Microphone</string>
+    <string name="sound">Sound</string>
+    <string name="share">Share</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">Password</string>
+    <string name="person_sound_off">Sound off</string>
+    <string name="person_mic_off">Microphone off</string>
+    <string name="person_cant_talk">Can\'t talk in this channel</string>
+    <string name="person_streaming">Streaming</string>
+    <!-- Short tags after a name, in capitals as in the TeamSpeak app -->
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">YOU</string>
+
+    <!-- Chat -->
+    <string name="chat_channel">Channel</string>
+    <string name="chat_empty_channel">No messages in this channel yet.</string>
+    <string name="chat_empty_private">No messages yet.</string>
+    <!-- The message box's hint: %1$s is the channel's or the person's name -->
+    <string name="chat_message_to">Message to %1$s…</string>
+    <string name="chat_message_to_channel">Message to the channel…</string>
+    <string name="chat_message_to_them">Message to them…</string>
+    <!-- The sender of a line from the server itself -->
+    <string name="chat_system">System</string>
+    <!-- A link's card: %1$s is the website's name, such as example.com -->
+    <string name="chat_link_open">Open: %1$s</string>
+    <string name="chat_pictures_max">At most %1$d pictures at a time.</string>
+    <string name="chat_camera_needed">Taking a photo needs the camera to be allowed.</string>
+    <string name="chat_sending_picture">Sending picture %1$d of %2$d…</string>
+    <string name="chat_attached_picture">An attached picture</string>
+    <string name="chat_remove_picture">Remove the picture</string>
+    <string name="chat_send_picture">Send a picture</string>
+    <string name="chat_choose_pictures">Choose pictures</string>
+    <string name="chat_take_photo">Take a photo</string>
+    <string name="chat_send">Send</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">Save to the gallery</string>
+    <!-- %1$s is the folder, Pictures/PocketTS -->
+    <string name="picture_saved">Saved to %1$s</string>
+    <!-- %1$s is the reason, as the phone gives it -->
+    <string name="picture_failed">That didn\'t work: %1$s</string>
+
+    <!-- Streams: watching -->
+    <!-- The button next to someone who streams, in capitals as in the TeamSpeak app -->
+    <string name="stream_watch">WATCH</string>
+    <string name="stream_small_window">Small window</string>
+    <string name="stream_full_screen">Full screen</string>
+    <string name="stream_leave_full_screen">Leave full screen</string>
+    <string name="stream_stop_watching">Stop watching</string>
+    <string name="stream_sound_on">Sound on</string>
+    <string name="stream_sound_off">Sound off</string>
+    <string name="stream_requesting">Requesting access…</string>
+    <string name="stream_connecting">Connecting…</string>
+    <string name="stream_waiting_picture">Connected, waiting for the picture…</string>
+    <string name="stream_trying">Connection problem, still trying…</string>
+    <string name="stream_connection_lost">Connection lost.</string>
+    <string name="stream_open_failed">The stream couldn\'t be opened.</string>
+    <string name="stream_denied">The stream request was denied.</string>
+    <string name="stream_ended">Stream ended.</string>
+    <string name="stream_ended_left_channel">Stream ended (you are no longer in the same channel).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">Share your camera</string>
+    <string name="share_screen_title">Share your screen</string>
+    <string name="share_subtitle">Everyone in your channel can watch</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="share_what">What</string>
+    <string name="share_camera">Camera</string>
+    <string name="share_screen">Screen</string>
+    <string name="share_both_cameras">Both cameras</string>
+    <string name="camera_front">Front</string>
+    <string name="camera_back">Back</string>
+    <string name="camera_both">Both</string>
+    <string name="share_both_desc">The back camera big, the front one small in the corner. Swap switches them.</string>
+    <string name="share_quality">Quality</string>
+    <string name="share_quality_480">Data saver: the least data, for mobile networks.</string>
+    <string name="share_quality_720">HD: sharp, and light enough for most connections.</string>
+    <string name="share_quality_1080">Full HD: the sharpest, needs a good connection on both ends.</string>
+    <string name="share_sound">Stream sound</string>
+    <string name="share_sound_on_desc">Viewers hear your microphone with the picture. It goes quiet while your microphone is muted and while you talk in the channel, so you\'re not heard twice.</string>
+    <string name="share_sound_off_desc">No sound with the picture: talk in the channel as usual.</string>
+    <string name="share_screen_desc">Android asks once more before it starts. Everything on your screen is shown, notifications too.</string>
+    <string name="share_sound_quiet">Stream sound quiet</string>
+    <string name="share_sound_live">Stream sound on</string>
+    <string name="share_starting">starting…</string>
+    <string name="share_watching">Watching</string>
+    <string name="share_swap_cameras">Swap the cameras</string>
+    <string name="share_switch_camera">Switch camera</string>
+    <string name="share_turn_locked">Turn locked (tap to follow the phone)</string>
+    <string name="share_turn_follows">Turn follows the phone (tap to lock)</string>
+    <string name="share_light_on">Ring light on (tap for off)</string>
+    <string name="share_light_off">Ring light: a bright white screen lights your face</string>
+    <string name="share_both_unsupported">This phone can\'t use both cameras at the same time.</string>
+    <string name="share_failed">The share couldn\'t start.</string>
+    <!-- %1$s is TeamSpeak's reason -->
+    <string name="share_refused">TeamSpeak refused the share: %1$s</string>
+
+    <!-- Notifications -->
     <string name="notification_channel">Connection</string>
     <string name="notification_messages">Messages and pokes</string>
 </resources>

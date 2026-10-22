@@ -61,12 +61,14 @@ import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 import org.webrtc.VideoTrack
+import androidx.compose.ui.res.stringResource
+import io.github.korppujauho.pocketts.R
 
 /** WebTS's WATCH button (only for streams in your own channel, as in the desktop app). */
 @Composable
 fun WatchButton(onClick: () -> Unit) {
     Text(
-        "WATCH", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+        stringResource(R.string.stream_watch), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
         modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Ts.green).clickable(onClick = onClick)
             .padding(horizontal = 6.dp, vertical = 2.dp),
     )
@@ -258,13 +260,13 @@ fun WatchCard(
             )
             if (state.watchAudio != null) {
                 RoundButton(
-                    if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp, "Sound",
+                    if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.sound),
                     if (state.watchMuted) Ts.red else Ts.text,
                 ) { sound = !sound }
             }
-            if (onSmallWindow != null) RoundButton(Icons.Filled.PictureInPictureAlt, "Small window", Ts.text, onSmallWindow)
-            RoundButton(Icons.Filled.Fullscreen, "Full screen", Ts.text) { full = true }
-            RoundButton(Icons.Filled.Close, "Stop watching", Ts.text, onClose)
+            if (onSmallWindow != null) RoundButton(Icons.Filled.PictureInPictureAlt, stringResource(R.string.stream_small_window), Ts.text, onSmallWindow)
+            RoundButton(Icons.Filled.Fullscreen, stringResource(R.string.stream_full_screen), Ts.text) { full = true }
+            RoundButton(Icons.Filled.Close, stringResource(R.string.stream_stop_watching), Ts.text, onClose)
         }
         if (sound && state.watchAudio != null) SoundRow(state, onMute, onVolume)
     }
@@ -277,7 +279,7 @@ private fun SoundRow(state: StreamEngine.State, onMute: (Boolean) -> Unit, onVol
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         RoundButton(
             if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-            if (state.watchMuted) "Sound on" else "Sound off", if (state.watchMuted) Ts.red else Ts.text,
+            stringResource(if (state.watchMuted) R.string.stream_sound_on else R.string.stream_sound_off), if (state.watchMuted) Ts.red else Ts.text,
         ) { onMute(!state.watchMuted) }
         androidx.compose.material3.Slider(
             value = if (state.watchMuted) 0f else state.watchVolume, onValueChange = { onVolume(it); if (state.watchMuted) onMute(false) },
@@ -331,10 +333,10 @@ private fun FullScreenPlayer(
                     if (state.watchAudio != null) {
                         RoundButton(
                             if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-                            if (state.watchMuted) "Sound on" else "Sound off", if (state.watchMuted) Ts.red else Ts.text,
+                            stringResource(if (state.watchMuted) R.string.stream_sound_on else R.string.stream_sound_off), if (state.watchMuted) Ts.red else Ts.text,
                         ) { onMute(!state.watchMuted) }
                     }
-                    RoundButton(Icons.Filled.FullscreenExit, "Leave full screen", Ts.text, onExit)
+                    RoundButton(Icons.Filled.FullscreenExit, stringResource(R.string.stream_leave_full_screen), Ts.text, onExit)
                 }
             }
         }
@@ -353,12 +355,12 @@ fun ShareDialog(
     var quality by remember { mutableStateOf(720) }
     val qualities = listOf(480, 720, 1080)
     TsDialog(
-        onDismiss = onDismiss, title = if (screen) "Share your screen" else "Share your camera",
+        onDismiss = onDismiss, title = stringResource(if (screen) R.string.share_screen_title else R.string.share_camera_title),
         icon = if (screen) androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ScreenShare else androidx.compose.material.icons.Icons.Rounded.Videocam, tint = ShareGreen,
-        subtitle = "Everyone in your channel can watch",
+        subtitle = stringResource(R.string.share_subtitle),
         buttons = {
-            PillButton("Cancel", onClick = onDismiss)
-            PillButton("Start", PillKind.PRIMARY) {
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.start), PillKind.PRIMARY) {
                 when {
                     screen -> onScreen()
                     camera == 2 -> onBoth(quality, withSound)
@@ -368,19 +370,19 @@ fun ShareDialog(
         },
     ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("What", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                Segments(listOf("Camera", "Screen"), if (screen) 1 else 0) { screen = it == 1 }
+                Text(stringResource(R.string.share_what), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Segments(listOf(stringResource(R.string.share_camera), stringResource(R.string.share_screen)), if (screen) 1 else 0) { screen = it == 1 }
                 if (!screen) {
-                    Text("Camera", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    Segments(if (canBoth) listOf("Front", "Back", "Both") else listOf("Front", "Back"), camera) { camera = it }
-                    if (camera == 2) Text("The back camera big, the front one small in the corner. Swap switches them.", color = Ts.muted, fontSize = 13.sp)
-                    Text("Quality", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.share_camera), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Segments(listOf(stringResource(R.string.camera_front), stringResource(R.string.camera_back)) + if (canBoth) listOf(stringResource(R.string.camera_both)) else emptyList(), camera) { camera = it }
+                    if (camera == 2) Text(stringResource(R.string.share_both_desc), color = Ts.muted, fontSize = 13.sp)
+                    Text(stringResource(R.string.share_quality), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf("480p", "720p", "1080p"), qualities.indexOf(quality)) { quality = qualities[it] }
                     Text(
                         when (quality) {
-                            480 -> "Data saver: the least data, for mobile networks."
-                            720 -> "HD: sharp, and light enough for most connections."
-                            else -> "Full HD: the sharpest, needs a good connection on both ends."
+                            480 -> stringResource(R.string.share_quality_480)
+                            720 -> stringResource(R.string.share_quality_720)
+                            else -> stringResource(R.string.share_quality_1080)
                         },
                         color = Ts.muted, fontSize = 13.sp,
                     )
@@ -394,15 +396,14 @@ fun ShareDialog(
                                 colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
                             )
                         }
-                        Text("Stream sound", color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+                        Text(stringResource(R.string.share_sound), color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
                     }
                     Text(
-                        if (withSound) "Viewers hear your microphone with the picture. It goes quiet while your microphone is muted and while you talk in the channel, so you're not heard twice."
-                        else "No sound with the picture: talk in the channel as usual.",
+                        stringResource(if (withSound) R.string.share_sound_on_desc else R.string.share_sound_off_desc),
                         color = Ts.muted, fontSize = 13.sp,
                     )
                 } else {
-                    Text("Android asks once more before it starts. Everything on your screen is shown, notifications too.", color = Ts.muted, fontSize = 13.sp)
+                    Text(stringResource(R.string.share_screen_desc), color = Ts.muted, fontSize = 13.sp)
                 }
             }
     }
@@ -464,22 +465,22 @@ fun ShareBar(
         Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LiveDot()
             val what = when {
-                !camera -> "Screen"
-                state.shareBoth -> "Both cameras"
-                else -> "Camera"
+                !camera -> stringResource(R.string.share_screen)
+                state.shareBoth -> stringResource(R.string.share_both_cameras)
+                else -> stringResource(R.string.share_camera)
             }
             Text(what, color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
             if (state.shareSound) {
                 Icon(
                     if (state.soundPaused) Icons.Filled.MicOff else Icons.Filled.Mic,
-                    contentDescription = if (state.soundPaused) "Stream sound quiet" else "Stream sound on",
+                    contentDescription = stringResource(if (state.soundPaused) R.string.share_sound_quiet else R.string.share_sound_live),
                     tint = ShareText, modifier = Modifier.size(16.dp),
                 )
             }
             if (!state.shareLive) {
-                Text("starting…", color = ShareText, fontSize = 14.sp, maxLines = 1)
+                Text(stringResource(R.string.share_starting), color = ShareText, fontSize = 14.sp, maxLines = 1)
             } else {
-                Icon(Icons.Filled.Visibility, contentDescription = "Watching", tint = ShareText, modifier = Modifier.size(16.dp))
+                Icon(Icons.Filled.Visibility, contentDescription = stringResource(R.string.share_watching), tint = ShareText, modifier = Modifier.size(16.dp))
                 Text("${state.viewers}", color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
             }
         }
@@ -488,21 +489,21 @@ fun ShareBar(
     @Composable
     fun Buttons() {
         if (camera) {
-            RoundButton(Icons.Filled.FlipCameraAndroid, if (state.shareBoth) "Swap the cameras" else "Switch camera", Ts.text, onFlip)
+            RoundButton(Icons.Filled.FlipCameraAndroid, stringResource(if (state.shareBoth) R.string.share_swap_cameras else R.string.share_switch_camera), Ts.text, onFlip)
             RoundButton(
                 if (state.rotateLocked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
-                if (state.rotateLocked) "Turn locked (tap to follow the phone)" else "Turn follows the phone (tap to lock)",
+                stringResource(if (state.rotateLocked) R.string.share_turn_locked else R.string.share_turn_follows),
                 if (state.rotateLocked) Color(0xFFFBBF24) else Ts.text,
             ) { onRotateLock(!state.rotateLocked) }
             if (light != null) {
                 RoundButton(
-                    Icons.Filled.LightMode, if (light) "Ring light on (tap for off)" else "Ring light: a bright white screen lights your face",
+                    Icons.Filled.LightMode, stringResource(if (light) R.string.share_light_on else R.string.share_light_off),
                     if (light) Color(0xFFFBBF24) else Ts.text,
                 ) { onLight(!light) }
             }
         }
         Text(
-            "Stop", color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+            stringResource(R.string.stop), color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
             modifier = Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(Ts.redButton.copy(alpha = 0.15f))
                 .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(onClick = onStop)
                 .wrapContentHeight(Alignment.CenterVertically).padding(horizontal = 18.dp),
@@ -589,7 +590,7 @@ object StreamSize {
 fun PipPlayer(state: StreamEngine.State, egl: EglBase) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         state.watchVideo?.let { VideoView(it, egl, Modifier.fillMaxSize(), onSize = { w, h -> StreamSize.set(w, h) }) }
-        val status = if (state.watching == 0) "Stream ended." else state.watchStatus
+        val status = if (state.watching == 0) stringResource(R.string.stream_ended) else state.watchStatus
         if (status.isNotEmpty()) {
             Text(status, color = Color.White, fontSize = 12.sp, modifier = Modifier.align(Alignment.Center).padding(8.dp))
         }

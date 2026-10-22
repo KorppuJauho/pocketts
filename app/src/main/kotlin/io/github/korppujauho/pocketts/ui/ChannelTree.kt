@@ -56,6 +56,8 @@ import androidx.compose.ui.unit.sp
 import io.github.korppujauho.pocketts.proto.ServerModel
 import io.github.korppujauho.pocketts.proto.Pictures
 import io.github.korppujauho.pocketts.TsFile
+import io.github.korppujauho.pocketts.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
@@ -236,7 +238,7 @@ private fun ChannelTitleRow(ch: ServerModel.Channel, spacer: ServerModel.Spacer?
             ch.displayName, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
         )
-        if (ch.hasPassword) Icon(Icons.Filled.Lock, contentDescription = "Password", tint = Ts.muted, modifier = Modifier.size(14.dp))
+        if (ch.hasPassword) Icon(Icons.Filled.Lock, contentDescription = stringResource(R.string.channel_has_password), tint = Ts.muted, modifier = Modifier.size(14.dp))
     }
 }
 
@@ -301,19 +303,19 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
         ) {
             when {
                 c.outputMuted || !c.outputHardware ->
-                    Icon(Icons.Filled.HeadsetOff, "Sound off", tint = Ts.red, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Filled.HeadsetOff, stringResource(R.string.person_sound_off), tint = Ts.red, modifier = Modifier.size(14.dp))
                 c.inputMuted || !c.inputHardware ->
-                    Icon(Icons.Filled.MicOff, "Microphone off", tint = Ts.red, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Filled.MicOff, stringResource(R.string.person_mic_off), tint = Ts.red, modifier = Modifier.size(14.dp))
                 !ctx.canTalk(c) ->
-                    Icon(Icons.Outlined.MicExternalOff, "Can't talk in this channel", tint = Ts.amber, modifier = Modifier.size(15.dp))
+                    Icon(Icons.Outlined.MicExternalOff, stringResource(R.string.person_cant_talk), tint = Ts.amber, modifier = Modifier.size(15.dp))
             }
             if (c.streaming) {
                 // Like the desktop app: the mark in every channel, WATCH only in your own
                 if (!self && c.channel == ctx.ownChannel && ctx.onWatch != null) WatchButton { ctx.onWatch.invoke(c) }
-                Icon(Icons.Filled.Videocam, "Streaming", tint = Ts.green, modifier = Modifier.size(15.dp))
+                Icon(Icons.Filled.Videocam, stringResource(R.string.person_streaming), tint = Ts.green, modifier = Modifier.size(15.dp))
             }
-            if (c.away) Tag("AFK", Ts.afk, Ts.afkBg, Ts.afkBorder)
-            if (self) Tag("YOU", Ts.you, Ts.afkBg.copy(alpha = 0f), Ts.youBorder)
+            if (c.away) Tag(stringResource(R.string.tag_afk), Ts.afk, Ts.afkBg, Ts.afkBorder)
+            if (self) Tag(stringResource(R.string.tag_you), Ts.you, Ts.afkBg.copy(alpha = 0f), Ts.youBorder)
             for (icon in ctx.badges[c.id].orEmpty()) TsIcon(icon, ctx.server) // their groups' icons and their own
         }
     }

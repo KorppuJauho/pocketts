@@ -43,6 +43,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import io.github.korppujauho.pocketts.SavedPictures
+import io.github.korppujauho.pocketts.R
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -129,17 +131,17 @@ fun PictureViewer(model: Any, shown: MemoryCache.Key? = null, onDismiss: () -> U
                     scope.launch {
                         val result = runCatching { withContext(Dispatchers.IO) { SavedPictures.load(context, model) } }
                         busy = false
-                        val message = result.mapCatching { use(it); done }.getOrElse { "That didn't work: ${it.message}" }
+                        val message = result.mapCatching { use(it); done }.getOrElse { context.getString(R.string.picture_failed, it.message) }
                         if (message != null) Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
-                ViewerButton(Icons.Filled.Download, "Save to the gallery", busy) {
-                    withPicture("Saved to Pictures/${SavedPictures.FOLDER}") { SavedPictures.saveToGallery(context, it) }
+                ViewerButton(Icons.Filled.Download, stringResource(R.string.picture_save), busy) {
+                    withPicture(context.getString(R.string.picture_saved, "Pictures/${SavedPictures.FOLDER}")) { SavedPictures.saveToGallery(context, it) }
                 }
-                ViewerButton(Icons.Filled.Share, "Share", busy) {
+                ViewerButton(Icons.Filled.Share, stringResource(R.string.share), busy) {
                     withPicture(null) { SavedPictures.share(context, it) }
                 }
-                ViewerButton(Icons.Filled.Close, "Close", false, onDismiss)
+                ViewerButton(Icons.Filled.Close, stringResource(R.string.close), false, onDismiss)
             }
         }
     }

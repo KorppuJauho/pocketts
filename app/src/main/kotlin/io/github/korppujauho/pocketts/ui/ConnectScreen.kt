@@ -45,7 +45,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.Favorite
+import io.github.korppujauho.pocketts.R
 
 /** What the connect screen can ask for. */
 interface ConnectActions {
@@ -86,7 +88,7 @@ fun ConnectScreen(
         ) {
             if (favorites.isNotEmpty()) {
                 Panel(Modifier.fillMaxWidth(), header = {
-                    Text("Favourites", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text(stringResource(R.string.favourites), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 }) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         for (f in favorites) FavoriteRow(f, actions, onEdit = { editing = f })
@@ -94,19 +96,19 @@ fun ConnectScreen(
                 }
             }
             Panel(Modifier.fillMaxWidth(), header = {
-                Text("Connect to a server", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(R.string.connect_title), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    TsField(nick, { nick = it }, "Nickname")
-                    TsField(addr, { addr = it }, "Server address", placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
-                    TsField(pw, { pw = it }, "Server password", password = true, imeAction = ImeAction.Go)
-                    CheckRow("Remember the password", remember) { remember = it }
+                    TsField(nick, { nick = it }, stringResource(R.string.nickname))
+                    TsField(addr, { addr = it }, stringResource(R.string.server_address), placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
+                    TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true, imeAction = ImeAction.Go)
+                    CheckRow(stringResource(R.string.remember_password), remember) { remember = it }
                     // Always there; ticked (and fixed) for a server that already is a favourite
-                    CheckRow(if (known) "In favourites" else "Save to favourites", favorite || known, enabled = !known) { favorite = it }
+                    CheckRow(stringResource(if (known) R.string.favourites_in else R.string.favourites_save), favorite || known, enabled = !known) { favorite = it }
                     error?.let { WarningBanner(it, onDismissError, inset = 0.dp) }
                     UpdateCard()
                     PrimaryButton(
-                        "Connect", enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
+                        stringResource(R.string.connect), enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
                     ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
                 }
             }
@@ -133,8 +135,8 @@ private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit
         ) {
             Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        FavButton(androidx.compose.material.icons.Icons.Rounded.Edit, "Edit", onEdit)
-        FavButton(androidx.compose.material.icons.Icons.Rounded.Close, "Remove") { actions.removeFavorite(f) }
+        FavButton(androidx.compose.material.icons.Icons.Rounded.Edit, stringResource(R.string.edit), onEdit)
+        FavButton(androidx.compose.material.icons.Icons.Rounded.Close, stringResource(R.string.remove)) { actions.removeFavorite(f) }
     }
 }
 
@@ -171,30 +173,30 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
     var filePort by remember { mutableStateOf(f.filePort?.toString().orEmpty()) }
     var advanced by remember { mutableStateOf(f.filePort != null) }
     TsDialog(
-        onDismiss = onDismiss, title = if (onDelete != null) "Edit favourite" else "Add to favourites",
+        onDismiss = onDismiss, title = stringResource(if (onDelete != null) R.string.favourite_edit else R.string.favourite_add),
         icon = androidx.compose.material.icons.Icons.Rounded.Star, tint = Ts.amber, subtitle = f.address.takeIf { onDelete != null },
         // Delete on the left of the same row as Cancel and Save
         buttons = {
-            if (onDelete != null) PillButton("Delete", PillKind.DANGER_TEXT, onClick = onDelete)
+            if (onDelete != null) PillButton(stringResource(R.string.delete), PillKind.DANGER_TEXT, onClick = onDelete)
             Spacer(Modifier.weight(1f))
-            PillButton("Cancel", onClick = onDismiss)
-            PillButton("Save", PillKind.PRIMARY, enabled = address.isNotBlank()) {
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.save), PillKind.PRIMARY, enabled = address.isNotBlank()) {
                 onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 }))
             }
         },
     ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                TsField(name, { name = it }, "Name in your lists", placeholder = address)
-                TsField(address, { address = it }, "Server address", keyboard = KeyboardType.Uri)
-                TsField(nick, { nick = it }, "Your nickname on this server")
-                TsField(pw, { pw = it }, "Server password", password = true)
-                CheckRow("Connect automatically when the app opens", auto) { auto = it }
+                TsField(name, { name = it }, stringResource(R.string.favourite_name), placeholder = address)
+                TsField(address, { address = it }, stringResource(R.string.server_address), keyboard = KeyboardType.Uri)
+                TsField(nick, { nick = it }, stringResource(R.string.favourite_nickname))
+                TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true)
+                CheckRow(stringResource(R.string.favourite_auto), auto) { auto = it }
                 // Advanced: folded away unless used
                 Row(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).clickable { advanced = !advanced }.padding(vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Advanced", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.advanced), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     androidx.compose.material3.Icon(
                         if (advanced) androidx.compose.material.icons.Icons.Rounded.ExpandLess else androidx.compose.material.icons.Icons.Rounded.ExpandMore,
                         contentDescription = null, tint = Ts.muted,
@@ -202,10 +204,10 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 }
                 if (advanced) {
                     TsField(
-                        filePort, { v -> filePort = v.filter { it.isDigit() }.take(5) }, "File transfer port",
-                        placeholder = "The server's own (usually 30033)", keyboard = KeyboardType.Number,
+                        filePort, { v -> filePort = v.filter { it.isDigit() }.take(5) }, stringResource(R.string.favourite_file_port),
+                        placeholder = stringResource(R.string.favourite_file_port_hint), keyboard = KeyboardType.Number,
                     )
-                    Text("Only if the server's pictures and avatars don't load: its file transfer is on another port.", color = Ts.muted, fontSize = 12.sp)
+                    Text(stringResource(R.string.favourite_file_port_desc), color = Ts.muted, fontSize = 12.sp)
                 }
             }
     }
@@ -219,11 +221,11 @@ private fun UpdateCard() {
     val context = androidx.compose.ui.platform.LocalContext.current
     val uri = androidx.compose.ui.platform.LocalUriHandler.current
     PopCard {
-        Text("PocketTS ${r.version} is out", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-        Text("A newer version than this one (${io.github.korppujauho.pocketts.BuildConfig.VERSION_NAME}) is on GitHub.", color = Ts.muted, fontSize = 13.sp)
+        Text(stringResource(R.string.update_title, r.version), color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        Text(stringResource(R.string.update_text, io.github.korppujauho.pocketts.BuildConfig.VERSION_NAME), color = Ts.muted, fontSize = 13.sp)
         Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
-            PillButton("Not now") { io.github.korppujauho.pocketts.UpdateCheck.dismiss(context) }
-            PillButton("Download", PillKind.PRIMARY) { uri.openUri(r.url) }
+            PillButton(stringResource(R.string.not_now)) { io.github.korppujauho.pocketts.UpdateCheck.dismiss(context) }
+            PillButton(stringResource(R.string.download), PillKind.PRIMARY) { uri.openUri(r.url) }
         }
     }
 }
