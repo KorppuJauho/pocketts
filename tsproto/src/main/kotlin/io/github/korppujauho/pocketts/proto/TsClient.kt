@@ -56,7 +56,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         const val INIT = 8
     }
 
-    private companion object {
+    internal companion object {
         const val FLAG_FRAGMENTED = 0x10
         const val FLAG_NEWPROTOCOL = 0x20
         const val FLAG_COMPRESSED = 0x40
@@ -72,6 +72,9 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         const val RESEND_AFTER_MS = 1000L
         const val GIVE_UP_MS = 30_000L
         const val SILENCE_MS = 10_000L // pings go every second, and the server answers each
+
+        /** Nothing ever came back from the address: most likely a wrong address or port, or the server is down. */
+        const val NO_ANSWER = "Couldn't connect: no answer from the server. Check the address and port."
 
         // A client version the servers accept.
         const val VERSION = "3.?.? [Build: 5680278000]"
@@ -120,6 +123,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     private val pending = HashMap<Int, Pending>() // (type shl 16) or id -> packet waiting for its ack
     private var initPending: Pending? = null
     private var lastHeard = 0L
+    private var heardAny = false // anything from the server since this connection started
 
     // Crypto
     private var cryptoReady = false
@@ -207,6 +211,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         initPending = null
         fragments = null
         disconnectReason = null
+        heardAny = false
 
         try {
             val address = InetSocketAddress(InetAddress.getByName(options.host), options.port)
@@ -223,7 +228,10 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         } catch (e: Exception) {
             log("Can't reach ${options.host}:${options.port}: $e")
             state = State.DISCONNECTED
-            listener.onDisconnected("Can't reach the server: ${e.message ?: e.javaClass.simpleName}")
+            listener.onDisconnected(
+                if (e is java.net.UnknownHostException) "Couldn't connect: no server found at \"${options.host}\". Check the address."
+                else "Couldn't connect: ${e.message ?: e.javaClass.simpleName}"
+            )
             return
         }
 
@@ -243,7 +251,9 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
                 val data = buf.copyOf(p.length)
                 exec.execute { if (socket === s) handlePacket(data) }
             } catch (e: Exception) {
-                if (!s.isClosed) exec.execute { if (socket === s) fail("Network error: ${e.message}") }
+                // Nothing listens on that port (the computer said so before the server ever answered)
+                val noServer = e is java.net.PortUnreachableException
+                if (!s.isClosed) exec.execute { if (socket === s) fail(if (noServer && !heardAny) NO_ANSWER else "Network error: ${e.message}") }
                 return
             }
         }
@@ -269,14 +279,15 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     private fun tick() {
         val t = now()
         initPending?.let { p ->
-            if (t - p.first > GIVE_UP_MS) return fail("The server didn't answer")
+            if (t - p.first > GIVE_UP_MS) return fail(if (heardAny) "The server didn't answer" else NO_ANSWER)
             if (t - p.last > RESEND_AFTER_MS) { p.last = t; sendRaw(p.raw) }
         }
         for (p in pending.values) {
             if (t - p.first > GIVE_UP_MS) return fail("The server stopped answering")
             if (t - p.last > RESEND_AFTER_MS) { p.last = t; sendRaw(p.raw) }
         }
-        if (t - lastHeard > SILENCE_MS) fail("Connection lost")
+        // Silence before the server ever answered isn't a lost connection: there never was one
+        if (t - lastHeard > SILENCE_MS) fail(if (heardAny) "Connection lost" else NO_ANSWER)
     }
 
     // ====== Sending ======
@@ -400,6 +411,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             return
         }
         lastHeard = now()
+        heardAny = true
 
         when (type) {
             Type.INIT -> handleInit(data)
