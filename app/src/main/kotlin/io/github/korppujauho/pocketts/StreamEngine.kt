@@ -132,6 +132,9 @@ class StreamEngine(
 
     private fun log(s: String) = AppLog.log("[Streams] $s")
 
+    /** A text shown to the person, in the phone's language. */
+    private fun text(id: Int, vararg args: Any): String = context.getString(id, *args)
+
     private fun config(): PeerConnection.RTCConfiguration {
         val v = settings()
         val servers = Streams.STUN.map { PeerConnection.IceServer.builder(it).createIceServer() }.toMutableList()
@@ -210,7 +213,7 @@ class StreamEngine(
     fun watch(streamer: ServerModel.Client, streamId: String?) = exec.execute {
         closeWatch(sendLeave = true)
         watch = Watch(streamer.id, streamId)
-        update { it.copy(watching = streamer.id, watchStatus = "Requesting access…", watchVideo = null, watchAudio = null, watchMuted = false) }
+        update { it.copy(watching = streamer.id, watchStatus = text(R.string.stream_requesting), watchVideo = null, watchAudio = null, watchMuted = false) }
         if (streamId == null) send(Streams.requestInfo(streamer.id, rc("info"))) else send(Streams.join(streamId, streamer.id, rc("join")))
     }
 
@@ -264,10 +267,10 @@ class StreamEngine(
             setLocal(pc, local)
             val sdp = Streams.withOfferSessionVersion(Streams.restoreH264(pc.localDescription.description, w.original), offerSdp)
             send(Streams.answer(streamId, w.streamerId, sdp, rc("answer")))
-            update { it.copy(watchStatus = "Connecting…") }
+            update { it.copy(watchStatus = text(R.string.stream_connecting)) }
         } catch (e: Throwable) {
             log("Watching failed: $e")
-            endWatch("The stream couldn't be opened.")
+            endWatch(text(R.string.stream_open_failed))
         }
     }
 
@@ -282,12 +285,12 @@ class StreamEngine(
                 exec.execute {
                     if (watch !== w) return@execute
                     when (s) {
-                        PeerConnection.PeerConnectionState.CONNECTED -> update { it.copy(watchStatus = if (it.watchVideo != null) "" else "Connected, waiting for the picture…") }
+                        PeerConnection.PeerConnectionState.CONNECTED -> update { it.copy(watchStatus = if (it.watchVideo != null) "" else text(R.string.stream_waiting_picture)) }
                         PeerConnection.PeerConnectionState.FAILED -> {
-                            update { it.copy(watchStatus = "Connection problem, still trying…") }
+                            update { it.copy(watchStatus = text(R.string.stream_trying)) }
                             exec.execute {
                                 Thread.sleep(20_000)
-                                if (watch === w && w.pc?.connectionState() == PeerConnection.PeerConnectionState.FAILED) endWatch("Connection lost.")
+                                if (watch === w && w.pc?.connectionState() == PeerConnection.PeerConnectionState.FAILED) endWatch(text(R.string.stream_connection_lost))
                             }
                         }
                         else -> {}
@@ -360,7 +363,7 @@ class StreamEngine(
     fun shareBothCameras(quality: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
         val ids = DualCamera.pair(context) ?: run {
-            update { it.copy(message = "This phone can't use both cameras at the same time.") }
+            update { it.copy(message = text(R.string.share_both_unsupported)) }
             return@execute
         }
         bitrate = when { quality >= 1080 -> 5000; quality >= 720 -> 3000; else -> 1200 }
@@ -450,7 +453,7 @@ class StreamEngine(
         } catch (e: Exception) {
             log("Share failed to start: $e")
             releaseCapture()
-            update { it.copy(sharing = null, localVideo = null, message = "The share couldn't start.") }
+            update { it.copy(sharing = null, localVideo = null, message = text(R.string.share_failed)) }
         }
     }
 
@@ -686,13 +689,13 @@ class StreamEngine(
                 val clid = g["clid"]?.toIntOrNull() ?: 0
                 if (id != null && id == shareId) endShare()
                 val w = watch
-                if (w != null && (id == w.streamId || clid == w.streamerId)) endWatch("Stream ended.")
+                if (w != null && (id == w.streamId || clid == w.streamerId)) endWatch(text(R.string.stream_ended))
             }
             "notifyrespondjoinstreamrequest" -> {
                 val w = watch ?: return
                 val offer = g["offer"]
                 if (g["decision"] == "1" && !offer.isNullOrEmpty()) onOffer(g["id"] ?: g["stream_id"] ?: w.streamId ?: return, offer)
-                else endWatch(g["msg"]?.ifEmpty { null } ?: "The stream request was denied.")
+                else endWatch(g["msg"]?.ifEmpty { null } ?: text(R.string.stream_denied))
             }
             "notifystreamsignaling" -> {
                 val s = Streams.readSignal(cmd) ?: return
@@ -722,7 +725,7 @@ class StreamEngine(
                 val w = watch ?: return
                 val here = ownChannel()
                 val theirs = channelOf(w.streamerId)
-                if (here > 0 && theirs != here) endWatch("Stream ended (you are no longer in the same channel).")
+                if (here > 0 && theirs != here) endWatch(text(R.string.stream_ended_left_channel))
             }
             "error" -> {
                 val code = g["return_code"].orEmpty()
@@ -731,9 +734,9 @@ class StreamEngine(
                 when {
                     code.startsWith("stream-setup") -> {
                         endShare()
-                        update { it.copy(message = "TeamSpeak refused the share: ${g["msg"].orEmpty()}") }
+                        update { it.copy(message = text(R.string.share_refused, g["msg"].orEmpty())) }
                     }
-                    code.startsWith("stream-join") || code.startsWith("stream-info") -> endWatch(g["msg"]?.ifEmpty { null } ?: "The stream couldn't be opened.")
+                    code.startsWith("stream-join") || code.startsWith("stream-info") -> endWatch(g["msg"]?.ifEmpty { null } ?: text(R.string.stream_open_failed))
                 }
             }
         }
