@@ -55,7 +55,7 @@ jobs:
           CERTS=$(docker run --rm -v "$PWD/dist":/dist pocketts-build "$APKSIGNER" verify --print-certs "/dist/PocketTS-$VERSION.apk")
           grep -q "CN=PocketTS" <<< "$CERTS" || { echo "::error::The APK isn't signed with the release key"; exit 1; }
 
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/PocketTS-${{ env.VERSION }}.apk
 
