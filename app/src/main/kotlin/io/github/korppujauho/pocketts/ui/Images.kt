@@ -34,7 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
+import coil3.memory.MemoryCache
+import coil3.request.ImageRequest
+import coil3.size.Precision
 import io.github.korppujauho.pocketts.TsFile
 import io.github.korppujauho.pocketts.proto.ServerModel
 
@@ -74,9 +78,16 @@ fun TsIcon(id: Long, server: String, size: Dp = 16.dp) {
     AsyncImage(file, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size))
 }
 
-/** A picture on the whole screen: pinch to zoom, tap to close. */
+/**
+ * A picture on the whole screen: pinch to zoom, tap to close. The whole picture (up to 4096 px a side), not the
+ * smaller one the chat shows, which [shown] (its memory cache key) shows until this one has loaded.
+ */
 @Composable
-fun PictureViewer(model: Any, onDismiss: () -> Unit) {
+fun PictureViewer(model: Any, shown: MemoryCache.Key? = null, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val request = remember(model, shown) {
+        ImageRequest.Builder(context).data(model).size(4096).precision(Precision.INEXACT).placeholderMemoryCacheKey(shown).build()
+    }
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -92,7 +103,7 @@ fun PictureViewer(model: Any, onDismiss: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             AsyncImage(
-                model, contentDescription = null, contentScale = ContentScale.Fit,
+                request, contentDescription = null, contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize().graphicsLayer {
                     scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y
                 },

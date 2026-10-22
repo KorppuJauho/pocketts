@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Smoother chat with pictures: a picture's place is kept for it while it loads (from its size the time before), so
+  the chat no longer jumps; the chat shows pictures only as big as it draws them, and tapping one opens the whole
+  picture, sharp when zoomed in; chat lines are no longer drawn again each time someone starts or stops talking;
+  the same picture is downloaded only once at a time, and big pictures are read from the phone's copy as they're
+  drawn instead of first all into memory.
+- Test builds log how smoothly the screen draws (frames, late frames, the slowest) every 10 seconds.
 - A wrong server address or port now says "Couldn't connect: no answer from the server. Check the address and port."
   instead of "Connection lost", and a name that doesn't exist says that no server was found at it.
 

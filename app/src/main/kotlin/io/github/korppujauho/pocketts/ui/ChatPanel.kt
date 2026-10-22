@@ -82,8 +82,14 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.core.content.FileProvider
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.ui.platform.LocalDensity
 import coil3.compose.AsyncImage
+import coil3.memory.MemoryCache
+import io.github.korppujauho.pocketts.PictureSizes
 import io.github.korppujauho.pocketts.proto.Chat
+import io.github.korppujauho.pocketts.proto.ServerModel
+import kotlin.math.abs
 import io.github.korppujauho.pocketts.proto.MessageText
 import java.util.Date
 
@@ -114,10 +120,13 @@ fun ChatPanel(
     }) {
         val key = if (view is Chat.Key.Channel) Chat.Key.Channel(state.ownChannel) else view
         val entries = state.chat[key].orEmpty()
-        Messages(entries, emptyText = when (key) {
-            is Chat.Key.Channel -> "No messages in this channel yet."
-            is Chat.Key.Private -> "No messages yet."
-        }, state)
+        // Each conversation its own list, so switching tabs opens the other one at its newest line too
+        androidx.compose.runtime.key(key) {
+            Messages(entries, emptyText = when (key) {
+                is Chat.Key.Channel -> "No messages in this channel yet."
+                is Chat.Key.Private -> "No messages yet."
+            }, state)
+        }
         val target = when (key) {
             is Chat.Key.Channel -> state.ownChannelName.ifEmpty { "the channel" }
             is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name ?: "them"
@@ -149,10 +158,17 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
 
 @Composable
 private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, state: Session.UiState) {
-    var viewing by remember { mutableStateOf<Any?>(null) }
-    viewing?.let { PictureViewer(it) { viewing = null } }
-    val list = rememberLazyListState()
-    LaunchedEffect(entries.size) { if (entries.isNotEmpty()) list.animateScrollToItem(entries.size - 1) }
+    var viewing by remember { mutableStateOf<Viewing?>(null) }
+    viewing?.let { PictureViewer(it.model, it.shown) { viewing = null } }
+    val open = remember { { v: Viewing -> viewing = v } }
+    // Opened at the newest line straight away; only lines coming in while it's open scroll there
+    val list = rememberLazyListState(initialFirstVisibleItemIndex = (entries.size - 1).coerceAtLeast(0))
+    var opened by remember { mutableStateOf(false) }
+    LaunchedEffect(entries.size) {
+        if (entries.isEmpty()) return@LaunchedEffect
+        if (opened) list.animateScrollToItem(entries.size - 1) else list.scrollToItem(entries.size - 1)
+        opened = true
+    }
     if (entries.isEmpty()) {
         Box(Modifier.fillMaxWidth().weight(1f).padding(top = 40.dp), contentAlignment = Alignment.TopCenter) {
             Text(emptyText, color = Ts.muted, fontSize = 14.sp)
@@ -169,9 +185,56 @@ private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, s
     ) {
         items(entries, key = { it.id }) { e ->
             val time = lineTime(e.time, chatNow(), timeFormat.format(Date(e.time)))
-            if (e.event != null) EventLine(time, e.event!!) else MessageLine(time, e, state) { viewing = it }
+            if (e.event != null) {
+                EventLine(time, e.event!!)
+            } else {
+                // A line from before has no client id: our own is ours today too. The line gets only what it shows,
+                // so it isn't drawn again each time someone starts or stops talking.
+                val sender = state.clientByUid(e.senderUid) ?: state.client(if (e.outgoing && e.senderId == 0) state.ownId else e.senderId)
+                MessageLine(time, e, sender, state.serverKey, open)
+            }
         }
     }
+}
+
+/** A picture opened on the whole screen, and what the chat showed of it (shown until the full one has loaded). */
+private class Viewing(val model: Any, val shown: MemoryCache.Key?)
+
+private val PICTURE_LINK = Regex("""\.(jpe?g|gif|png|webp)(\?.*)?$""", RegexOption.IGNORE_CASE)
+
+/**
+ * A picture in the chat, only as big as the chat shows it (a tap opens the whole picture). Its place is kept for it
+ * from its size the time before, so the chat doesn't jump when it loads.
+ */
+@Composable
+private fun ChatPicture(model: Any, sizeKey: String, description: String?, onOpen: (Viewing) -> Unit) {
+    var size by remember(sizeKey) { mutableStateOf(PictureSizes.get(sizeKey)) }
+    var shown by remember(sizeKey) { mutableStateOf<MemoryCache.Key?>(null) }
+    var loaded by remember(sizeKey) { mutableStateOf(false) }
+    var failed by remember(sizeKey) { mutableStateOf(false) }
+    if (failed) return
+    val known = size
+    // The first time a 4:3 place; a small picture isn't made bigger than it is
+    val ratio = known?.let { it.width.toFloat() / it.height } ?: (4f / 3f)
+    val maxHeight = known?.let { minOf(260.dp, with(LocalDensity.current) { it.height.toDp() }) } ?: 260.dp
+    AsyncImage(
+        model, contentDescription = description, contentScale = ContentScale.Fit,
+        onSuccess = { s ->
+            loaded = true
+            shown = s.result.memoryCacheKey
+            val w = s.result.image.width
+            val h = s.result.image.height
+            // Kept when the shape is new (a few pixels' difference from being made smaller doesn't count)
+            if (w > 0 && h > 0 && (known == null || abs(w.toFloat() / h - ratio) > 0.02f)) {
+                PictureSizes.put(sizeKey, w, h)
+                size = PictureSizes.get(sizeKey)
+            }
+        },
+        onError = { failed = true },
+        modifier = Modifier.heightIn(max = maxHeight).aspectRatio(ratio, matchHeightConstraintsFirst = true)
+            .clip(RoundedCornerShape(6.dp)).then(if (loaded) Modifier else Modifier.background(Ts.card))
+            .clickable { onOpen(Viewing(model, shown)) },
+    )
 }
 
 /** Now, for the lines' days (the screenshots set their own). */
@@ -212,13 +275,11 @@ private fun EventLine(time: String, parts: List<Chat.Part>) {
 }
 
 @Composable
-private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onPicture: (Any) -> Unit) {
+private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?, server: String, onPicture: (Viewing) -> Unit) {
     // A file from the TeamSpeak app (through myTeamSpeak): one short line instead of its note
     val tsFile = remember(e.text) { Pictures.teamSpeakFile(e.text) }
     val (pictures, rest) = remember(e.text) { if (tsFile != null) emptyList<Pictures.ChannelPicture>() to "" else Pictures.channelPictures(e.text) }
     val text = remember(rest) { formatted(rest) }
-    // A line from before has no client id: our own is ours today too
-    val sender = state.clientByUid(e.senderUid) ?: state.client(if (e.outgoing && e.senderId == 0) state.ownId else e.senderId)
     val uri = LocalUriHandler.current
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))
@@ -241,7 +302,7 @@ private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onP
             },
             inlineContent = mapOf(
                 "avatar" to InlineTextContent(Placeholder(20.sp, 20.sp, PlaceholderVerticalAlign.TextCenter)) {
-                    PersonAvatar(sender, state.serverKey, 20)
+                    PersonAvatar(sender, server, 20)
                 },
             ),
             color = Ts.text, fontSize = 15.sp,
@@ -257,21 +318,15 @@ private fun MessageLine(time: String, e: Chat.Entry, state: Session.UiState, onP
         }
         // Pictures from the channel's files, as the TeamSpeak app shows them
         for (p in pictures) {
-            val file = TsFile.picture(state.serverKey, p)
-            AsyncImage(
-                file, contentDescription = p.name, contentScale = ContentScale.Fit,
-                modifier = Modifier.heightIn(max = 260.dp).clip(RoundedCornerShape(6.dp)).clickable { onPicture(file) },
-            )
+            val file = TsFile.picture(server, p)
+            ChatPicture(file, file.key, p.name, onPicture)
         }
         if (pictures.isNotEmpty() && rest.isNotEmpty()) Text(text, color = Ts.text, fontSize = 15.sp)
         // A preview of the first link: a direct picture, else a small "Open" card
         val link = remember(rest) { MessageText.parse(rest).firstNotNullOfOrNull { it.link } }
         if (link != null) {
-            if (Regex("""\.(jpe?g|gif|png|webp)(\?.*)?$""", RegexOption.IGNORE_CASE).containsMatchIn(link)) {
-                AsyncImage(
-                    link, contentDescription = null, contentScale = ContentScale.Fit,
-                    modifier = Modifier.heightIn(max = 260.dp).clip(RoundedCornerShape(6.dp)).clickable { onPicture(link) },
-                )
+            if (PICTURE_LINK.containsMatchIn(link)) {
+                ChatPicture(link, link, null, onPicture)
             } else {
                 val host = remember(link) { runCatching { java.net.URI(link).host }.getOrNull() }
                 if (host != null) {
