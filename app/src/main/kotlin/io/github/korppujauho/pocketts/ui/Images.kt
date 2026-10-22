@@ -34,7 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import io.github.korppujauho.pocketts.SavedPictures
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import coil3.compose.AsyncImage
 import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
@@ -108,7 +119,38 @@ fun PictureViewer(model: Any, shown: MemoryCache.Key? = null, onDismiss: () -> U
                     scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y
                 },
             )
-            Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Color.White, modifier = Modifier.align(Alignment.TopEnd).padding(20.dp).size(28.dp))
+            Row(Modifier.align(Alignment.TopEnd).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Save and share wait for the picture itself (it may still be downloading)
+                val scope = rememberCoroutineScope()
+                var busy by remember { mutableStateOf(false) }
+                fun withPicture(done: String?, use: (SavedPictures.Picture) -> Unit) {
+                    if (busy) return
+                    busy = true
+                    scope.launch {
+                        val result = runCatching { withContext(Dispatchers.IO) { SavedPictures.load(context, model) } }
+                        busy = false
+                        val message = result.mapCatching { use(it); done }.getOrElse { "That didn't work: ${it.message}" }
+                        if (message != null) Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                ViewerButton(Icons.Filled.Download, "Save to the gallery", busy) {
+                    withPicture("Saved to Pictures/${SavedPictures.FOLDER}") { SavedPictures.saveToGallery(context, it) }
+                }
+                ViewerButton(Icons.Filled.Share, "Share", busy) {
+                    withPicture(null) { SavedPictures.share(context, it) }
+                }
+                ViewerButton(Icons.Filled.Close, "Close", false, onDismiss)
+            }
         }
+    }
+}
+
+@Composable
+private fun ViewerButton(icon: ImageVector, description: String, busy: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier.size(44.dp).clip(CircleShape).background(Color(0x66000000)).clickable(enabled = !busy, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription = description, tint = if (busy) Color(0x80FFFFFF) else Color.White, modifier = Modifier.size(24.dp))
     }
 }

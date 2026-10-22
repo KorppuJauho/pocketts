@@ -262,8 +262,8 @@ private object SessionActions : ServerActions {
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
-    override fun sendPicture(uri: android.net.Uri, text: String) {
-        MainActivity.current?.let { Session.sendPicture(it.applicationContext, uri, text) }
+    override fun sendPictures(uris: List<android.net.Uri>, text: String) {
+        MainActivity.current?.let { Session.sendPictures(it.applicationContext, uris, text) }
     }
     override fun viewing(key: Chat.Key?) {
         Session.viewing = key

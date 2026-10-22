@@ -101,7 +101,7 @@ fun ChatPanel(
     onView: (Chat.Key) -> Unit,
     onCloseTab: (String) -> Unit,
     onSend: (Chat.Key, String) -> Unit,
-    onPicture: (Uri, String) -> Unit = { _, _ -> },
+    onPicture: (List<Uri>, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     Panel(modifier, header = {
@@ -133,7 +133,8 @@ fun ChatPanel(
         }
         MessageBox(
             "Message to $target…", enabled = state.phase == Session.Phase.CONNECTED,
-            pictures = key is Chat.Key.Channel, sendingPicture = state.sendingPicture, onPicture = onPicture,
+            pictures = key is Chat.Key.Channel, sendingPicture = state.sendingPicture, progress = state.sendingProgress,
+            onPicture = onPicture,
         ) { onSend(key, it) }
     }
 }
@@ -201,6 +202,9 @@ private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, s
 private class Viewing(val model: Any, val shown: MemoryCache.Key?)
 
 private val PICTURE_LINK = Regex("""\.(jpe?g|gif|png|webp)(\?.*)?$""", RegexOption.IGNORE_CASE)
+
+/** Pictures sent together at most (one message each). */
+private const val MAX_PICTURES = 10
 
 /**
  * A picture in the chat, only as big as the chat shows it (a tap opens the whole picture). Its place is kept for it
@@ -375,16 +379,25 @@ private fun MessageBox(
     enabled: Boolean,
     pictures: Boolean,
     sendingPicture: Boolean,
-    onPicture: (Uri, String) -> Unit,
+    progress: Pair<Int, Int>?,
+    onPicture: (List<Uri>, String) -> Unit,
     onSend: (String) -> Unit,
 ) {
     var text by rememberSaveable { mutableStateOf("") }
-    var pending by remember { mutableStateOf<Uri?>(null) }
+    var pending by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var menu by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) pending = uri }
+    // More can be added to those already chosen, up to MAX_PICTURES
+    fun add(uris: List<Uri>) {
+        val all = (pending + uris).distinct()
+        if (all.size > MAX_PICTURES) {
+            android.widget.Toast.makeText(context, "At most $MAX_PICTURES pictures at a time.", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        pending = all.take(MAX_PICTURES)
+    }
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(MAX_PICTURES)) { uris -> add(uris) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> if (ok) pending = photoUri }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> if (ok) photoUri?.let { add(listOf(it)) } }
     fun takePhoto() {
         val dir = java.io.File(context.cacheDir, "photos").apply { mkdirs() }
         val file = java.io.File(dir, "photo-${System.currentTimeMillis()}.jpg")
@@ -396,32 +409,43 @@ private fun MessageBox(
         if (ok) takePhoto()
         else android.widget.Toast.makeText(context, "Taking a photo needs the camera to be allowed.", android.widget.Toast.LENGTH_LONG).show()
     }
-    pending?.let { uri ->
+    if (progress != null) {
+        Text(
+            "Sending picture ${progress.first} of ${progress.second}…", color = Ts.muted, fontSize = 13.sp,
+            modifier = Modifier.fillMaxWidth().background(Ts.panel).padding(start = 14.dp, top = 10.dp),
+        )
+    }
+    if (pending.isNotEmpty()) {
         // Smaller while the keyboard is open, so the text stays in view
         val keyboard = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
-        Box(Modifier.fillMaxWidth().background(Ts.panel).padding(start = 12.dp, top = 12.dp)) {
-            Box(Modifier.size(if (keyboard) 56.dp else 84.dp)) {
-                AsyncImage(
-                    uri, contentDescription = "The attached picture", contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).border(1.dp, Pop.edge, RoundedCornerShape(10.dp)),
-                )
-                Box(
-                    Modifier.align(Alignment.TopEnd).padding(4.dp).size(24.dp).clip(CircleShape).background(Color(0xCC000000))
-                        .clickable { pending = null },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Remove the picture", tint = Color.White, modifier = Modifier.size(16.dp))
+        Row(
+            Modifier.fillMaxWidth().background(Ts.panel).horizontalScroll(rememberScrollState()).padding(start = 12.dp, top = 12.dp, end = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            for (uri in pending) {
+                Box(Modifier.size(if (keyboard) 56.dp else 84.dp)) {
+                    AsyncImage(
+                        uri, contentDescription = "An attached picture", contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).border(1.dp, Pop.edge, RoundedCornerShape(10.dp)),
+                    )
+                    Box(
+                        Modifier.align(Alignment.TopEnd).padding(4.dp).size(24.dp).clip(CircleShape).background(Color(0xCC000000))
+                            .clickable { pending = pending - uri },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Remove the picture", tint = Color.White, modifier = Modifier.size(16.dp))
+                    }
                 }
             }
         }
     }
-    val canSend = enabled && (text.isNotBlank() || (pending != null && !sendingPicture))
+    val canSend = enabled && (text.isNotBlank() || (pending.isNotEmpty() && !sendingPicture))
     fun send() {
-        val picture = pending
-        if (picture != null) {
+        val chosen = pending
+        if (chosen.isNotEmpty()) {
             if (sendingPicture) return
-            onPicture(picture, text)
-            pending = null
+            onPicture(chosen, text)
+            pending = emptyList()
             text = ""
         } else if (text.isNotBlank()) {
             onSend(text)
@@ -443,7 +467,7 @@ private fun MessageBox(
                 else Icon(Icons.Filled.Image, contentDescription = "Send a picture", tint = Ts.text)
             }
             DropdownMenu(menu, onDismissRequest = { menu = false }, containerColor = Ts.card) {
-                DropdownMenuItem(text = { Text("Choose a picture", color = Ts.text) }, onClick = {
+                DropdownMenuItem(text = { Text("Choose pictures", color = Ts.text) }, onClick = {
                     menu = false
                     pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 })
