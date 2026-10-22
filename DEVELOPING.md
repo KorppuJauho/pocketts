@@ -48,10 +48,64 @@ Put the test server's address in `dev.env` as `TS_TEST_SERVER=host:port`. If the
 
 ## Releasing
 
-A release is a signed APK attached to a GitHub release. Test builds are a separate app (their ID ends in `.debug`),
-so both can be on one phone.
+A release is a signed APK attached to a GitHub release, built by GitHub Actions from the tagged commit
+(`.github/workflows/release.yml`). Test builds are a separate app (their ID ends in `.debug`), so both can be on one
+phone.
 
-### The release key (once)
+### A release
+
+1. In `app/build.gradle.kts`, raise `versionCode` by one and set `versionName` (for example `1.1.0`).
+2. Move the changelog's "Unreleased" lines under a new heading `## <version> (<date>)`.
+3. Merge that to `main`, then tag the merged commit and push the tag:
+   ```bash
+   git tag v1.1.0 origin/main
+   git push origin v1.1.0
+   ```
+4. The workflow checks that the tag matches `versionName`, runs the tests, builds and signs the APK, checks its
+   signature, records a build attestation and makes a **draft** release with the APK, its SHA-256 and the changelog
+   lines.
+5. Download the APK from the draft, install it on a phone and try the basics: connect, talk, chat, a picture, a
+   stream. If the release crashes where a test build doesn't, shrinking removed something: `scripts/dev.sh apk-shrunk`
+   makes the same shrunk app with the test key, sending its log to the test page like a test build, so the error
+   shows (a crash in native code leaves no line: then look for a class the native code needs, see
+   `app/proguard-rules.pro`).
+6. Publish the draft.
+
+Anyone can check that a release APK was built by this repository's workflow:
+
+```bash
+gh attestation verify PocketTS-1.1.0.apk --repo KorppuJauho/pocketts
+```
+
+The GitHub version checks `releases/latest` once a day, so a published release reaches users who have update checks
+on. Drafts and pre-releases aren't offered.
+
+### The release key
+
+The workflow signs with the key in the `release` environment's secrets (Settings › Environments › release), which
+only `v*` tags can use:
+
+- `POCKETTS_KEYSTORE_BASE64`: the key file as base64
+- `POCKETTS_KEYSTORE_PASSWORD`: its password (the key's password is the same)
+
+The key was made once with `scripts/dev.sh keystore`, and the file is kept outside the repo.
+
+**Back up the key file and its password somewhere safe.** Every update has to be signed with the same key: without
+it, people can't update to a new version and would have to uninstall first, which loses their settings.
+
+To put the key into the secrets (from Windows, with the key in WSL; it goes straight to GitHub, not through the
+screen or the clipboard):
+
+```bash
+wsl -e bash -c "base64 -w0 ~/.pocketts/release.keystore" | gh secret set POCKETTS_KEYSTORE_BASE64 --env release --repo KorppuJauho/pocketts
+gh secret set POCKETTS_KEYSTORE_PASSWORD --env release --repo KorppuJauho/pocketts
+```
+
+### Building a release on this machine
+
+`scripts/dev.sh release` still builds the same signed APK locally (for example if GitHub Actions is unavailable).
+
+### Making the release key (once)
 
 ```bash
 scripts/dev.sh keystore
@@ -59,23 +113,3 @@ scripts/dev.sh keystore
 
 This asks for a password and makes the key at `~/.pocketts/release.keystore` (inside WSL on Windows; set
 `POCKETTS_KEYSTORE` in `dev.env` to keep it somewhere else). It never goes into the repo.
-
-**Back up the key file and its password somewhere safe.** Every update has to be signed with the same key: without
-it, people can't update to a new version and would have to uninstall first, which loses their settings.
-
-### A release
-
-1. In `app/build.gradle.kts`, raise `versionCode` by one and set `versionName` (for example `0.2.0`).
-2. Move the changelog's "Unreleased" lines under the new version.
-3. Run `scripts/dev.sh release`. It asks for the key's password and makes `dist/PocketTS-<version>.apk`, with its
-   SHA-256.
-4. Install it on a phone and try the basics: connect, talk, chat, a picture, a stream. If the release crashes where a
-   test build doesn't, shrinking removed something: `scripts/dev.sh apk-shrunk` makes the same shrunk app with the test
-   key, sending its log to the test page like a test build, so the error shows (a crash in native code leaves no
-   line: then look for a class the native code needs, see `app/proguard-rules.pro`).
-5. On GitHub: Releases › Draft a new release, tag `v<version>` (for example `v0.2.0`). Paste the changelog lines and
-   the SHA-256, attach the APK, and publish.
-
-The GitHub version checks `releases/latest` once a day, so a published release reaches users who have update checks
-on. Pre-releases aren't offered.
-
