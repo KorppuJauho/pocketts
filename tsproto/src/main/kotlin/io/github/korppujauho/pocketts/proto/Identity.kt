@@ -4,6 +4,7 @@ import java.math.BigInteger
 import java.security.AlgorithmParameters
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
+import java.security.MessageDigest
 import java.security.PrivateKey
 import java.security.Signature
 import java.security.interfaces.ECPrivateKey
@@ -14,6 +15,8 @@ import java.security.spec.ECPoint
 import java.security.spec.ECPrivateKeySpec
 import java.security.spec.ECPublicKeySpec
 import java.util.Base64
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import javax.crypto.KeyAgreement
 
 /**
@@ -63,21 +66,45 @@ class Identity(val privateScalar: BigInteger, val keyOffset: Long) {
         return Crypto.sha1(x)
     }
 
-    /** A higher security level: keeps trying offsets (CPU work; level 8 takes a moment, each level about doubles it). */
-    fun improvedTo(level: Int, cancelled: () -> Boolean = { false }): Identity {
+    /**
+     * A higher security level, up to [level]: keeps trying key offsets on [threads] threads (CPU work: reaching a
+     * level takes about 2^level tries, so each level about doubles the time). [progress] hears each better level as
+     * it's found. When [cancelled], the best level found so far is kept.
+     */
+    fun improvedTo(level: Int, cancelled: () -> Boolean = { false }, threads: Int = 1, progress: (Int) -> Unit = {}): Identity {
+        val lock = Any()
         var best = securityLevel
         var bestOffset = keyOffset
-        var offset = keyOffset
-        while (best < level) {
-            if (offset and 0xffff == 0L && cancelled()) break
-            offset++
-            val l = securityLevel(publicKeyString, offset)
-            if (l > best) {
-                best = l
-                bestOffset = offset
-            }
+        if (best >= level) return this
+        val prefix = publicKeyString.toByteArray(Charsets.US_ASCII)
+        val next = AtomicLong(keyOffset + 1)
+        val stop = AtomicBoolean(false)
+        val workers = List(threads.coerceAtLeast(1)) {
+            Thread({
+                val sha1 = MessageDigest.getInstance("SHA-1")
+                val digits = ByteArray(20)
+                while (!stop.get()) {
+                    val start = next.getAndAdd(CHUNK)
+                    for (offset in start until start + CHUNK) {
+                        sha1.update(prefix)
+                        val from = writeDecimal(offset, digits)
+                        sha1.update(digits, from, digits.size - from)
+                        val l = zeroBits(sha1.digest())
+                        if (l > best) synchronized(lock) {
+                            if (l > best) {
+                                best = l
+                                bestOffset = offset
+                                progress(l)
+                                if (l >= level) stop.set(true)
+                            }
+                        }
+                    }
+                    if (cancelled()) stop.set(true)
+                }
+            }, "identity-level-$it").apply { isDaemon = true; start() }
         }
-        return Identity(privateScalar, bestOffset)
+        workers.forEach { it.join() }
+        return synchronized(lock) { Identity(privateScalar, bestOffset) }
     }
 
     /** The format TeamSpeak clients export and import identities in ("<offset>V<data>"). */
@@ -156,8 +183,39 @@ class Identity(val privateScalar: BigInteger, val keyOffset: Long) {
             return Identity(scalar, offset)
         }
 
-        fun securityLevel(publicKeyString: String, offset: Long): Int {
-            val hash = Crypto.sha1((publicKeyString + offset.toString()).toByteArray(Charsets.US_ASCII))
+        fun securityLevel(publicKeyString: String, offset: Long): Int =
+            zeroBits(Crypto.sha1((publicKeyString + offset.toString()).toByteArray(Charsets.US_ASCII)))
+
+        /** Offsets each raising thread takes at a time (it checks for being stopped between them). */
+        private const val CHUNK = 65_536L
+
+        /** How many tries a second this machine makes on [threads] threads, measured for about [millis] ms. */
+        fun triesPerSecond(millis: Long = 300, threads: Int = 1): Double {
+            val id = generate(securityLevel = 0)
+            val end = System.nanoTime() + millis * 1_000_000
+            val tries = AtomicLong()
+            val start = System.nanoTime()
+            // Aims for a level nobody reaches, stopped by the clock; the tries are counted in whole chunks
+            id.improvedTo(160, cancelled = { tries.addAndGet(CHUNK); System.nanoTime() > end }, threads = threads)
+            return tries.get() / ((System.nanoTime() - start) / 1e9)
+        }
+
+        /** The time [level] takes on average at [triesPerSecond], in seconds (about 2^level tries). */
+        fun secondsFor(level: Int, triesPerSecond: Double): Double = Math.pow(2.0, level.toDouble()) / triesPerSecond
+
+        // The offset's decimal digits at the end of [into]; returns where they start
+        private fun writeDecimal(value: Long, into: ByteArray): Int {
+            var v = value
+            var i = into.size
+            do {
+                into[--i] = ('0'.code + (v % 10).toInt()).toByte()
+                v /= 10
+            } while (v != 0L)
+            return i
+        }
+
+        // The security level of a hash: its zero bits from the start, lowest bit of each byte first
+        private fun zeroBits(hash: ByteArray): Int {
             var count = 0
             for (b in hash) {
                 val v = b.toInt() and 0xff

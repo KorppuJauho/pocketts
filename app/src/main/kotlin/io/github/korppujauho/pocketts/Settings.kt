@@ -54,6 +54,11 @@ class Settings(private val context: Context) {
         UNREADABLE
     }
 
+    /** Saves the identity in place of the old one (the same identity with a raised security level). */
+    fun saveIdentity(id: Identity) {
+        secrets.edit().putSecret("identity", IDENTITY, id.export()).apply()
+    }
+
     /** Lets go of the saved identity: a new one is made at the next connect. */
     fun forgetIdentity() {
         secrets.edit().remove("identity").apply()

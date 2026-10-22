@@ -188,6 +188,15 @@ private fun App() {
     androidx.compose.runtime.LaunchedEffect(state.stream.watching) { MainActivity.current?.updatePip() }
     if (state.phase == Session.Phase.IDLE) {
         Connect(state, favs)
+        // The server needs a higher security level than our identity's: raise it, then connect again
+        if (state.neededLevel > 0) {
+            val current = remember { IdentityRaise.level(ctx) }
+            if (current != null) {
+                io.github.korppujauho.pocketts.ui.RaiseLevelDialog(
+                    current, needed = state.neededLevel, onReached = Session::connectAgain, onClose = Session::dismissNeededLevel,
+                )
+            }
+        }
     } else {
         val egl = Session.streams().egl
         androidx.compose.foundation.layout.Box {
@@ -364,6 +373,7 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     }
     override fun identityProblem(): String? = Settings(context).identityProblem()
     override fun forgetIdentity() = Settings(context).forgetIdentity()
+    override fun securityLevel(): Int? = IdentityRaise.level(context)
     override fun clearChatHistory() = Session.clearChatHistory(context)
     override fun forgetChannelPasswords() = ChannelPasswords(context).clear()
 }
