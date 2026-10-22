@@ -12,6 +12,7 @@
 #   scripts/dev.sh gradle <args>      any Gradle command
 #   scripts/dev.sh keystore           make the release key (once; keep it safe, see DEVELOPING.md)
 #   scripts/dev.sh release            the signed release APK -> dist/ (asks for the key's password)
+#   scripts/dev.sh play-key PEPK PEM  the release key, encrypted for Google Play App Signing (asks for the password)
 #
 # This machine's own settings go in dev.env next to this repo's README (never committed), for example:
 #   TS_CONTAINER=my-teamspeak-test      an existing TeamSpeak test server container
@@ -124,8 +125,24 @@ case "${1:-}" in
       "cp /out/app/outputs/apk/release/app-release.apk /dist/PocketTS-$VERSION.apk && cd /dist && sha256sum PocketTS-$VERSION.apk"
     echo "dist/PocketTS-$VERSION.apk is ready to attach to the GitHub release."
     ;;
+  play-key)
+    # Google Play signs the app with our own release key, so the Play and GitHub versions are the same app.
+    # Play Console gives pepk.jar and an encryption key (.pem); pepk encrypts the release key with it, so only Google
+    # can open the result. The result goes next to the .pem, to upload in Play Console.
+    [ -f "$KEYSTORE" ] || { echo "No release key at $KEYSTORE"; exit 1; }
+    PEPK="${1:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
+    PEM="${2:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
+    [ -f "$PEPK" ] && [ -f "$PEM" ] || { echo "Can't find $PEPK or $PEM"; exit 1; }
+    OUT="$(cd "$(dirname "$PEM")" && pwd)"
+    docker run --rm -it --user "$(id -u):$(id -g)" -e HOME=/tmp \
+      -v "$(dirname "$KEYSTORE")":/keys:ro -v "$(realpath "$PEPK")":/tools/pepk.jar:ro -v "$OUT":/play \
+      "$IMAGE" java -jar /tools/pepk.jar --keystore="/keys/$(basename "$KEYSTORE")" --alias=pocketts \
+      --output=/play/pocketts-play-signing-key.zip --include-cert --rsa-aes-encryption \
+      --encryption-key-path="/play/$(basename "$PEM")"
+    echo "Upload $OUT/pocketts-play-signing-key.zip in Play Console (it's encrypted for Google), then delete it."
+    ;;
   *)
-    sed -n '2,21p' "$0"
+    sed -n '2,22p' "$0"
     exit 1
     ;;
 esac

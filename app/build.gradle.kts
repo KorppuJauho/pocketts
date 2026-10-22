@@ -56,6 +56,13 @@ android {
             // The GitHub release asks GitHub for newer versions (a Google Play build won't)
             buildConfigField("boolean", "UPDATE_CHECK", "true")
         }
+        // The Google Play version: the release as an app bundle (bundlePlay), the same app and key, but without the
+        // GitHub update check (Play updates it)
+        create("play") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            buildConfigField("boolean", "UPDATE_CHECK", "false")
+        }
         // The release, shrunk the same way, but signed with the test key and sending its log like a test build:
         // to find what shrinking broke (scripts/dev.sh apk-shrunk). An app of its own (".shrunk").
         create("shrunk") {
