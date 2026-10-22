@@ -27,7 +27,8 @@ Your TeamSpeak identity and saved passwords are encrypted on the phone. No accou
 GitHub version asks GitHub once a day whether there's a newer version (you can turn that off in Settings).
 
 **Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
-[issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned.
+[issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Security problems: please report them
+privately, see [SECURITY.md](SECURITY.md).
 
 ## Install
 
