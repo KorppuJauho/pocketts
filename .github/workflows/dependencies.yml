@@ -24,7 +24,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: gradle/actions/dependency-submission@v4
+      - uses: gradle/actions/dependency-submission@v6
         with:
           # Only what goes into the app, not the build's own tools
           dependency-graph-include-configurations: ".*[rR]untimeClasspath"
