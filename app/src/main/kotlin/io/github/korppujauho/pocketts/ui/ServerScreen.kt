@@ -61,6 +61,12 @@ interface ServerActions {
     fun openPrivate(person: ServerModel.Client)
     fun closePrivate(uid: String)
     fun poke(person: ServerModel.Client, text: String)
+    /** Admin: into another channel. */
+    fun moveClient(person: ServerModel.Client, channelId: Int) {}
+    /** Admin: out of their channel, or off the server. */
+    fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) {}
+    /** Admin: banned for [seconds] (0: for good). */
+    fun ban(person: ServerModel.Client, seconds: Long, reason: String) {}
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
@@ -117,6 +123,10 @@ fun ServerScreen(
     var rememberAgain by remember { mutableStateOf(false) }
     var person by remember { mutableStateOf<ServerModel.Client?>(null) }
     var pokeTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
+    // Admin actions on a person (Settings › UI › Show admin functions)
+    var moveTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
+    var kickTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
+    var banTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
     val items = remember(state.tree) { flattenTree(state.tree) }
 
@@ -356,7 +366,23 @@ fun ServerScreen(
             onDismiss = { person = null },
             away = state.away, awayMessage = state.awayMessage,
             onAway = { a, m -> actions.setAway(a, m) },
+            admin = state.voice.adminTools,
+            onMove = { person = null; moveTarget = p },
+            onKick = { person = null; kickTarget = p },
+            onBan = { person = null; banTarget = p },
         )
+    }
+    moveTarget?.let { p ->
+        MoveDialog(
+            p, state.tree, spacers = state.voice.joinSpacers,
+            onMove = { actions.moveClient(p, it); moveTarget = null }, onDismiss = { moveTarget = null },
+        )
+    }
+    kickTarget?.let { p ->
+        KickDialog(p, onKick = { server, reason -> actions.kick(p, server, reason); kickTarget = null }, onDismiss = { kickTarget = null })
+    }
+    banTarget?.let { p ->
+        BanDialog(p, onBan = { seconds, reason -> actions.ban(p, seconds, reason); banTarget = null }, onDismiss = { banTarget = null })
     }
     addingFavorite?.let { f ->
         FavoriteDialog(f, onSave = { actions.addFavorite(it); addingFavorite = null }, onDelete = null) { addingFavorite = null }

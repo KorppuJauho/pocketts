@@ -27,6 +27,7 @@ data class VoiceSettings(
     val overlayPtt: Boolean = false, // the push-to-talk button stays on screen over other apps
     val uiSounds: Boolean = true, // sounds for events (people coming and going, messages, pokes, streams, the buttons)
     val uiSoundVolume: Float = 0.6f, // their volume, 0 - 1
+    val adminTools: Boolean = false, // the person menu offers move, kick and ban (the server decides who may)
 ) {
     enum class Activation { VAD, PTT, CONTINUOUS }
 
@@ -67,6 +68,7 @@ data class VoiceSettings(
                 overlayPtt = p.getBoolean("overlayPtt", d.overlayPtt),
                 uiSounds = p.getBoolean("uiSounds", d.uiSounds),
                 uiSoundVolume = p.getFloat("uiSoundVolume", d.uiSoundVolume),
+                adminTools = p.getBoolean("adminTools", d.adminTools),
             )
         }
     }
@@ -96,6 +98,7 @@ data class VoiceSettings(
             .putBoolean("overlayPtt", overlayPtt)
             .putBoolean("uiSounds", uiSounds)
             .putFloat("uiSoundVolume", uiSoundVolume)
+            .putBoolean("adminTools", adminTools)
             .apply()
         secretPrefs(context).edit().putSecret("turnPassword", TURN_PASSWORD, turnPassword).apply()
     }
