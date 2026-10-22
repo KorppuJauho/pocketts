@@ -109,7 +109,7 @@ fun BanDialog(person: ServerModel.Client, onBan: (seconds: Long, reason: String)
     var reason by remember { mutableStateOf("") }
     TsDialog(
         onDismiss = onDismiss, title = "Ban ${person.nickname}", icon = Icons.Rounded.Block, tint = Ts.red,
-        subtitle = "Their identity and IP address are banned, and they're removed from the server",
+        subtitle = "Bans their identity and IP address",
         buttons = {
             PillButton("Cancel", onClick = onDismiss)
             PillButton("Ban", PillKind.DANGER) { onBan(seconds, reason) }

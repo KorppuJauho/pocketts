@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,9 +75,13 @@ fun PersonSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss, containerColor = Pop.bottom,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), dragHandle = { SheetHandle() },
+        // Open all the way (with the admin row it's taller than half the screen)
+        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
+        // Above the phone's navigation buttons, and scrolling on a short screen
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 8.dp, bottom = 28.dp),
+            Modifier.fillMaxWidth().verticalScroll(androidx.compose.foundation.rememberScrollState()).navigationBarsPadding()
+                .padding(horizontal = 20.dp).padding(top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Who: the picture with a ring, the name, the description and whether they're away
