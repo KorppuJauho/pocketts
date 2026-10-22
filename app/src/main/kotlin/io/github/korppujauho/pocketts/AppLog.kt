@@ -1,5 +1,8 @@
 package io.github.korppujauho.pocketts
 
+import android.app.ActivityManager
+import android.app.ApplicationExitInfo
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import java.net.HttpURLConnection
@@ -20,7 +23,7 @@ object AppLog {
     private val time = SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT)
     @Volatile private var started = false
 
-    fun start() {
+    fun start(context: Context) {
         val url = BuildConfig.DEV_LOG_URL
         if (started || url.isEmpty()) return
         started = true
@@ -32,6 +35,46 @@ object AppLog {
             previous?.uncaughtException(t, e)
         }
         log("Started ${BuildConfig.VERSION_NAME} on ${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE}")
+        lastStops(context)
+    }
+
+    // Why the app stopped the last times, as Android recorded it: a crash in native code (WebRTC's) or Android
+    // stopping the app leaves no line of its own
+    private fun lastStops(context: Context) {
+        if (Build.VERSION.SDK_INT < 30) return
+        val stops = try {
+            context.getSystemService(ActivityManager::class.java)?.getHistoricalProcessExitReasons(null, 0, 5)
+        } catch (_: Exception) {
+            null
+        } ?: return
+        for (s in stops) {
+            val at = synchronized(time) { time.format(Date(s.timestamp)) }
+            log("Stopped before at $at: reason ${s.reason}, ${s.description.orEmpty()} (status ${s.status}, importance ${s.importance}, ${s.pss / 1024} MB)")
+            val trace = when (s.reason) {
+                ApplicationExitInfo.REASON_ANR -> readTrace(s)?.toString(Charsets.UTF_8)?.lineSequence()?.take(60)?.toList()
+                // A tombstone, in a binary format: its readable parts (the stack's functions and libraries) are enough
+                ApplicationExitInfo.REASON_CRASH_NATIVE -> readTrace(s)?.let { bytes ->
+                    Regex("[ -~]{8,}").findAll(String(bytes, Charsets.ISO_8859_1)).map { it.value }.take(150).toList()
+                }
+                else -> null
+            }
+            trace?.let { log("  " + it.joinToString("\n  ")) }
+        }
+    }
+
+    private fun readTrace(s: ApplicationExitInfo): ByteArray? = try {
+        s.traceInputStream?.use { input ->
+            val out = java.io.ByteArrayOutputStream()
+            val buffer = ByteArray(8192)
+            while (out.size() < 512 * 1024) {
+                val n = input.read(buffer)
+                if (n < 0) break
+                out.write(buffer, 0, n)
+            }
+            out.toByteArray()
+        }
+    } catch (_: Exception) {
+        null
     }
 
     fun log(msg: String) {

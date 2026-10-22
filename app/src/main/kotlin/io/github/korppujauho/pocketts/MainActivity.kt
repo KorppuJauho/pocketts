@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppLog.start()
+        AppLog.start(this)
         FrameLog.start(this)
         ServerFiles.install(applicationContext)
         enableEdgeToEdge(
