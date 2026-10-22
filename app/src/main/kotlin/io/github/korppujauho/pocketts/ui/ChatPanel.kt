@@ -120,10 +120,13 @@ fun ChatPanel(
     }) {
         val key = if (view is Chat.Key.Channel) Chat.Key.Channel(state.ownChannel) else view
         val entries = state.chat[key].orEmpty()
-        Messages(entries, emptyText = when (key) {
-            is Chat.Key.Channel -> "No messages in this channel yet."
-            is Chat.Key.Private -> "No messages yet."
-        }, state)
+        // Each conversation its own list, so switching tabs opens the other one at its newest line too
+        androidx.compose.runtime.key(key) {
+            Messages(entries, emptyText = when (key) {
+                is Chat.Key.Channel -> "No messages in this channel yet."
+                is Chat.Key.Private -> "No messages yet."
+            }, state)
+        }
         val target = when (key) {
             is Chat.Key.Channel -> state.ownChannelName.ifEmpty { "the channel" }
             is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name ?: "them"
@@ -158,8 +161,14 @@ private fun ColumnScope.Messages(entries: List<Chat.Entry>, emptyText: String, s
     var viewing by remember { mutableStateOf<Viewing?>(null) }
     viewing?.let { PictureViewer(it.model, it.shown) { viewing = null } }
     val open = remember { { v: Viewing -> viewing = v } }
-    val list = rememberLazyListState()
-    LaunchedEffect(entries.size) { if (entries.isNotEmpty()) list.animateScrollToItem(entries.size - 1) }
+    // Opened at the newest line straight away; only lines coming in while it's open scroll there
+    val list = rememberLazyListState(initialFirstVisibleItemIndex = (entries.size - 1).coerceAtLeast(0))
+    var opened by remember { mutableStateOf(false) }
+    LaunchedEffect(entries.size) {
+        if (entries.isEmpty()) return@LaunchedEffect
+        if (opened) list.animateScrollToItem(entries.size - 1) else list.scrollToItem(entries.size - 1)
+        opened = true
+    }
     if (entries.isEmpty()) {
         Box(Modifier.fillMaxWidth().weight(1f).padding(top = 40.dp), contentAlignment = Alignment.TopCenter) {
             Text(emptyText, color = Ts.muted, fontSize = 14.sp)
