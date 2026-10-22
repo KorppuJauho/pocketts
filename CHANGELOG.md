@@ -1,21 +1,25 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (2026-10-22)
 
-- Smoother chat with pictures: a picture's place is kept for it while it loads (from its size the time before), so
-  the chat no longer jumps; the chat shows pictures only as big as it draws them, and tapping one opens the whole
-  picture, sharp when zoomed in; chat lines are no longer drawn again each time someone starts or stops talking;
-  the same picture is downloaded only once at a time, and big pictures are read from the phone's copy as they're
-  drawn instead of first all into memory.
+- **Several pictures at once:** choose up to 10 from the gallery. They show in a row above the message box, each can
+  be taken off, and a photo from the camera joins the row too. They're sent one message each in order, with the
+  words on the first, and the chat shows which one is being sent.
+- **Save and share pictures:** a picture opened on the whole screen has Save (into the gallery, under
+  Pictures/PocketTS) and Share (Android's share menu) next to the close button.
+- **Smoother chat with pictures:**
+  - A picture's place is kept for it while it loads (from its size the time before), so the chat no longer jumps.
+  - The chat shows pictures only as big as it draws them, and tapping one opens the whole picture, sharp when zoomed
+    in.
+  - Chat lines are no longer drawn again each time someone starts or stops talking.
+  - The same picture is downloaded only once at a time, and big pictures are read from the phone's copy as they're
+    drawn instead of first all into memory.
 - The chat opens at its newest line straight away, instead of scrolling down past the older ones.
-- Test builds log how smoothly the screen draws (frames, late frames, the slowest) every 10 seconds.
 - A wrong server address or port now says "Couldn't connect: no answer from the server. Check the address and port."
   instead of "Connection lost", and a name that doesn't exist says that no server was found at it.
-- A picture opened on the whole screen has Save (into the gallery, under Pictures/PocketTS) and Share (Android's
-  share menu) next to the close button.
-- Several pictures can be chosen from the gallery at once (up to 10): they show in a row above the message box, each
-  can be taken off, and they're sent one message each in order, with the words on the first. A photo from the camera
-  joins the row too. While several go, the chat shows which one is being sent.
+- Releases are built by GitHub Actions from the tagged commit, with a build attestation: anyone can check that a
+  release APK came from this repository (see SECURITY.md). Security problems can be reported privately.
+- Test builds log how smoothly the screen draws (frames, late frames, the slowest) every 10 seconds.
 
 ## 1.0.0 (2026-10-21)
 

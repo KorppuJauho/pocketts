@@ -6,11 +6,7 @@
 A free, unofficial TeamSpeak client for Android, made for TeamSpeak 6 servers. Type a nickname and a server address
 to join.
 
-<p>
-  <img src="docs/screenshots/server.png" width="200" alt="The server view: channels and the people in them">
-  <img src="docs/screenshots/chat.png" width="200" alt="The channel chat">
-  <img src="docs/screenshots/popup-person.png" width="200" alt="A person's menu: volume, poke and private chat">
-</p>
+<img src="docs/screenshots/overview.png" alt="PocketTS screens: the channels and the people in them, the channel chat, a person's menu (volume, poke and private chat), and the settings">
 
 ## What it does
 
