@@ -55,7 +55,7 @@ class StreamEngine(
         val watchMuted: Boolean = false,
         val sharing: Streams.Kind? = null,
         val shareLive: Boolean = false,
-        val shareSound: Boolean = false, // our camera stream carries the microphone
+        val shareSound: Boolean = false, // our stream carries sound (a camera's: the microphone; the screen's: what the phone plays)
         val soundPaused: Boolean = false, // ... silent just now (microphone muted, or talking in the channel)
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
@@ -96,6 +96,11 @@ class StreamEngine(
             .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
             .setUseHardwareAcousticEchoCanceler(echo)
             .setUseHardwareNoiseSuppressor(false) // the surroundings are heard (as WebTS does it)
+            // Sharing the screen with its sound, the microphone is off and the phone's sound is put in its place
+            .setAudioBufferCallback { buffer, encoding, channels, rate, bytes, time ->
+                phoneSound?.fill(buffer, encoding, channels, rate, bytes)
+                time
+            }
             .createAudioDeviceModule()
         val f = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(DefaultVideoEncoderFactory(egl.eglBaseContext, true, true))
@@ -342,6 +347,7 @@ class StreamEngine(
         CameraTurn(context).also { t -> t.onTurn = { deg -> exec.execute { if (state.sharing == Streams.Kind.CAMERA || deg == 0) update { it.copy(phoneTurn = deg) } } } }
     }
     private var dual: DualCamera? = null
+    @Volatile private var phoneSound: ScreenSound? = null
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
@@ -374,10 +380,13 @@ class StreamEngine(
         startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound)
     }
 
-    /** The stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
+    // The phone's sound (a screen share's) goes on while you talk; the microphone's (a camera's) doesn't
+    private fun paused() = phoneSound == null && soundPaused()
+
+    /** The camera stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
     fun refreshSound() = exec.execute {
         if (sound == null) return@execute
-        val paused = soundPaused()
+        val paused = paused()
         // The microphone muted, not the track: muted, it still delivers (silence) at full time. A track switched off
         // sent nothing, so each pause dropped out of the sound's timeline and viewers heard it that much later.
         madeAudio?.setMicrophoneMute(paused)
@@ -407,7 +416,7 @@ class StreamEngine(
     }
 
     /** Starts sharing the screen, with the permission Android gave ([projection]: its result). */
-    fun shareScreen(projection: Intent, width: Int, height: Int, name: String) = exec.execute {
+    fun shareScreen(projection: Intent, width: Int, height: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
         val cap = ScreenCapturerAndroid(projection, object : MediaProjection.Callback() {
             override fun onStop() = stopShare()
@@ -415,7 +424,7 @@ class StreamEngine(
         // At most 1920 on the long side, the screen's shape kept
         val scale = minOf(1.0, 1920.0 / maxOf(width, height))
         bitrate = 4000
-        startCapture(cap, true, (width * scale).toInt() / 2 * 2, (height * scale).toInt() / 2 * 2, Streams.Kind.SCREEN, name)
+        startCapture(cap, true, (width * scale).toInt() / 2 * 2, (height * scale).toInt() / 2 * 2, Streams.Kind.SCREEN, name, withSound)
     }
 
     private fun startCapture(
@@ -430,22 +439,33 @@ class StreamEngine(
             cap.startCapture(w, h, fps)
             capturer = cap; source = src; helper = help
             track = factory.createVideoTrack("share", src)
-            if (withSound) {
+            // The screen's sound is what the phone plays: recorded through the share's own permission
+            val phone = if (withSound && cap is ScreenCapturerAndroid) cap.mediaProjection?.let { ScreenSound(it) } else null
+            if (phone != null) {
+                phoneSound = phone
+                madeAudio?.setAudioRecordEnabled(false)
+            } else if (withSound && cap is ScreenCapturerAndroid) {
+                log("No screen to record the sound with: sharing without it")
+            }
+            if (withSound && (cap !is ScreenCapturerAndroid || phone != null)) {
+                fun option(key: String, on: Boolean) = org.webrtc.MediaConstraints.KeyValuePair(key, "$on")
                 val constraints = org.webrtc.MediaConstraints().apply {
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googEchoCancellation", "${settings().echoCancellation}"))
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googNoiseSuppression", "false"))
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
+                    // The phone's sound as it is: no echo cancelling, levelling or filtering meant for a voice
+                    mandatory.add(option("googEchoCancellation", phone == null && settings().echoCancellation))
+                    mandatory.add(option("googNoiseSuppression", false))
+                    mandatory.add(option("googAutoGainControl", phone == null))
+                    if (phone != null) mandatory.add(option("googHighpassFilter", false))
                 }
                 soundSource = factory.createAudioSource(constraints)
                 sound = factory.createAudioTrack("share-sound", soundSource)
             }
             // Without stream sound, the stream's microphone stays muted too (WebRTC would send it on the sound line)
-            madeAudio?.setMicrophoneMute(sound == null || soundPaused())
+            madeAudio?.setMicrophoneMute(sound == null || paused())
             sharePending = true
             update {
                 it.copy(
                     sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked,
-                    lockedTurn = turn.extra(false), shareSound = sound != null, soundPaused = sound != null && soundPaused(),
+                    lockedTurn = turn.extra(false), shareSound = sound != null, soundPaused = sound != null && paused(),
                 )
             }
             send(Streams.setup(name, kind, bitrate, audio = sound != null, returnCode = rc("setup")))
@@ -516,6 +536,8 @@ class StreamEngine(
         statsTask = null
         shareId = null
         sharePending = false
+        // First, so WebRTC's recording loop isn't left waiting for the phone's sound while the viewers are let go
+        phoneSound?.stop()
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
@@ -523,6 +545,7 @@ class StreamEngine(
     }
 
     private fun releaseCapture() {
+        phoneSound?.stop()
         turn.stop()
         try { capturer?.stopCapture() } catch (_: Exception) {}
         capturer?.dispose(); capturer = null
@@ -532,6 +555,11 @@ class StreamEngine(
         sound?.dispose(); sound = null
         soundSource?.dispose(); soundSource = null
         helper?.dispose(); helper = null
+        phoneSound?.let { p ->
+            madeAudio?.setAudioRecordEnabled(true)
+            phoneSound = null
+            p.release()
+        }
     }
 
     /** Someone asks to watch our share: everyone may, so they get our offer right away. */

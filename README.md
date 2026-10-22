@@ -16,7 +16,7 @@ to join.
   password.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
 - **Streams:** watch others' screen and camera streams (also in a small window over other apps), and share your own
-  camera or screen.
+  camera (with your microphone) or screen (with what the phone plays).
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 
 Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking. The
