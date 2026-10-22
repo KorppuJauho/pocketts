@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- A wrong server address or port now says "Couldn't connect: no answer from the server. Check the address and port."
+  instead of "Connection lost", and a name that doesn't exist says that no server was found at it.
+
 ## 1.0.0 (2026-10-21)
 
 The first release.
