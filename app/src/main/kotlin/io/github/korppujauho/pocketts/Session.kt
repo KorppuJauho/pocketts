@@ -541,16 +541,13 @@ object Session : TsClient.Listener {
     )
 
     /**
-     * Banned by their identity, for [seconds] (0: for good). The server removes them at once. Not by their address:
-     * others on the same network (a mobile network, a home) may share it.
+     * Banned for [seconds] (0: for good), as the TeamSpeak app bans: the server bans both their identity and their
+     * address (so a new identity doesn't get them back in) and removes them at once.
      */
-    fun ban(person: ServerModel.Client, seconds: Long, reason: String) {
-        if (person.uid.isEmpty()) return
-        admin(
-            "ban ${person.nickname}", "banadd", "uid" to person.uid, "time" to seconds,
-            "banreason" to reason.trim().take(REASON_MAX).ifEmpty { null },
-        )
-    }
+    fun ban(person: ServerModel.Client, seconds: Long, reason: String) = admin(
+        "ban ${person.nickname}", "banclient", "clid" to person.id, "time" to seconds,
+        "banreason" to reason.trim().take(REASON_MAX).ifEmpty { null },
+    )
 
     /** The longest reason given with a kick or a ban (TeamSpeak's limit). */
     const val REASON_MAX = 40

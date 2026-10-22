@@ -102,14 +102,14 @@ fun KickDialog(person: ServerModel.Client, onKick: (fromServer: Boolean, reason:
     }
 }
 
-/** Banning someone for a while or for good. By their identity: the server removes them at once. */
+/** Banning someone for a while or for good: their identity and address, and the server removes them at once. */
 @Composable
 fun BanDialog(person: ServerModel.Client, onBan: (seconds: Long, reason: String) -> Unit, onDismiss: () -> Unit) {
     var seconds by remember { mutableLongStateOf(3600L) }
     var reason by remember { mutableStateOf("") }
     TsDialog(
         onDismiss = onDismiss, title = "Ban ${person.nickname}", icon = Icons.Rounded.Block, tint = Ts.red,
-        subtitle = "Their identity is banned, and they're removed from the server",
+        subtitle = "Their identity and IP address are banned, and they're removed from the server",
         buttons = {
             PillButton("Cancel", onClick = onDismiss)
             PillButton("Ban", PillKind.DANGER) { onBan(seconds, reason) }
