@@ -1,0 +1,82 @@
+# The release: pushing a tag v<version> (the same as versionName in app/build.gradle.kts) builds the signed APK from
+# that commit, records where it was built (a build attestation anyone can check), and makes a draft release with the
+# APK attached. Publishing the draft stays a person's step. See DEVELOPING.md, "Releasing".
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write      # the draft release
+  id-token: write      # signing the attestation
+  attestations: write  # storing it
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    # The release key is in this environment's secrets, which only v* tags can use
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the version
+        run: |
+          VERSION=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::The tag is $GITHUB_REF_NAME but versionName is $VERSION"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      # The same build environment as scripts/dev.sh uses
+      - name: Build image
+        run: docker build -f docker/build.Dockerfile -t pocketts-build --build-arg ACCEPT_ANDROID_SDK_LICENSE=yes docker
+
+      - name: Build the signed APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.POCKETTS_KEYSTORE_BASE64 }}
+          POCKETTS_KEYSTORE_PASSWORD: ${{ secrets.POCKETTS_KEYSTORE_PASSWORD }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys" out
+          trap 'rm -rf "$RUNNER_TEMP/keys"' EXIT
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > "$RUNNER_TEMP/keys/release.keystore"
+          docker run --rm \
+            -v "$PWD":/work -v "$PWD/out":/out -v "$RUNNER_TEMP/keys":/keys:ro \
+            -e POCKETTS_BUILD_ROOT=/out \
+            -e POCKETTS_KEYSTORE_FILE=/keys/release.keystore -e POCKETTS_KEYSTORE_PASSWORD \
+            pocketts-build ./gradlew --no-daemon --console=plain :app:testDebugUnitTest :tsproto:test :app:assembleRelease
+          mkdir dist
+          cp out/app/outputs/apk/release/app-release.apk "dist/PocketTS-$VERSION.apk"
+
+      - name: Check the signature
+        run: |
+          APKSIGNER=$(docker run --rm pocketts-build bash -c 'ls /opt/android-sdk/build-tools/*/apksigner | head -1')
+          CERTS=$(docker run --rm -v "$PWD/dist":/dist pocketts-build "$APKSIGNER" verify --print-certs "/dist/PocketTS-$VERSION.apk")
+          grep -q "CN=PocketTS" <<< "$CERTS" || { echo "::error::The APK isn't signed with the release key"; exit 1; }
+
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/PocketTS-${{ env.VERSION }}.apk
+
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK="dist/PocketTS-$VERSION.apk"
+          SHA=$(sha256sum "$APK" | cut -d' ' -f1)
+          # This version's lines from the changelog
+          CHANGES=$(awk -v v="## $VERSION" 'index($0, v) == 1 {on = 1; next} /^## / {on = 0} on' CHANGELOG.md)
+          {
+            echo "$CHANGES"
+            echo
+            echo "## Install"
+            echo
+            echo "Download **PocketTS-$VERSION.apk** below and open it on the phone (Android 10 or newer)."
+            echo
+            echo "SHA-256: \`$SHA\`"
+            echo
+            echo "This APK was built by GitHub Actions from the tagged commit. To check that, with the GitHub CLI:"
+            echo "\`gh attestation verify PocketTS-$VERSION.apk --repo $GITHUB_REPOSITORY\`"
+          } > notes.md
+          gh release create "$GITHUB_REF_NAME" "$APK" --draft --verify-tag --title "PocketTS $VERSION" --notes-file notes.md
