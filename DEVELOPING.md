@@ -61,15 +61,16 @@ phone.
    git tag v1.1.0 origin/main
    git push origin v1.1.0
    ```
-4. The workflow checks that the tag matches `versionName`, runs the tests, builds and signs the APK, checks its
-   signature, records a build attestation and makes a **draft** release with the APK, its SHA-256 and the changelog
-   lines.
+4. The workflow checks that the tag matches `versionName`, runs the tests, builds and signs the APK and the Google
+   Play bundle, checks their signatures, records build attestations and makes a **draft** release with the APK, its
+   SHA-256 and the changelog lines. The Play bundle stays with the run (Artifacts).
 5. Download the APK from the draft, install it on a phone and try the basics: connect, talk, chat, a picture, a
    stream. If the release crashes where a test build doesn't, shrinking removed something: `scripts/dev.sh apk-shrunk`
    makes the same shrunk app with the test key, sending its log to the test page like a test build, so the error
    shows (a crash in native code leaves no line: then look for a class the native code needs, see
    `app/proguard-rules.pro`).
 6. Publish the draft.
+7. Upload the Play bundle to Google Play: see [docs/play/README.md](docs/play/README.md).
 
 Anyone can check that a release APK was built by this repository's workflow:
 
