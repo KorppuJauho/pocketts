@@ -197,7 +197,7 @@ object Example {
         override fun setVolume(person: ServerModel.Client, volume: Float) {}
         override fun viewing(key: Chat.Key?) {}
         override fun setPtt(held: Boolean) {}
-        override fun sendPicture(uri: android.net.Uri, text: String) {}
+        override fun sendPictures(uris: List<android.net.Uri>, text: String) {}
         override fun setAway(away: Boolean, message: String) {}
         override fun switchTo(f: Favorite) {}
         override fun addFavorite(f: Favorite) {}

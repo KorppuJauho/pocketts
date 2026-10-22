@@ -54,6 +54,7 @@ object Session : TsClient.Listener {
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
+        val sendingProgress: Pair<Int, Int>? = null, // sending several pictures: which one (from 1), of how many
         val waitingForOld: Boolean = false, // reconnecting, but the server still has our old connection
         val retryPassword: Int = 0, // a channel whose password was just refused: its password is asked again
         val retryRemember: Boolean = false, // ... and whether that one was to be remembered
@@ -687,28 +688,40 @@ object Session : TsClient.Listener {
      * Sends a picture into our channel's chat: into the channel's files (/PocketTS), then one message with the picture and
      * [text] (if any) under it, as the TeamSpeak app sends them.
      */
-    fun sendPicture(context: Context, uri: android.net.Uri, text: String = "") {
+    /**
+     * Pictures to the channel, one message each in the order chosen (as the TeamSpeak app shows them), the words with
+     * the first. A picture that fails stops the rest (the reason, like no permission, would stop them too).
+     */
+    fun sendPictures(context: Context, uris: List<android.net.Uri>, text: String = "") {
         val c = client ?: return
         val f = files ?: return
+        if (uris.isEmpty()) return
         val cid = _state.value.ownChannel
-        _state.update { it.copy(sendingPicture = true) }
+        _state.update { it.copy(sendingPicture = true, sendingProgress = if (uris.size > 1) 1 to uris.size else null) }
         worker.execute {
+            var n = 0
+            // Which one failed, when there were several
+            fun which() = if (uris.size > 1) "Picture $n of ${uris.size}" else "The picture"
             try {
-                val p = ServerFiles.prepareChatPicture(context, uri)
-                val name = io.github.korppujauho.pocketts.proto.Pictures.pictureName(p.type, java.util.UUID.randomUUID().toString().take(6))
                 f.createDirectory(cid, io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER)
-                f.upload(cid, "${io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER}/$name", p.bytes)
-                val picture = io.github.korppujauho.pocketts.proto.Pictures.pictureMessage(name, cid)
-                val words = text.trim().take(1000 - picture.length)
-                val msg = if (words.isEmpty()) picture else "$picture\n$words"
-                c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to msg))
-                AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
+                for (uri in uris) {
+                    n++
+                    if (uris.size > 1) _state.update { it.copy(sendingProgress = n to uris.size) }
+                    val p = ServerFiles.prepareChatPicture(context, uri)
+                    val name = io.github.korppujauho.pocketts.proto.Pictures.pictureName(p.type, java.util.UUID.randomUUID().toString().take(6))
+                    f.upload(cid, "${io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER}/$name", p.bytes)
+                    val picture = io.github.korppujauho.pocketts.proto.Pictures.pictureMessage(name, cid)
+                    val words = if (n == 1) text.trim().take(1000 - picture.length) else ""
+                    val msg = if (words.isEmpty()) picture else "$picture\n$words"
+                    c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to cid, "msg" to msg))
+                    AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
+                }
             } catch (e: FileTransfer.Error) {
-                _state.update { it.copy(error = "The picture wasn't sent: ${e.message}" + if (e.code == 2568) " (no permission in this channel)" else "") }
+                _state.update { it.copy(error = "${which()} wasn't sent: ${e.message}" + if (e.code == 2568) " (no permission in this channel)" else "") }
             } catch (e: Exception) {
-                _state.update { it.copy(error = "The picture wasn't sent: ${e.message}") }
+                _state.update { it.copy(error = "${which()} wasn't sent: ${e.message}") }
             } finally {
-                _state.update { it.copy(sendingPicture = false) }
+                _state.update { it.copy(sendingPicture = false, sendingProgress = null) }
             }
         }
     }

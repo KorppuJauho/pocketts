@@ -7,9 +7,15 @@
   picture, sharp when zoomed in; chat lines are no longer drawn again each time someone starts or stops talking;
   the same picture is downloaded only once at a time, and big pictures are read from the phone's copy as they're
   drawn instead of first all into memory.
+- The chat opens at its newest line straight away, instead of scrolling down past the older ones.
 - Test builds log how smoothly the screen draws (frames, late frames, the slowest) every 10 seconds.
 - A wrong server address or port now says "Couldn't connect: no answer from the server. Check the address and port."
   instead of "Connection lost", and a name that doesn't exist says that no server was found at it.
+- A picture opened on the whole screen has Save (into the gallery, under Pictures/PocketTS) and Share (Android's
+  share menu) next to the close button.
+- Several pictures can be chosen from the gallery at once (up to 10): they show in a row above the message box, each
+  can be taken off, and they're sent one message each in order, with the words on the first. A photo from the camera
+  joins the row too. While several go, the chat shows which one is being sent.
 
 ## 1.0.0 (2026-10-21)
 
