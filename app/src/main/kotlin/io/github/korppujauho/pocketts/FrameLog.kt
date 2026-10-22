@@ -22,7 +22,10 @@ object FrameLog {
     /** For each new window (the activity is made again when the phone turns). */
     fun start(activity: Activity) {
         if (BuildConfig.DEV_LOG_URL.isEmpty()) return
-        val refreshNs = (1_000_000_000 / (activity.display?.refreshRate ?: 60f)).toLong()
+        // The screen's refresh (Activity.display is Android 11+; Android 10 has only the older way)
+        @Suppress("DEPRECATION")
+        val hz = (if (android.os.Build.VERSION.SDK_INT >= 30) activity.display?.refreshRate else activity.windowManager.defaultDisplay.refreshRate) ?: 60f
+        val refreshNs = (1_000_000_000 / hz).toLong()
         activity.window.addOnFrameMetricsAvailableListener(Window.OnFrameMetricsAvailableListener { _, m, _ ->
             if (m.getMetric(FrameMetrics.FIRST_DRAW_FRAME) == 1L) return@OnFrameMetricsAvailableListener
             val took = m.getMetric(FrameMetrics.TOTAL_DURATION)
