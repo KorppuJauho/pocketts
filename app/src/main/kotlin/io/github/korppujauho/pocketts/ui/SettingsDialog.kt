@@ -57,6 +57,8 @@ import io.github.korppujauho.pocketts.VoiceSettings
 import io.github.korppujauho.pocketts.VoiceSettings.Activation
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import io.github.korppujauho.pocketts.R
 
 /** What the settings window needs besides the settings themselves. */
 interface SettingsActions {
@@ -132,9 +134,9 @@ fun SettingsContent(
             modifier.clip(RoundedCornerShape(12.dp)).background(Ts.panel),
         ) {
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Settings", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.settings), color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                 androidx.compose.material3.Icon(
-                    androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Ts.muted,
+                    androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.muted,
                     modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onDismiss).padding(4.dp),
                 )
             }
@@ -143,7 +145,7 @@ fun SettingsContent(
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp).padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                listOf("General", "Playback", "Capture", "UI", "Advanced").forEachIndexed { i, name ->
+                listOf(R.string.settings_general, R.string.settings_playback, R.string.settings_capture, R.string.settings_ui, R.string.advanced).map { stringResource(it) }.forEachIndexed { i, name ->
                     val active = i == tab
                     Text(
                         name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
@@ -176,7 +178,7 @@ fun SettingsContent(
                 }
             }
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
-                PrimaryButton("Save & Apply") { actions.save(v, nick.trim()); onDismiss() }
+                PrimaryButton(stringResource(R.string.settings_save)) { actions.save(v, nick.trim()); onDismiss() }
             }
         }
     }
@@ -239,18 +241,18 @@ private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
     val pick = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(),
     ) { uri -> if (uri != null) actions.setAvatar(uri) }
-    Group("Profile picture") {
+    Group(stringResource(R.string.avatar_title)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             PersonAvatar(self.person, self.server, 88)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton("Change") {
+                SecondaryButton(stringResource(R.string.avatar_change)) {
                     pick.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
                 }
-                if (self.person?.avatar?.isNotEmpty() == true) SecondaryButton("Remove") { actions.removeAvatar() }
+                if (self.person?.avatar?.isNotEmpty() == true) SecondaryButton(stringResource(R.string.remove)) { actions.removeAvatar() }
             }
         }
         self.avatarStatus?.let { Desc(it) }
-        Desc("Others see it on this server. It's made to fit 320 × 320.")
+        Desc(stringResource(R.string.avatar_desc))
     }
 }
 
@@ -259,8 +261,11 @@ private fun Identity(actions: SettingsActions) {
     var importing by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
     var problem by remember { mutableStateOf(actions.identityProblem()) }
+    val imported = stringResource(R.string.identity_imported)
+    val saved = stringResource(R.string.identity_saved)
+    val wiped = stringResource(R.string.identity_wiped)
     val done = { error: String? ->
-        status = error ?: "Imported. It's used from the next connect."
+        status = error ?: imported
         if (error == null) problem = null
         importing = false
     }
@@ -271,14 +276,14 @@ private fun Identity(actions: SettingsActions) {
     var wiping by remember { mutableStateOf(false) }
     val saveFile = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")
-    ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: "Saved. Keep the file somewhere only you can reach." }
-    Group("TeamSpeak identity") {
-        Desc("Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.")
+    ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: saved }
+    Group(stringResource(R.string.identity_title)) {
+        Desc(stringResource(R.string.identity_desc))
         problem?.let { Desc(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton("Wipe") { wiping = true }
-            if (problem == null) SecondaryButton("Export") { warning = true }
-            SecondaryButton("Import") { importing = true }
+            SecondaryButton(stringResource(R.string.identity_wipe)) { wiping = true }
+            if (problem == null) SecondaryButton(stringResource(R.string.identity_export)) { warning = true }
+            SecondaryButton(stringResource(R.string.identity_import)) { importing = true }
         }
         status?.let { Desc(it) }
     }
@@ -286,72 +291,62 @@ private fun Identity(actions: SettingsActions) {
     var level by remember { mutableStateOf(actions.securityLevel()) }
     var raising by remember { mutableStateOf(false) }
     level?.let { current ->
-        Group("Security level", badge = "$current") {
-            Desc("Some servers only let in identities of at least a certain level. Raising it keeps the same identity, with its groups and permissions.")
-            SecondaryButton("Raise level") { raising = true }
+        Group(stringResource(R.string.level_title), badge = "$current") {
+            Desc(stringResource(R.string.level_desc))
+            SecondaryButton(stringResource(R.string.level_raise_button)) { raising = true }
         }
         if (raising) RaiseLevelDialog(current, onClose = { raising = false; level = actions.securityLevel() })
     }
     // Export: what the file means first, then a file of the person's choosing (not shared to an app)
     if (warning) {
         TsDialog(
-            onDismiss = { warning = false }, title = "Export your identity", icon = androidx.compose.material.icons.Icons.Rounded.Warning,
-            tint = Ts.amber, subtitle = "Keep it private",
+            onDismiss = { warning = false }, title = stringResource(R.string.identity_export_title), icon = androidx.compose.material.icons.Icons.Rounded.Warning,
+            tint = Ts.amber, subtitle = stringResource(R.string.identity_export_subtitle),
             buttons = {
-                PillButton("Cancel") { warning = false }
-                PillButton("Save to a file", PillKind.PRIMARY) {
+                PillButton(stringResource(R.string.cancel)) { warning = false }
+                PillButton(stringResource(R.string.identity_save_file), PillKind.PRIMARY) {
                     warning = false
                     saveFile.launch("pocketts-identity.ini")
                 }
             },
         ) {
-            Desc(
-                "The file is your identity itself: anyone who has it is you on every server, with your groups and " +
-                    "permissions, such as a server admin's. Nobody can tell the difference."
-            )
-            Desc(
-                "Save it somewhere only you can reach, like this phone or a private drive. Don't send it in a chat or " +
-                    "an email, and don't post it. A TeamSpeak app can open it, and so can PocketTS on another phone."
-            )
+            Desc(stringResource(R.string.identity_export_what))
+            Desc(stringResource(R.string.identity_export_where))
         }
     }
     // Wipe: what's lost first, with a way to keep a copy
     if (wiping) {
         TsDialog(
-            onDismiss = { wiping = false }, title = "Wipe your identity?", icon = androidx.compose.material.icons.Icons.Rounded.Warning,
-            tint = Ts.red, subtitle = "This can't be undone",
+            onDismiss = { wiping = false }, title = stringResource(R.string.identity_wipe_title), icon = androidx.compose.material.icons.Icons.Rounded.Warning,
+            tint = Ts.red, subtitle = stringResource(R.string.cant_be_undone),
             buttons = {
-                PillButton("Cancel") { wiping = false }
-                PillButton("Wipe", PillKind.DANGER) {
+                PillButton(stringResource(R.string.cancel)) { wiping = false }
+                PillButton(stringResource(R.string.identity_wipe), PillKind.DANGER) {
                     actions.forgetIdentity()
                     problem = null
                     wiping = false
-                    status = "Wiped. A new identity is made at the next connect."
+                    status = wiped
                 }
             },
         ) {
-            Desc(
-                "This phone's identity is deleted, and a new one is made the next time you connect. To every server " +
-                    "you're then someone new: your groups, permissions and anything given to your old identity (such " +
-                    "as admin rights) don't come along."
-            )
-            Desc("The only way back is an exported copy. If you might want it again, cancel and Export it first.")
+            Desc(stringResource(R.string.identity_wipe_what))
+            Desc(stringResource(R.string.identity_wipe_back))
         }
     }
     if (importing) {
         var text by remember { mutableStateOf("") }
         TsDialog(
-            onDismiss = { importing = false }, title = "Import an identity", icon = androidx.compose.material.icons.Icons.Rounded.Key,
-            subtitle = "From a TeamSpeak app",
+            onDismiss = { importing = false }, title = stringResource(R.string.identity_import_title), icon = androidx.compose.material.icons.Icons.Rounded.Key,
+            subtitle = stringResource(R.string.identity_import_subtitle),
             buttons = {
-                PillButton("Cancel") { importing = false }
-                PillButton("Import", PillKind.PRIMARY, enabled = text.isNotBlank()) { done(actions.importIdentity(text)) }
+                PillButton(stringResource(R.string.cancel)) { importing = false }
+                PillButton(stringResource(R.string.identity_import), PillKind.PRIMARY, enabled = text.isNotBlank()) { done(actions.importIdentity(text)) }
             },
         ) {
-            Desc("Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone's own from the next connect.")
+            Desc(stringResource(R.string.identity_import_desc))
             // Hidden like a password while it's on screen
-            TsField(text, { text = it }, "Identity", password = true)
-            PillButton("Choose a file…", modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
+            TsField(text, { text = it }, stringResource(R.string.identity_field), password = true)
+            PillButton(stringResource(R.string.identity_choose_file), modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
         }
     }
 }
@@ -359,13 +354,13 @@ private fun Identity(actions: SettingsActions) {
 @Composable
 private fun ChannelPasswordsGroup(actions: SettingsActions) {
     var forgotten by remember { mutableStateOf(false) }
-    Group("Channel passwords") {
-        Desc("Passwords you chose to remember join their channels with one tap. They're kept on this phone, encrypted.")
-        SecondaryButton("Forget saved passwords") {
+    Group(stringResource(R.string.passwords_title)) {
+        Desc(stringResource(R.string.passwords_desc))
+        SecondaryButton(stringResource(R.string.passwords_forget)) {
             actions.forgetChannelPasswords()
             forgotten = true
         }
-        if (forgotten) Desc("Forgotten.")
+        if (forgotten) Desc(stringResource(R.string.passwords_forgotten))
     }
 }
 
@@ -374,64 +369,66 @@ private fun ChatHistory(actions: SettingsActions) {
     var asking by remember { mutableStateOf(false) }
     var cleared by remember { mutableStateOf(false) }
     val rules = io.github.korppujauho.pocketts.proto.ChatHistory
-    Group("Chat history") {
+    Group(stringResource(R.string.history_title)) {
         Desc(
-            "Channel chats, private chats and who joined or left are kept on this phone, encrypted, and shown again " +
-                "when you connect to the same server: the last ${rules.DAYS} days, at most ${rules.LINES} lines per " +
-                "conversation. Pokes aren't kept."
+            stringResource(
+                R.string.history_desc,
+                androidx.compose.ui.res.pluralStringResource(R.plurals.history_days, rules.DAYS, rules.DAYS),
+                androidx.compose.ui.res.pluralStringResource(R.plurals.history_lines, rules.LINES, rules.LINES),
+            )
         )
-        SecondaryButton("Clear chat history") { asking = true }
-        if (cleared) Desc("Cleared.")
+        SecondaryButton(stringResource(R.string.history_clear)) { asking = true }
+        if (cleared) Desc(stringResource(R.string.history_cleared))
     }
     if (asking) {
         TsDialog(
-            onDismiss = { asking = false }, title = "Clear chat history?", icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
+            onDismiss = { asking = false }, title = stringResource(R.string.history_clear_title), icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
             buttons = {
-                PillButton("Cancel") { asking = false }
-                PillButton("Clear", PillKind.DANGER) {
+                PillButton(stringResource(R.string.cancel)) { asking = false }
+                PillButton(stringResource(R.string.history_clear_button), PillKind.DANGER) {
                     actions.clearChatHistory()
                     cleared = true
                     asking = false
                 }
             },
         ) {
-            Desc("Every server's saved chat is removed from this phone, and the chat on screen now.")
+            Desc(stringResource(R.string.history_clear_desc))
         }
     }
 }
 
 @Composable
 private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, onChange: (VoiceSettings) -> Unit) {
-    Group("Nickname") {
-        TsField(nick, onNick, "Nickname")
+    Group(stringResource(R.string.nickname)) {
+        TsField(nick, onNick, stringResource(R.string.nickname))
     }
     Group {
-        Check("Floating push-to-talk button", v.floatingPtt) { onChange(v.copy(floatingPtt = it)) }
-        Desc("In push-to-talk mode, a round button stays at the bottom of the screen, so you can talk while you scroll the chat.")
+        Check(stringResource(R.string.general_floating_ptt), v.floatingPtt) { onChange(v.copy(floatingPtt = it)) }
+        Desc(stringResource(R.string.general_floating_ptt_desc))
     }
     Group {
-        Check("Talk button over other apps", v.overlayPtt) { onChange(v.copy(overlayPtt = it)) }
-        Desc("In push-to-talk mode, the round button stays on screen when you go to other apps. Hold it to talk, drag it to move it. Android asks once to let PocketTS display over other apps.")
+        Check(stringResource(R.string.general_overlay_ptt), v.overlayPtt) { onChange(v.copy(overlayPtt = it)) }
+        Desc(stringResource(R.string.general_overlay_ptt_desc))
     }
     Group {
-        Check("Volume buttons are push-to-talk", v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
-        Desc("In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).")
+        Check(stringResource(R.string.general_volume_ptt), v.volumeKeysPtt) { onChange(v.copy(volumeKeysPtt = it)) }
+        Desc(stringResource(R.string.general_volume_ptt_desc))
     }
     Group {
-        Check("Headset button is push-to-talk", v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
-        Desc("In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it's on, the button doesn't play or pause music.")
+        Check(stringResource(R.string.general_headset_ptt), v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
+        Desc(stringResource(R.string.general_headset_ptt_desc))
     }
     if (io.github.korppujauho.pocketts.UpdateCheck.enabled) Group {
-        Check("Check for updates", v.checkUpdates) { onChange(v.copy(checkUpdates = it)) }
-        Desc("Once a day, PocketTS asks GitHub whether a newer version is out, and says so on the connect screen. Nothing about you is sent.")
+        Check(stringResource(R.string.general_updates), v.checkUpdates) { onChange(v.copy(checkUpdates = it)) }
+        Desc(stringResource(R.string.general_updates_desc))
     }
     Group {
-        Check("Keep the screen on", v.keepScreenOn) { onChange(v.copy(keepScreenOn = it)) }
-        Desc("The screen doesn't go dark while you're connected and the app is open. While you share or watch a stream, it stays on anyway.")
+        Check(stringResource(R.string.general_screen_on), v.keepScreenOn) { onChange(v.copy(keepScreenOn = it)) }
+        Desc(stringResource(R.string.general_screen_on_desc))
     }
     Group {
-        Check("Allow joining spacer channels", v.joinSpacers) { onChange(v.copy(joinSpacers = it)) }
-        Desc("Tapping a spacer (a divider line or title in the channel list) joins it like any channel. Some servers use one as their AFK channel. Off, spacers can't be joined by a stray tap.")
+        Check(stringResource(R.string.general_spacers), v.joinSpacers) { onChange(v.copy(joinSpacers = it)) }
+        Desc(stringResource(R.string.general_spacers_desc))
     }
 }
 
@@ -439,79 +436,76 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
 @Composable
 private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group {
-        Check("Show admin functions", v.adminTools) { onChange(v.copy(adminTools = it)) }
-        Desc("A person's menu also offers moving them to another channel, kicking them from the channel or the server, and banning them. The server decides whether you're allowed: without the permission it says no.")
+        Check(stringResource(R.string.ui_admin), v.adminTools) { onChange(v.copy(adminTools = it)) }
+        Desc(stringResource(R.string.ui_admin_desc))
     }
 }
 
 @Composable
 private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
-    Group("Video connection") {
-        Desc("Streams go straight between you and the other end. Behind some networks they need a relay (a TURN server): enter one here if you have it.")
-        TsField(v.turnUrl, { onChange(v.copy(turnUrl = it)) }, "Relay (turn:host:port)", placeholder = "turn:relay.example.com:3478")
-        TsField(v.turnUser, { onChange(v.copy(turnUser = it)) }, "Relay username")
-        TsField(v.turnPassword, { onChange(v.copy(turnPassword = it)) }, "Relay password", password = true)
-        Check("Always through the relay", v.relayOnly) { onChange(v.copy(relayOnly = it)) }
+    Group(stringResource(R.string.relay_title)) {
+        Desc(stringResource(R.string.relay_desc))
+        TsField(v.turnUrl, { onChange(v.copy(turnUrl = it)) }, stringResource(R.string.relay_address), placeholder = "turn:relay.example.com:3478")
+        TsField(v.turnUser, { onChange(v.copy(turnUser = it)) }, stringResource(R.string.relay_user))
+        TsField(v.turnPassword, { onChange(v.copy(turnPassword = it)) }, stringResource(R.string.relay_password), password = true)
+        Check(stringResource(R.string.relay_only), v.relayOnly) { onChange(v.copy(relayOnly = it)) }
     }
     Group {
-        Desc("A server whose file transfer is on another port (its pictures and avatars don't load) can have its own port in the favourite's Advanced part.")
+        Desc(stringResource(R.string.advanced_file_port))
     }
 }
 
 @Composable
 private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
-    Group("Voice volume", "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB") {
+    Group(stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB") {
         TsSlider(v.voiceVolumeDb.toFloat(), -20f..12f, 31) { onChange(v.copy(voiceVolumeDb = it.roundToInt())) }
-        RangeEnds("Quiet", "Loud")
+        RangeEnds(stringResource(R.string.quiet), stringResource(R.string.loud))
     }
     Group {
-        SecondaryButton("Play test sound") { actions.playTestSound() }
+        SecondaryButton(stringResource(R.string.playback_test_sound)) { actions.playTestSound() }
     }
     Group {
-        Check("Sounds for events", v.uiSounds) { onChange(v.copy(uiSounds = it)) }
-        Desc("Short sounds when someone comes into or leaves your channel, for messages, pokes and streams, and for the microphone and sound buttons.")
+        Check(stringResource(R.string.playback_event_sounds), v.uiSounds) { onChange(v.copy(uiSounds = it)) }
+        Desc(stringResource(R.string.playback_event_sounds_desc))
     }
     if (v.uiSounds) {
-        Group("Sound volume", "${(v.uiSoundVolume * 100).roundToInt()}%") {
+        Group(stringResource(R.string.playback_sound_volume), "${(v.uiSoundVolume * 100).roundToInt()}%") {
             TsSlider(v.uiSoundVolume, 0f..1f, 19) { onChange(v.copy(uiSoundVolume = (it * 20).roundToInt() / 20f)) }
-            SecondaryButton("Play a sound") { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
+            SecondaryButton(stringResource(R.string.playback_play_sound)) { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
         }
     }
-    Desc(
-        if (v.echoCancellation) "With echo cancellation on, voices follow the call volume: press a volume button while connected."
-        else "Voices follow the media volume."
-    )
+    Desc(stringResource(if (v.echoCancellation) R.string.playback_call_volume else R.string.playback_media_volume))
 }
 
 @Composable
 private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
-    Group("Microphone volume", "${(v.micVolume * 100).roundToInt()}%") {
+    Group(stringResource(R.string.capture_mic_volume), "${(v.micVolume * 100).roundToInt()}%") {
         TsSlider(v.micVolume, 0f..3f, 29) { onChange(v.copy(micVolume = (it * 10).roundToInt() / 10f)) }
     }
-    Group("Activation") {
-        Radio("Voice activation", v.activation == Activation.VAD) { onChange(v.copy(activation = Activation.VAD)) }
-        Radio("Push-to-talk", v.activation == Activation.PTT) { onChange(v.copy(activation = Activation.PTT)) }
-        Radio("Continuous transmission", v.activation == Activation.CONTINUOUS) { onChange(v.copy(activation = Activation.CONTINUOUS)) }
+    Group(stringResource(R.string.capture_activation)) {
+        Radio(stringResource(R.string.capture_vad), v.activation == Activation.VAD) { onChange(v.copy(activation = Activation.VAD)) }
+        Radio(stringResource(R.string.capture_ptt), v.activation == Activation.PTT) { onChange(v.copy(activation = Activation.PTT)) }
+        Radio(stringResource(R.string.capture_continuous), v.activation == Activation.CONTINUOUS) { onChange(v.copy(activation = Activation.CONTINUOUS)) }
     }
-    if (v.activation == Activation.PTT) Desc("Hold the \"Hold to talk\" button while you speak.")
-    Group("Level") {
+    if (v.activation == Activation.PTT) Desc(stringResource(R.string.capture_ptt_desc))
+    Group(stringResource(R.string.capture_level)) {
         LevelMeter(actions, if (v.activation == Activation.VAD) v.vadThreshold else null)
-        Desc("The bar shows your microphone while these settings are open; nothing is sent meanwhile.")
+        Desc(stringResource(R.string.capture_level_desc))
     }
     if (v.activation == Activation.VAD) {
-        Group("Voice activation level", "%.1f%%".format(v.vadThreshold * 100)) {
+        Group(stringResource(R.string.capture_vad_level), "%.1f%%".format(v.vadThreshold * 100)) {
             TsSlider(v.vadThreshold, 0f..0.1f, 99) { onChange(v.copy(vadThreshold = (it * 1000).roundToInt() / 1000f)) }
-            Desc("Slide right to block background noise. If your voice cuts out, slide left.")
+            Desc(stringResource(R.string.capture_vad_level_desc))
         }
-        Group("Delay before deactivation", "%.1f s".format(v.vadTailMs / 1000f)) {
+        Group(stringResource(R.string.capture_vad_delay), "%.1f s".format(v.vadTailMs / 1000f)) {
             TsSlider(v.vadTailMs / 1000f, 0.1f..2f, 18) { onChange(v.copy(vadTailMs = (it * 10).roundToInt() * 100)) }
         }
     }
-    Group("Signal processing") {
-        Check("Remove background noise", v.noiseSuppression) { onChange(v.copy(noiseSuppression = it)) }
-        Check("Echo cancellation", v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
-        Check("Automatic gain control", v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
-        Desc("Echo cancellation plays voices like a phone call (loudspeaker, or your headset). Turn it off for the best sound with headphones.")
+    Group(stringResource(R.string.capture_processing)) {
+        Check(stringResource(R.string.capture_noise), v.noiseSuppression) { onChange(v.copy(noiseSuppression = it)) }
+        Check(stringResource(R.string.capture_echo), v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
+        Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
+        Desc(stringResource(R.string.capture_echo_desc))
     }
 }
 

@@ -46,7 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.korppujauho.pocketts.R
 import io.github.korppujauho.pocketts.Session
+import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.proto.Chat
 import io.github.korppujauho.pocketts.proto.ServerModel
 import java.util.Date
@@ -94,8 +96,8 @@ fun PersonSheet(
                     Text(person.nickname, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, maxLines = 2)
                     if (person.description.isNotEmpty()) Text(person.description, color = Ts.muted, fontSize = 14.sp, maxLines = 3)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        if (isSelf) Chip("You", Ts.you)
-                        if (person.away) Chip("Away" + if (person.awayMessage.isNotEmpty()) ": ${person.awayMessage}" else "", Ts.afk)
+                        if (isSelf) Chip(stringResource(R.string.person_you), Ts.you)
+                        if (person.away) Chip(if (person.awayMessage.isNotEmpty()) stringResource(R.string.person_away_message, person.awayMessage) else stringResource(R.string.person_away), Ts.afk)
                     }
                 }
             }
@@ -103,16 +105,16 @@ fun PersonSheet(
                 // Away, as the TeamSpeak app sets it: others see AFK and the message
                 var msg by remember { mutableStateOf(awayMessage) }
                 PopCard {
-                    Text("Away", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.person_away), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Spacer(Modifier.height(8.dp))
-                    TsField(msg, { msg = it.take(80) }, "Away message (optional)")
+                    TsField(msg, { msg = it.take(80) }, stringResource(R.string.away_message_field))
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (away) {
-                        PillButton("I'm back", modifier = Modifier.weight(1f)) { onAway(false, ""); onDismiss() }
-                        PillButton("Update", PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                        PillButton(stringResource(R.string.away_back), modifier = Modifier.weight(1f)) { onAway(false, ""); onDismiss() }
+                        PillButton(stringResource(R.string.away_update), PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
                     } else {
-                        PillButton("Set away", PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
+                        PillButton(stringResource(R.string.away_set), PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
                     }
                 }
                 return@Column
@@ -120,7 +122,7 @@ fun PersonSheet(
             var v by remember { mutableFloatStateOf(volume) }
             PopCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Volume for you", color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.person_volume), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     ValueBadge("${(v * 100).roundToInt()}%")
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -134,8 +136,8 @@ fun PersonSheet(
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ActionTile(androidx.compose.material.icons.Icons.Rounded.NotificationsActive, "Poke", Modifier.weight(1f), onClick = onPoke)
-                ActionTile(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Chat, "Chat", Modifier.weight(1f), onClick = onChat)
+                ActionTile(androidx.compose.material.icons.Icons.Rounded.NotificationsActive, stringResource(R.string.poke), Modifier.weight(1f), onClick = onPoke)
+                ActionTile(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Chat, stringResource(R.string.chat), Modifier.weight(1f), onClick = onChat)
             }
             if (admin) AdminTiles(onMove, onKick, onBan)
         }
@@ -164,14 +166,14 @@ fun ValueBadge(text: String) {
 fun PokeDialog(person: ServerModel.Client, onSend: (String) -> Unit, onDismiss: () -> Unit) {
     var msg by remember { mutableStateOf("") }
     TsDialog(
-        onDismiss = onDismiss, title = "Poke ${person.nickname}", icon = androidx.compose.material.icons.Icons.Rounded.NotificationsActive,
-        subtitle = "They get a popup with your message",
+        onDismiss = onDismiss, title = stringResource(R.string.poke_title, person.nickname), icon = androidx.compose.material.icons.Icons.Rounded.NotificationsActive,
+        subtitle = stringResource(R.string.poke_subtitle),
         buttons = {
-            PillButton("Cancel", onClick = onDismiss)
-            PillButton("Poke", PillKind.PRIMARY) { onSend(msg) }
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.poke), PillKind.PRIMARY) { onSend(msg) }
         },
     ) {
-        TsField(msg, { msg = it.take(100) }, "Message (optional)")
+        TsField(msg, { msg = it.take(100) }, stringResource(R.string.poke_message_field))
     }
 }
 
@@ -188,11 +190,11 @@ fun PokeCards(pokes: List<Chat.Poke>, onDismiss: (Long) -> Unit, modifier: Modif
                     .border(1.dp, Ts.accent.copy(alpha = 0.6f), RoundedCornerShape(10.dp)).padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text("${p.fromName} poked you", color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(R.string.poked_you, p.fromName), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 if (p.text.isNotEmpty()) Text(formatted(p.text), color = Ts.text, fontSize = 14.sp)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(timeFormat.format(Date(p.time)), color = Ts.faint, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                    SecondaryButton("Dismiss") { onDismiss(p.id) }
+                    SecondaryButton(stringResource(R.string.dismiss)) { onDismiss(p.id) }
                 }
             }
         }
@@ -205,9 +207,9 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
     val v = state.server
     val uri = LocalUriHandler.current
     TsDialog(
-        onDismiss = onDismiss, title = state.serverName.ifEmpty { "Server info" }, icon = androidx.compose.material.icons.Icons.Rounded.Dns,
+        onDismiss = onDismiss, title = state.serverName.ifEmpty { stringResource(R.string.info_title) }, icon = androidx.compose.material.icons.Icons.Rounded.Dns,
         subtitle = state.address,
-        buttons = { PillButton("Close", PillKind.PRIMARY, onClick = onDismiss) },
+        buttons = { PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss) },
     ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // The server's banner: a web address, or a picture in the server's own files (as channel banners)
@@ -229,15 +231,16 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
                 val welcome = v["virtualserver_welcomemessage"].orEmpty().trim()
                 if (welcome.isNotEmpty()) InfoBox { Text(formatted(welcome), color = Ts.text, fontSize = 14.sp) }
                 val max = v["virtualserver_maxclients"]?.toIntOrNull() ?: 0
+                val res = androidx.compose.ui.platform.LocalResources.current
                 val stats = buildList {
-                    add("Users" to if (max > 0) "${state.clientCount} / $max" else "${state.clientCount}")
-                    add("Channels" to "${state.channelCount}")
+                    add(res.getString(R.string.info_users) to if (max > 0) "${state.clientCount} / $max" else "${state.clientCount}")
+                    add(res.getString(R.string.info_channels) to "${state.channelCount}")
                     v["virtualserver_uptime"]?.toLongOrNull()?.let {
                         val since = v["received_at"]?.toLongOrNull()?.let { at -> System.currentTimeMillis() - at } ?: 0
-                        add("Uptime" to span(it * 1000 + since))
+                        add(res.getString(R.string.info_uptime) to span(res, it * 1000 + since))
                     }
                     v["virtualserver_created"]?.toLongOrNull()?.takeIf { it > 0 }?.let {
-                        add("Created" to "${span(System.currentTimeMillis() - it * 1000)} ago")
+                        add(res.getString(R.string.info_created) to res.getString(R.string.info_ago, span(res, System.currentTimeMillis() - it * 1000)))
                     }
                 }
                 for (row in stats.chunked(2)) {
@@ -274,15 +277,16 @@ private fun InfoBox(modifier: Modifier = Modifier, content: @Composable () -> Un
     }
 }
 
-/** "5 minutes", "3 hours", "12 days", "4 months", "2 years". */
-fun span(ms: Long): String {
+/** "5 minutes", "3 hours", "12 days", "4 months", "2 years", in the phone's language. */
+fun span(res: android.content.res.Resources, ms: Long): String {
+    fun n(id: Int, count: Long) = res.getQuantityString(id, count.toInt(), count.toInt())
     val min = maxOf(0, ms / 60000)
-    if (min < 60) return "$min minute${if (min == 1L) "" else "s"}"
+    if (min < 60) return n(R.plurals.span_minutes, min)
     val hours = min / 60
-    if (hours < 24) return "$hours hour${if (hours == 1L) "" else "s"}"
+    if (hours < 24) return n(R.plurals.span_hours, hours)
     val days = hours / 24
-    if (days < 60) return "$days day${if (days == 1L) "" else "s"}"
+    if (days < 60) return n(R.plurals.span_days, days)
     val months = (days / 30.44).toLong()
-    if (months < 24) return "$months months"
-    return "${(days / 365.25).toLong()} years"
+    if (months < 24) return n(R.plurals.span_months, months)
+    return n(R.plurals.span_years, (days / 365.25).toLong())
 }

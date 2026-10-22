@@ -13,6 +13,9 @@
   gets there. Settings › Advanced shows your level, and Raise level raises it to a level you choose, with an estimate
   of how long it takes on your phone. Raising keeps the same identity (groups and permissions stay), uses all but one
   of the phone's cores, and Stop keeps the level reached so far.
+- All of the app's text is in string resources (`res/values/strings.xml`), with placeholders and plural forms, ready
+  for translations. How a connection ended (kicked, banned, no answer…) is now said by the app, so it can be
+  translated too.
 
 ## 1.1.0 (2026-10-22)
 

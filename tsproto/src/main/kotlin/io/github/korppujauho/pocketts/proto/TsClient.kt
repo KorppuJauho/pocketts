@@ -100,6 +100,21 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     @Volatile var refusal: String? = null
         private set
 
+    /**
+     * How a connection ends, so the app can say it in its user's language ([Listener.onDisconnected] says it in
+     * English, for logs). [endDetail] goes with it: the server's message, the address, or the error.
+     */
+    enum class End {
+        NO_ANSWER, NO_SUCH_HOST, CANT_CONNECT, NETWORK_ERROR, NETWORK_GONE, SERVER_SILENT, SERVER_STOPPED, LOST,
+        KICKED_CHANNEL, KICKED, BANNED, SHUT_DOWN, BY_SERVER, REFUSED, HANDSHAKE,
+    }
+
+    /** How the last connection ended (null when we left, or while it's on). */
+    @Volatile var end: End? = null
+        private set
+    @Volatile var endDetail: String = ""
+        private set
+
     /** The server's address (for file transfers), once connecting has started. */
     val serverAddress: InetAddress? get() = server?.address
 
@@ -163,7 +178,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
     /** The phone's network went away or changed: the connection is lost now (not after the silence runs out). */
     fun networkGone(reason: String) {
-        exec.execute { if (state == State.CONNECTING || state == State.CONNECTED) fail(reason) }
+        exec.execute { if (state == State.CONNECTING || state == State.CONNECTED) fail(reason, End.NETWORK_GONE, reason) }
     }
 
     /** Runs [block] on the connection's thread (where the listener is called), after what was asked before. */
@@ -212,6 +227,8 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         fragments = null
         disconnectReason = null
         heardAny = false
+        end = null
+        endDetail = ""
 
         try {
             val address = InetSocketAddress(InetAddress.getByName(options.host), options.port)
@@ -228,6 +245,13 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         } catch (e: Exception) {
             log("Can't reach ${options.host}:${options.port}: $e")
             state = State.DISCONNECTED
+            if (e is java.net.UnknownHostException) {
+                end = End.NO_SUCH_HOST
+                endDetail = options.host
+            } else {
+                end = End.CANT_CONNECT
+                endDetail = e.message ?: e.javaClass.simpleName
+            }
             listener.onDisconnected(
                 if (e is java.net.UnknownHostException) "Couldn't connect: no server found at \"${options.host}\". Check the address."
                 else "Couldn't connect: ${e.message ?: e.javaClass.simpleName}"
@@ -253,15 +277,17 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             } catch (e: Exception) {
                 // Nothing listens on that port (the computer said so before the server ever answered)
                 val noServer = e is java.net.PortUnreachableException
-                if (!s.isClosed) exec.execute { if (socket === s) fail(if (noServer && !heardAny) NO_ANSWER else "Network error: ${e.message}") }
+                if (!s.isClosed) exec.execute { if (socket === s) if (noServer && !heardAny) fail(NO_ANSWER, End.NO_ANSWER) else fail("Network error: ${e.message}", End.NETWORK_ERROR, e.message.orEmpty()) }
                 return
             }
         }
     }
 
-    private fun fail(reason: String, network: Boolean = true) {
+    private fun fail(reason: String, kind: End, detail: String = "", network: Boolean = true) {
         log("Disconnected: $reason")
         lostConnection = network
+        end = kind
+        endDetail = detail
         finish(reason)
     }
 
@@ -279,15 +305,15 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     private fun tick() {
         val t = now()
         initPending?.let { p ->
-            if (t - p.first > GIVE_UP_MS) return fail(if (heardAny) "The server didn't answer" else NO_ANSWER)
+            if (t - p.first > GIVE_UP_MS) return if (heardAny) fail("The server didn't answer", End.SERVER_SILENT) else fail(NO_ANSWER, End.NO_ANSWER)
             if (t - p.last > RESEND_AFTER_MS) { p.last = t; sendRaw(p.raw) }
         }
         for (p in pending.values) {
-            if (t - p.first > GIVE_UP_MS) return fail("The server stopped answering")
+            if (t - p.first > GIVE_UP_MS) return fail("The server stopped answering", End.SERVER_STOPPED)
             if (t - p.last > RESEND_AFTER_MS) { p.last = t; sendRaw(p.raw) }
         }
         // Silence before the server ever answered isn't a lost connection: there never was one
-        if (t - lastHeard > SILENCE_MS) fail(if (heardAny) "Connection lost" else NO_ANSWER)
+        if (t - lastHeard > SILENCE_MS) { if (heardAny) fail("Connection lost", End.LOST) else fail(NO_ANSWER, End.NO_ANSWER) }
     }
 
     // ====== Sending ======
@@ -528,6 +554,14 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             "initserver" -> initServer(cmd)
             "notifyclientleftview" -> if (cmd.groups.any { it["clid"]?.toIntOrNull() == clientId }) {
                 val msg = cmd["reasonmsg"].orEmpty()
+                end = when (cmd["reasonid"]) {
+                    "4" -> End.KICKED_CHANNEL
+                    "5" -> End.KICKED
+                    "6" -> End.BANNED
+                    "11" -> End.SHUT_DOWN
+                    else -> if (state == State.DISCONNECTING) null else End.BY_SERVER
+                }
+                endDetail = msg
                 disconnectReason = when (cmd["reasonid"]) {
                     "4" -> "Kicked from the channel".let { if (msg.isNotEmpty()) "$it: $msg" else it }
                     "5" -> "Kicked from the server".let { if (msg.isNotEmpty()) "$it: $msg" else it }
@@ -540,7 +574,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
                 // While connecting, an error answers clientinit: wrong password, banned, and so on.
                 refusal = cmd["id"]
                 listener.onCommand(cmd)
-                return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})", network = false)
+                return fail(cmd["msg"]?.ifEmpty { null } ?: "The server refused the connection (${cmd["id"]})", End.REFUSED, cmd["msg"].orEmpty(), network = false)
             }
         }
         listener.onCommand(cmd)
@@ -597,8 +631,8 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     private fun initIvExpand(cmd: Command) {
         val a = alpha ?: return
         initPending = null
-        val beta = Base64.getDecoder().decode(cmd["beta"] ?: return fail("Bad handshake"))
-        val omega = Base64.getDecoder().decode(cmd["omega"] ?: return fail("Bad handshake"))
+        val beta = Base64.getDecoder().decode(cmd["beta"] ?: return fail("Bad handshake", End.HANDSHAKE))
+        val omega = Base64.getDecoder().decode(cmd["omega"] ?: return fail("Bad handshake", End.HANDSHAKE))
         val shared = opts.identity.sharedSecret(omega)
         val iv = ByteArray(10 + beta.size)
         for (i in 0 until 10) iv[i] = (shared[i].toInt() xor a[i].toInt()).toByte()
@@ -613,7 +647,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         initPending = null
         val license = cmd["l"]
         val betaB64 = cmd["beta"]
-        if (license.isNullOrEmpty() || betaB64.isNullOrEmpty() || cmd["omega"].isNullOrEmpty()) return fail("Bad handshake")
+        if (license.isNullOrEmpty() || betaB64.isNullOrEmpty() || cmd["omega"].isNullOrEmpty()) return fail("Bad handshake", End.HANDSHAKE)
         try {
             val beta = Base64.getDecoder().decode(betaB64)
             val serverKey = License.deriveKey(License.parse(Base64.getDecoder().decode(license)))
@@ -631,7 +665,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             Crypto.xorInto(iv, beta, beta.size, 10)
             startEncryption(iv)
         } catch (e: Exception) {
-            fail("Handshake failed: ${e.message}", network = false)
+            fail("Handshake failed: ${e.message}", End.HANDSHAKE, e.message.orEmpty(), network = false)
         }
     }
 

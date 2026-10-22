@@ -351,10 +351,10 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
         AppLog.log("Identity saved to a file")
         null
     } catch (e: Settings.IdentityUnreadable) {
-        "The identity can't be read, so it can't be saved."
+        context.getString(R.string.identity_export_unreadable)
     } catch (e: Exception) {
         AppLog.log("Couldn't save the identity: ${e.javaClass.simpleName}")
-        "That file couldn't be written."
+        context.getString(R.string.file_not_written)
     }
     override fun importIdentity(text: String): String? = Settings(context).importIdentity(text)
     override fun importIdentityFile(uri: android.net.Uri): String? = try {
@@ -369,10 +369,10 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
             }
             out.toString(Charsets.UTF_8.name())
         }
-        if (text == null) "That file can't be opened." else importIdentity(text)
+        if (text == null) context.getString(R.string.file_not_opened) else importIdentity(text)
     } catch (e: Exception) {
         AppLog.log("Couldn't read the identity file: ${e.javaClass.simpleName}")
-        "That file can't be opened."
+        context.getString(R.string.file_not_opened)
     }
     override fun identityProblem(): String? = Settings(context).identityProblem()
     override fun forgetIdentity() = Settings(context).forgetIdentity()

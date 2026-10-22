@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.korppujauho.pocketts.IdentityRaise
+import io.github.korppujauho.pocketts.R
+import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.proto.Identity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,6 +42,7 @@ private const val MAX_LEVEL = 40
 @Composable
 fun RaiseLevelDialog(current: Int, needed: Int? = null, onReached: () -> Unit = {}, onClose: () -> Unit) {
     val context = LocalContext.current
+    val res = androidx.compose.ui.platform.LocalResources.current
     val progress by IdentityRaise.progress.collectAsState()
     var target by remember { mutableIntStateOf(needed ?: maxOf(current + 1, 24).coerceAtMost(MAX_LEVEL)) }
     var rate by remember { mutableStateOf<Double?>(null) }
@@ -58,16 +61,16 @@ fun RaiseLevelDialog(current: Int, needed: Int? = null, onReached: () -> Unit = 
     TsDialog(
         // Not closed by a tap outside while it works: Stop first
         onDismiss = { if (!running) close() },
-        title = if (needed != null) "Security level $needed needed" else "Raise security level",
+        title = if (needed != null) stringResource(R.string.level_needed_title, needed) else stringResource(R.string.level_raise_title),
         icon = Icons.Rounded.Shield,
-        subtitle = if (needed != null) "This server needs it. Yours is $current." else "Yours is $current",
+        subtitle = if (needed != null) stringResource(R.string.level_needed_subtitle, current) else stringResource(R.string.level_yours, current),
         buttons = {
             when {
-                running -> PillButton("Stop", PillKind.DANGER) { IdentityRaise.stop() }
-                p != null -> PillButton("Close", PillKind.PRIMARY) { close() }
+                running -> PillButton(stringResource(R.string.stop), PillKind.DANGER) { IdentityRaise.stop() }
+                p != null -> PillButton(stringResource(R.string.close), PillKind.PRIMARY) { close() }
                 else -> {
-                    PillButton("Cancel") { close() }
-                    PillButton("Raise", PillKind.PRIMARY, enabled = target > current) {
+                    PillButton(stringResource(R.string.cancel)) { close() }
+                    PillButton(stringResource(R.string.level_raise), PillKind.PRIMARY, enabled = target > current) {
                         IdentityRaise.start(context, target) { reached -> if (reached && needed != null) onReached() }
                     }
                 }
@@ -87,34 +90,31 @@ fun RaiseLevelDialog(current: Int, needed: Int? = null, onReached: () -> Unit = 
                     }
                 }
                 Desc(
-                    rate?.let { "On this phone that takes ${duration(Identity.secondsFor(target, it))} on average. It can be quicker or slower." }
-                        ?: "Working out how long it takes on this phone…"
+                    rate?.let { stringResource(R.string.level_estimate, duration(res, Identity.secondsFor(target, it))) }
+                        ?: stringResource(R.string.level_measuring)
                 )
-                Desc(
-                    "Raising is a one-time job. Your identity stays the same: your groups and permissions stay, and the " +
-                        "higher level works on every server. Keep the app open while it works; Stop keeps the level reached so far."
-                )
+                Desc(stringResource(R.string.level_desc_raise))
             }
             running -> {
-                Text("Level ${p.level} of ${p.target}", color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                Text(stringResource(R.string.level_progress, p.level, p.target), color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
                 LinearProgressIndicator(Modifier.fillMaxWidth(), color = Ts.accent, trackColor = Ts.card)
-                Desc("Keep the app open. Each level takes about twice as long as the one before.")
+                Desc(stringResource(R.string.level_running_desc))
             }
             p.level >= p.target -> Desc(
-                "Done: your security level is ${p.level}." + if (needed != null) " Connecting again…" else ""
+                stringResource(if (needed != null) R.string.level_done_connecting else R.string.level_done, p.level)
             )
-            else -> Desc("Stopped at level ${p.level}. Raising again goes on from there.")
+            else -> Desc(stringResource(R.string.level_stopped, p.level))
         }
     }
 }
 
-/** A rough time in words: "about 3 minutes". */
-private fun duration(seconds: Double): String {
-    fun about(n: Int, one: String, many: String) = if (n <= 1) "about $one" else "about $n $many"
+/** A rough time in words: "about 3 minutes", in the phone's language. */
+private fun duration(res: android.content.res.Resources, seconds: Double): String {
+    fun about(id: Int, n: Int) = n.coerceAtLeast(1).let { res.getQuantityString(id, it, it) }
     return when {
-        seconds < 60 -> "under a minute"
-        seconds < 3600 -> about((seconds / 60).toInt(), "a minute", "minutes")
-        seconds < 48 * 3600 -> about((seconds / 3600).toInt(), "an hour", "hours")
-        else -> about((seconds / 86_400).toInt(), "a day", "days")
+        seconds < 60 -> res.getString(R.string.about_under_minute)
+        seconds < 3600 -> about(R.plurals.about_minutes, (seconds / 60).toInt())
+        seconds < 48 * 3600 -> about(R.plurals.about_hours, (seconds / 3600).toInt())
+        else -> about(R.plurals.about_days, (seconds / 86_400).toInt())
     }
 }

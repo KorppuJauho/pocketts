@@ -127,7 +127,7 @@ object Session : TsClient.Listener {
         if (!::app.isInitialized || _state.value.phase == Phase.IDLE) return
         val kind = _state.value.stream.sharing
         ConnectionService.start(
-            app, "Connected to ${_state.value.serverName.ifEmpty { _state.value.address }}",
+            app, app.getString(R.string.notification_connected, _state.value.serverName.ifEmpty { _state.value.address }),
             camera = kind == io.github.korppujauho.pocketts.proto.Streams.Kind.CAMERA,
             projection = kind == io.github.korppujauho.pocketts.proto.Streams.Kind.SCREEN,
         )
@@ -156,14 +156,14 @@ object Session : TsClient.Listener {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         if (_state.value.voice.cameraSound != sound) updateVoice(_state.value.voice.copy(cameraSound = sound))
         // The service says "camera" before the camera opens (Android's rule for using it in the background)
-        ConnectionService.start(app, "Sharing your camera", camera = true)
+        ConnectionService.start(app, app.getString(R.string.notification_sharing_camera), camera = true)
         streams().shareCamera(front, quality, name, sound && micPermitted())
     }
 
     fun shareBothCameras(quality: Int, sound: Boolean) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         if (_state.value.voice.cameraSound != sound) updateVoice(_state.value.voice.copy(cameraSound = sound))
-        ConnectionService.start(app, "Sharing your cameras", camera = true)
+        ConnectionService.start(app, app.getString(R.string.notification_sharing_cameras), camera = true)
         streams().shareBothCameras(quality, name, sound && micPermitted())
     }
 
@@ -178,7 +178,7 @@ object Session : TsClient.Listener {
     fun shareScreen(projection: android.content.Intent, width: Int, height: Int) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Screen"
         ConnectionService.onForeground = { streams().shareScreen(projection, width, height, name) }
-        ConnectionService.start(app, "Sharing your screen", projection = true)
+        ConnectionService.start(app, app.getString(R.string.notification_sharing_screen), projection = true)
     }
     private var player: VoicePlayer? = null
     private var sender: MicSender? = null
@@ -274,7 +274,7 @@ object Session : TsClient.Listener {
     fun dismissNeededLevel() {
         levelTarget = null
         _state.update {
-            it.copy(neededLevel = 0, error = "Not connected: the server needs identity security level ${it.neededLevel}. You can raise yours in Settings › Advanced.")
+            it.copy(neededLevel = 0, error = app.getString(R.string.level_not_connected, it.neededLevel))
         }
     }
 
@@ -282,7 +282,7 @@ object Session : TsClient.Listener {
     private fun start(keepChat: Boolean) {
         val (address, nickname, serverPassword, filePort) = target ?: return
         val typed = ServerAddress.parse(address) ?: run {
-            _state.update { it.copy(error = "That doesn't look like a server address") }
+            _state.update { it.copy(error = app.getString(R.string.not_an_address)) }
             return
         }
         val prev = _state.value
@@ -295,7 +295,7 @@ object Session : TsClient.Listener {
             pokes = if (keepChat) prev.pokes else emptyList(), away = prev.away && keepChat, awayMessage = prev.awayMessage,
         )
         watchNetwork()
-        ConnectionService.start(app, "Connecting to $address")
+        ConnectionService.start(app, app.getString(R.string.notification_connecting, address))
         worker.execute {
             val identity = try {
                 Settings(app).identity() // made on first use, which takes a moment
@@ -417,7 +417,7 @@ object Session : TsClient.Listener {
         _state.update { it.copy(micAllowed = granted) }
         if (granted && _state.value.phase != Phase.IDLE) {
             // Now the service may use the microphone in the background too
-            ConnectionService.start(app, "Connected to ${_state.value.serverName.ifEmpty { _state.value.address }}")
+            ConnectionService.start(app, app.getString(R.string.notification_connected, _state.value.serverName.ifEmpty { _state.value.address }))
             if (sender == null && player != null) startSender()
         }
     }
@@ -506,7 +506,7 @@ object Session : TsClient.Listener {
             is Chat.Key.Channel -> c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to key.id, "msg" to msg))
             is Chat.Key.Private -> c.post {
                 val person = model.clients.values.firstOrNull { it.uid == key.uid && it.id != model.ownClientId } ?: run {
-                    _state.update { it.copy(error = "${chat.privateNames[key.uid] ?: "They"} left the server") }
+                    _state.update { it.copy(error = chat.privateNames[key.uid]?.let { n -> app.getString(R.string.private_left, n) } ?: app.getString(R.string.private_left_unknown)) }
                     return@post
                 }
                 chat.sendingPrivate(person.id, key.uid)
@@ -539,26 +539,34 @@ object Session : TsClient.Listener {
 
     // ====== Admin: moving, kicking and banning people (the server decides who may) ======
 
-    // Asked and not answered yet: the return code -> what it was, in words for a refusal ("kick Noa from the server")
-    private val adminAsked = java.util.concurrent.ConcurrentHashMap<String, String>()
+    /** An admin action: what the log calls it, and its messages when the server says no (%1$s: the person). */
+    private enum class AdminAction(val log: String, val noPermission: Int, val failed: Int) {
+        MOVE("move", R.string.admin_no_permission_move, R.string.admin_failed_move),
+        KICK_CHANNEL("kick from the channel", R.string.admin_no_permission_kick_channel, R.string.admin_failed_kick_channel),
+        KICK_SERVER("kick from the server", R.string.admin_no_permission_kick_server, R.string.admin_failed_kick_server),
+        BAN("ban", R.string.admin_no_permission_ban, R.string.admin_failed_ban),
+    }
+
+    // Asked and not answered yet: the return code -> what it was, and to whom
+    private val adminAsked = java.util.concurrent.ConcurrentHashMap<String, Pair<AdminAction, String>>()
     private val adminCount = java.util.concurrent.atomic.AtomicInteger()
 
-    private fun admin(what: String, name: String, vararg params: Pair<String, Any?>) {
+    private fun admin(action: AdminAction, person: ServerModel.Client, name: String, vararg params: Pair<String, Any?>) {
         val c = client ?: return
         val code = "admin-${adminCount.incrementAndGet()}"
-        adminAsked[code] = what
+        adminAsked[code] = action to person.nickname
         c.sendCommand(Commands.build(name, *params, "return_code" to code))
     }
 
     /** Into another channel. Admins need no password there; a saved one goes along for a server that still asks. */
     fun moveClient(person: ServerModel.Client, channelId: Int) = admin(
-        "move ${person.nickname}", "clientmove", "clid" to person.id, "cid" to channelId,
+        AdminAction.MOVE, person, "clientmove", "clid" to person.id, "cid" to channelId,
         "cpw" to savedChannelPassword(channelId)?.let { Crypto.hashPassword(it) }?.ifEmpty { null },
     )
 
     /** Out of their channel (into the default one), or off the server; the reason is shown to them. */
     fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) = admin(
-        "kick ${person.nickname} from the " + if (fromServer) "server" else "channel",
+        if (fromServer) AdminAction.KICK_SERVER else AdminAction.KICK_CHANNEL, person,
         "clientkick", "clid" to person.id, "reasonid" to if (fromServer) 5 else 4, "reasonmsg" to reason.trim().take(REASON_MAX).ifEmpty { null },
     )
 
@@ -567,21 +575,22 @@ object Session : TsClient.Listener {
      * address (so a new identity doesn't get them back in) and removes them at once.
      */
     fun ban(person: ServerModel.Client, seconds: Long, reason: String) = admin(
-        "ban ${person.nickname}", "banclient", "clid" to person.id, "time" to seconds,
+        AdminAction.BAN, person, "banclient", "clid" to person.id, "time" to seconds,
         "banreason" to reason.trim().take(REASON_MAX).ifEmpty { null },
     )
 
     /** The longest reason given with a kick or a ban (TeamSpeak's limit). */
     const val REASON_MAX = 40
 
-    private fun adminAnswered(what: String, cmd: Command) {
+    private fun adminAnswered(asked: Pair<AdminAction, String>, cmd: Command) {
+        val (action, who) = asked
         val id = cmd["id"] ?: return
-        if (id == "0") return AppLog.log("Admin: $what")
-        AppLog.log("Admin: couldn't $what, error $id: ${cmd["msg"]} (permission ${cmd["failed_permid"]})")
+        if (id == "0") return AppLog.log("Admin: ${action.log} $who")
+        AppLog.log("Admin: couldn't ${action.log} $who, error $id: ${cmd["msg"]} (permission ${cmd["failed_permid"]})")
         val message = when (id) {
-            NO_PERMISSION -> "You don't have permission to $what."
-            WRONG_CHANNEL_PASSWORD -> "Couldn't $what: the channel needs its password. Join it once with the password, remembering it, to move people there."
-            else -> "Couldn't $what: ${cmd["msg"]}"
+            NO_PERMISSION -> app.getString(action.noPermission, who)
+            WRONG_CHANNEL_PASSWORD -> app.getString(R.string.admin_move_needs_password, who)
+            else -> app.getString(action.failed, who, cmd["msg"].orEmpty())
         }
         _state.update { it.copy(error = message) }
     }
@@ -682,7 +691,7 @@ object Session : TsClient.Listener {
             client?.sendCommand(Commands.build(cmd, "return_code" to "quiet-$i"))
         }
         publish(Phase.CONNECTED)
-        ConnectionService.start(app, "Connected to ${model.serverName.ifEmpty { _state.value.address }}")
+        ConnectionService.start(app, app.getString(R.string.notification_connected, model.serverName.ifEmpty { _state.value.address }))
         kicked = false
         soundsFrom = System.currentTimeMillis() + 3000
         UiSounds.play(Cue.CONNECTED, s.voice, s.outputMuted)
@@ -773,7 +782,7 @@ object Session : TsClient.Listener {
         worker.execute {
             var n = 0
             // Which one failed, when there were several
-            fun which() = if (uris.size > 1) "Picture $n of ${uris.size}" else "The picture"
+            fun notSent(why: String) = if (uris.size > 1) app.getString(R.string.pictures_not_sent, n, uris.size, why) else app.getString(R.string.picture_not_sent, why)
             try {
                 f.createDirectory(cid, io.github.korppujauho.pocketts.proto.Pictures.PICTURE_FOLDER)
                 for (uri in uris) {
@@ -789,9 +798,9 @@ object Session : TsClient.Listener {
                     AppLog.log("Sent a picture (${p.bytes.size / 1024} KB)")
                 }
             } catch (e: FileTransfer.Error) {
-                _state.update { it.copy(error = "${which()} wasn't sent: ${e.message}" + if (e.code == 2568) " (no permission in this channel)" else "") }
+                _state.update { it.copy(error = notSent(if (e.code == 2568) app.getString(R.string.picture_no_permission, e.message.orEmpty()) else e.message.orEmpty())) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = "${which()} wasn't sent: ${e.message}") }
+                _state.update { it.copy(error = notSent(e.message.orEmpty())) }
             } finally {
                 _state.update { it.copy(sendingPicture = false, sendingProgress = null) }
             }
@@ -802,7 +811,7 @@ object Session : TsClient.Listener {
     fun setAvatar(context: Context, uri: android.net.Uri) {
         val c = client ?: return
         val f = files ?: return
-        _state.update { it.copy(avatarStatus = "Uploading…") }
+        _state.update { it.copy(avatarStatus = app.getString(R.string.avatar_uploading)) }
         worker.execute {
             try {
                 // Over the server's size limit, the next smaller one is tried (as the TeamSpeak app asks for a smaller one)
@@ -821,17 +830,17 @@ object Session : TsClient.Listener {
                 val data = sent ?: return@execute
                 c.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to io.github.korppujauho.pocketts.proto.Pictures.avatarFlag(data)))
                 AppLog.log("Profile picture set (${data.size / 1024} KB)")
-                _state.update { it.copy(avatarStatus = "Profile picture set.") }
+                _state.update { it.copy(avatarStatus = app.getString(R.string.avatar_set)) }
             } catch (e: FileTransfer.Error) {
                 _state.update {
                     it.copy(avatarStatus = when (e.code) {
-                        AVATAR_TOO_BIG -> "This server allows only a very small profile picture, or none."
-                        2568 -> "This server doesn't allow you a profile picture."
-                        else -> "The profile picture wasn't set: ${e.message}"
+                        AVATAR_TOO_BIG -> app.getString(R.string.avatar_too_big)
+                        2568 -> app.getString(R.string.avatar_not_allowed)
+                        else -> app.getString(R.string.avatar_failed, e.message.orEmpty())
                     })
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(avatarStatus = "The profile picture wasn't set: ${e.message}") }
+                _state.update { it.copy(avatarStatus = app.getString(R.string.avatar_failed, e.message.orEmpty())) }
             }
         }
     }
@@ -839,7 +848,7 @@ object Session : TsClient.Listener {
     /** No profile picture: the flag is cleared, so nobody shows it (the file itself can't be deleted). */
     fun removeAvatar() {
         client?.sendCommand(Commands.build("clientupdate", "client_flag_avatar" to ""))
-        _state.update { it.copy(avatarStatus = "Profile picture removed.") }
+        _state.update { it.copy(avatarStatus = app.getString(R.string.avatar_removed)) }
     }
 
     override fun onCommand(cmd: Command) {
@@ -893,6 +902,7 @@ object Session : TsClient.Listener {
 
     override fun onDisconnected(reason: String?) {
         AppLog.log("Disconnected" + (reason?.let { ": $it" } ?: ""))
+        val text = endText(client, reason)
         // The server still has our old connection, which it drops only after a while (the same identity may be on
         // once): tried again every few seconds until it lets go, for up to two minutes
         val oldStillThere = client?.refusal == CLONE_STILL_ON && oldWaits < 40
@@ -916,14 +926,37 @@ object Session : TsClient.Listener {
             _state.update {
                 it.copy(
                     phase = Phase.CONNECTING, reconnecting = retries, waitingForOld = oldStillThere,
-                    error = if (oldStillThere) null else reason, talking = emptySet(),
+                    error = if (oldStillThere) null else text, talking = emptySet(),
                 )
             }
-            ConnectionService.start(app, "Reconnecting to ${_state.value.address}…")
+            ConnectionService.start(app, app.getString(R.string.notification_reconnecting, _state.value.address))
             scheduleRetry(if (oldStillThere) 3L else minOf(30L, 2L * retries))
             return
         }
-        finish(reason)
+        finish(text)
+    }
+
+    /** Why the connection ended, in the phone's language; the client's English when it can't say more. */
+    private fun endText(c: TsClient?, english: String?): String? {
+        val d = c?.endDetail.orEmpty()
+        fun withReason(plain: Int, reason: Int) = if (d.isEmpty()) app.getString(plain) else app.getString(reason, d)
+        return when (c?.end ?: return english) {
+            TsClient.End.NO_ANSWER -> app.getString(R.string.end_no_answer)
+            TsClient.End.NO_SUCH_HOST -> app.getString(R.string.end_no_such_host, d)
+            TsClient.End.CANT_CONNECT -> app.getString(R.string.end_cant_connect, d)
+            TsClient.End.NETWORK_ERROR -> app.getString(R.string.end_network_error, d)
+            TsClient.End.NETWORK_GONE -> d // the app's own words already
+            TsClient.End.SERVER_SILENT -> app.getString(R.string.end_server_silent)
+            TsClient.End.SERVER_STOPPED -> app.getString(R.string.end_server_stopped)
+            TsClient.End.LOST -> app.getString(R.string.end_lost)
+            TsClient.End.KICKED_CHANNEL -> withReason(R.string.end_kicked_channel, R.string.end_kicked_channel_reason)
+            TsClient.End.KICKED -> withReason(R.string.end_kicked, R.string.end_kicked_reason)
+            TsClient.End.BANNED -> withReason(R.string.end_banned, R.string.end_banned_reason)
+            TsClient.End.SHUT_DOWN -> withReason(R.string.end_shut_down, R.string.end_shut_down_reason)
+            TsClient.End.BY_SERVER -> d.ifEmpty { app.getString(R.string.end_by_server) }
+            TsClient.End.REFUSED -> d.ifEmpty { english } // the server's own words
+            TsClient.End.HANDSHAKE -> app.getString(R.string.end_handshake)
+        }
     }
 
     private fun scheduleRetry(seconds: Long) {
@@ -951,14 +984,14 @@ object Session : TsClient.Listener {
                 val before = defaultNetwork
                 defaultNetwork = n
                 // Another network took over: the connection went out the old one, and the server won't follow
-                if (before != null && before != n) client?.networkGone("The network changed")
+                if (before != null && before != n) client?.networkGone(app.getString(R.string.end_network_changed))
                 if (_state.value.reconnecting > 0 && client == null) scheduleRetry(1)
             }
 
             override fun onLost(n: android.net.Network) {
                 if (n != defaultNetwork) return
                 defaultNetwork = null
-                client?.networkGone("The network went away")
+                client?.networkGone(app.getString(R.string.end_network_gone))
             }
         }
         try {
@@ -1009,7 +1042,7 @@ object Session : TsClient.Listener {
     private fun poked(p: Chat.Poke) {
         _state.update { s -> s.copy(pokes = (s.pokes + p).takeLast(5)) }
         if (!foreground && ::app.isInitialized) {
-            ConnectionService.notifyMessage(app, "${p.fromName} poked you", MessageText.plain(p.text))
+            ConnectionService.notifyMessage(app, app.getString(R.string.poked_you, p.fromName), MessageText.plain(p.text))
         }
     }
 

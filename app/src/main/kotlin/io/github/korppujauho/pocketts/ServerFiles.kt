@@ -147,13 +147,13 @@ object ServerFiles {
         val raw = context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
         val type = Pictures.type(raw)
         if (type == Pictures.Type.GIF || type == Pictures.Type.WEBP) {
-            if (raw.size > Pictures.PICTURE_UPLOAD_MAX_BYTES) throw IllegalArgumentException("The picture is too big (over 15 MB).")
+            if (raw.size > Pictures.PICTURE_UPLOAD_MAX_BYTES) throw IllegalArgumentException(context.getString(R.string.picture_too_big, Pictures.PICTURE_UPLOAD_MAX_BYTES / (1024 * 1024)))
             return Prepared(raw, type)
         }
         val bitmap = decode(raw, 2560)
         val png = type == Pictures.Type.PNG
         val out = encode(bitmap, if (png) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG, 88)
-        if (out.size > Pictures.PICTURE_UPLOAD_MAX_BYTES) throw IllegalArgumentException("The picture is too big (over 15 MB).")
+        if (out.size > Pictures.PICTURE_UPLOAD_MAX_BYTES) throw IllegalArgumentException(context.getString(R.string.picture_too_big, Pictures.PICTURE_UPLOAD_MAX_BYTES / (1024 * 1024)))
         return Prepared(out, if (png) Pictures.Type.PNG else Pictures.Type.JPG)
     }
 
