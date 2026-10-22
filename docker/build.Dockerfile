@@ -1,6 +1,6 @@
 # The build environment: Java and the Android SDK, so nothing has to be installed on the developer's own machine.
 # Used by scripts/dev.sh (and by CI). Gradle itself comes through the wrapper (./gradlew) into a cache volume.
-FROM eclipse-temurin:21-jdk-noble
+FROM eclipse-temurin:25-jdk-noble
 
 ARG CMDLINE_TOOLS=15859902
 ARG CMDLINE_TOOLS_SHA256=4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583
