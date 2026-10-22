@@ -20,8 +20,8 @@ android {
         applicationId = "io.github.korppujauho.pocketts"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
         // Phones (WebRTC's native code is large; these two cover practically every phone)
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
