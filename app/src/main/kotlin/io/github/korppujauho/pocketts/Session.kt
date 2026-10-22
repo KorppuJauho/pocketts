@@ -21,6 +21,7 @@ object Session : TsClient.Listener {
     private const val WRONG_CHANNEL_PASSWORD = "781" // "invalid channel password"
     private const val CLONE_STILL_ON = "521" // "too many clones already connected": our identity is still on
     private const val NO_PERMISSION = "2568" // "insufficient client permissions"
+    private const val LEVEL_TOO_LOW = "519" // "could not validate client identity": its extra_msg is the level needed
     private const val AVATAR_TOO_BIG = 2565 // over the server's max avatar file size
 
 
@@ -65,6 +66,7 @@ object Session : TsClient.Listener {
         val streams: Map<Int, String> = emptyMap(), // running streams: whose and their id
         val away: Boolean = false,
         val awayMessage: String = "",
+        val neededLevel: Int = 0, // the server refused our identity's security level: the level it needs
     ) {
         /** Files on this server (for pictures). */
         val serverKey: String get() = address
@@ -254,6 +256,26 @@ object Session : TsClient.Listener {
         wasConnected = false
         target = Target(address, nickname, serverPassword, filePort)
         start(keepChat = false)
+    }
+
+    // The server that refused our security level (see UiState.neededLevel), until we connect to it again or let it be
+    @Volatile private var neededLevel = 0
+    private var levelTarget: Target? = null
+
+    /** After raising the security level: the server that asked for it again. */
+    fun connectAgain() {
+        val t = levelTarget ?: return
+        levelTarget = null
+        _state.update { it.copy(neededLevel = 0) }
+        connect(app, t.address, t.nickname, t.password, t.filePort)
+    }
+
+    /** The security level wasn't raised (enough): the server's need is let be, and said why we're not connected. */
+    fun dismissNeededLevel() {
+        levelTarget = null
+        _state.update {
+            it.copy(neededLevel = 0, error = "Not connected: the server needs identity security level ${it.neededLevel}. You can raise yours in Settings › Advanced.")
+        }
     }
 
     /** Connects to [target]; a reconnect keeps the chat and the pokes. */
@@ -826,6 +848,10 @@ object Session : TsClient.Listener {
             "channellistfinished" -> client?.sendCommand("channelsubscribeall")
             "notifychannelcreated" -> client?.sendCommand(Commands.build("channelsubscribe", "cid" to cmd["cid"]))
             "error" -> {
+                // Refused while connecting: our identity's security level is under the server's
+                if (cmd["id"] == LEVEL_TOO_LOW && _state.value.phase == Phase.CONNECTING) {
+                    neededLevel = cmd["extra_msg"]?.toIntOrNull() ?: 0
+                }
                 pendingJoin?.takeIf { it.code == cmd["return_code"] }?.let {
                     pendingJoin = null
                     joinAnswered(it, cmd)
@@ -953,6 +979,10 @@ object Session : TsClient.Listener {
         kicked = false
         engine?.reset()
         retryTask?.cancel(false)
+        // A server that needs a higher security level: it's offered to raise ours, then to connect again
+        val level = neededLevel
+        neededLevel = 0
+        levelTarget = if (level > 0) target else null
         target = null
         files?.onDisconnected()
         files = null
@@ -961,8 +991,8 @@ object Session : TsClient.Listener {
         closeHistory()
         val s = _state.value
         _state.value = UiState(
-            phase = Phase.IDLE, error = reason, address = s.address, inputMuted = s.inputMuted, outputMuted = s.outputMuted,
-            volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed,
+            phase = Phase.IDLE, error = if (level > 0) null else reason, address = s.address, inputMuted = s.inputMuted,
+            outputMuted = s.outputMuted, volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed, neededLevel = level,
         )
         if (::app.isInitialized) ConnectionService.stop(app)
         pendingSwitch?.let { next ->

@@ -192,6 +192,12 @@ Sending pictures needs a server whose file transfer works for you (and the permi
       sharing to apps). Import it again (Choose a file): no complaint, and the identity field hides what's pasted.
 - [x] Settings › Advanced › Identity › Import › Choose a file…: pick the .ini file the TeamSpeak app on the PC exported. It says
   "Imported"; after reconnecting, the PC sees you with that identity's unique id (the same as the PC's own).
+- [ ] Settings › Advanced › Security level shows your level. Raise level: pick a level a few above it, see the
+      estimate, Raise: the level counts up and ends in "Done". Raise again to a high level and Stop: it keeps the level
+      reached, the badge shows it, and the server still knows you (same unique id).
+- [ ] On the test server, set the needed security level above yours (`serveredit
+      virtualserver_needed_identity_security_level=…`): connecting offers to raise it; Raise connects when it gets
+      there. Cancel instead: "Not connected: the server needs identity security level …". Set it back afterwards.
 - [x] Install this build over an older one (don't uninstall first): the server still knows you (same unique id), and
   the remembered server password, the favourites' passwords and the relay password (Settings › Advanced) are all still there.
 - [ ] Optional, when moving to a new phone with Android's "copy apps and data": the favourites, nickname and settings

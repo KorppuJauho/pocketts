@@ -8,6 +8,11 @@
   app: it covers the person's identity and IP address, and removes them at once. The server decides who may: without
   the permission the app says "You don't have permission to …" instead of the server's raw error.
 - A new **UI** tab in Settings, before Advanced.
+- **Security level:** a server that needs a higher identity security level than yours no longer just refuses. PocketTS
+  says which level it needs, offers to raise yours, shows the progress with a Stop button, and connects again when it
+  gets there. Settings › Advanced shows your level, and Raise level raises it to a level you choose, with an estimate
+  of how long it takes on your phone. Raising keeps the same identity (groups and permissions stay), uses all but one
+  of the phone's cores, and Stop keeps the level reached so far.
 
 ## 1.1.0 (2026-10-22)
 

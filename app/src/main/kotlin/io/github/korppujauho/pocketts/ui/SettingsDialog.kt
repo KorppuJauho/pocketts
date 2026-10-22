@@ -77,6 +77,8 @@ interface SettingsActions {
     fun identityProblem(): String? = null
     /** Lets go of the saved identity: a new one is made at the next connect. */
     fun forgetIdentity() {}
+    /** The identity's security level (null when it can't be read). */
+    fun securityLevel(): Int? = null
     /** Forgets every server's chat history, and the lines on screen. */
     fun clearChatHistory() {}
     /** Forgets every remembered channel password. */
@@ -192,7 +194,7 @@ private fun Group(label: String? = null, badge: String? = null, content: @Compos
 }
 
 @Composable
-private fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
+fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
 private fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
@@ -279,6 +281,16 @@ private fun Identity(actions: SettingsActions) {
             SecondaryButton("Import") { importing = true }
         }
         status?.let { Desc(it) }
+    }
+    // The security level: some servers need a higher one than a new identity has
+    var level by remember { mutableStateOf(actions.securityLevel()) }
+    var raising by remember { mutableStateOf(false) }
+    level?.let { current ->
+        Group("Security level", badge = "$current") {
+            Desc("Some servers only let in identities of at least a certain level. Raising it keeps the same identity, with its groups and permissions.")
+            SecondaryButton("Raise level") { raising = true }
+        }
+        if (raising) RaiseLevelDialog(current, onClose = { raising = false; level = actions.securityLevel() })
     }
     // Export: what the file means first, then a file of the person's choosing (not shared to an app)
     if (warning) {
