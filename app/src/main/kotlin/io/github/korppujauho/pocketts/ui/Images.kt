@@ -98,6 +98,7 @@ fun TsIcon(id: Long, server: String, size: Dp = 16.dp) {
 @Composable
 fun PictureViewer(model: Any, shown: MemoryCache.Key? = null, onDismiss: () -> Unit) {
     val context = LocalContext.current
+    val resources = androidx.compose.ui.platform.LocalResources.current
     val request = remember(model, shown) {
         ImageRequest.Builder(context).data(model).size(4096).precision(Precision.INEXACT).placeholderMemoryCacheKey(shown).build()
     }
@@ -131,12 +132,12 @@ fun PictureViewer(model: Any, shown: MemoryCache.Key? = null, onDismiss: () -> U
                     scope.launch {
                         val result = runCatching { withContext(Dispatchers.IO) { SavedPictures.load(context, model) } }
                         busy = false
-                        val message = result.mapCatching { use(it); done }.getOrElse { context.getString(R.string.picture_failed, it.message) }
+                        val message = result.mapCatching { use(it); done }.getOrElse { resources.getString(R.string.picture_failed, it.message) }
                         if (message != null) Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
                 ViewerButton(Icons.Filled.Download, stringResource(R.string.picture_save), busy) {
-                    withPicture(context.getString(R.string.picture_saved, "Pictures/${SavedPictures.FOLDER}")) { SavedPictures.saveToGallery(context, it) }
+                    withPicture(resources.getString(R.string.picture_saved, "Pictures/${SavedPictures.FOLDER}")) { SavedPictures.saveToGallery(context, it) }
                 }
                 ViewerButton(Icons.Filled.Share, stringResource(R.string.share), busy) {
                     withPicture(null) { SavedPictures.share(context, it) }

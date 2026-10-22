@@ -10,34 +10,43 @@ import kotlin.test.assertTrue
 
 /** Connecting to an address where no TeamSpeak server answers says so, not that a connection was lost. */
 class ConnectFailTest {
-    private fun reasonFor(host: String, port: Int): String? {
-        val reasons = ArrayBlockingQueue<String>(1)
-        val client = TsClient(object : TsClient.Listener {
+    private class Ended(val reason: String, val end: TsClient.End?, val detail: String)
+
+    private fun endFor(host: String, port: Int): Ended? {
+        val ends = ArrayBlockingQueue<Ended>(1)
+        lateinit var client: TsClient
+        client = TsClient(object : TsClient.Listener {
             override fun onDisconnected(reason: String?) {
-                reasons.offer(reason ?: "(none)")
+                ends.offer(Ended(reason ?: "(none)", client.end, client.endDetail))
             }
         })
         client.connect(TsClient.Options(host, port, Identity.generate(8), "PocketTS test"))
-        return reasons.poll(TsClient.SILENCE_MS + 5_000, TimeUnit.MILLISECONDS)
+        return ends.poll(TsClient.SILENCE_MS + 5_000, TimeUnit.MILLISECONDS)
     }
 
     @Test
     fun aSilentAddress() {
         // Something listens there but never answers
         DatagramSocket(0, InetAddress.getLoopbackAddress()).use { silent ->
-            assertEquals(TsClient.NO_ANSWER, reasonFor("127.0.0.1", silent.localPort))
+            val e = endFor("127.0.0.1", silent.localPort)
+            assertEquals(TsClient.NO_ANSWER, e?.reason)
+            assertEquals(TsClient.End.NO_ANSWER, e?.end)
         }
     }
 
     @Test
     fun aClosedPort() {
         val port = DatagramSocket(0, InetAddress.getLoopbackAddress()).use { it.localPort } // free again
-        assertEquals(TsClient.NO_ANSWER, reasonFor("127.0.0.1", port))
+        val e = endFor("127.0.0.1", port)
+        assertEquals(TsClient.NO_ANSWER, e?.reason)
+        assertEquals(TsClient.End.NO_ANSWER, e?.end)
     }
 
     @Test
     fun anUnknownName() {
-        val reason = reasonFor("no-such-server.invalid", 9987)
-        assertTrue(reason?.startsWith("Couldn't connect: no server found at \"no-such-server.invalid\"") == true, "was: $reason")
+        val e = endFor("no-such-server.invalid", 9987)
+        assertTrue(e?.reason?.startsWith("Couldn't connect: no server found at \"no-such-server.invalid\"") == true, "was: ${e?.reason}")
+        assertEquals(TsClient.End.NO_SUCH_HOST, e?.end)
+        assertEquals("no-such-server.invalid", e?.detail)
     }
 }

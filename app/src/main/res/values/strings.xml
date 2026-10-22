@@ -22,7 +22,6 @@
     <string name="remember_password">Remember the password</string>
     <string name="channel_password">Channel password</string>
     <string name="join">Join</string>
-    <string name="away">away</string>
 
     <!-- Connect screen -->
     <string name="favourites">Favourites</string>
@@ -71,7 +70,10 @@
     <string name="chat_system">System</string>
     <!-- A link's card: %1$s is the website's name, such as example.com -->
     <string name="chat_link_open">Open: %1$s</string>
-    <string name="chat_pictures_max">At most %1$d pictures at a time.</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="one">At most %1$d picture at a time.</item>
+        <item quantity="other">At most %1$d pictures at a time.</item>
+    </plurals>
     <string name="chat_camera_needed">Taking a photo needs the camera to be allowed.</string>
     <string name="chat_sending_picture">Sending picture %1$d of %2$d…</string>
     <string name="chat_attached_picture">An attached picture</string>
@@ -144,7 +146,311 @@
     <!-- %1$s is TeamSpeak's reason -->
     <string name="share_refused">TeamSpeak refused the share: %1$s</string>
 
+    <!-- Settings -->
+    <string name="settings_general">General</string>
+    <string name="settings_playback">Playback</string>
+    <string name="settings_capture">Capture</string>
+    <!-- The tab with how the app looks and what it offers -->
+    <string name="settings_ui">UI</string>
+    <string name="settings_save">Save &amp; Apply</string>
+    <string name="cant_be_undone">This can\'t be undone</string>
+    <string name="quiet">Quiet</string>
+    <string name="loud">Loud</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">Profile picture</string>
+    <string name="avatar_change">Change</string>
+    <string name="avatar_desc">Others see it on this server. It\'s made to fit 320 × 320.</string>
+    <string name="general_floating_ptt">Floating push-to-talk button</string>
+    <string name="general_floating_ptt_desc">In push-to-talk mode, a round button stays at the bottom of the screen, so you can talk while you scroll the chat.</string>
+    <string name="general_overlay_ptt">Talk button over other apps</string>
+    <string name="general_overlay_ptt_desc">In push-to-talk mode, the round button stays on screen when you go to other apps. Hold it to talk, drag it to move it. Android asks once to let PocketTS display over other apps.</string>
+    <string name="general_volume_ptt">Volume buttons are push-to-talk</string>
+    <string name="general_volume_ptt_desc">In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).</string>
+    <string name="general_headset_ptt">Headset button is push-to-talk</string>
+    <string name="general_headset_ptt_desc">In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it\'s on, the button doesn\'t play or pause music.</string>
+    <string name="general_updates">Check for updates</string>
+    <string name="general_updates_desc">Once a day, PocketTS asks GitHub whether a newer version is out, and says so on the connect screen. Nothing about you is sent.</string>
+    <string name="general_screen_on">Keep the screen on</string>
+    <string name="general_screen_on_desc">The screen doesn\'t go dark while you\'re connected and the app is open. While you share or watch a stream, it stays on anyway.</string>
+    <string name="general_spacers">Allow joining spacer channels</string>
+    <string name="general_spacers_desc">Tapping a spacer (a divider line or title in the channel list) joins it like any channel. Some servers use one as their AFK channel. Off, spacers can\'t be joined by a stray tap.</string>
+    <string name="history_title">Chat history</string>
+    <!-- %1$s is how many days (history_days), %2$s how many lines (history_lines) -->
+    <string name="history_desc">Channel chats, private chats and who joined or left are kept on this phone, encrypted, and shown again when you connect to the same server: the last %1$s, at most %2$s per conversation. Pokes aren\'t kept.</string>
+    <plurals name="history_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="one">%1$d line</item>
+        <item quantity="other">%1$d lines</item>
+    </plurals>
+    <string name="history_clear">Clear chat history</string>
+    <string name="history_cleared">Cleared.</string>
+    <string name="history_clear_title">Clear chat history?</string>
+    <string name="history_clear_button">Clear</string>
+    <string name="history_clear_desc">Every server\'s saved chat is removed from this phone, and the chat on screen now.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">Voice volume</string>
+    <string name="playback_test_sound">Play test sound</string>
+    <string name="playback_event_sounds">Sounds for events</string>
+    <string name="playback_event_sounds_desc">Short sounds when someone comes into or leaves your channel, for messages, pokes and streams, and for the microphone and sound buttons.</string>
+    <string name="playback_sound_volume">Sound volume</string>
+    <string name="playback_play_sound">Play a sound</string>
+    <string name="playback_call_volume">With echo cancellation on, voices follow the call volume: press a volume button while connected.</string>
+    <string name="playback_media_volume">Voices follow the media volume.</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">Microphone volume</string>
+    <string name="capture_activation">Activation</string>
+    <string name="capture_vad">Voice activation</string>
+    <string name="capture_ptt">Push-to-talk</string>
+    <string name="capture_continuous">Continuous transmission</string>
+    <string name="capture_ptt_desc">Hold the \"Hold to talk\" button while you speak.</string>
+    <string name="capture_level">Level</string>
+    <string name="capture_level_desc">The bar shows your microphone while these settings are open; nothing is sent meanwhile.</string>
+    <string name="capture_vad_level">Voice activation level</string>
+    <string name="capture_vad_level_desc">Slide right to block background noise. If your voice cuts out, slide left.</string>
+    <string name="capture_vad_delay">Delay before deactivation</string>
+    <string name="capture_processing">Signal processing</string>
+    <string name="capture_noise">Remove background noise</string>
+    <string name="capture_echo">Echo cancellation</string>
+    <string name="capture_agc">Automatic gain control</string>
+    <string name="capture_echo_desc">Echo cancellation plays voices like a phone call (loudspeaker, or your headset). Turn it off for the best sound with headphones.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">Show admin functions</string>
+    <string name="ui_admin_desc">A person\'s menu also offers moving them to another channel, kicking them from the channel or the server, and banning them. The server decides whether you\'re allowed: without the permission it says no.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">Video connection</string>
+    <string name="relay_desc">Streams go straight between you and the other end. Behind some networks they need a relay (a TURN server): enter one here if you have it.</string>
+    <string name="relay_address">Relay (turn:host:port)</string>
+    <string name="relay_user">Relay username</string>
+    <string name="relay_password">Relay password</string>
+    <string name="relay_only">Always through the relay</string>
+    <string name="advanced_file_port">A server whose file transfer is on another port (its pictures and avatars don\'t load) can have its own port in the favourite\'s Advanced part.</string>
+    <string name="passwords_title">Channel passwords</string>
+    <string name="passwords_desc">Passwords you chose to remember join their channels with one tap. They\'re kept on this phone, encrypted.</string>
+    <string name="passwords_forget">Forget saved passwords</string>
+    <string name="passwords_forgotten">Forgotten.</string>
+    <string name="identity_title">TeamSpeak identity</string>
+    <string name="identity_desc">Your identity is who you are to servers (your groups and permissions). Keep a copy, or use the one from another TeamSpeak app.</string>
+    <string name="identity_wipe">Wipe</string>
+    <string name="identity_export">Export</string>
+    <string name="identity_import">Import</string>
+    <string name="identity_imported">Imported. It\'s used from the next connect.</string>
+    <string name="identity_saved">Saved. Keep the file somewhere only you can reach.</string>
+    <string name="identity_wiped">Wiped. A new identity is made at the next connect.</string>
+    <string name="identity_export_title">Export your identity</string>
+    <string name="identity_export_subtitle">Keep it private</string>
+    <string name="identity_save_file">Save to a file</string>
+    <string name="identity_export_what">The file is your identity itself: anyone who has it is you on every server, with your groups and permissions, such as a server admin\'s. Nobody can tell the difference.</string>
+    <string name="identity_export_where">Save it somewhere only you can reach, like this phone or a private drive. Don\'t send it in a chat or an email, and don\'t post it. A TeamSpeak app can open it, and so can PocketTS on another phone.</string>
+    <string name="identity_wipe_title">Wipe your identity?</string>
+    <string name="identity_wipe_what">This phone\'s identity is deleted, and a new one is made the next time you connect. To every server you\'re then someone new: your groups, permissions and anything given to your old identity (such as admin rights) don\'t come along.</string>
+    <string name="identity_wipe_back">The only way back is an exported copy. If you might want it again, cancel and Export it first.</string>
+    <string name="identity_import_title">Import an identity</string>
+    <string name="identity_import_subtitle">From a TeamSpeak app</string>
+    <string name="identity_import_desc">Paste the identity a TeamSpeak app exported, or choose the file it saved (.ini). It replaces this phone\'s own from the next connect.</string>
+    <string name="identity_field">Identity</string>
+    <string name="identity_choose_file">Choose a file…</string>
+    <string name="level_title">Security level</string>
+    <string name="level_desc">Some servers only let in identities of at least a certain level. Raising it keeps the same identity, with its groups and permissions.</string>
+    <string name="level_raise_button">Raise level</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">You</string>
+    <string name="person_away">Away</string>
+    <!-- %1$s is their away message -->
+    <string name="person_away_message">Away: %1$s</string>
+    <string name="person_volume">Volume for you</string>
+    <string name="away_message_field">Away message (optional)</string>
+    <string name="away_back">I\'m back</string>
+    <string name="away_update">Update</string>
+    <string name="away_set">Set away</string>
+    <string name="poke">Poke</string>
+    <string name="chat">Chat</string>
+    <!-- %1$s is the person's name -->
+    <string name="poke_title">Poke %1$s</string>
+    <string name="poke_subtitle">They get a popup with your message</string>
+    <string name="poke_message_field">Message (optional)</string>
+    <!-- A poke received: %1$s is who poked -->
+    <string name="poked_you">%1$s poked you</string>
+    <string name="dismiss">Dismiss</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">Admin</string>
+    <string name="admin_move">Move</string>
+    <string name="admin_kick">Kick</string>
+    <string name="admin_ban">Ban</string>
+    <!-- %1$s is the person's name -->
+    <string name="admin_move_title">Move %1$s</string>
+    <string name="admin_move_subtitle">Choose the channel</string>
+    <!-- The channel the person is in now -->
+    <string name="admin_here_now">Here now</string>
+    <string name="admin_has_password">Has a password</string>
+    <string name="admin_kick_title">Kick %1$s</string>
+    <string name="admin_kick_subtitle">They see the reason</string>
+    <string name="admin_kick_channel">From the channel (into the default channel)</string>
+    <string name="admin_kick_server">From the server</string>
+    <string name="admin_reason">Reason (optional)</string>
+    <string name="admin_ban_title">Ban %1$s</string>
+    <string name="admin_ban_subtitle">Bans their identity and IP address</string>
+    <string name="ban_10_minutes">10 minutes</string>
+    <string name="ban_1_hour">1 hour</string>
+    <string name="ban_1_day">1 day</string>
+    <string name="ban_1_week">1 week</string>
+    <string name="ban_permanently">Permanently</string>
+
+    <!-- Server info -->
+    <string name="info_title">Server info</string>
+    <string name="info_users">Users</string>
+    <string name="info_channels">Channels</string>
+    <string name="info_uptime">Uptime</string>
+    <string name="info_created">Created</string>
+    <!-- %1$s is a time span, such as "3 months" -->
+    <string name="info_ago">%1$s ago</string>
+    <plurals name="span_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <!-- %1$d is the level the server needs -->
+    <string name="level_needed_title">Security level %1$d needed</string>
+    <string name="level_raise_title">Raise security level</string>
+    <!-- %1$d is the identity's level now -->
+    <string name="level_needed_subtitle">This server needs it. Yours is %1$d.</string>
+    <string name="level_yours">Yours is %1$d</string>
+    <string name="level_raise">Raise</string>
+    <!-- %1$s is a rough time, such as "about 3 minutes" -->
+    <string name="level_estimate">On this phone that takes %1$s on average. It can be quicker or slower.</string>
+    <string name="level_measuring">Working out how long it takes on this phone…</string>
+    <string name="level_desc_raise">Raising is a one-time job. Your identity stays the same: your groups and permissions stay, and the higher level works on every server. Keep the app open while it works; Stop keeps the level reached so far.</string>
+    <!-- %1$d is the level reached, %2$d the level aimed at -->
+    <string name="level_progress">Level %1$d of %2$d</string>
+    <string name="level_running_desc">Keep the app open. Each level takes about twice as long as the one before.</string>
+    <string name="level_done">Done: your security level is %1$d.</string>
+    <string name="level_done_connecting">Done: your security level is %1$d. Connecting again…</string>
+    <string name="level_stopped">Stopped at level %1$d. Raising again goes on from there.</string>
+    <string name="about_under_minute">under a minute</string>
+    <plurals name="about_minutes">
+        <item quantity="one">about a minute</item>
+        <item quantity="other">about %1$d minutes</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="one">about an hour</item>
+        <item quantity="other">about %1$d hours</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">about a day</item>
+        <item quantity="other">about %1$d days</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">Servers</string>
+    <string name="connected">Connected</string>
+    <!-- %1$s is the server's address -->
+    <string name="connecting_to">Connecting to %1$s…</string>
+    <string name="reconnecting_old">Reconnecting… The server still has your old connection: waiting for it to let go.</string>
+    <!-- %1$d is which try this is -->
+    <string name="reconnecting_try">Connection lost. Reconnecting… (try %1$d)</string>
+    <string name="channel_password_subtitle">This channel has a password</string>
+    <string name="view_channels">Channels</string>
+    <!-- The stream player's title: %1$s is whose stream -->
+    <string name="stream_title">%1$s\'s stream</string>
+    <string name="stream_title_unknown">Stream</string>
+    <string name="not_an_address">That doesn\'t look like a server address</string>
+    <!-- A private chat's person left: %1$s is their name -->
+    <string name="private_left">%1$s left the server</string>
+    <string name="private_left_unknown">They left the server</string>
+    <string name="level_not_connected">Not connected: the server needs identity security level %1$d. You can raise yours in Settings › Advanced.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">Couldn\'t connect: no answer from the server. Check the address and port.</string>
+    <!-- %1$s is the address typed -->
+    <string name="end_no_such_host">Couldn\'t connect: no server found at \"%1$s\". Check the address.</string>
+    <!-- %1$s is the phone's own error -->
+    <string name="end_cant_connect">Couldn\'t connect: %1$s</string>
+    <string name="end_network_error">Network error: %1$s</string>
+    <string name="end_network_changed">The network changed</string>
+    <string name="end_network_gone">The network went away</string>
+    <string name="end_server_silent">The server didn\'t answer</string>
+    <string name="end_server_stopped">The server stopped answering</string>
+    <string name="end_lost">Connection lost</string>
+    <string name="end_handshake">The connection to the server couldn\'t be set up.</string>
+    <string name="end_by_server">Disconnected by the server</string>
+    <string name="end_kicked_channel">Kicked from the channel</string>
+    <!-- %1$s is the reason the admin gave -->
+    <string name="end_kicked_channel_reason">Kicked from the channel: %1$s</string>
+    <string name="end_kicked">Kicked from the server</string>
+    <string name="end_kicked_reason">Kicked from the server: %1$s</string>
+    <string name="end_banned">Banned from the server</string>
+    <string name="end_banned_reason">Banned from the server: %1$s</string>
+    <string name="end_shut_down">The server shut down</string>
+    <string name="end_shut_down_reason">The server shut down: %1$s</string>
+
+    <!-- Admin actions the server refused: %1$s is the person's name, %2$s the server's reason -->
+    <string name="admin_no_permission_move">You don\'t have permission to move %1$s.</string>
+    <string name="admin_no_permission_kick_channel">You don\'t have permission to kick %1$s from the channel.</string>
+    <string name="admin_no_permission_kick_server">You don\'t have permission to kick %1$s from the server.</string>
+    <string name="admin_no_permission_ban">You don\'t have permission to ban %1$s.</string>
+    <string name="admin_failed_move">Couldn\'t move %1$s: %2$s</string>
+    <string name="admin_failed_kick_channel">Couldn\'t kick %1$s from the channel: %2$s</string>
+    <string name="admin_failed_kick_server">Couldn\'t kick %1$s from the server: %2$s</string>
+    <string name="admin_failed_ban">Couldn\'t ban %1$s: %2$s</string>
+    <string name="admin_move_needs_password">Couldn\'t move %1$s: the channel needs its password. Join it once with the password, remembering it, to move people there.</string>
+
+    <!-- Sending pictures: %1$s / %3$s is the reason -->
+    <string name="picture_not_sent">The picture wasn\'t sent: %1$s</string>
+    <!-- %1$d is which picture, %2$d of how many -->
+    <string name="pictures_not_sent">Picture %1$d of %2$d wasn\'t sent: %3$s</string>
+    <string name="picture_no_permission">%1$s (no permission in this channel)</string>
+    <!-- %1$d is the limit in megabytes -->
+    <string name="picture_too_big">The picture is too big (over %1$d MB).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">Uploading…</string>
+    <string name="avatar_set">Profile picture set.</string>
+    <string name="avatar_too_big">This server allows only a very small profile picture, or none.</string>
+    <string name="avatar_not_allowed">This server doesn\'t allow you a profile picture.</string>
+    <string name="avatar_failed">The profile picture wasn\'t set: %1$s</string>
+    <string name="avatar_removed">Profile picture removed.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">That isn\'t a TeamSpeak identity.</string>
+    <string name="identity_unreadable">The saved identity can\'t be opened on this phone. Import yours in Settings › Advanced › TeamSpeak identity, or make a new one there.</string>
+    <string name="identity_export_unreadable">The identity can\'t be read, so it can\'t be saved.</string>
+    <string name="file_not_written">That file couldn\'t be written.</string>
+    <string name="file_not_opened">That file can\'t be opened.</string>
+
     <!-- Notifications -->
     <string name="notification_channel">Connection</string>
     <string name="notification_messages">Messages and pokes</string>
+    <!-- %1$s is the server's name or address -->
+    <string name="notification_connected">Connected to %1$s</string>
+    <string name="notification_connecting">Connecting to %1$s</string>
+    <string name="notification_reconnecting">Reconnecting to %1$s…</string>
+    <string name="notification_sharing_camera">Sharing your camera</string>
+    <string name="notification_sharing_cameras">Sharing your cameras</string>
+    <string name="notification_sharing_screen">Sharing your screen</string>
 </resources>

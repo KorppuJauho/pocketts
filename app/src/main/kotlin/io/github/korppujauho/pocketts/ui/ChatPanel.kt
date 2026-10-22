@@ -395,11 +395,12 @@ private fun MessageBox(
     var pending by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var menu by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val resources = androidx.compose.ui.platform.LocalResources.current
     // More can be added to those already chosen, up to MAX_PICTURES
     fun add(uris: List<Uri>) {
         val all = (pending + uris).distinct()
         if (all.size > MAX_PICTURES) {
-            android.widget.Toast.makeText(context, context.getString(R.string.chat_pictures_max, MAX_PICTURES), android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, resources.getQuantityString(R.plurals.chat_pictures_max, MAX_PICTURES, MAX_PICTURES), android.widget.Toast.LENGTH_SHORT).show()
         }
         pending = all.take(MAX_PICTURES)
     }
@@ -415,7 +416,7 @@ private fun MessageBox(
     // The camera app may only be opened once the camera is allowed (the app also uses it for streams)
     val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         if (ok) takePhoto()
-        else android.widget.Toast.makeText(context, context.getString(R.string.chat_camera_needed), android.widget.Toast.LENGTH_LONG).show()
+        else android.widget.Toast.makeText(context, resources.getString(R.string.chat_camera_needed), android.widget.Toast.LENGTH_LONG).show()
     }
     if (progress != null) {
         Text(

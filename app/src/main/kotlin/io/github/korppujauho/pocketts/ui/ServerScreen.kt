@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import io.github.korppujauho.pocketts.Session
 import io.github.korppujauho.pocketts.proto.Chat
 import io.github.korppujauho.pocketts.proto.ServerModel
+import io.github.korppujauho.pocketts.R
+import androidx.compose.ui.res.stringResource
 
 /** What the server screen can ask for. */
 interface ServerActions {
@@ -176,11 +178,11 @@ fun ServerScreen(
         }
         Column(Modifier.fillMaxSize()) {
             AppHeader {
-                ExitButton("Disconnect") { actions.disconnect() }
+                ExitButton(stringResource(R.string.disconnect)) { actions.disconnect() }
                 androidx.compose.foundation.layout.Spacer(Modifier.size(14.dp)) // so the star isn't Disconnect by mistake
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
-                    HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, "Servers") { serversMenu = true }
+                    HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, stringResource(R.string.servers)) { serversMenu = true }
                     androidx.compose.material3.DropdownMenu(
                         serversMenu, onDismissRequest = { serversMenu = false },
                         shape = RoundedCornerShape(16.dp), containerColor = Pop.top, shadowElevation = 12.dp,
@@ -193,7 +195,7 @@ fun ServerScreen(
                                 leadingIcon = {
                                     androidx.compose.material3.Icon(
                                         if (here) androidx.compose.material.icons.Icons.Filled.CheckCircle else androidx.compose.material.icons.Icons.Filled.Star,
-                                        contentDescription = if (here) "Connected" else null, tint = if (here) Ts.green else Ts.muted,
+                                        contentDescription = if (here) stringResource(R.string.connected) else null, tint = if (here) Ts.green else Ts.muted,
                                     )
                                 },
                                 enabled = !here,
@@ -202,7 +204,7 @@ fun ServerScreen(
                         }
                         if (favorites.none { io.github.korppujauho.pocketts.Favorites.same(it.address, state.address) }) {
                             androidx.compose.material3.DropdownMenuItem(
-                                text = { Text("Add to favourites", color = Ts.text) },
+                                text = { Text(stringResource(R.string.favourite_add), color = Ts.text) },
                                 leadingIcon = {
                                     androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Filled.StarBorder, contentDescription = null, tint = Ts.muted)
                                 },
@@ -234,9 +236,9 @@ fun ServerScreen(
                     )
                 }
                 if (state.stream.watching != 0 && egl != null && !pip) {
-                    val who = state.client(state.stream.watching)?.nickname ?: "Stream"
+                    val who = state.client(state.stream.watching)?.nickname
                     WatchCard(
-                        state.stream, "$who's stream", egl, actions::stopWatching, actions::setWatchMuted, actions::setWatchVolume,
+                        state.stream, who?.let { stringResource(R.string.stream_title, it) } ?: stringResource(R.string.stream_title_unknown), egl, actions::stopWatching, actions::setWatchMuted, actions::setWatchVolume,
                         actions::pictureInPicture,
                     )
                 }
@@ -252,14 +254,14 @@ fun ServerScreen(
                             androidx.compose.material.icons.Icons.Filled.Dns, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp),
                         )
                         androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
-                        ServerName(state.serverName.ifEmpty { "Connecting to ${state.address}…" }) { serverInfo = true }
+                        ServerName(state.serverName.ifEmpty { stringResource(R.string.connecting_to, state.address) }) { serverInfo = true }
                     }) {
                         if (state.phase == Session.Phase.CONNECTING) {
                             Loading(
                                 when {
-                                    state.waitingForOld -> "Reconnecting… The server still has your old connection: waiting for it to let go."
-                                    state.reconnecting > 0 -> "Connection lost. Reconnecting… (try ${state.reconnecting})"
-                                    else -> "Connecting…"
+                                    state.waitingForOld -> stringResource(R.string.reconnecting_old)
+                                    state.reconnecting > 0 -> stringResource(R.string.reconnecting_try, state.reconnecting)
+                                    else -> stringResource(R.string.stream_connecting)
                                 }
                             )
                         } else {
@@ -327,17 +329,17 @@ fun ServerScreen(
         var keep by remember { mutableStateOf(rememberAgain) }
         TsDialog(
             onDismiss = { askPassword = null }, title = ch.displayName, icon = androidx.compose.material.icons.Icons.Rounded.Lock,
-            subtitle = "This channel has a password",
+            subtitle = stringResource(R.string.channel_password_subtitle),
             buttons = {
-                PillButton("Cancel") { askPassword = null }
-                PillButton("Join", PillKind.PRIMARY, enabled = pw.isNotEmpty()) {
+                PillButton(stringResource(R.string.cancel)) { askPassword = null }
+                PillButton(stringResource(R.string.join), PillKind.PRIMARY, enabled = pw.isNotEmpty()) {
                     actions.join(ch, pw, remember = keep)
                     askPassword = null
                     rememberAgain = false
                 }
             },
         ) {
-            TsField(pw, { pw = it }, "Channel password", password = true)
+            TsField(pw, { pw = it }, stringResource(R.string.channel_password), password = true)
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { keep = !keep },
                 verticalAlignment = Alignment.CenterVertically,
@@ -348,7 +350,7 @@ fun ServerScreen(
                         colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
                     )
                 }
-                Text("Remember the password", color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+                Text(stringResource(R.string.remember_password), color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
             }
         }
     }
@@ -412,7 +414,7 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
             .border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)).padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        for ((v, label) in listOf(View.CHANNELS to "Channels", View.CHAT to "Chat")) {
+        for ((v, label) in listOf(View.CHANNELS to stringResource(R.string.view_channels), View.CHAT to stringResource(R.string.chat))) {
             val active = v == view
             Row(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)

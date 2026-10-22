@@ -43,7 +43,7 @@ class Settings(private val context: Context) {
         AppLog.log("Imported an identity (security level ${id.securityLevel})")
         null
     } catch (e: Exception) {
-        "That isn't a TeamSpeak identity."
+        context.getString(R.string.identity_not_valid)
     }
 
     /** Why the saved identity can't be used, when it can't (it's then left as it is, not replaced by a new one). */
@@ -51,7 +51,7 @@ class Settings(private val context: Context) {
         secrets.getSecret("identity", IDENTITY, old = prefs)
         null
     } catch (e: SecretBox.Unreadable) {
-        UNREADABLE
+        context.getString(R.string.identity_unreadable)
     }
 
     /** Saves the identity in place of the old one (the same identity with a raised security level). */
@@ -75,7 +75,7 @@ class Settings(private val context: Context) {
             secrets.getSecret("identity", IDENTITY, old = prefs)
         } catch (e: SecretBox.Unreadable) {
             AppLog.log("The saved identity can't be decrypted, keeping it and not making a new one: ${e.message}")
-            throw IdentityUnreadable()
+            throw IdentityUnreadable(context.getString(R.string.identity_unreadable))
         }
         saved?.let {
             try {
@@ -90,11 +90,9 @@ class Settings(private val context: Context) {
         return id
     }
 
-    class IdentityUnreadable : Exception(UNREADABLE)
+    class IdentityUnreadable(message: String) : Exception(message)
 
     private companion object {
         const val IDENTITY = "settings/identity"
-        const val UNREADABLE = "The saved identity can't be opened on this phone. Import yours in Settings › Advanced › " +
-            "TeamSpeak identity, or make a new one there."
     }
 }

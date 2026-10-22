@@ -34,7 +34,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.korppujauho.pocketts.R
 import io.github.korppujauho.pocketts.Session
+import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.proto.ServerModel
 
 /** Moving someone: the server's channels as a tree, tap one. Spacers only when they may be joined (Settings). */
@@ -58,9 +60,9 @@ fun MoveDialog(
         }
     }
     TsDialog(
-        onDismiss = onDismiss, title = "Move ${person.nickname}", icon = Icons.Rounded.SwapVert,
-        subtitle = "Choose the channel",
-        buttons = { PillButton("Cancel", onClick = onDismiss) },
+        onDismiss = onDismiss, title = stringResource(R.string.admin_move_title, person.nickname), icon = Icons.Rounded.SwapVert,
+        subtitle = stringResource(R.string.admin_move_subtitle),
+        buttons = { PillButton(stringResource(R.string.cancel), onClick = onDismiss) },
     ) {
         Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
             for ((channel, depth) in rows) {
@@ -75,8 +77,8 @@ fun MoveDialog(
                         channel.displayName.ifBlank { channel.name }, color = if (here) Ts.muted else Ts.text, fontSize = 15.sp,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
                     )
-                    if (here) Text("Here now", color = Ts.muted, fontSize = 12.sp)
-                    if (channel.hasPassword) Icon(Icons.Rounded.Lock, contentDescription = "Has a password", tint = Ts.muted, modifier = Modifier.size(16.dp))
+                    if (here) Text(stringResource(R.string.admin_here_now), color = Ts.muted, fontSize = 12.sp)
+                    if (channel.hasPassword) Icon(Icons.Rounded.Lock, contentDescription = stringResource(R.string.admin_has_password), tint = Ts.muted, modifier = Modifier.size(16.dp))
                 }
             }
         }
@@ -89,16 +91,16 @@ fun KickDialog(person: ServerModel.Client, onKick: (fromServer: Boolean, reason:
     var fromServer by remember { mutableStateOf(false) }
     var reason by remember { mutableStateOf("") }
     TsDialog(
-        onDismiss = onDismiss, title = "Kick ${person.nickname}", icon = Icons.AutoMirrored.Rounded.Logout, tint = Ts.red,
-        subtitle = "They see the reason",
+        onDismiss = onDismiss, title = stringResource(R.string.admin_kick_title, person.nickname), icon = Icons.AutoMirrored.Rounded.Logout, tint = Ts.red,
+        subtitle = stringResource(R.string.admin_kick_subtitle),
         buttons = {
-            PillButton("Cancel", onClick = onDismiss)
-            PillButton("Kick", PillKind.DANGER) { onKick(fromServer, reason) }
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.admin_kick), PillKind.DANGER) { onKick(fromServer, reason) }
         },
     ) {
-        Choice("From the channel (into the default channel)", !fromServer) { fromServer = false }
-        Choice("From the server", fromServer) { fromServer = true }
-        TsField(reason, { reason = it.take(Session.REASON_MAX) }, "Reason (optional)")
+        Choice(stringResource(R.string.admin_kick_channel), !fromServer) { fromServer = false }
+        Choice(stringResource(R.string.admin_kick_server), fromServer) { fromServer = true }
+        TsField(reason, { reason = it.take(Session.REASON_MAX) }, stringResource(R.string.admin_reason))
     }
 }
 
@@ -108,20 +110,23 @@ fun BanDialog(person: ServerModel.Client, onBan: (seconds: Long, reason: String)
     var seconds by remember { mutableLongStateOf(3600L) }
     var reason by remember { mutableStateOf("") }
     TsDialog(
-        onDismiss = onDismiss, title = "Ban ${person.nickname}", icon = Icons.Rounded.Block, tint = Ts.red,
-        subtitle = "Bans their identity and IP address",
+        onDismiss = onDismiss, title = stringResource(R.string.admin_ban_title, person.nickname), icon = Icons.Rounded.Block, tint = Ts.red,
+        subtitle = stringResource(R.string.admin_ban_subtitle),
         buttons = {
-            PillButton("Cancel", onClick = onDismiss)
-            PillButton("Ban", PillKind.DANGER) { onBan(seconds, reason) }
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.admin_ban), PillKind.DANGER) { onBan(seconds, reason) }
         },
     ) {
-        for ((label, s) in BAN_TIMES) Choice(label, seconds == s) { seconds = s }
-        TsField(reason, { reason = it.take(Session.REASON_MAX) }, "Reason (optional)")
+        for ((label, s) in BAN_TIMES) Choice(stringResource(label), seconds == s) { seconds = s }
+        TsField(reason, { reason = it.take(Session.REASON_MAX) }, stringResource(R.string.admin_reason))
     }
 }
 
 /** How long a ban lasts: 0 is for good. */
-private val BAN_TIMES = listOf("10 minutes" to 600L, "1 hour" to 3600L, "1 day" to 86_400L, "1 week" to 604_800L, "Permanently" to 0L)
+private val BAN_TIMES = listOf(
+    R.string.ban_10_minutes to 600L, R.string.ban_1_hour to 3600L, R.string.ban_1_day to 86_400L, R.string.ban_1_week to 604_800L,
+    R.string.ban_permanently to 0L,
+)
 
 @Composable
 private fun Choice(text: String, selected: Boolean, onClick: () -> Unit) {
@@ -140,11 +145,11 @@ private fun Choice(text: String, selected: Boolean, onClick: () -> Unit) {
 @Composable
 fun AdminTiles(onMove: () -> Unit, onKick: () -> Unit, onBan: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Admin", color = Ts.muted, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
+        Text(stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ActionTile(Icons.Rounded.SwapVert, "Move", Modifier.weight(1f), onClick = onMove)
-            ActionTile(Icons.AutoMirrored.Rounded.Logout, "Kick", Modifier.weight(1f), tint = Ts.red, onClick = onKick)
-            ActionTile(Icons.Rounded.Block, "Ban", Modifier.weight(1f), tint = Ts.red, onClick = onBan)
+            ActionTile(Icons.Rounded.SwapVert, stringResource(R.string.admin_move), Modifier.weight(1f), onClick = onMove)
+            ActionTile(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.admin_kick), Modifier.weight(1f), tint = Ts.red, onClick = onKick)
+            ActionTile(Icons.Rounded.Block, stringResource(R.string.admin_ban), Modifier.weight(1f), tint = Ts.red, onClick = onBan)
         }
     }
 }
