@@ -143,7 +143,7 @@ fun SettingsContent(
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 10.dp).padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                listOf("General", "Playback", "Capture", "Advanced").forEachIndexed { i, name ->
+                listOf("General", "Playback", "Capture", "UI", "Advanced").forEachIndexed { i, name ->
                     val active = i == tab
                     Text(
                         name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
@@ -167,6 +167,7 @@ fun SettingsContent(
                     }
                     1 -> Playback(v, actions) { v = it }
                     2 -> Capture(v, actions) { v = it }
+                    3 -> Ui(v) { v = it }
                     else -> {
                         Advanced(v) { v = it }
                         ChannelPasswordsGroup(actions)
@@ -431,6 +432,15 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
     Group {
         Check("Allow joining spacer channels", v.joinSpacers) { onChange(v.copy(joinSpacers = it)) }
         Desc("Tapping a spacer (a divider line or title in the channel list) joins it like any channel. Some servers use one as their AFK channel. Off, spacers can't be joined by a stray tap.")
+    }
+}
+
+/** How the app looks and what it offers. */
+@Composable
+private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
+    Group {
+        Check("Show admin functions", v.adminTools) { onChange(v.copy(adminTools = it)) }
+        Desc("A person's menu also offers moving them to another channel, kicking them from the channel or the server, and banning them. The server decides whether you're allowed: without the permission it says no.")
     }
 }
 

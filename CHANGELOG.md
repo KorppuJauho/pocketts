@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Admin functions:** with Settings › UI › Show admin functions on (off by default), a person's menu also offers
+  Move (to a channel from the server's tree; admins need no channel password), Kick (from the channel or from the
+  server, with a reason they see) and Ban (10 minutes to permanently, with a reason). A ban works as in the TeamSpeak
+  app: it covers the person's identity and IP address, and removes them at once. The server decides who may: without
+  the permission the app says "You don't have permission to …" instead of the server's raw error.
+- A new **UI** tab in Settings, before Advanced.
 - **Security level:** a server that needs a higher identity security level than yours no longer just refuses. PocketTS
   says which level it needs, offers to raise yours, shows the progress with a Stop button, and connects again when it
   gets there. Settings › Advanced shows your level, and Raise level raises it to a level you choose, with an estimate

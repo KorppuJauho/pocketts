@@ -84,9 +84,11 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.core.content.FileProvider
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import coil3.compose.AsyncImage
 import coil3.memory.MemoryCache
 import io.github.korppujauho.pocketts.PictureSizes
+import io.github.korppujauho.pocketts.R
 import io.github.korppujauho.pocketts.proto.Chat
 import io.github.korppujauho.pocketts.proto.ServerModel
 import kotlin.math.abs
@@ -111,7 +113,7 @@ fun ChatPanel(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val channelKey = Chat.Key.Channel(state.ownChannel)
-            ChatTab("#", state.ownChannelName.ifEmpty { "Channel" }, view is Chat.Key.Channel, channelKey in state.unread) { onView(channelKey) }
+            ChatTab("#", state.ownChannelName.ifEmpty { stringResource(R.string.chat_channel) }, view is Chat.Key.Channel, channelKey in state.unread) { onView(channelKey) }
             for (t in state.privateTabs) {
                 val key = Chat.Key.Private(t.uid)
                 ChatTab("@", t.name, view == key, key in state.unread, onClose = { onCloseTab(t.uid) }) { onView(key) }
@@ -123,16 +125,21 @@ fun ChatPanel(
         // Each conversation its own list, so switching tabs opens the other one at its newest line too
         androidx.compose.runtime.key(key) {
             Messages(entries, emptyText = when (key) {
-                is Chat.Key.Channel -> "No messages in this channel yet."
-                is Chat.Key.Private -> "No messages yet."
+                is Chat.Key.Channel -> stringResource(R.string.chat_empty_channel)
+                is Chat.Key.Private -> stringResource(R.string.chat_empty_private)
             }, state)
         }
         val target = when (key) {
-            is Chat.Key.Channel -> state.ownChannelName.ifEmpty { "the channel" }
-            is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name ?: "them"
+            is Chat.Key.Channel -> state.ownChannelName.ifEmpty { null }
+            is Chat.Key.Private -> state.privateTabs.firstOrNull { it.uid == key.uid }?.name
+        }
+        val placeholder = when {
+            target != null -> stringResource(R.string.chat_message_to, target)
+            key is Chat.Key.Channel -> stringResource(R.string.chat_message_to_channel)
+            else -> stringResource(R.string.chat_message_to_them)
         }
         MessageBox(
-            "Message to $target…", enabled = state.phase == Session.Phase.CONNECTED,
+            placeholder, enabled = state.phase == Session.Phase.CONNECTED,
             pictures = key is Chat.Key.Channel, sendingPicture = state.sendingPicture, progress = state.sendingProgress,
             onPicture = onPicture,
         ) { onSend(key, it) }
@@ -151,7 +158,7 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
         Text(name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
         if (unread) Box(Modifier.size(8.dp).clip(CircleShape).background(Ts.red))
         if (onClose != null) Icon(
-            androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Close", tint = Ts.muted,
+            androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.muted,
             modifier = Modifier.clip(CircleShape).clickable(onClick = onClose).padding(2.dp).size(16.dp),
         )
     }
@@ -285,6 +292,7 @@ private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?
     val (pictures, rest) = remember(e.text) { if (tsFile != null) emptyList<Pictures.ChannelPicture>() to "" else Pictures.channelPictures(e.text) }
     val text = remember(rest) { formatted(rest) }
     val uri = LocalUriHandler.current
+    val system = stringResource(R.string.chat_system)
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))
             .drawBehind { drawLine(Ts.accent, Offset(1f, 0f), Offset(1f, size.height), strokeWidth = 2.dp.toPx()) }
@@ -297,7 +305,7 @@ private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?
                 append("  ")
                 appendInlineContent("avatar", "•")
                 append(" ")
-                withStyle(SpanStyle(color = Ts.sender, fontWeight = FontWeight.Bold)) { append(e.senderName.ifEmpty { "System" } + ":") }
+                withStyle(SpanStyle(color = Ts.sender, fontWeight = FontWeight.Bold)) { append(e.senderName.ifEmpty { system } + ":") }
                 // With pictures, the words go under them (as in the TeamSpeak app)
                 if (pictures.isEmpty()) {
                     append("  ")
@@ -341,7 +349,7 @@ private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         Icon(Icons.Filled.Link, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(16.dp))
-                        Text("Open: $host", color = Ts.text, fontSize = 13.sp)
+                        Text(stringResource(R.string.chat_link_open, host), color = Ts.text, fontSize = 13.sp)
                     }
                 }
             }
@@ -391,7 +399,7 @@ private fun MessageBox(
     fun add(uris: List<Uri>) {
         val all = (pending + uris).distinct()
         if (all.size > MAX_PICTURES) {
-            android.widget.Toast.makeText(context, "At most $MAX_PICTURES pictures at a time.", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, context.getString(R.string.chat_pictures_max, MAX_PICTURES), android.widget.Toast.LENGTH_SHORT).show()
         }
         pending = all.take(MAX_PICTURES)
     }
@@ -407,11 +415,11 @@ private fun MessageBox(
     // The camera app may only be opened once the camera is allowed (the app also uses it for streams)
     val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         if (ok) takePhoto()
-        else android.widget.Toast.makeText(context, "Taking a photo needs the camera to be allowed.", android.widget.Toast.LENGTH_LONG).show()
+        else android.widget.Toast.makeText(context, context.getString(R.string.chat_camera_needed), android.widget.Toast.LENGTH_LONG).show()
     }
     if (progress != null) {
         Text(
-            "Sending picture ${progress.first} of ${progress.second}…", color = Ts.muted, fontSize = 13.sp,
+            stringResource(R.string.chat_sending_picture, progress.first, progress.second), color = Ts.muted, fontSize = 13.sp,
             modifier = Modifier.fillMaxWidth().background(Ts.panel).padding(start = 14.dp, top = 10.dp),
         )
     }
@@ -425,7 +433,7 @@ private fun MessageBox(
             for (uri in pending) {
                 Box(Modifier.size(if (keyboard) 56.dp else 84.dp)) {
                     AsyncImage(
-                        uri, contentDescription = "An attached picture", contentScale = ContentScale.Crop,
+                        uri, contentDescription = stringResource(R.string.chat_attached_picture), contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).border(1.dp, Pop.edge, RoundedCornerShape(10.dp)),
                     )
                     Box(
@@ -433,7 +441,7 @@ private fun MessageBox(
                             .clickable { pending = pending - uri },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = "Remove the picture", tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.chat_remove_picture), tint = Color.White, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -464,14 +472,14 @@ private fun MessageBox(
                 contentAlignment = Alignment.Center,
             ) {
                 if (sendingPicture) CircularProgressIndicator(color = Ts.accent, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
-                else Icon(Icons.Filled.Image, contentDescription = "Send a picture", tint = Ts.text)
+                else Icon(Icons.Filled.Image, contentDescription = stringResource(R.string.chat_send_picture), tint = Ts.text)
             }
             DropdownMenu(menu, onDismissRequest = { menu = false }, containerColor = Ts.card) {
-                DropdownMenuItem(text = { Text("Choose pictures", color = Ts.text) }, onClick = {
+                DropdownMenuItem(text = { Text(stringResource(R.string.chat_choose_pictures), color = Ts.text) }, onClick = {
                     menu = false
                     pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 })
-                DropdownMenuItem(text = { Text("Take a photo", color = Ts.text) }, onClick = {
+                DropdownMenuItem(text = { Text(stringResource(R.string.chat_take_photo), color = Ts.text) }, onClick = {
                     menu = false
                     val allowed = androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) ==
                         android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -498,7 +506,7 @@ private fun MessageBox(
                 .clickable(enabled = canSend) { send() },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = if (canSend) Color.White else Ts.muted)
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.chat_send), tint = if (canSend) Color.White else Ts.muted)
         }
     }
 }

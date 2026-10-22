@@ -42,6 +42,11 @@ permissions guests may not have.
 - [x] Settings › Advanced › Channel passwords › Forget saved passwords: the channel asks for its password again.
 - [x] As a server admin (allowed to skip channel passwords): a password-protected channel joins without asking.
       As a normal user, it asks, with no warning first.
+- [ ] Settings › UI › Show admin functions, as a server admin: someone's menu shows Move, Kick and Ban. Move them
+      into a password-protected channel (no password asked), kick them from the channel (they land in the default
+      channel and see the reason), kick them from the server, and ban them for 10 minutes (they're removed and can't
+      come back until it ends; the PC's ban list shows it, and removing it there lets them back).
+- [ ] The same as a normal user: each says "You don't have permission to …". With the setting off, no admin row.
 
 ## 3. Hearing (Phone + PC)
 - [x] PC talks: the phone plays it, and the speaker's name glows blue with a green ring.

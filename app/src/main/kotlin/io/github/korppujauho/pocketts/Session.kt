@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 object Session : TsClient.Listener {
     private const val WRONG_CHANNEL_PASSWORD = "781" // "invalid channel password"
     private const val CLONE_STILL_ON = "521" // "too many clones already connected": our identity is still on
+    private const val NO_PERMISSION = "2568" // "insufficient client permissions"
     private const val LEVEL_TOO_LOW = "519" // "could not validate client identity": its extra_msg is the level needed
     private const val AVATAR_TOO_BIG = 2565 // over the server's max avatar file size
 
@@ -536,6 +537,55 @@ object Session : TsClient.Listener {
 
     fun dismissPoke(id: Long) = _state.update { s -> s.copy(pokes = s.pokes.filter { it.id != id }) }
 
+    // ====== Admin: moving, kicking and banning people (the server decides who may) ======
+
+    // Asked and not answered yet: the return code -> what it was, in words for a refusal ("kick Noa from the server")
+    private val adminAsked = java.util.concurrent.ConcurrentHashMap<String, String>()
+    private val adminCount = java.util.concurrent.atomic.AtomicInteger()
+
+    private fun admin(what: String, name: String, vararg params: Pair<String, Any?>) {
+        val c = client ?: return
+        val code = "admin-${adminCount.incrementAndGet()}"
+        adminAsked[code] = what
+        c.sendCommand(Commands.build(name, *params, "return_code" to code))
+    }
+
+    /** Into another channel. Admins need no password there; a saved one goes along for a server that still asks. */
+    fun moveClient(person: ServerModel.Client, channelId: Int) = admin(
+        "move ${person.nickname}", "clientmove", "clid" to person.id, "cid" to channelId,
+        "cpw" to savedChannelPassword(channelId)?.let { Crypto.hashPassword(it) }?.ifEmpty { null },
+    )
+
+    /** Out of their channel (into the default one), or off the server; the reason is shown to them. */
+    fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) = admin(
+        "kick ${person.nickname} from the " + if (fromServer) "server" else "channel",
+        "clientkick", "clid" to person.id, "reasonid" to if (fromServer) 5 else 4, "reasonmsg" to reason.trim().take(REASON_MAX).ifEmpty { null },
+    )
+
+    /**
+     * Banned for [seconds] (0: for good), as the TeamSpeak app bans: the server bans both their identity and their
+     * address (so a new identity doesn't get them back in) and removes them at once.
+     */
+    fun ban(person: ServerModel.Client, seconds: Long, reason: String) = admin(
+        "ban ${person.nickname}", "banclient", "clid" to person.id, "time" to seconds,
+        "banreason" to reason.trim().take(REASON_MAX).ifEmpty { null },
+    )
+
+    /** The longest reason given with a kick or a ban (TeamSpeak's limit). */
+    const val REASON_MAX = 40
+
+    private fun adminAnswered(what: String, cmd: Command) {
+        val id = cmd["id"] ?: return
+        if (id == "0") return AppLog.log("Admin: $what")
+        AppLog.log("Admin: couldn't $what, error $id: ${cmd["msg"]} (permission ${cmd["failed_permid"]})")
+        val message = when (id) {
+            NO_PERMISSION -> "You don't have permission to $what."
+            WRONG_CHANNEL_PASSWORD -> "Couldn't $what: the channel needs its password. Join it once with the password, remembering it, to move people there."
+            else -> "Couldn't $what: ${cmd["msg"]}"
+        }
+        _state.update { it.copy(error = message) }
+    }
+
     // ====== Chat history ======
 
     /** The server's chat from before, into the chat (before the connection starts, on the worker). */
@@ -806,7 +856,8 @@ object Session : TsClient.Listener {
                     pendingJoin = null
                     joinAnswered(it, cmd)
                 }
-                if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") } != true) {
+                cmd["return_code"]?.let { adminAsked.remove(it) }?.let { adminAnswered(it, cmd) }
+                if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") || it.startsWith("admin-") } != true) {
                     AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
                     if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }
                 }

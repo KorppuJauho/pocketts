@@ -59,6 +59,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import io.github.korppujauho.pocketts.R
 
 /**
  * How far the round buttons' icons are turned (degrees, clockwise): while you share the camera with the screen
@@ -85,7 +87,7 @@ fun AppHeader(right: @Composable () -> Unit = {}) {
             )
         }
         Spacer(Modifier.width(8.dp))
-        Text("PocketTS", color = Ts.bright, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+        Text(stringResource(R.string.app_name), color = Ts.bright, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
         right()
     }
     Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
@@ -94,7 +96,7 @@ fun AppHeader(right: @Composable () -> Unit = {}) {
 /** The settings gear in the header's corner. */
 @Composable
 fun SettingsGear(onClick: () -> Unit) {
-    HeaderButton(Icons.Filled.Settings, "Settings", onClick)
+    HeaderButton(Icons.Filled.Settings, stringResource(R.string.settings), onClick)
 }
 
 /** A small icon button for the header. */
@@ -125,7 +127,7 @@ fun WarningBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modi
         Spacer(Modifier.width(10.dp))
         Text(text, color = Color(0xFFFECACA), fontSize = 14.sp, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
         androidx.compose.material3.IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
-            Icon(Icons.Filled.Close, contentDescription = "Close", tint = Color(0xFFFECACA), modifier = Modifier.size(20.dp))
+            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Color(0xFFFECACA), modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -176,7 +178,7 @@ fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
             .border(1.dp, if (held) Ts.talking else Ts.buttonBorder, CircleShape).holdToTalk(onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = "Hold to talk", tint = color, modifier = Modifier.upright())
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = color, modifier = Modifier.upright())
     }
 }
 
@@ -190,7 +192,7 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
             .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.Mic, contentDescription = "Hold to talk", tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
+        Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
     }
 }
 
@@ -207,10 +209,10 @@ fun ControlsBar(
             .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)).padding(12.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
-        ControlButton(if (micOff) Icons.Filled.MicOff else Icons.Filled.Mic, "Microphone", off = micOff, onClick = onMic)
+        ControlButton(if (micOff) Icons.Filled.MicOff else Icons.Filled.Mic, stringResource(R.string.microphone), off = micOff, onClick = onMic)
         ControlButton(
             if (soundOff) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-            "Sound", off = soundOff, onClick = onSound,
+            stringResource(R.string.sound), off = soundOff, onClick = onSound,
         )
         ptt?.invoke()
         if (onShare != null) {
@@ -219,7 +221,7 @@ fun ControlsBar(
                     .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(onClick = onShare),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Filled.ScreenShare, contentDescription = "Share", tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
+                Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
             }
         }
     }
