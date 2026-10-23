@@ -28,6 +28,7 @@ data class VoiceSettings(
     val uiSounds: Boolean = true, // sounds for events (people coming and going, messages, pokes, streams, the buttons)
     val uiSoundVolume: Float = 0.6f, // their volume, 0 - 1
     val adminTools: Boolean = false, // the person menu offers move, kick and ban (the server decides who may)
+    val controlsAtBottom: Boolean = false, // the buttons and the Channels/Chat switch at the bottom of the screen (within thumb reach)
 ) {
     enum class Activation { VAD, PTT, CONTINUOUS }
 
@@ -69,6 +70,7 @@ data class VoiceSettings(
                 uiSounds = p.getBoolean("uiSounds", d.uiSounds),
                 uiSoundVolume = p.getFloat("uiSoundVolume", d.uiSoundVolume),
                 adminTools = p.getBoolean("adminTools", d.adminTools),
+                controlsAtBottom = p.getBoolean("controlsAtBottom", d.controlsAtBottom),
             )
         }
     }
@@ -99,6 +101,7 @@ data class VoiceSettings(
             .putBoolean("uiSounds", uiSounds)
             .putFloat("uiSoundVolume", uiSoundVolume)
             .putBoolean("adminTools", adminTools)
+            .putBoolean("controlsAtBottom", controlsAtBottom)
             .apply()
         secretPrefs(context).edit().putSecret("turnPassword", TURN_PASSWORD, turnPassword).apply()
     }

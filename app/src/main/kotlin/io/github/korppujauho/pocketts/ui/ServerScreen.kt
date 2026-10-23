@@ -222,13 +222,18 @@ fun ServerScreen(
                 // Typing in the chat: the keyboard needs the room, so the buttons and the switch step aside until it closes
                 val typing = view == View.CHAT &&
                     androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
-                if (!typing) ControlsBar(
-                    micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
-                    onMic = actions::toggleMic, onSound = actions::toggleSound,
-                    ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
-                    sharing = state.stream.sharing != null,
-                    onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
-                )
+                // Settings › UI › Buttons at the bottom: the buttons and the switch go under the view, closer to the thumb
+                val bottom = state.voice.controlsAtBottom
+                val controls = @Composable {
+                    ControlsBar(
+                        micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
+                        onMic = actions::toggleMic, onSound = actions::toggleSound,
+                        ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
+                        sharing = state.stream.sharing != null,
+                        onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
+                    )
+                }
+                if (!typing && !bottom) controls()
                 if (egl != null) {
                     ShareBar(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
@@ -245,66 +250,74 @@ fun ServerScreen(
                 val unread = state.unread.any { k ->
                     if (k is Chat.Key.Private) state.privateTabs.any { it.uid == k.uid } else k == Chat.Key.Channel(state.ownChannel)
                 }
-                if (!typing) ViewSwitch(view, unread = unread) { view = it }
-                when (view) {
-                    View.CHANNELS -> Panel(Modifier.fillMaxWidth().weight(1f), header = {
-                        // The server's own icon, else a plain server one (as channels have the note)
-                        if (state.serverIcon > 0) TsIcon(state.serverIcon, state.serverKey, 18.dp)
-                        else androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Filled.Dns, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp),
-                        )
-                        androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
-                        ServerName(state.serverName.ifEmpty { stringResource(R.string.connecting_to, state.address) }) { serverInfo = true }
-                    }) {
-                        if (state.phase == Session.Phase.CONNECTING) {
-                            Loading(
-                                when {
-                                    state.waitingForOld -> stringResource(R.string.reconnecting_old)
-                                    state.reconnecting > 0 -> stringResource(R.string.reconnecting_try, state.reconnecting)
-                                    else -> stringResource(R.string.stream_connecting)
-                                }
+                val switch = @Composable { ViewSwitch(view, unread = unread) { view = it } }
+                if (!typing && !bottom) switch()
+                // The view, with the round push-to-talk button over its bottom corner (so it stays above the buttons when
+                // they're at the bottom too)
+                Box(Modifier.fillMaxWidth().weight(1f)) {
+                    when (view) {
+                        View.CHANNELS -> Panel(Modifier.fillMaxSize(), header = {
+                            // The server's own icon, else a plain server one (as channels have the note)
+                            if (state.serverIcon > 0) TsIcon(state.serverIcon, state.serverKey, 18.dp)
+                            else androidx.compose.material3.Icon(
+                                androidx.compose.material.icons.Icons.Filled.Dns, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp),
                             )
-                        } else {
-                            ChannelTree(
-                                items,
-                                TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
-                                onChannel = { ch ->
-                                    if (ch.id == state.ownChannel) return@ChannelTree
-                                    // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
-                                    if (ch.spacer != null && !state.voice.joinSpacers) return@ChannelTree
-                                    if (!ch.hasPassword) actions.join(ch)
-                                    // A remembered password joins straight away. Without one, joining is first tried without a
-                                    // password (as the TeamSpeak app does, for those allowed to skip it); a refusal asks for it
-                                    else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) }
-                                        ?: actions.join(ch, quiet = true)
-                                },
-                                onPerson = { person = it },
-                                modifier = Modifier.fillMaxSize(),
-                            )
+                            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+                            ServerName(state.serverName.ifEmpty { stringResource(R.string.connecting_to, state.address) }) { serverInfo = true }
+                        }) {
+                            if (state.phase == Session.Phase.CONNECTING) {
+                                Loading(
+                                    when {
+                                        state.waitingForOld -> stringResource(R.string.reconnecting_old)
+                                        state.reconnecting > 0 -> stringResource(R.string.reconnecting_try, state.reconnecting)
+                                        else -> stringResource(R.string.stream_connecting)
+                                    }
+                                )
+                            } else {
+                                ChannelTree(
+                                    items,
+                                    TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
+                                    onChannel = { ch ->
+                                        if (ch.id == state.ownChannel) return@ChannelTree
+                                        // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
+                                        if (ch.spacer != null && !state.voice.joinSpacers) return@ChannelTree
+                                        if (!ch.hasPassword) actions.join(ch)
+                                        // A remembered password joins straight away. Without one, joining is first tried without a
+                                        // password (as the TeamSpeak app does, for those allowed to skip it); a refusal asks for it
+                                        else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) }
+                                            ?: actions.join(ch, quiet = true)
+                                    },
+                                    onPerson = { person = it },
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
                         }
+                        View.CHAT -> ChatPanel(
+                            state, chatKey,
+                            onView = { chatKey = it },
+                            onCloseTab = actions::closePrivate,
+                            onSend = actions::send,
+                            onPicture = actions::sendPictures,
+                            modifier = Modifier.fillMaxSize(),
+                        )
                     }
-                    View.CHAT -> ChatPanel(
-                        state, chatKey,
-                        onView = { chatKey = it },
-                        onCloseTab = actions::closePrivate,
-                        onSend = actions::send,
-                        onPicture = actions::sendPictures,
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                    )
+                    if (ptt && state.voice.floatingPtt && state.phase == Session.Phase.CONNECTED) {
+                        // In the chat, above the message box
+                        FloatingPtt(
+                            state.pttHeld, actions::setPtt,
+                            Modifier.align(Alignment.BottomEnd).padding(end = 1.dp, bottom = if (view == View.CHAT) 81.dp else 9.dp),
+                        )
+                    }
+                }
+                if (!typing && bottom) {
+                    switch()
+                    controls()
                 }
             }
         }
         PokeCards(state.pokes, actions::dismissPoke, Modifier.align(Alignment.TopCenter).padding(top = 56.dp))
         (state.stream.message ?: state.error.takeIf { state.phase == Session.Phase.CONNECTED })?.let {
             WarningBanner(it, actions::dismissError, Modifier.align(Alignment.TopCenter).padding(top = 52.dp))
-        }
-        if (state.voice.activation == io.github.korppujauho.pocketts.VoiceSettings.Activation.PTT && state.voice.floatingPtt &&
-            state.phase == Session.Phase.CONNECTED
-        ) {
-            FloatingPtt(
-                state.pttHeld, actions::setPtt,
-                Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = if (view == View.CHAT) 96.dp else 24.dp),
-            )
         }
     }
     }
