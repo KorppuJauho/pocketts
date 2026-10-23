@@ -165,7 +165,7 @@
     <string name="avatar_title">Profiilikuva</string>
     <string name="avatar_change">Vaihda</string>
     <string name="avatar_desc">Muut näkevät sen tällä palvelimella. Se sovitetaan kokoon 320 × 320.</string>
-    <string name="general_floating_ptt">Kelluva paina puhuaksesi -painike</string>
+    <string name="general_floating_ptt">Kelluva puhepainike</string>
     <string name="general_floating_ptt_desc">Paina puhuaksesi -tilassa pyöreä painike pysyy PocketTS:n näytön alareunassa, joten voit puhua selatessasi keskustelua. Painike muiden sovellusten päällä (alla) on erillinen asetus.</string>
     <string name="general_overlay_ptt">Puhepainike muiden sovellusten päällä</string>
     <string name="general_overlay_ptt_desc">Paina puhuaksesi -tilassa pyöreä painike näkyy, kun siirryt muihin sovelluksiin (ei itse PocketTS:ssä). Pidä sitä pohjassa puhuaksesi, vedä siirtääksesi. Android pyytää kerran luvan näyttää PocketTS muiden sovellusten päällä.</string>
@@ -446,7 +446,7 @@
     <string name="channel_parent">Sijainti</string>
     <string name="channel_top_level">Ylin taso</string>
     <string name="channel_parent_change">Vaihda</string>
-    <string name="channel_parent_title">Minne se tulee</string>
+    <string name="channel_parent_title">Valitse sijainti</string>
     <string name="channel_delete_title">Poistetaanko %1$s?</string>
     <string name="channel_delete_subtitle">Tätä ei voi perua.</string>
     <plurals name="channel_delete_subs">

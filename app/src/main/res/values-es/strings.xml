@@ -458,7 +458,7 @@
     <string name="channel_parent">Dentro de</string>
     <string name="channel_top_level">Nivel superior</string>
     <string name="channel_parent_change">Cambiar</string>
-    <string name="channel_parent_title">Dónde va</string>
+    <string name="channel_parent_title">Elige la ubicación</string>
     <string name="channel_delete_title">¿Eliminar %1$s?</string>
     <string name="channel_delete_subtitle">No se puede deshacer.</string>
     <plurals name="channel_delete_subs">

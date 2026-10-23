@@ -446,7 +446,7 @@
     <string name="channel_parent">Liegt in</string>
     <string name="channel_top_level">Oberste Ebene</string>
     <string name="channel_parent_change">Ändern</string>
-    <string name="channel_parent_title">Wohin er kommt</string>
+    <string name="channel_parent_title">Ort wählen</string>
     <string name="channel_delete_title">%1$s löschen?</string>
     <string name="channel_delete_subtitle">Das lässt sich nicht rückgängig machen.</string>
     <plurals name="channel_delete_subs">
