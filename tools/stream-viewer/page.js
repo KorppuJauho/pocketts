@@ -40,9 +40,42 @@
   const canvas = document.createElement("canvas");
   const ctx = () => canvas.getContext("2d", { willReadFrequently: true });
 
+  // The stream's picture in a player of our own (WebTS's may not show one), from the connection's video
+  let player = null;
+  let playerTrack = null;
+  function picture() {
+    if (typeof peerConnection === "undefined" || !peerConnection) return null;
+    const receiver = peerConnection.getReceivers().find((r) => r.track && r.track.kind === "video");
+    if (!receiver) return null;
+    if (!player) {
+      player = document.createElement("video");
+      player.muted = true;
+      player.autoplay = true;
+      player.playsInline = true;
+      player.style.cssText = "position:fixed;left:0;top:0;width:64px;opacity:0.01;pointer-events:none";
+      document.body.appendChild(player);
+    }
+    if (playerTrack !== receiver.track) {
+      playerTrack = receiver.track;
+      player.srcObject = new MediaStream([receiver.track]);
+      player.play().catch(() => {});
+    }
+    return player;
+  }
+
+  // H.264 like the TeamSpeak app (VIEWER_CODEC=h264): WebTS relabels the phone's H.264 only when the offer has
+  // nothing else it plays, so it's told there's nothing else
+  let codecSet = false;
+  function setCodec() {
+    if (codecSet || window.__viewerCodec !== "h264" || typeof offerHasOtherPlayableVideo !== "function") return;
+    window.offerHasOtherPlayableVideo = () => false;
+    codecSet = true;
+  }
+
   window.__viewer = {
     // One step: find a stream, go to its channel, watch it. What it's doing, for the log.
     tick() {
+      setCodec();
       const s = typeof latestState === "undefined" ? null : latestState;
       if (!s || !s.connected) return { phase: "connecting" };
       const clients = s.clients || [];
@@ -94,13 +127,15 @@
         audioBytes: audio?.bytesReceived, audioLevel: audio?.audioLevel,
         route: local ? `${local.candidateType}${local.relayProtocol ? "/" + local.relayProtocol : ""} -> ${remote?.candidateType}` : null,
         rtt: pair?.currentRoundTripTime,
+        keyFrames: video?.keyFramesDecoded, nacks: video?.nackCount, plis: video?.pliCount,
+        webtsPicture: typeof streamVideo !== "undefined" && !!streamVideo.videoWidth,
       };
     },
 
     // The frame on screen now: the delay read from the test page's clock, if it's in the picture, and a JPEG of it
     // (when asked) with the viewer's time and that delay written on it.
     frame(withPicture) {
-      const v = typeof streamVideo === "undefined" ? null : streamVideo;
+      const v = picture();
       if (!v || !v.videoWidth) return null;
       const now = Date.now();
       canvas.width = v.videoWidth;

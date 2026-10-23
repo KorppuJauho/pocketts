@@ -10,7 +10,8 @@
 #   scripts/dev.sh it                 tests against that server (TS_TEST_SERVER)
 #   scripts/dev.sh devserver up|down  the page phones install test builds from and send their log to (DEV_PORT)
 #   scripts/dev.sh viewer up|down     a "Stream viewer" on the test server that watches every stream, for testing
-#                                     sharing without a second device; the dev page shows what it sees (/viewer)
+#                                     sharing without a second device; the dev page shows what it sees (/viewer).
+#                                     It takes H.264 as the TeamSpeak app does; "viewer up webts" lets WebTS choose
 #   scripts/dev.sh gradle <args>      any Gradle command
 #   scripts/dev.sh keystore           make the release key (once; keep it safe, see DEVELOPING.md)
 #   scripts/dev.sh release            the signed release APK -> dist/ (asks for the key's password)
@@ -112,8 +113,9 @@ case "${1:-}" in
           -e NICK_PREFIX= -e MAX_USERS=2 -e PICTURES=false -v "$VIEWER_NAME-webts:/app/data" "$WEBTS_IMAGE" >/dev/null
         mkdir -p "$ROOT/dist/viewer"
         rm -f "$ROOT/dist/viewer/viewer.log"
+        # Video as H.264 like the TeamSpeak app takes it; "viewer up webts" lets WebTS choose (VP8 from PocketTS)
         docker run -d --name "$VIEWER_NAME" --cpus 2 --memory 2g --shm-size 512m --network "container:$TS_CONTAINER" \
-          -v "$ROOT/dist/viewer:/out" "$VIEWER_NAME" >/dev/null
+          -e VIEWER_CODEC="${3:-h264}" -v "$ROOT/dist/viewer:/out" "$VIEWER_NAME" >/dev/null
         echo "Stream viewer started: the dev page shows what it sees (/viewer)"
         ;;
       down) docker rm -f "$VIEWER_NAME" "$VIEWER_NAME-webts" >/dev/null 2>&1 || true ;;

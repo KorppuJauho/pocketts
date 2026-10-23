@@ -10,6 +10,7 @@ const OUT = "/out";
 const PICTURES = path.join(OUT, "pictures");
 const LOG = path.join(OUT, "viewer.log");
 const PICTURE_EVERY = Number(process.env.PICTURE_EVERY || 5); // seconds
+const CODEC = process.env.VIEWER_CODEC || "h264"; // h264 as the TeamSpeak app takes it, or "webts" for WebTS's choice
 const KEEP_PICTURES = 120;
 const DEBUG_PORT = 9223;
 
@@ -83,9 +84,10 @@ async function run(expression) {
 
 await cdp("Runtime.enable");
 await cdp("Page.enable");
+await cdp("Page.addScriptToEvaluateOnNewDocument", { source: `window.__viewerCodec = ${JSON.stringify(CODEC)};` });
 await cdp("Page.addScriptToEvaluateOnNewDocument", { source: readFileSync(new URL("./page.js", import.meta.url), "utf8") });
 await cdp("Page.navigate", { url: WEBTS_URL });
-log(`Opened ${WEBTS_URL}`);
+log(`Opened ${WEBTS_URL} (video: ${CODEC === "h264" ? "H.264 as the TeamSpeak app" : "as WebTS chooses"})`);
 
 // --- Once a second: what it's doing, and the stream's numbers ---
 
@@ -113,6 +115,11 @@ function line(phase, s, prev, frame) {
   if (frame?.delay != null) parts.push(`DELAY ${(frame.delay / 1000).toFixed(2)} s`);
   const sound = rate(s.audioBytes, prev?.audioBytes);
   if (sound != null) parts.push(`sound ${Math.round(sound)} kbit/s` + (s.audioLevel != null ? ` level ${s.audioLevel.toFixed(2)}` : ""));
+  const more = (key) => (prev && s[key] != null && prev[key] != null ? s[key] - prev[key] : 0);
+  if (more("keyFrames")) parts.push(`key frame`);
+  if (more("nacks")) parts.push(`asked to resend ${more("nacks")}`);
+  if (more("plis")) parts.push(`asked for a key frame`);
+  if (s.width && !s.webtsPicture) parts.push("no picture in WebTS");
   if (s.route) parts.push(`${s.route}${s.rtt != null ? " rtt " + Math.round(s.rtt * 1000) + " ms" : ""}`);
   if (s.state !== "connected") parts.push(s.state);
   return parts.join(" | ");
