@@ -103,6 +103,7 @@
     <string name="stream_watch">СМОТРЕТЬ</string>
     <string name="stream_small_window">Маленькое окно</string>
     <string name="stream_full_screen">Во весь экран</string>
+    <string name="stream_resize">Потяните, чтобы изменить размер трансляции</string>
     <string name="stream_leave_full_screen">Выйти из полноэкранного режима</string>
     <string name="stream_stop_watching">Перестать смотреть</string>
     <string name="stream_sound_on">Включить звук</string>
