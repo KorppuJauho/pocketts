@@ -192,7 +192,8 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
             .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
+        // The same icon as the push-to-talk button in the bar: the microphone there means muting
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
     }
 }
 
@@ -214,7 +215,6 @@ fun ControlsBar(
             if (soundOff) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
             stringResource(R.string.sound), off = soundOff, onClick = onSound,
         )
-        ptt?.invoke()
         if (onShare != null) {
             Box(
                 Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Color(0xFF23A559) else Ts.button)
@@ -224,6 +224,8 @@ fun ControlsBar(
                 Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
             }
         }
+        // Push-to-talk last: on the right, where a thumb reaches it most easily
+        ptt?.invoke()
     }
 }
 
