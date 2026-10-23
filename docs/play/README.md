@@ -42,8 +42,31 @@ for the last 14 days in a row. Testers who leave and come back start their 14 da
 
 ## Each release on Play
 
+With the automatic upload set up (below), the release workflow puts each release's bundle on the closed test track
+as a draft, with this version's changelog headlines as its release notes. Then, in Play Console › Publishing
+overview, check it and "Send for review". Don't send a new version while the previous one is still in review.
+
+Without it (the workflow says so and skips the step):
+
 1. Make the GitHub release as usual (see DEVELOPING.md, "Releasing").
 2. Download the bundle from the release run's artifacts.
 3. Play Console › the track › Create new release › upload the bundle, paste the changelog lines, roll out.
 
 `versionCode` must go up with every bundle, which the usual release steps already do.
+
+## Automatic upload (once)
+
+`scripts/play-upload.sh` uploads with the Play Developer API as a service account (a Google account for programs).
+
+1. **Google Cloud Console** (console.cloud.google.com): create a project, for example `pocketts-play`, and in APIs &
+   Services › Library turn on the **Google Play Android Developer API**.
+2. In IAM & Admin › **Service accounts**: create one, for example `play-upload`. It needs no roles in the project.
+   Open it › Keys › Add key › JSON: the key file downloads. It can publish the app: keep it like the release key.
+3. **Play Console** › Users and permissions › Invite new users: the service account's email
+   (`…@….iam.gserviceaccount.com`). Under App permissions add PocketTS with "Release to testing tracks" (and "View app
+   information"). Invite. It can take a day before the permission works.
+4. **GitHub** › Settings › Environments › `release` › Add environment secret: `PLAY_SERVICE_ACCOUNT_JSON`, the key
+   file's whole content. Then delete the downloaded file.
+
+The next release uploads its bundle as a draft. Once that has worked a few times, `PLAY_RELEASE_STATUS: completed` in
+`release.yml` sends each release for review by itself.
