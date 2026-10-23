@@ -22,7 +22,8 @@
 - **Screen share sound:** sharing the screen can carry what the phone plays, such as a video or a game ("Phone sound"
   in the share window, on by default). Some apps don't allow their sound to be recorded and stay silent. The
   channel's voices and the streams you watch are left out, so viewers don't hear the channel twice. The microphone
-  isn't used for it, and it keeps playing while you talk.
+  isn't used for it, it keeps playing while you talk, and viewers hear it even with the phone's volume at zero. It
+  can't be used while you watch a stream (the option is greyed out then).
 
 ## 1.2.0 (2026-10-22)
 
