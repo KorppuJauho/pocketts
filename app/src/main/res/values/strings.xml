@@ -4,7 +4,7 @@
   language wants; counts use plurals. Log lines and TeamSpeak commands stay in the code, in English.
 -->
 <resources>
-    <string name="app_name">PocketTS</string>
+    <string name="app_name" translatable="false">PocketTS</string>
 
     <!-- Shared -->
     <string name="cancel">Cancel</string>
@@ -59,6 +59,27 @@
     <string name="tag_you">YOU</string>
 
     <!-- Chat -->
+    <!-- The chat's lines about people coming and going. %1$s and %2$s are names (a person's, a channel's), shown bold -->
+    <string name="event_connected">%1$s connected</string>
+    <string name="event_joined_from">%1$s joined coming from %2$s</string>
+    <string name="event_you_moved_to">You were moved to %1$s</string>
+    <string name="event_you_kicked_from">You were kicked from %1$s</string>
+    <string name="event_moved_here_from">%1$s was moved here from %2$s</string>
+    <string name="event_kicked_from">%1$s was kicked from %2$s</string>
+    <string name="event_moved_to">%1$s was moved to %2$s</string>
+    <string name="event_kicked_from_channel">%1$s was kicked from the channel</string>
+    <string name="event_left_to">%1$s left to %2$s</string>
+    <string name="event_you_kicked_from_server">You were kicked from the server</string>
+    <string name="event_you_banned">You were banned</string>
+    <string name="event_lost_connection">%1$s lost connection</string>
+    <string name="event_kicked_from_server">%1$s was kicked from the server</string>
+    <string name="event_banned">%1$s was banned</string>
+    <string name="event_disconnected">%1$s disconnected</string>
+    <!-- Added after a line: who did it (%1$s), and the reason they gave (%1$s). Keep the space at the start -->
+    <string name="event_by">" by %1$s"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <!-- A channel without a name -->
+    <string name="event_another_channel">another channel</string>
     <string name="chat_channel">Channel</string>
     <string name="chat_empty_channel">No messages in this channel yet.</string>
     <string name="chat_empty_private">No messages yet.</string>

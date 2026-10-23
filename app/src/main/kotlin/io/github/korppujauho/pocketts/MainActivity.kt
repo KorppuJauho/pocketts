@@ -120,6 +120,27 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppLog.start()
+        // The chat's event lines in the app's language (made in the protocol module, which has no text of its own)
+        io.github.korppujauho.pocketts.proto.Chat.words = io.github.korppujauho.pocketts.proto.Chat.Words(
+            connected = getString(R.string.event_connected),
+            joinedFrom = getString(R.string.event_joined_from),
+            youMovedTo = getString(R.string.event_you_moved_to),
+            youKickedFrom = getString(R.string.event_you_kicked_from),
+            movedHereFrom = getString(R.string.event_moved_here_from),
+            kickedFrom = getString(R.string.event_kicked_from),
+            movedTo = getString(R.string.event_moved_to),
+            kickedFromChannel = getString(R.string.event_kicked_from_channel),
+            leftTo = getString(R.string.event_left_to),
+            youKickedFromServer = getString(R.string.event_you_kicked_from_server),
+            youBanned = getString(R.string.event_you_banned),
+            lostConnection = getString(R.string.event_lost_connection),
+            kickedFromServer = getString(R.string.event_kicked_from_server),
+            banned = getString(R.string.event_banned),
+            disconnected = getString(R.string.event_disconnected),
+            by = getString(R.string.event_by),
+            because = getString(R.string.event_because),
+            anotherChannel = getString(R.string.event_another_channel),
+        )
         FrameLog.start(this)
         ServerFiles.install(applicationContext)
         enableEdgeToEdge(

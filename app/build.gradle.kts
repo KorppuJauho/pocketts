@@ -76,6 +76,11 @@ android {
         }
     }
 
+    // The app's languages, listed for Android 13 and later (Settings › Apps › PocketTS › Language), from res/values-*
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     buildFeatures {
         compose = true
         buildConfig = true

@@ -210,65 +210,105 @@ class Chat(private val keep: Int = 300) {
         val from: String, val to: String, val invoker: String = "", val reasonMsg: String = "",
     )
 
+    /**
+     * How the chat words its event lines, in the app's language. Each is a sentence with the names as `%1$s` and
+     * `%2$s` (shown bold), so a language can put them where it wants. English is built in; the app passes its own.
+     */
+    data class Words(
+        val connected: String = "%1\$s connected",
+        val joinedFrom: String = "%1\$s joined coming from %2\$s",
+        val youMovedTo: String = "You were moved to %1\$s",
+        val youKickedFrom: String = "You were kicked from %1\$s",
+        val movedHereFrom: String = "%1\$s was moved here from %2\$s",
+        val kickedFrom: String = "%1\$s was kicked from %2\$s",
+        val movedTo: String = "%1\$s was moved to %2\$s",
+        val kickedFromChannel: String = "%1\$s was kicked from the channel",
+        val leftTo: String = "%1\$s left to %2\$s",
+        val youKickedFromServer: String = "You were kicked from the server",
+        val youBanned: String = "You were banned",
+        val lostConnection: String = "%1\$s lost connection",
+        val kickedFromServer: String = "%1\$s was kicked from the server",
+        val banned: String = "%1\$s was banned",
+        val disconnected: String = "%1\$s disconnected",
+        val by: String = " by %1\$s", // who did it, after the line
+        val because: String = " (%1\$s)", // the reason they gave, after the line
+        val anotherChannel: String = "another channel", // a channel without a name
+    )
+
     companion object {
         private val SPACER = Regex("""^\[[^\]]*spacer[^\]]*](.*)$""", RegexOption.IGNORE_CASE)
+        private val SLOT = Regex("%(\\d)\\\$s")
+
+        /** The words lines are made with (set by the app for its language). */
+        @Volatile var words = Words()
 
         /** A channel's name as the tree shows it (a spacer's tag left out). */
         fun channelLabel(name: String?): String {
             val raw = name.orEmpty()
             val m = SPACER.matchEntire(raw)
-            return (m?.groupValues?.get(1)?.trim() ?: raw).ifEmpty { raw }.ifEmpty { "another channel" }
+            return (m?.groupValues?.get(1)?.trim() ?: raw).ifEmpty { raw }.ifEmpty { words.anotherChannel }
         }
 
-        private fun b(s: String) = Part(s, bold = true)
-        private fun t(s: String) = Part(s)
-        private fun by(invoker: String) = if (invoker.isNotEmpty()) listOf(t(" by "), b(invoker)) else emptyList()
-        private fun why(msg: String) = if (msg.isNotEmpty()) listOf(t(" ($msg)")) else emptyList()
+        // A sentence with its names filled in: the names bold, the rest plain
+        private fun line(template: String, vararg names: String): List<Part> {
+            val out = ArrayList<Part>()
+            var at = 0
+            for (m in SLOT.findAll(template)) {
+                if (m.range.first > at) out.add(Part(template.substring(at, m.range.first)))
+                names.getOrNull(m.groupValues[1].toInt() - 1)?.let { out.add(Part(it, bold = true)) }
+                at = m.range.last + 1
+            }
+            if (at < template.length) out.add(Part(template.substring(at)))
+            return out
+        }
+
+        private fun by(invoker: String) = if (invoker.isNotEmpty()) line(words.by, invoker) else emptyList()
+        private fun why(msg: String) = if (msg.isNotEmpty()) listOf(Part(words.because.replace("%1\$s", msg))) else emptyList()
 
         /** Someone appeared in our channel: connected, or came over from a channel we don't see. */
         fun enterEvent(who: String, from: String?): List<Part> =
-            if (from != null) listOf(b(who), t(" joined coming from "), b(from)) else listOf(b(who), t(" connected"))
+            if (from != null) line(words.joinedFrom, who, from) else line(words.connected, who)
 
         /** A move between channels; null when it needs no line (our own switch: we know). */
         fun moveEvent(m: Move): List<Part>? {
+            val w = words
             if (m.self) {
                 return when (m.reason) {
-                    1 -> listOf(t("You were moved to "), b(m.to)) + by(m.invoker)
-                    4 -> listOf(t("You were kicked from "), b(m.from)) + by(m.invoker) + why(m.reasonMsg)
+                    1 -> line(w.youMovedTo, m.to) + by(m.invoker)
+                    4 -> line(w.youKickedFrom, m.from) + by(m.invoker) + why(m.reasonMsg)
                     else -> null
                 }
             }
-            val who = b(m.who)
             if (m.intoHere) {
                 return when (m.reason) {
-                    1 -> listOf(who, t(" was moved here from "), b(m.from)) + by(m.invoker)
-                    4 -> listOf(who, t(" was kicked from "), b(m.from)) + by(m.invoker) + why(m.reasonMsg)
-                    else -> listOf(who, t(" joined coming from "), b(m.from))
+                    1 -> line(w.movedHereFrom, m.who, m.from) + by(m.invoker)
+                    4 -> line(w.kickedFrom, m.who, m.from) + by(m.invoker) + why(m.reasonMsg)
+                    else -> line(w.joinedFrom, m.who, m.from)
                 }
             }
             return when (m.reason) {
-                1 -> listOf(who, t(" was moved to "), b(m.to)) + by(m.invoker)
-                4 -> listOf(who, t(" was kicked from the channel")) + by(m.invoker) + why(m.reasonMsg)
-                else -> listOf(who, t(" left to "), b(m.to))
+                1 -> line(w.movedTo, m.who, m.to) + by(m.invoker)
+                4 -> line(w.kickedFromChannel, m.who) + by(m.invoker) + why(m.reasonMsg)
+                else -> line(w.leftTo, m.who, m.to)
             }
         }
 
         /** Someone left the server (3 lost, 5 kicked, 6 banned, 8 left, 11 shut down); null when no line. */
         fun leaveEvent(who: String, self: Boolean, reason: Int, invoker: String = "", reasonMsg: String = ""): List<Part>? {
+            val w = words
             if (self) {
                 return when (reason) {
-                    5 -> listOf(t("You were kicked from the server")) + by(invoker) + why(reasonMsg)
-                    6 -> listOf(t("You were banned")) + by(invoker) + why(reasonMsg)
+                    5 -> line(w.youKickedFromServer) + by(invoker) + why(reasonMsg)
+                    6 -> line(w.youBanned) + by(invoker) + why(reasonMsg)
                     else -> null
                 }
             }
-            val w = b(who)
             return when (reason) {
-                3 -> listOf(w, t(" lost connection"))
-                5 -> listOf(w, t(" was kicked from the server")) + by(invoker) + why(reasonMsg)
-                6 -> listOf(w, t(" was banned")) + by(invoker) + why(reasonMsg)
+                3 -> line(w.lostConnection, who)
+                5 -> line(w.kickedFromServer, who) + by(invoker) + why(reasonMsg)
+                6 -> line(w.banned, who) + by(invoker) + why(reasonMsg)
                 11 -> null
-                else -> listOf(w, t(" disconnected")) + why(reasonMsg)
+                else -> line(w.disconnected, who) + why(reasonMsg)
             }
         }
     }
