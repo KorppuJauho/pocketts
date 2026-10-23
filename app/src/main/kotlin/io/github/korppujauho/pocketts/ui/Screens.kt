@@ -214,7 +214,6 @@ fun ControlsBar(
             if (soundOff) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
             stringResource(R.string.sound), off = soundOff, onClick = onSound,
         )
-        ptt?.invoke()
         if (onShare != null) {
             Box(
                 Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Color(0xFF23A559) else Ts.button)
@@ -224,6 +223,8 @@ fun ControlsBar(
                 Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
             }
         }
+        // Push-to-talk last: on the right, where a thumb reaches it most easily
+        ptt?.invoke()
     }
 }
 

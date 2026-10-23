@@ -162,9 +162,9 @@
     <string name="avatar_change">Change</string>
     <string name="avatar_desc">Others see it on this server. It\'s made to fit 320 × 320.</string>
     <string name="general_floating_ptt">Floating push-to-talk button</string>
-    <string name="general_floating_ptt_desc">In push-to-talk mode, a round button stays at the bottom of the screen, so you can talk while you scroll the chat.</string>
+    <string name="general_floating_ptt_desc">In push-to-talk mode, a round button stays at the bottom of PocketTS\'s screen, so you can talk while you scroll the chat. The button over other apps (below) is a separate setting.</string>
     <string name="general_overlay_ptt">Talk button over other apps</string>
-    <string name="general_overlay_ptt_desc">In push-to-talk mode, the round button stays on screen when you go to other apps. Hold it to talk, drag it to move it. Android asks once to let PocketTS display over other apps.</string>
+    <string name="general_overlay_ptt_desc">In push-to-talk mode, a round button shows when you go to other apps (not in PocketTS itself). Hold it to talk, drag it to move it. Android asks once to let PocketTS display over other apps.</string>
     <string name="general_volume_ptt">Volume buttons are push-to-talk</string>
     <string name="general_volume_ptt_desc">In push-to-talk mode, holding a volume button talks while the app is on screen (instead of changing the volume).</string>
     <string name="general_headset_ptt">Headset button is push-to-talk</string>
