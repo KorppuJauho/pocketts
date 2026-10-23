@@ -33,9 +33,8 @@ class ScreenSound(private val projection: MediaProjection) {
     private var ringStart = 0
     private var ringSize = 0
 
-    // The pace: when the next piece is due, and the sizes of 10 ms and of the most kept waiting
-    private var nextDue = 0L
-    private var pieceNs = 0L
+    // The pace, and the most kept waiting
+    private val pace = SoundPace()
     private var keep = 0
 
     // Every 10 s, how it went (in the log)
@@ -49,7 +48,7 @@ class ScreenSound(private val projection: MediaProjection) {
     @Synchronized
     fun fill(buffer: ByteBuffer, encoding: Int, channels: Int, sampleRate: Int, bytes: Int) {
         if (!stopped) start(encoding, channels, sampleRate, bytes)
-        waitTurn(bytes, encoding, channels, sampleRate)
+        pace.wait(bytes, encoding, channels, sampleRate)
         var got = 0
         synchronized(lock) {
             got = minOf(ringSize, bytes)
@@ -59,25 +58,6 @@ class ScreenSound(private val projection: MediaProjection) {
         }
         for (i in got until bytes) buffer.put(i, 0)
         count(got, bytes)
-    }
-
-    // Waits until this piece is due: one piece per piece's length of time
-    private fun waitTurn(bytes: Int, encoding: Int, channels: Int, sampleRate: Int) {
-        val perSecond = sampleRate.toLong() * channels * bytesPerSample(encoding)
-        pieceNs = if (perSecond > 0) bytes * 1_000_000_000L / perSecond else 10_000_000L
-        val now = System.nanoTime()
-        if (nextDue == 0L || now - nextDue > 100_000_000L) nextDue = now // the start, or after a pause: not catching up
-        val wait = nextDue - now
-        if (wait > 0) {
-            try { Thread.sleep(wait / 1_000_000, (wait % 1_000_000).toInt()) } catch (_: InterruptedException) { Thread.currentThread().interrupt() }
-        }
-        nextDue += pieceNs
-    }
-
-    private fun bytesPerSample(encoding: Int) = when (encoding) {
-        AudioFormat.ENCODING_PCM_FLOAT -> 4
-        AudioFormat.ENCODING_PCM_8BIT -> 1
-        else -> 2
     }
 
     private fun count(got: Int, bytes: Int) {
@@ -181,5 +161,28 @@ class ScreenSound(private val projection: MediaProjection) {
     @Synchronized
     fun release() {
         stopReading()
+    }
+}
+
+/** Keeps a sound loop to the clock: each piece waits until it's due, one piece per piece's length of time. */
+class SoundPace {
+    private var nextDue = 0L
+
+    fun wait(bytes: Int, encoding: Int, channels: Int, sampleRate: Int) {
+        val perSecond = sampleRate.toLong() * channels * bytesPerSample(encoding)
+        val pieceNs = if (perSecond > 0) bytes * 1_000_000_000L / perSecond else 10_000_000L
+        val now = System.nanoTime()
+        if (nextDue == 0L || now - nextDue > 100_000_000L) nextDue = now // the start, or after a pause: not catching up
+        val wait = nextDue - now
+        if (wait > 0) {
+            try { Thread.sleep(wait / 1_000_000, (wait % 1_000_000).toInt()) } catch (_: InterruptedException) { Thread.currentThread().interrupt() }
+        }
+        nextDue += pieceNs
+    }
+
+    private fun bytesPerSample(encoding: Int) = when (encoding) {
+        AudioFormat.ENCODING_PCM_FLOAT -> 4
+        AudioFormat.ENCODING_PCM_8BIT -> 1
+        else -> 2
     }
 }

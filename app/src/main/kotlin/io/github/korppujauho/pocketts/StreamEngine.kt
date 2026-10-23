@@ -98,9 +98,18 @@ class StreamEngine(
             .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
             .setUseHardwareAcousticEchoCanceler(echo)
             .setUseHardwareNoiseSuppressor(false) // the surroundings are heard (as WebTS does it)
-            // Sharing the screen with its sound, the microphone is off and the phone's sound is put in its place
+            // Sharing the screen with its sound, the microphone is off and the phone's sound is put in its place. With
+            // no microphone WebRTC says it recorded nothing (bytes 0) and nothing else keeps its loop to time: the
+            // whole buffer is one piece, the phone's sound or silence, handed out at the pace sound plays (unpaced,
+            // the loop ran flat out and filled the memory)
             .setAudioBufferCallback { buffer, encoding, channels, rate, bytes, time ->
-                phoneSound?.fill(buffer, encoding, channels, rate, bytes)
+                if (bytes == 0) {
+                    val size = buffer.capacity()
+                    phoneSound?.fill(buffer, encoding, channels, rate, size) ?: run {
+                        for (i in 0 until size) buffer.put(i, 0)
+                        idlePace.wait(size, encoding, channels, rate)
+                    }
+                }
                 time
             }
             .createAudioDeviceModule()
@@ -367,6 +376,7 @@ class StreamEngine(
     }
     private var dual: DualCamera? = null
     @Volatile private var phoneSound: ScreenSound? = null
+    private val idlePace = SoundPace() // WebRTC's sound loop without a microphone and without the phone's sound
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
