@@ -18,6 +18,8 @@ to join.
 - **Streams:** watch others' screen and camera streams (also in a small window over other apps), and share your own
   camera (with your microphone) or screen (with what the phone plays).
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
+- **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian (see
+  [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
 
 Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking (see the
 [privacy policy](PRIVACY.md)). The GitHub version asks GitHub once a day whether there's a newer version (you can turn

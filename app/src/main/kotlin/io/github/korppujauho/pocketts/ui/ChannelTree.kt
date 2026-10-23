@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,6 +94,7 @@ fun ChannelTree(
     onChannel: (ServerModel.Channel) -> Unit,
     onPerson: (ServerModel.Client) -> Unit,
     modifier: Modifier = Modifier,
+    onLongChannel: ((ServerModel.Channel) -> Unit)? = null, // holding a channel (admin functions: edit mode)
 ) {
     LazyColumn(
         modifier,
@@ -100,7 +102,7 @@ fun ChannelTree(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(items, key = { it.node.channel.id }) { item ->
-            ChannelBox(item, ctx, onChannel, onPerson)
+            ChannelBox(item, ctx, onChannel, onPerson, onLongChannel)
         }
     }
 }
@@ -111,6 +113,7 @@ private fun ChannelBox(
     ctx: TreeContext,
     onChannel: (ServerModel.Channel) -> Unit,
     onPerson: (ServerModel.Client) -> Unit,
+    onLongChannel: ((ServerModel.Channel) -> Unit)?,
 ) {
     val ch = item.node.channel
     val own = ch.id == ctx.ownChannel
@@ -131,13 +134,13 @@ private fun ChannelBox(
             if (sub) drawRect(Color(0x0DFFFFFF), size = Size(2.dp.toPx(), size.height)) // a sub-channel's edge
         },
     ) {
-        ChannelTitle(ch, ctx.server) { onChannel(ch) }
+        ChannelTitle(ch, ctx.server, onLongClick = onLongChannel?.let { { it(ch) } }) { onChannel(ch) }
         for (c in item.node.clients) PersonRow(c, ctx) { onPerson(c) }
     }
 }
 
 @Composable
-private fun ChannelTitle(ch: ServerModel.Channel, server: String, onClick: () -> Unit) {
+internal fun ChannelTitle(ch: ServerModel.Channel, server: String, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
     val spacer = ch.spacer
     val banner: Any? = ch.bannerUrl.takeIf { it.isNotEmpty() }?.let { url ->
         if (url.startsWith("https://", ignoreCase = true)) url
@@ -145,7 +148,7 @@ private fun ChannelTitle(ch: ServerModel.Channel, server: String, onClick: () ->
     }
     Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         if (banner != null) Banner(banner, spacer?.align)
-        ChannelTitleRow(ch, spacer, server, onClick)
+        ChannelTitleRow(ch, spacer, server, onLongClick, onClick)
     }
 }
 
@@ -221,9 +224,9 @@ internal fun androidx.compose.foundation.layout.BoxScope.BannerPicture(picture: 
 }
 
 @Composable
-private fun ChannelTitleRow(ch: ServerModel.Channel, spacer: ServerModel.Spacer?, server: String, onClick: () -> Unit) {
+private fun ChannelTitleRow(ch: ServerModel.Channel, spacer: ServerModel.Spacer?, server: String, onLongClick: (() -> Unit)?, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
+        Modifier.fillMaxWidth().combinedClickable(onLongClick = onLongClick, onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (spacer != null) {

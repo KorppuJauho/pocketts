@@ -3,6 +3,7 @@ package io.github.korppujauho.pocketts
 import android.content.Context
 import io.github.korppujauho.pocketts.proto.Chat
 import io.github.korppujauho.pocketts.proto.Command
+import io.github.korppujauho.pocketts.proto.ChannelEdits
 import io.github.korppujauho.pocketts.proto.Commands
 import io.github.korppujauho.pocketts.proto.Crypto
 import io.github.korppujauho.pocketts.proto.FileTransfer
@@ -544,25 +545,54 @@ object Session : TsClient.Listener {
 
     fun dismissPoke(id: Long) = _state.update { s -> s.copy(pokes = s.pokes.filter { it.id != id }) }
 
-    // ====== Admin: moving, kicking and banning people (the server decides who may) ======
+    // ====== Admin: moving, kicking and banning people, and changing channels (the server decides who may) ======
 
-    /** An admin action: what the log calls it, and its messages when the server says no (%1$s: the person). */
+    /** An admin action: what the log calls it, and its messages when the server says no (%1$s: the person or channel). */
     private enum class AdminAction(val log: String, val noPermission: Int, val failed: Int) {
         MOVE("move", R.string.admin_no_permission_move, R.string.admin_failed_move),
         KICK_CHANNEL("kick from the channel", R.string.admin_no_permission_kick_channel, R.string.admin_failed_kick_channel),
         KICK_SERVER("kick from the server", R.string.admin_no_permission_kick_server, R.string.admin_failed_kick_server),
         BAN("ban", R.string.admin_no_permission_ban, R.string.admin_failed_ban),
+        CREATE_CHANNEL("create the channel", R.string.channel_no_permission_create, R.string.channel_failed_create),
+        EDIT_CHANNEL("change the channel", R.string.channel_no_permission_edit, R.string.channel_failed_edit),
+        REORDER_CHANNEL("move the channel", R.string.channel_no_permission_reorder, R.string.channel_failed_reorder),
+        DELETE_CHANNEL("delete the channel", R.string.channel_no_permission_delete, R.string.channel_failed_delete),
     }
 
     // Asked and not answered yet: the return code -> what it was, and to whom
     private val adminAsked = java.util.concurrent.ConcurrentHashMap<String, Pair<AdminAction, String>>()
     private val adminCount = java.util.concurrent.atomic.AtomicInteger()
 
-    private fun admin(action: AdminAction, person: ServerModel.Client, name: String, vararg params: Pair<String, Any?>) {
+    private fun admin(action: AdminAction, person: ServerModel.Client, name: String, vararg params: Pair<String, Any?>) =
+        admin(action, person.nickname, name, *params)
+
+    private fun admin(action: AdminAction, who: String, name: String, vararg params: Pair<String, Any?>) {
         val c = client ?: return
         val code = "admin-${adminCount.incrementAndGet()}"
-        adminAsked[code] = action to person.nickname
+        adminAsked[code] = action to who
         c.sendCommand(Commands.build(name, *params, "return_code" to code))
+    }
+
+    private fun admin(action: AdminAction, who: String, edit: ChannelEdits.Edit) = admin(action, who, edit.name, *edit.params.toTypedArray())
+
+    /** A new channel. A temporary one is entered at once (the server moves its maker in, or it would be gone). */
+    fun createChannel(s: ChannelEdits.Settings) = admin(AdminAction.CREATE_CHANNEL, s.name.trim(), ChannelEdits.create(s))
+
+    /** The channel changed to [s]: only what differs is sent. */
+    fun editChannel(ch: ServerModel.Channel, s: ChannelEdits.Settings) {
+        for (e in ChannelEdits.edit(ch, s)) admin(AdminAction.EDIT_CHANNEL, ch.displayName, e)
+    }
+
+    /** The channel to come after [after] (0 = first) among its siblings. */
+    fun reorderChannel(ch: ServerModel.Channel, after: Int) = admin(AdminAction.REORDER_CHANNEL, ch.displayName, ChannelEdits.reorder(ch, after))
+
+    /** Deleted with its sub-channels; the people in them go to the default channel. */
+    fun deleteChannel(ch: ServerModel.Channel) = admin(AdminAction.DELETE_CHANNEL, ch.displayName, ChannelEdits.delete(ch))
+
+    /** Asks for a channel's description, which the server sends only when asked (it arrives as a channel edit). */
+    fun channelDescription(id: Int) {
+        val e = ChannelEdits.description(id)
+        client?.sendCommand(Commands.build(e.name, *e.params.toTypedArray(), "return_code" to "quiet-description"))
     }
 
     /** Into another channel. Admins need no password there; a saved one goes along for a server that still asks. */

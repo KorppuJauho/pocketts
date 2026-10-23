@@ -121,6 +121,27 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppLog.start(this)
+        // The chat's event lines in the app's language (made in the protocol module, which has no text of its own)
+        io.github.korppujauho.pocketts.proto.Chat.words = io.github.korppujauho.pocketts.proto.Chat.Words(
+            connected = getString(R.string.event_connected),
+            joinedFrom = getString(R.string.event_joined_from),
+            youMovedTo = getString(R.string.event_you_moved_to),
+            youKickedFrom = getString(R.string.event_you_kicked_from),
+            movedHereFrom = getString(R.string.event_moved_here_from),
+            kickedFrom = getString(R.string.event_kicked_from),
+            movedTo = getString(R.string.event_moved_to),
+            kickedFromChannel = getString(R.string.event_kicked_from_channel),
+            leftTo = getString(R.string.event_left_to),
+            youKickedFromServer = getString(R.string.event_you_kicked_from_server),
+            youBanned = getString(R.string.event_you_banned),
+            lostConnection = getString(R.string.event_lost_connection),
+            kickedFromServer = getString(R.string.event_kicked_from_server),
+            banned = getString(R.string.event_banned),
+            disconnected = getString(R.string.event_disconnected),
+            by = getString(R.string.event_by),
+            because = getString(R.string.event_because),
+            anotherChannel = getString(R.string.event_another_channel),
+        )
         FrameLog.start(this)
         ServerFiles.install(applicationContext)
         enableEdgeToEdge(
@@ -272,6 +293,12 @@ private object SessionActions : ServerActions {
     override fun moveClient(person: ServerModel.Client, channelId: Int) = Session.moveClient(person, channelId)
     override fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) = Session.kick(person, fromServer, reason)
     override fun ban(person: ServerModel.Client, seconds: Long, reason: String) = Session.ban(person, seconds, reason)
+    override fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) = Session.createChannel(settings)
+    override fun editChannel(channel: ServerModel.Channel, settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) =
+        Session.editChannel(channel, settings)
+    override fun reorderChannel(channel: ServerModel.Channel, after: Int) = Session.reorderChannel(channel, after)
+    override fun deleteChannel(channel: ServerModel.Channel) = Session.deleteChannel(channel)
+    override fun channelDescription(channel: ServerModel.Channel) = Session.channelDescription(channel.id)
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
