@@ -157,8 +157,8 @@ case "${1:-}" in
     # Play Console gives pepk.jar and an encryption key (.pem); pepk encrypts the release key with it, so only Google
     # can open the result. The result goes next to the .pem, to upload in Play Console.
     [ -f "$KEYSTORE" ] || { echo "No release key at $KEYSTORE"; exit 1; }
-    PEPK="${1:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
-    PEM="${2:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
+    PEPK="${2:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
+    PEM="${3:?Usage: scripts/dev.sh play-key path/to/pepk.jar path/to/encryption_public_key.pem}"
     [ -f "$PEPK" ] && [ -f "$PEM" ] || { echo "Can't find $PEPK or $PEM"; exit 1; }
     OUT="$(cd "$(dirname "$PEM")" && pwd)"
     docker run --rm -it --user "$(id -u):$(id -g)" -e HOME=/tmp \
