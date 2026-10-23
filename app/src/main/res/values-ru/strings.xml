@@ -236,6 +236,8 @@
     <string name="ui_admin">Показывать функции администратора</string>
     <string name="ui_controls_bottom">Кнопки внизу</string>
     <string name="ui_controls_bottom_desc">Кнопки микрофона, звука и трансляции и переключатель Каналы/Чат находятся внизу экрана, под большим пальцем.</string>
+    <string name="ui_language">Язык</string>
+    <string name="ui_language_phone">Язык телефона</string>
     <string name="ui_admin_desc">В меню пользователя также можно переместить его в другой канал, выгнать из канала или с сервера и забанить. Сервер решает, разрешено ли вам это: без разрешения он откажет.</string>
 
     <!-- Settings › Advanced -->

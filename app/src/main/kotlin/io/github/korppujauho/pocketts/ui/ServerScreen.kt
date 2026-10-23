@@ -453,13 +453,11 @@ fun ServerScreen(
             ChannelDialog(
                 ch, d.start, state.tree, description = ch?.description.orEmpty(),
                 onSave = { s ->
-                    if (ch != null) actions.editChannel(ch, s)
-                    else {
-                        // Put somewhere else than where it was opened: last under its new parent
-                        val after = if (s.parent == d.start.parent) s.after
-                        else state.tree.let { t -> flattenTree(t) }.lastOrNull { it.node.channel.parent == s.parent }?.node?.channel?.id ?: 0
-                        actions.createChannel(s.copy(after = after))
-                    }
+                    // Put under another parent than where it was: last there, as the location window showed it
+                    fun lastIn(parent: Int) =
+                        flattenTree(state.tree).lastOrNull { it.node.channel.parent == parent && it.node.channel.id != ch?.id }?.node?.channel?.id ?: 0
+                    if (ch != null) actions.editChannel(ch, if (s.parent != ch.parent) s.copy(after = lastIn(s.parent)) else s)
+                    else actions.createChannel(if (s.parent == d.start.parent) s else s.copy(after = lastIn(s.parent)))
                     channelDialog = null
                 },
                 onDelete = ch?.let { c -> { channelDialog = null; deleteTarget = c } },

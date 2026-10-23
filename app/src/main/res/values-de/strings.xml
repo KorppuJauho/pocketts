@@ -230,6 +230,8 @@
     <string name="ui_admin">Admin-Funktionen anzeigen</string>
     <string name="ui_controls_bottom">Tasten unten</string>
     <string name="ui_controls_bottom_desc">Die Mikrofon-, Ton- und Teilen-Tasten und der Channels/Chat-Schalter sitzen unten auf dem Bildschirm, in Reichweite deines Daumens.</string>
+    <string name="ui_language">Sprache</string>
+    <string name="ui_language_phone">Sprache des Handys</string>
     <string name="ui_admin_desc">Das Menü einer Person bietet auch an, sie in einen anderen Channel zu verschieben, aus dem Channel oder vom Server zu kicken und sie zu bannen. Der Server entscheidet, ob du das darfst: Ohne die Berechtigung lehnt er ab.</string>
 
     <!-- Settings › Advanced -->

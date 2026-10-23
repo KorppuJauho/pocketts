@@ -227,6 +227,8 @@
     <string name="ui_admin">显示管理功能</string>
     <string name="ui_controls_bottom">按钮置于底部</string>
     <string name="ui_controls_bottom_desc">麦克风、声音和分享按钮以及「频道/聊天」切换位于屏幕底部，拇指即可够到。</string>
+    <string name="ui_language">语言</string>
+    <string name="ui_language_phone">跟随手机语言</string>
     <string name="ui_admin_desc">用户菜单中还会提供将其移动到其他频道、将其从频道或服务器中踢出以及封禁的功能。由服务器决定你是否有权这样做：没有权限时会被拒绝。</string>
 
     <!-- Settings › Advanced -->

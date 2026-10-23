@@ -102,6 +102,11 @@ class MainActivity : ComponentActivity() {
         return false
     }
 
+    // The app's own language, on Androids older than 13 (newer ones do it themselves)
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
+
     // Volume buttons as push-to-talk (Settings > General), while the app is on screen
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val s = Session.state.value
@@ -364,6 +369,10 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
             Settings(context).nickname = nickname
             Session.setNickname(nickname)
         }
+    }
+    override fun language() = AppLanguage.current(context)
+    override fun setLanguage(tag: String) {
+        MainActivity.current?.let { AppLanguage.set(it, tag) }
     }
     override fun micLevel() = Session.micLevel()
     override fun micTest(on: Boolean) = Session.micTest(on)

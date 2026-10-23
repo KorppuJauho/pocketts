@@ -230,6 +230,8 @@
     <string name="ui_admin">Näytä ylläpitotoiminnot</string>
     <string name="ui_controls_bottom">Painikkeet alareunassa</string>
     <string name="ui_controls_bottom_desc">Mikrofoni-, ääni- ja jakopainikkeet sekä Kanavat/Keskustelu-valitsin ovat näytön alareunassa, peukalosi ulottuvilla.</string>
+    <string name="ui_language">Kieli</string>
+    <string name="ui_language_phone">Puhelimen kieli</string>
     <string name="ui_admin_desc">Henkilön valikossa voi myös siirtää hänet toiselle kanavalle, potkaista hänet kanavalta tai palvelimelta ja antaa porttikiellon. Palvelin päättää, onko sinulla lupa: ilman käyttöoikeutta se kieltäytyy.</string>
 
     <!-- Settings › Advanced -->

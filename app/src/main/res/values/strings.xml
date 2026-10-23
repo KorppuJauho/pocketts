@@ -248,6 +248,8 @@
     <string name="ui_admin">Show admin functions</string>
     <string name="ui_controls_bottom">Buttons at the bottom</string>
     <string name="ui_controls_bottom_desc">The microphone, sound and share buttons and the Channels/Chat switch sit at the bottom of the screen, within reach of your thumb.</string>
+    <string name="ui_language">Language</string>
+    <string name="ui_language_phone">Phone\'s language</string>
     <string name="ui_admin_desc">A person\'s menu also offers moving them to another channel, kicking them from the channel or the server, and banning them. The server decides whether you\'re allowed: without the permission it says no.</string>
 
     <!-- Settings › Advanced -->
