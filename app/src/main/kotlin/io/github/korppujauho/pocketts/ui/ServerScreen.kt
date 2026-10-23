@@ -92,7 +92,7 @@ interface ServerActions {
     /** The camera at [quality]: the picture's height, 480, 720 or 1080. */
     fun shareCamera(front: Boolean, quality: Int, sound: Boolean)
     /** Asks Android for the screen, then shares it. */
-    fun shareScreen()
+    fun shareScreen(sound: Boolean)
     fun stopShare()
     fun flipCamera()
     /** Both cameras at once (asked for first if needed). */
@@ -479,7 +479,9 @@ fun ServerScreen(
             onBoth = { quality, sound -> shareDialog = false; actions.shareBothCameras(quality, sound) },
             sound = state.voice.cameraSound,
             canBoth = canBoth,
-            onScreen = { shareDialog = false; actions.shareScreen() },
+            screenSound = state.voice.screenSound,
+            screenSoundBlocked = state.stream.phoneSoundBlocked,
+            onScreen = { sound -> shareDialog = false; actions.shareScreen(sound) },
             onDismiss = { shareDialog = false },
         )
     }
