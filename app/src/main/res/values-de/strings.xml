@@ -101,6 +101,8 @@
     <string name="stream_watch">ANSEHEN</string>
     <string name="stream_small_window">Kleines Fenster</string>
     <string name="stream_full_screen">Vollbild</string>
+    <string name="stream_resize">Ziehen, um die Größe des Streams zu ändern</string>
+    <string name="stream_mini">Kleiner Stream: Tippen zum Vergrößern, Ziehen zum Verschieben</string>
     <string name="stream_leave_full_screen">Vollbild verlassen</string>
     <string name="stream_stop_watching">Nicht mehr ansehen</string>
     <string name="stream_sound_on">Ton an</string>

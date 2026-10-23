@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.ScreenLockRotation
 import androidx.compose.material.icons.filled.ScreenRotation
@@ -43,7 +44,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -215,10 +223,17 @@ fun VideoView(
     // (each renderer is let go when its view goes: onRelease)
 }
 
+private const val MIN_WATCH_HEIGHT = 96f // dp
+private const val PULL_TO_SWITCH = 56f // dp dragged on past the top that makes the stream small inside the app
+
 /**
- * Watching someone's stream: a box like the large preview of your own share, the picture at most half the screen,
- * with its sound (on, off and how loud), a small window over other apps, full screen, and close. Full screen turns
- * the app the way the picture is: a wide picture goes sideways, a tall one stays upright.
+ * Watching someone's stream: a box like the large preview of your own share, with its sound (on, off and how loud),
+ * a small window over other apps, full screen, and close. Full screen turns the app the way the picture is: a wide
+ * picture goes sideways, a tall one stays upright.
+ *
+ * The handle under the picture sets its height (remembered): at first at most 40 % of the screen, so the channels and
+ * the chat stay in view, and never taller than the picture needs. Pulled on past the top it shrinks to a small
+ * picture over the app that can be moved ([MiniPlayer]).
  */
 @Composable
 fun WatchCard(
@@ -229,26 +244,73 @@ fun WatchCard(
     var full by remember { mutableStateOf(false) }
     var sound by remember { mutableStateOf(false) }
     val video = state.watchVideo
+    val prefs = androidx.compose.ui.platform.LocalContext.current.let { remember { it.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE) } }
+    var chosen by remember { mutableFloatStateOf(prefs.getFloat("watchHeight", 0f)) } // dp; 0: not chosen yet
+    var pull by remember { mutableFloatStateOf(0f) } // dragged on past the top, dp (below 0)
+    var mini by remember { mutableStateOf(false) }
+    if (mini) {
+        MiniPlayer(state, video, egl, aspect, onOpen = { mini = false }, onClose = onClose)
+        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+        return
+    }
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.accent.copy(alpha = 0.12f))
             .border(1.dp, Ts.accent.copy(alpha = 0.8f), RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.5f).dp
+        val screen = LocalConfiguration.current.screenHeightDp.toFloat()
+        val density = androidx.compose.ui.platform.LocalDensity.current.density
         androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
-            Box(
-                Modifier.fillMaxWidth().height(minOf(maxWidth / aspect, maxHeight)).clip(RoundedCornerShape(8.dp)).background(Color.Black)
-                    .border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp)),
-            ) {
-                if (video != null && !full) {
-                    VideoView(video, egl, Modifier.fillMaxSize(), onSize = { w, h -> aspect = w.toFloat() / h; StreamSize.set(w, h) })
+            val natural = maxWidth.value / aspect
+            val highest = maxOf(MIN_WATCH_HEIGHT, minOf(natural, screen * 0.75f))
+            val height = (if (chosen > 0) chosen else minOf(natural, screen * 0.4f)).coerceIn(MIN_WATCH_HEIGHT, highest)
+            val currentHeight by androidx.compose.runtime.rememberUpdatedState(height)
+            Column {
+                Box(
+                    Modifier.fillMaxWidth().height(height.dp).clip(RoundedCornerShape(8.dp)).background(Color.Black)
+                        .border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp)),
+                ) {
+                    if (video != null && !full) {
+                        VideoView(video, egl, Modifier.fillMaxSize(), onSize = { w, h -> aspect = w.toFloat() / h; StreamSize.set(w, h) })
+                    }
+                    if (state.watchStatus.isNotEmpty()) {
+                        Text(
+                            state.watchStatus, color = Color.White, fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Center).clip(RoundedCornerShape(8.dp)).background(Color(0x99000000))
+                                .padding(horizontal = 14.dp, vertical = 8.dp),
+                        )
+                    }
                 }
-                if (state.watchStatus.isNotEmpty()) {
-                    Text(
-                        state.watchStatus, color = Color.White, fontSize = 14.sp,
-                        modifier = Modifier.align(Alignment.Center).clip(RoundedCornerShape(8.dp)).background(Color(0x99000000))
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                    )
+                // The handle: drag for the height; on past the top, small inside the app (its icon shows when letting go
+                // would do it)
+                var raw by remember { mutableFloatStateOf(0f) }
+                val toSmall = pull < -PULL_TO_SWITCH
+                val handleLabel = stringResource(R.string.stream_resize)
+                Box(
+                    Modifier.fillMaxWidth().height(22.dp)
+                        .semantics { contentDescription = handleLabel }
+                        .pointerInput(highest) {
+                            detectVerticalDragGestures(
+                                onDragStart = { raw = currentHeight },
+                                onDragEnd = {
+                                    if (pull < -PULL_TO_SWITCH) mini = true
+                                    pull = 0f
+                                    prefs.edit().putFloat("watchHeight", chosen).apply()
+                                },
+                                onDragCancel = { pull = 0f },
+                            ) { change, dy ->
+                                change.consume()
+                                raw += dy / density
+                                chosen = raw.coerceIn(MIN_WATCH_HEIGHT, highest)
+                                pull = minOf(0f, raw - chosen)
+                            }
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when {
+                        toSmall -> Icon(Icons.Filled.PictureInPicture, stringResource(R.string.stream_mini), tint = Ts.accent, modifier = Modifier.size(20.dp))
+                        else -> Box(Modifier.size(width = 40.dp, height = 4.dp).clip(CircleShape).background(if (pull != 0f) Ts.accent else Ts.muted))
+                    }
                 }
             }
         }
@@ -271,6 +333,61 @@ fun WatchCard(
         if (sound && state.watchAudio != null) SoundRow(state, onMute, onVolume)
     }
     if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+}
+
+/**
+ * A watched stream made small inside the app (its box pulled up past the top): the picture over everything, at first
+ * in the top corner, moved by dragging it. A tap brings the box back; the ✕ stops watching.
+ */
+@Composable
+private fun MiniPlayer(state: StreamEngine.State, video: VideoTrack?, egl: EglBase, aspect: Float, onOpen: () -> Unit, onClose: () -> Unit) {
+    val density = androidx.compose.ui.platform.LocalDensity.current.density
+    val config = LocalConfiguration.current
+    val width = config.screenWidthDp * if (aspect >= 1f) 0.5f else 0.32f
+    val height = width / aspect
+    val screenW = config.screenWidthDp * density
+    val screenH = config.screenHeightDp * density
+    fun inside(x: Float, y: Float) = androidx.compose.ui.geometry.Offset(
+        x.coerceIn(0f, maxOf(0f, screenW - width * density)), y.coerceIn(0f, maxOf(0f, screenH - height * density)),
+    )
+    var at by remember { mutableStateOf(inside(screenW - (width + 12) * density, 96 * density)) }
+    val label = stringResource(R.string.stream_mini)
+    androidx.compose.ui.window.Popup(
+        popupPositionProvider = object : androidx.compose.ui.window.PopupPositionProvider {
+            override fun calculatePosition(
+                anchorBounds: androidx.compose.ui.unit.IntRect, windowSize: androidx.compose.ui.unit.IntSize,
+                layoutDirection: androidx.compose.ui.unit.LayoutDirection, popupContentSize: androidx.compose.ui.unit.IntSize,
+            ) = androidx.compose.ui.unit.IntOffset(
+                at.x.toInt().coerceIn(0, maxOf(0, windowSize.width - popupContentSize.width)),
+                at.y.toInt().coerceIn(0, maxOf(0, windowSize.height - popupContentSize.height)),
+            )
+        },
+        properties = androidx.compose.ui.window.PopupProperties(focusable = false),
+    ) {
+        Box(
+            Modifier.size(width.dp, height.dp).clip(RoundedCornerShape(10.dp)).background(Color.Black)
+                .border(2.dp, Ts.accent, RoundedCornerShape(10.dp))
+                .semantics { contentDescription = label }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, drag ->
+                        change.consume()
+                        at = inside(at.x + drag.x, at.y + drag.y)
+                    }
+                }
+                .pointerInput(Unit) { detectTapGestures(onTap = { onOpen() }) },
+        ) {
+            if (video != null) VideoView(video, egl, Modifier.fillMaxSize())
+            if (state.watchStatus.isNotEmpty()) {
+                Text(state.watchStatus, color = Color.White, fontSize = 11.sp, modifier = Modifier.align(Alignment.Center).padding(6.dp))
+            }
+            Box(
+                Modifier.align(Alignment.TopEnd).padding(4.dp).size(26.dp).clip(CircleShape).background(Color(0x99000000)).clickable(onClick = onClose),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Filled.Close, stringResource(R.string.stream_stop_watching), tint = Color.White, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
 }
 
 /** The stream's sound: on or off, and how loud. */

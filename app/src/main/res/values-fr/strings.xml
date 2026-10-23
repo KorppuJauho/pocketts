@@ -102,6 +102,8 @@
     <string name="stream_watch">REGARDER</string>
     <string name="stream_small_window">Petite fenêtre</string>
     <string name="stream_full_screen">Plein écran</string>
+    <string name="stream_resize">Faites glisser pour changer la taille de la diffusion</string>
+    <string name="stream_mini">Petite diffusion : touchez pour l’agrandir, faites glisser pour la déplacer</string>
     <string name="stream_leave_full_screen">Quitter le plein écran</string>
     <string name="stream_stop_watching">Arrêter de regarder</string>
     <string name="stream_sound_on">Activer le son</string>

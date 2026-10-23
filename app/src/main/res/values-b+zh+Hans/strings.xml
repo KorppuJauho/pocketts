@@ -100,6 +100,8 @@
     <string name="stream_watch">观看</string>
     <string name="stream_small_window">小窗口</string>
     <string name="stream_full_screen">全屏</string>
+    <string name="stream_resize">拖动以调整直播大小</string>
+    <string name="stream_mini">小窗直播：轻触放大，拖动移动</string>
     <string name="stream_leave_full_screen">退出全屏</string>
     <string name="stream_stop_watching">停止观看</string>
     <string name="stream_sound_on">打开声音</string>

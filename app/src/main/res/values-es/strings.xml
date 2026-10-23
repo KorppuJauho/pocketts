@@ -102,6 +102,8 @@
     <string name="stream_watch">VER</string>
     <string name="stream_small_window">Ventana pequeña</string>
     <string name="stream_full_screen">Pantalla completa</string>
+    <string name="stream_resize">Arrastra para cambiar el tamaño de la transmisión</string>
+    <string name="stream_mini">Transmisión pequeña: toca para ampliarla, arrastra para moverla</string>
     <string name="stream_leave_full_screen">Salir de pantalla completa</string>
     <string name="stream_stop_watching">Dejar de ver</string>
     <string name="stream_sound_on">Activar sonido</string>
