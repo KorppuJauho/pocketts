@@ -138,6 +138,9 @@
     <string name="share_sound">Звук трансляции</string>
     <string name="share_sound_on_desc">Зрители слышат ваш микрофон вместе с изображением. Он затихает, пока ваш микрофон выключен и пока вы говорите в канале, чтобы вас не было слышно дважды.</string>
     <string name="share_sound_off_desc">Изображение без звука: говорите в канале как обычно.</string>
+    <string name="share_screen_sound">Звук телефона</string>
+    <string name="share_screen_sound_on_desc">Зрители слышат то, что воспроизводит ваш телефон, например видео или игру. Некоторые приложения этого не разрешают и остаются без звука. Голоса канала не передаются.</string>
+    <string name="share_screen_sound_off_desc">Изображение без звука.</string>
     <string name="share_screen_desc">Перед началом Android спросит ещё раз. Показывается всё, что на экране, включая уведомления.</string>
     <string name="share_sound_quiet">Звук трансляции приглушён</string>
     <string name="share_sound_live">Звук трансляции включён</string>

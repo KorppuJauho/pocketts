@@ -5,6 +5,7 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -62,6 +63,7 @@ object AppLog {
         }
     }
 
+    @RequiresApi(30)
     private fun readTrace(s: ApplicationExitInfo): ByteArray? = try {
         s.traceInputStream?.use { input ->
             val out = java.io.ByteArrayOutputStream()

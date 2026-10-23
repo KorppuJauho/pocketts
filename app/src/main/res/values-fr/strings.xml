@@ -137,6 +137,9 @@
     <string name="share_sound">Son de la diffusion</string>
     <string name="share_sound_on_desc">Les spectateurs entendent votre micro avec l’image. Il se tait quand votre micro est coupé et quand vous parlez dans le canal, pour qu’on ne vous entende pas deux fois.</string>
     <string name="share_sound_off_desc">Pas de son avec l’image : parlez dans le canal comme d’habitude.</string>
+    <string name="share_screen_sound">Son du téléphone</string>
+    <string name="share_screen_sound_on_desc">Les spectateurs entendent ce que joue votre téléphone, comme une vidéo ou un jeu. Certaines apps ne le permettent pas et restent muettes. Les voix du canal ne sont pas incluses.</string>
+    <string name="share_screen_sound_off_desc">Pas de son avec l’image.</string>
     <string name="share_screen_desc">Android demande encore une fois avant de commencer. Tout ce qui est à l’écran est montré, notifications comprises.</string>
     <string name="share_sound_quiet">Son de la diffusion coupé</string>
     <string name="share_sound_live">Son de la diffusion actif</string>
