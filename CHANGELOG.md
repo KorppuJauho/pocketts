@@ -1,32 +1,34 @@
 # Changelog
 
-## Unreleased
+## 1.3.0 (2026-10-23)
 
 - **In seven languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian. PocketTS follows
   the phone's language, or the one chosen in Settings › UI › Language (on Android 13 and later, the same choice as
   in Android's app settings).
   TeamSpeak's own words follow the TeamSpeak 5 client's translations. See [TRANSLATIONS.md](TRANSLATIONS.md) to
   help with corrections.
-- **A stream's size:** drag the handle under a stream you watch to make it bigger or smaller (remembered). Pulled on
-  past the top it shrinks to a small picture over the app that you can drag anywhere (tap it to bring it back). At
-  first it takes at most 40 % of the screen, so the channels and the chat stay in view.
+- **Screen share sound:** sharing the screen can carry what the phone plays, such as a video or a game ("Phone sound"
+  in the share window, on by default). Some apps don't allow their sound to be recorded and stay silent. The
+  channel's voices and the streams you watch are left out, so viewers don't hear the channel twice. The microphone
+  isn't used for it, it keeps playing while you talk, and viewers hear it even with the phone's volume at zero. It
+  can't be used while you watch a stream (the option is greyed out then).
 - **Editing channels** (with Settings › UI › Show admin functions on): holding a channel opens edit mode. The channels
   wiggle; drag one to move it among its neighbours, tap one to change its name, description, type (permanent,
   semi-permanent or temporary), password, voice codec and quality, max users, or where it is in the tree. Add makes
   a new channel, and Delete always asks first, saying which sub-channels go too and how many people are moved out.
   The server decides who may.
 - The channel list stays in the server's order when an admin elsewhere adds or moves a channel between others.
+- **A stream's size:** drag the handle under a stream you watch to make it bigger or smaller (remembered). Pulled on
+  past the top it shrinks to a small picture over the app that you can drag anywhere (tap it to bring it back). At
+  first it takes at most 40 % of the screen, so the channels and the chat stay in view.
 - **Buttons at the bottom** (Settings › UI): the microphone, sound, push-to-talk and share buttons and the
   Channels/Chat switch move to the bottom of the screen, within reach of your thumb. The round push-to-talk button
   stays above them, and they step aside while you type in the chat.
 - The push-to-talk button is now the rightmost of the buttons, where a thumb reaches it most easily. The round
   push-to-talk buttons (in the app and over other apps) show the same talking person, since the microphone means
   muting.
-- **Screen share sound:** sharing the screen can carry what the phone plays, such as a video or a game ("Phone sound"
-  in the share window, on by default). Some apps don't allow their sound to be recorded and stay silent. The
-  channel's voices and the streams you watch are left out, so viewers don't hear the channel twice. The microphone
-  isn't used for it, it keeps playing while you talk, and viewers hear it even with the phone's volume at zero. It
-  can't be used while you watch a stream (the option is greyed out then).
+- **For developers:** `scripts/dev.sh viewer up` starts a test viewer that watches every stream on the test
+  server, logs what arrives and measures the delay (see [DEVELOPING.md](DEVELOPING.md)).
 
 ## 1.2.0 (2026-10-22)
 

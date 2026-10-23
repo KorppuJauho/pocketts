@@ -46,6 +46,18 @@ never do.
 Put the test server's address in `dev.env` as `TS_TEST_SERVER=host:port`. If the server runs in a container, add
 `TS_CONTAINER=<name>` as well, so `scripts/dev.sh ts-server up` and `down` can start and stop it.
 
+## Testing streams
+
+`scripts/dev.sh viewer up` starts a test viewer on the test server (`TS_CONTAINER`): WebTS and a headless Chromium,
+inside the server container's own network, so nothing is opened to the outside. It joins as "Stream viewer", goes
+to the channel of whoever starts a stream and watches it, taking the video as H.264 like the TeamSpeak app
+(`scripts/dev.sh viewer up webts` lets WebTS choose instead). `scripts/dev.sh viewer down` stops it.
+
+The test page shows what it sees at `/viewer`: a log line a second (picture size, frame rate, data rate, losses,
+freezes, sound, route) and a picture every few seconds (also in `dist/viewer/`). To measure the delay, open the test
+page's `/clock` on the phone and share the screen: the viewer reads the clock from the stream and logs the delay from
+the phone's screen to its own.
+
 ## Releasing
 
 A release is a signed APK attached to a GitHub release, built by GitHub Actions from the tagged commit

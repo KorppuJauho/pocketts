@@ -15,8 +15,10 @@ to join.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
   password.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
-- **Streams:** watch others' screen and camera streams (also in a small window over other apps), and share your own
-  camera (with your microphone) or screen (with what the phone plays).
+- **Streams:** watch others' screen and camera streams (at the size you choose, small over the app, or in a small
+  window over other apps), and share your own camera (with your microphone) or screen (with what the phone plays).
+- **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
+  who may.
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
