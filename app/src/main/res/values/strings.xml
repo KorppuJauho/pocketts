@@ -420,6 +420,62 @@
     <string name="admin_failed_kick_channel">Couldn\'t kick %1$s from the channel: %2$s</string>
     <string name="admin_failed_kick_server">Couldn\'t kick %1$s from the server: %2$s</string>
     <string name="admin_failed_ban">Couldn\'t ban %1$s: %2$s</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_no_permission_create">You don\'t have permission to create the channel %1$s.</string>
+    <string name="channel_no_permission_edit">You don\'t have permission to change %1$s.</string>
+    <string name="channel_no_permission_reorder">You don\'t have permission to move %1$s.</string>
+    <string name="channel_no_permission_delete">You don\'t have permission to delete %1$s.</string>
+    <!-- %1$s: the channel, %2$s: the server's reason -->
+    <string name="channel_failed_create">Couldn\'t create %1$s: %2$s</string>
+    <string name="channel_failed_edit">Couldn\'t change %1$s: %2$s</string>
+    <string name="channel_failed_reorder">Couldn\'t move %1$s: %2$s</string>
+    <string name="channel_failed_delete">Couldn\'t delete %1$s: %2$s</string>
+    <string name="channels_editing">Editing channels</string>
+    <string name="channels_add">Add</string>
+    <string name="channels_done">Done</string>
+    <string name="channels_edit_hint">Hold a channel and drag it to move it. Tap it to change or delete it.</string>
+    <plurals name="channel_people">
+        <item quantity="one">%d person</item>
+        <item quantity="other">%d people</item>
+    </plurals>
+    <string name="channel_new_title">New channel</string>
+    <string name="channel_new_subtitle">The server decides which kinds of channel you may create.</string>
+    <string name="channel_edit_subtitle">Channel settings</string>
+    <string name="channel_create">Create</string>
+    <string name="channel_name">Name</string>
+    <string name="channel_description">Description</string>
+    <string name="channel_kind">Type</string>
+    <string name="channel_kind_permanent">Permanent</string>
+    <string name="channel_kind_semi">Semi-permanent</string>
+    <string name="channel_kind_temporary">Temporary</string>
+    <string name="channel_kind_permanent_desc">Stays until it\'s deleted.</string>
+    <string name="channel_kind_semi_desc">Stays until the server restarts.</string>
+    <string name="channel_kind_temporary_desc">Goes away when the last person leaves. You\'re moved into it when it\'s created.</string>
+    <string name="channel_password_on">Password</string>
+    <string name="channel_password_keep">Leave empty to keep the current one</string>
+    <string name="channel_codec">Voice codec</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <!-- %1$d: 0 to 10 -->
+    <string name="channel_quality">Quality: %1$d</string>
+    <string name="channel_unlimited">Unlimited users</string>
+    <string name="channel_max_users">Max users</string>
+    <string name="channel_parent">Inside</string>
+    <string name="channel_top_level">Top level</string>
+    <string name="channel_parent_change">Change</string>
+    <string name="channel_parent_title">Where it goes</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_delete_title">Delete %1$s?</string>
+    <string name="channel_delete_subtitle">This can\'t be undone.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="one">Its %d sub-channel is deleted too.</item>
+        <item quantity="other">Its %d sub-channels are deleted too.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="one">%d person is moved to the default channel.</item>
+        <item quantity="other">%d people are moved to the default channel.</item>
+    </plurals>
+    <string name="channel_delete_empty">Nobody is in it.</string>
     <string name="admin_move_needs_password">Couldn\'t move %1$s: the channel needs its password. Join it once with the password, remembering it, to move people there.</string>
 
     <!-- Sending pictures: %1$s / %3$s is the reason -->

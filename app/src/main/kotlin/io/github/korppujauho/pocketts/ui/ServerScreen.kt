@@ -69,6 +69,16 @@ interface ServerActions {
     fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) {}
     /** Admin: banned for [seconds] (0: for good). */
     fun ban(person: ServerModel.Client, seconds: Long, reason: String) {}
+    /** Admin: a new channel. */
+    fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) {}
+    /** Admin: a channel changed. */
+    fun editChannel(channel: ServerModel.Channel, settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) {}
+    /** Admin: a channel to come after [after] (0 = first) among its siblings. */
+    fun reorderChannel(channel: ServerModel.Channel, after: Int) {}
+    /** Admin: a channel deleted, with its sub-channels. */
+    fun deleteChannel(channel: ServerModel.Channel) {}
+    /** A channel's description, which the server sends only when asked. */
+    fun channelDescription(channel: ServerModel.Channel) {}
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
@@ -110,6 +120,7 @@ fun ServerScreen(
     startView: View = View.CHANNELS,
     startChat: Chat.Key = Chat.Key.Channel(0),
     startSettings: Int? = null,
+    startEditing: Boolean = false, // in the channel edit mode (screenshots)
     favorites: List<io.github.korppujauho.pocketts.Favorite> = emptyList(),
     egl: org.webrtc.EglBase? = null,
     canBoth: Boolean = false, // the phone can use both cameras at once
@@ -130,6 +141,13 @@ fun ServerScreen(
     var kickTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var banTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
+    // Editing the channels (Settings › UI › Show admin functions, then holding a channel)
+    var editing by rememberSaveable { mutableStateOf(startEditing) }
+    var held by remember { mutableStateOf<ServerModel.Channel?>(null) }
+    var channelDialog by remember { mutableStateOf<ChannelEditing?>(null) }
+    var deleteTarget by remember { mutableStateOf<ServerModel.Channel?>(null) }
+    val editMode = editing && state.voice.adminTools && state.phase == Session.Phase.CONNECTED && view == View.CHANNELS
+    androidx.activity.compose.BackHandler(editMode) { editing = false }
     val items = remember(state.tree) { flattenTree(state.tree) }
 
     // A private chat whose tab was closed: back to the channel
@@ -257,6 +275,18 @@ fun ServerScreen(
                 Box(Modifier.fillMaxWidth().weight(1f)) {
                     when (view) {
                         View.CHANNELS -> Panel(Modifier.fillMaxSize(), header = {
+                            if (editMode) {
+                                ChannelEditHeader(
+                                    onAdd = {
+                                        // Next to the channel that was held, else at the end
+                                        val h = held?.let { state.channel(it.id) }
+                                        val after = h?.id ?: items.lastOrNull { it.node.channel.parent == 0 }?.node?.channel?.id ?: 0
+                                        channelDialog = ChannelEditing(null, io.github.korppujauho.pocketts.proto.ChannelEdits.Settings("", parent = h?.parent ?: 0, after = after))
+                                    },
+                                    onDone = { editing = false },
+                                )
+                                return@Panel
+                            }
                             // The server's own icon, else a plain server one (as channels have the note)
                             if (state.serverIcon > 0) TsIcon(state.serverIcon, state.serverKey, 18.dp)
                             else androidx.compose.material3.Icon(
@@ -272,6 +302,16 @@ fun ServerScreen(
                                         state.reconnecting > 0 -> stringResource(R.string.reconnecting_try, state.reconnecting)
                                         else -> stringResource(R.string.stream_connecting)
                                     }
+                                )
+                            } else if (editMode) {
+                                ChannelEditList(
+                                    items, state.serverKey,
+                                    onTap = { ch ->
+                                        actions.channelDescription(ch)
+                                        channelDialog = ChannelEditing(ch.id, io.github.korppujauho.pocketts.proto.ChannelEdits.settingsOf(ch))
+                                    },
+                                    onReorder = actions::reorderChannel,
+                                    modifier = Modifier.fillMaxSize(),
                                 )
                             } else {
                                 ChannelTree(
@@ -289,6 +329,7 @@ fun ServerScreen(
                                     },
                                     onPerson = { person = it },
                                     modifier = Modifier.fillMaxSize(),
+                                    onLongChannel = if (state.voice.adminTools && state.phase == Session.Phase.CONNECTED) ({ ch -> held = ch; editing = true }) else null,
                                 )
                             }
                         }
@@ -406,6 +447,34 @@ fun ServerScreen(
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })
     }
     if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
+    channelDialog?.let { d ->
+        val ch = d.id?.let { state.channel(it) }
+        if (d.id == null || ch != null) androidx.compose.runtime.key(d) {
+            ChannelDialog(
+                ch, d.start, state.tree, description = ch?.description.orEmpty(),
+                onSave = { s ->
+                    if (ch != null) actions.editChannel(ch, s)
+                    else {
+                        // Put somewhere else than where it was opened: last under its new parent
+                        val after = if (s.parent == d.start.parent) s.after
+                        else state.tree.let { t -> flattenTree(t) }.lastOrNull { it.node.channel.parent == s.parent }?.node?.channel?.id ?: 0
+                        actions.createChannel(s.copy(after = after))
+                    }
+                    channelDialog = null
+                },
+                onDelete = ch?.let { c -> { channelDialog = null; deleteTarget = c } },
+                onDismiss = { channelDialog = null },
+            )
+        }
+    }
+    deleteTarget?.let { ch ->
+        val under = io.github.korppujauho.pocketts.proto.ChannelEdits.subtree(items.map { it.node.channel }, ch.id)
+        DeleteChannelDialog(
+            ch, subChannels = under.size - 1, people = items.filter { it.node.channel.id in under }.sumOf { it.node.clients.size },
+            onDelete = { actions.deleteChannel(ch); deleteTarget = null },
+            onDismiss = { deleteTarget = null },
+        )
+    }
     if (shareDialog) {
         ShareDialog(
             onCamera = { front, quality, sound -> shareDialog = false; actions.shareCamera(front, quality, sound) },
@@ -448,3 +517,6 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
 fun ErrorLine(text: String) {
     Text(text, color = Color(0xFFF87171), fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 }
+
+/** The channel settings window: a channel's own ([id]), or a new one (null), starting as [start]. */
+private data class ChannelEditing(val id: Int?, val start: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings)

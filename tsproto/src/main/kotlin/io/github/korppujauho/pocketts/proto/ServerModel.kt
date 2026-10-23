@@ -20,9 +20,10 @@ class ServerModel {
         val topic: String = "",
         val isDefault: Boolean = false,
         val hasPassword: Boolean = false,
-        val codec: Int = 4,
+        val codec: Int = 4, // 4 = Opus Voice, 5 = Opus Music
+        val codecQuality: Int = 6, // 0 - 10
         val neededTalkPower: Int = 0,
-        val maxClients: Int = -1,
+        val maxClients: Int = -1, // -1 = unlimited
         val permanent: Boolean = true,
         val semiPermanent: Boolean = false,
         val iconId: Long = 0,
@@ -157,24 +158,34 @@ class ServerModel {
                 cmd.params.filterKeys { it.startsWith("virtualserver_") }.forEach { (k, v) -> serverVars[k] = v }
                 cmd["virtualserver_uptime"]?.let { serverVars["received_at"] = System.currentTimeMillis().toString() }
             }
-            "channellist", "notifychannelcreated" -> for (g in cmd.groups) {
+            "channellist" -> for (g in cmd.groups) {
                 val id = g["cid"]?.toIntOrNull() ?: continue
                 channels[id] = channelFrom(g, channels[id] ?: Channel(id, 0, 0, "Channel $id"))
+            }
+            // A new channel: the one that came after its place now comes after it (the server doesn't say so)
+            "notifychannelcreated" -> for (g in cmd.groups) {
+                val id = g["cid"]?.toIntOrNull() ?: continue
+                val ch = channelFrom(g, channels[id] ?: Channel(id, 0, 0, "Channel $id"))
+                channels[id] = ch
+                link(ch)
             }
             "notifychanneledited" -> {
                 val id = cmd["cid"]?.toIntOrNull() ?: return false
                 val old = channels[id] ?: return false
-                channels[id] = channelFrom(cmd.params, old)
+                place(old, channelFrom(cmd.params, old))
             }
             "notifychannelmoved" -> {
                 val id = cmd["cid"]?.toIntOrNull() ?: return false
                 val old = channels[id] ?: return false
-                channels[id] = old.copy(
-                    parent = cmd["cpid"]?.toIntOrNull() ?: old.parent,
-                    order = cmd["order"]?.toIntOrNull() ?: old.order,
-                )
+                place(old, old.copy(parent = cmd["cpid"]?.toIntOrNull() ?: old.parent, order = cmd["order"]?.toIntOrNull() ?: old.order))
             }
-            "notifychanneldeleted" -> for (g in cmd.groups) g["cid"]?.toIntOrNull()?.let { channels.remove(it) }
+            // Its sub-channels go too (the server lists them, deepest first)
+            "notifychanneldeleted" -> for (g in cmd.groups) {
+                val id = g["cid"]?.toIntOrNull() ?: continue
+                channels[id]?.let { unlink(it) }
+                channels.remove(id)
+                removeOrphans()
+            }
             "notifycliententerview" -> {
                 // In a list, the target channel may be given only once, in the first entry.
                 var target = 0
@@ -256,6 +267,36 @@ class ServerModel {
 
     private val clientOrder = compareByDescending<Client> { it.talkPower }.thenBy { it.nickname.lowercase() }
 
+    // Channels name the one they come after. The server tells only about the channel that moved, so its neighbours
+    // follow here: the one after its old place now follows what it followed, and the one at its new place follows it.
+    private fun unlink(ch: Channel) {
+        channels.values.filter { it.id != ch.id && it.parent == ch.parent && it.order == ch.id }
+            .forEach { channels[it.id] = it.copy(order = ch.order) }
+    }
+
+    private fun link(ch: Channel) {
+        channels.values.filter { it.id != ch.id && it.parent == ch.parent && it.order == ch.order }
+            .forEach { channels[it.id] = it.copy(order = ch.id) }
+    }
+
+    private fun place(old: Channel, new: Channel) {
+        if (old.parent == new.parent && old.order == new.order) {
+            channels[new.id] = new
+            return
+        }
+        unlink(old)
+        channels[new.id] = new
+        link(new)
+    }
+
+    private fun removeOrphans() {
+        while (true) {
+            val orphans = channels.values.filter { it.parent != 0 && !channels.containsKey(it.parent) }
+            if (orphans.isEmpty()) return
+            orphans.forEach { channels.remove(it.id) }
+        }
+    }
+
     /** Siblings follow each other: each names the one it comes after. */
     private fun ordered(siblings: List<Channel>): List<Channel> {
         val after = siblings.associateBy { it.order }
@@ -278,8 +319,9 @@ class ServerModel {
         isDefault = g["channel_flag_default"]?.let { it == "1" } ?: old.isDefault,
         hasPassword = g["channel_flag_password"]?.let { it == "1" } ?: old.hasPassword,
         codec = g["channel_codec"]?.toIntOrNull() ?: old.codec,
+        codecQuality = g["channel_codec_quality"]?.toIntOrNull() ?: old.codecQuality,
         neededTalkPower = g["channel_needed_talk_power"]?.toIntOrNull() ?: old.neededTalkPower,
-        maxClients = g["channel_maxclients"]?.toIntOrNull() ?: old.maxClients,
+        maxClients = if (g["channel_flag_maxclients_unlimited"] == "1") -1 else g["channel_maxclients"]?.toIntOrNull() ?: old.maxClients,
         permanent = g["channel_flag_permanent"]?.let { it == "1" } ?: old.permanent,
         semiPermanent = g["channel_flag_semi_permanent"]?.let { it == "1" } ?: old.semiPermanent,
         iconId = g["channel_icon_id"]?.let { unsignedId(it) } ?: old.iconId,
