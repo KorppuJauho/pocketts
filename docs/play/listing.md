@@ -31,13 +31,14 @@ CHANNELS AND CHAT
 • Chat history kept on your phone for 90 days
 
 STREAMS
-• Watch others' screen and camera streams, also in a small window over other apps
+• Watch others' screen and camera streams at the size you like, small over the app, or in a small window over other apps
 • Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
 
 AND MORE
 • Favourite servers, and switching between them
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
-• Admin tools for server admins: move, kick and ban (optional)
+• Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)
+• In English, Finnish, German, Spanish, French, Simplified Chinese and Russian
 
 PRIVATE BY DESIGN
 No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose.
