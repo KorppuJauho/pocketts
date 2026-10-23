@@ -226,6 +226,11 @@ class ScreenshotTest {
     }
 
     @Test
+    fun settingsUi() = shot("settings-ui") {
+        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 3, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
     fun serverConnecting() = shot("server-connecting") {
         ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com", reconnecting = 2), Example.noActions)
     }

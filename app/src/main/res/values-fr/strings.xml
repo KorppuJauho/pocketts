@@ -230,6 +230,8 @@
     <string name="ui_admin">Afficher les fonctions d’administration</string>
     <string name="ui_controls_bottom">Boutons en bas</string>
     <string name="ui_controls_bottom_desc">Les boutons micro, son et partage et le sélecteur Canaux/Chat se trouvent en bas de l’écran, à portée de votre pouce.</string>
+    <string name="ui_language">Langue</string>
+    <string name="ui_language_phone">Langue du téléphone</string>
     <string name="ui_admin_desc">Le menu d’une personne permet aussi de la déplacer vers un autre canal, de l’expulser du canal ou du serveur et de la bannir. Le serveur décide si vous en avez le droit : sans la permission, il refuse.</string>
 
     <!-- Settings › Advanced -->

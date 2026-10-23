@@ -81,6 +81,11 @@ android {
         generateLocaleConfig = true
     }
 
+    // Every language in every install from Google Play: the app's language can be chosen in its settings
+    bundle {
+        language { enableSplit = false }
+    }
+
     buildFeatures {
         compose = true
         buildConfig = true

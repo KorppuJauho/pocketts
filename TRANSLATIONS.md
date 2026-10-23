@@ -1,12 +1,13 @@
 # Translations
 
 PocketTS speaks English, Finnish, German, Spanish, French, Simplified Chinese and Russian. It follows the phone's
-language. On Android 13 and later, it can also be set for PocketTS alone: Settings › Apps › PocketTS › Language.
+language, or the one chosen in PocketTS's Settings › UI › Language. On Android 13 and later, that choice is the same
+as the phone's own per-app setting: Settings › Apps › PocketTS › Language.
 
 | Language | File | Checked by a native speaker |
 |---|---|---|
 | English | `app/src/main/res/values/strings.xml` | yes (the original) |
-| Finnish | `values-fi/strings.xml` | being checked |
+| Finnish | `values-fi/strings.xml` | yes |
 | German | `values-de/strings.xml` | not yet |
 | Spanish | `values-es/strings.xml` | not yet |
 | French | `values-fr/strings.xml` | not yet |
