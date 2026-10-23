@@ -9,6 +9,8 @@
 #   scripts/dev.sh ts-server up|down  start/stop the TeamSpeak test server container (TS_CONTAINER)
 #   scripts/dev.sh it                 tests against that server (TS_TEST_SERVER)
 #   scripts/dev.sh devserver up|down  the page phones install test builds from and send their log to (DEV_PORT)
+#   scripts/dev.sh viewer up|down     a "Stream viewer" on the test server that watches every stream, for testing
+#                                     sharing without a second device; the dev page shows what it sees (/viewer)
 #   scripts/dev.sh gradle <args>      any Gradle command
 #   scripts/dev.sh keystore           make the release key (once; keep it safe, see DEVELOPING.md)
 #   scripts/dev.sh release            the signed release APK -> dist/ (asks for the key's password)
@@ -31,6 +33,8 @@ KEYSTORE="${KEYSTORE/#\~/$HOME}"
 EXTRA=()  # more docker run options for one command
 DEV_NAME=pocketts-dev
 DEV_PORT="${DEV_PORT:-8686}"
+VIEWER_NAME=pocketts-viewer
+WEBTS_IMAGE="${WEBTS_IMAGE:-ghcr.io/korppujauho/webts:latest}"  # the stream viewer watches through WebTS
 CPUS="${CPUS:-4}"   # keep builds from taking every core
 
 gradle() {
@@ -93,6 +97,27 @@ case "${1:-}" in
         ;;
       down) docker rm -f "$DEV_NAME" >/dev/null 2>&1 || true ;;
       *) echo "devserver up|down"; exit 1 ;;
+    esac
+    ;;
+  viewer)
+    # WebTS and a headless Chromium inside the test server's own network: they reach it as 127.0.0.1, and nothing
+    # is opened to the outside. The viewer writes its log and pictures to dist/viewer.
+    need TS_CONTAINER
+    case "${2:-}" in
+      up)
+        docker build -q -t "$VIEWER_NAME" "$ROOT/tools/stream-viewer" >/dev/null
+        docker rm -f "$VIEWER_NAME" "$VIEWER_NAME-webts" >/dev/null 2>&1 || true
+        docker run -d --name "$VIEWER_NAME-webts" --cpus 1 --memory 512m --network "container:$TS_CONTAINER" \
+          -e TS_HOST=127.0.0.1 -e TS_PORT=9987 -e PORT=3002 -e ACCESS_MODE=public -e I_UNDERSTAND_THIS_IS_PUBLIC=true \
+          -e NICK_PREFIX= -e MAX_USERS=2 -e PICTURES=false -v "$VIEWER_NAME-webts:/app/data" "$WEBTS_IMAGE" >/dev/null
+        mkdir -p "$ROOT/dist/viewer"
+        rm -f "$ROOT/dist/viewer/viewer.log"
+        docker run -d --name "$VIEWER_NAME" --cpus 2 --memory 2g --shm-size 512m --network "container:$TS_CONTAINER" \
+          -v "$ROOT/dist/viewer:/out" "$VIEWER_NAME" >/dev/null
+        echo "Stream viewer started: the dev page shows what it sees (/viewer)"
+        ;;
+      down) docker rm -f "$VIEWER_NAME" "$VIEWER_NAME-webts" >/dev/null 2>&1 || true ;;
+      *) echo "viewer up|down"; exit 1 ;;
     esac
     ;;
   gradle)
