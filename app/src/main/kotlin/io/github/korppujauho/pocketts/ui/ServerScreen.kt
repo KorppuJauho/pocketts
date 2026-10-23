@@ -480,6 +480,7 @@ fun ServerScreen(
             sound = state.voice.cameraSound,
             canBoth = canBoth,
             screenSound = state.voice.screenSound,
+            screenSoundBlocked = state.stream.phoneSoundBlocked,
             onScreen = { sound -> shareDialog = false; actions.shareScreen(sound) },
             onDismiss = { shareDialog = false },
         )

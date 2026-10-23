@@ -66,6 +66,7 @@ class StreamEngine(
         val viewers: Int = 0,
         val localVideo: VideoTrack? = null,
         val message: String? = null, // why a share stopped or couldn't start
+        val phoneSoundBlocked: Boolean = false, // a screen share can't have the phone's sound now (watching a stream: factoryForSound)
     )
 
     private val exec = Executors.newSingleThreadExecutor { r -> Thread(r, "streams").apply { isDaemon = true } }
@@ -159,7 +160,7 @@ class StreamEngine(
         private set
 
     private fun update(f: (State) -> State) {
-        state = f(state)
+        state = f(state).let { it.copy(phoneSoundBlocked = made != null && !madeRecordless && (it.watching != 0 || viewers.isNotEmpty())) }
         onState(state)
     }
 

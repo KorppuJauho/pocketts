@@ -349,6 +349,7 @@ fun ShareDialog(
     onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
     onBoth: (quality: Int, sound: Boolean) -> Unit = { _, _ -> }, canBoth: Boolean = false, sound: Boolean = false,
     screenSound: Boolean = true,
+    screenSoundBlocked: Boolean = false, // watching a stream: the phone's sound can't go with the screen now
 ) {
     var withSound by remember { mutableStateOf(sound) }
     var withScreenSound by remember { mutableStateOf(screenSound) }
@@ -364,7 +365,7 @@ fun ShareDialog(
             PillButton(stringResource(R.string.cancel), onClick = onDismiss)
             PillButton(stringResource(R.string.start), PillKind.PRIMARY) {
                 when {
-                    screen -> onScreen(withScreenSound)
+                    screen -> onScreen(withScreenSound && !screenSoundBlocked)
                     camera == 2 -> onBoth(quality, withSound)
                     else -> onCamera(camera == 0, quality, withSound)
                 }
@@ -372,18 +373,21 @@ fun ShareDialog(
         },
     ) {
             @Composable
-            fun SoundChoice(label: String, on: Boolean, desc: String, onChange: (Boolean) -> Unit) {
+            fun SoundChoice(label: String, on: Boolean, desc: String, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
                 Row(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { onChange(!on) },
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(enabled = enabled) { onChange(!on) },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
                         androidx.compose.material3.Checkbox(
-                            on, onChange,
-                            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
+                            on, onChange, enabled = enabled,
+                            colors = androidx.compose.material3.CheckboxDefaults.colors(
+                                checkedColor = Ts.accent, uncheckedColor = Ts.muted,
+                                disabledCheckedColor = Ts.muted.copy(alpha = 0.4f), disabledUncheckedColor = Ts.muted.copy(alpha = 0.4f),
+                            ),
                         )
                     }
-                    Text(label, color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+                    Text(label, color = if (enabled) Ts.text else Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
                 }
                 Text(desc, color = Ts.muted, fontSize = 13.sp)
             }
@@ -411,8 +415,15 @@ fun ShareDialog(
                 } else {
                     Text(stringResource(R.string.share_screen_desc), color = Ts.muted, fontSize = 13.sp)
                     SoundChoice(
-                        stringResource(R.string.share_screen_sound), withScreenSound,
-                        stringResource(if (withScreenSound) R.string.share_screen_sound_on_desc else R.string.share_screen_sound_off_desc),
+                        stringResource(R.string.share_screen_sound), withScreenSound && !screenSoundBlocked,
+                        stringResource(
+                            when {
+                                screenSoundBlocked -> R.string.share_screen_sound_watching
+                                withScreenSound -> R.string.share_screen_sound_on_desc
+                                else -> R.string.share_screen_sound_off_desc
+                            },
+                        ),
+                        enabled = !screenSoundBlocked,
                     ) { withScreenSound = it }
                 }
             }

@@ -41,6 +41,7 @@ class ScreenSound(private val projection: MediaProjection) {
     private var pieces = 0
     private var heard = 0L
     private var short = 0
+    private var loudest = 0
     private var dropped = 0L // with the ring's lock
     private var countedSince = 0L
 
@@ -57,6 +58,13 @@ class ScreenSound(private val projection: MediaProjection) {
             ringSize -= got
         }
         for (i in got until bytes) buffer.put(i, 0)
+        if (encoding == AudioFormat.ENCODING_PCM_16BIT) {
+            // The loudest sample, to tell sound from silence (an app that doesn't allow recording gives silence)
+            for (i in 0 until got - 1 step 2) {
+                val sample = kotlin.math.abs(((buffer.get(i).toInt() and 0xff) or (buffer.get(i + 1).toInt() shl 8)).toShort().toInt())
+                if (sample > loudest) loudest = sample
+            }
+        }
         count(got, bytes)
     }
 
@@ -69,13 +77,13 @@ class ScreenSound(private val projection: MediaProjection) {
         if (now - countedSince >= 10_000_000_000L) {
             val (waiting, drops) = synchronized(lock) { (ringSize to dropped).also { dropped = 0 } }
             AppLog.log(
-                "[Streams] Phone sound: $pieces pieces in %.1f s, %d short, %d bytes heard, %d dropped, %d waiting; memory %d MB native, %d MB Java".format(
-                    (now - countedSince) / 1e9, short, heard, drops, waiting,
+                "[Streams] Phone sound: $pieces pieces in %.1f s, %d short, %d bytes heard (loudest %d %%), %d dropped, %d waiting; memory %d MB native, %d MB Java".format(
+                    (now - countedSince) / 1e9, short, heard, loudest * 100 / 32768, drops, waiting,
                     Debug.getNativeHeapAllocatedSize() / 1_048_576,
                     (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1_048_576,
                 ),
             )
-            pieces = 0; heard = 0; short = 0
+            pieces = 0; heard = 0; short = 0; loudest = 0
             countedSince = now
         }
     }

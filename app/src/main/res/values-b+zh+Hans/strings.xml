@@ -138,6 +138,7 @@
     <string name="share_screen_sound">手机声音</string>
     <string name="share_screen_sound_on_desc">观众会听到你手机播放的内容，例如视频或游戏。有些应用不允许这样做，会保持静音。频道中的语音不包括在内。</string>
     <string name="share_screen_sound_off_desc">画面不带声音。</string>
+    <string name="share_screen_sound_watching">观看直播时不可用：停止观看后即可同时分享手机声音。</string>
     <string name="share_screen_desc">开始前 Android 会再询问一次。屏幕上的所有内容都会显示，包括通知。</string>
     <string name="share_sound_quiet">直播声音已静音</string>
     <string name="share_sound_live">直播声音已开启</string>

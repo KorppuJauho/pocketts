@@ -139,6 +139,7 @@
     <string name="share_screen_sound">Puhelimen ääni</string>
     <string name="share_screen_sound_on_desc">Katsojat kuulevat, mitä puhelimesi toistaa, kuten videon tai pelin. Jotkin sovellukset eivät salli sitä ja pysyvät hiljaa. Kanavan äänet eivät tule mukaan.</string>
     <string name="share_screen_sound_off_desc">Kuva ilman ääntä.</string>
+    <string name="share_screen_sound_watching">Ei käytettävissä, kun katsot striimiä: lopeta katselu, niin voit jakaa myös puhelimen äänen.</string>
     <string name="share_screen_desc">Android kysyy vielä kerran ennen aloitusta. Kaikki näytölläsi näkyvä näytetään, myös ilmoitukset.</string>
     <string name="share_sound_quiet">Striimin ääni hiljaa</string>
     <string name="share_sound_live">Striimin ääni päällä</string>

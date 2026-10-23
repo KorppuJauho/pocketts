@@ -139,6 +139,7 @@
     <string name="share_screen_sound">Handyton</string>
     <string name="share_screen_sound_on_desc">Zuschauer hören, was dein Handy abspielt, etwa ein Video oder ein Spiel. Manche Apps erlauben das nicht und bleiben stumm. Die Stimmen im Channel sind nicht dabei.</string>
     <string name="share_screen_sound_off_desc">Kein Ton zum Bild.</string>
+    <string name="share_screen_sound_watching">Nicht, während du einen Stream ansiehst: Beende das Zuschauen, um auch den Handyton zu teilen.</string>
     <string name="share_screen_desc">Android fragt vor dem Start noch einmal nach. Alles auf deinem Bildschirm ist zu sehen, auch Benachrichtigungen.</string>
     <string name="share_sound_quiet">Stream-Ton stumm</string>
     <string name="share_sound_live">Stream-Ton an</string>
