@@ -112,6 +112,13 @@ class ScreenshotTest {
         )
     }
 
+    /** Choosing where a channel goes: Gaming picked, the new channel shown dashed at the end of it. */
+    @Test
+    fun channelLocation() = popup("popup-channel-location") {
+        val tree = Example.state().tree
+        io.github.korppujauho.pocketts.ui.LocationDialog(tree, tree.first { it.channel.name == "Gaming" }.channel.id, null, "Squad 3", {}, {})
+    }
+
     @Test
     fun channelDelete() = popup("popup-channel-delete") {
         val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
