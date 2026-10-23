@@ -404,10 +404,13 @@ private fun FullScreenPlayer(
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
 fun ShareDialog(
-    onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: () -> Unit, onDismiss: () -> Unit,
+    onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
     onBoth: (quality: Int, sound: Boolean) -> Unit = { _, _ -> }, canBoth: Boolean = false, sound: Boolean = false,
+    screenSound: Boolean = true,
+    screenSoundBlocked: Boolean = false, // watching a stream: the phone's sound can't go with the screen now
 ) {
     var withSound by remember { mutableStateOf(sound) }
+    var withScreenSound by remember { mutableStateOf(screenSound) }
     var screen by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(0) } // front, back, both
     var quality by remember { mutableStateOf(720) }
@@ -420,13 +423,32 @@ fun ShareDialog(
             PillButton(stringResource(R.string.cancel), onClick = onDismiss)
             PillButton(stringResource(R.string.start), PillKind.PRIMARY) {
                 when {
-                    screen -> onScreen()
+                    screen -> onScreen(withScreenSound && !screenSoundBlocked)
                     camera == 2 -> onBoth(quality, withSound)
                     else -> onCamera(camera == 0, quality, withSound)
                 }
             }
         },
     ) {
+            @Composable
+            fun SoundChoice(label: String, on: Boolean, desc: String, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(enabled = enabled) { onChange(!on) },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                        androidx.compose.material3.Checkbox(
+                            on, onChange, enabled = enabled,
+                            colors = androidx.compose.material3.CheckboxDefaults.colors(
+                                checkedColor = Ts.accent, uncheckedColor = Ts.muted,
+                                disabledCheckedColor = Ts.muted.copy(alpha = 0.4f), disabledUncheckedColor = Ts.muted.copy(alpha = 0.4f),
+                            ),
+                        )
+                    }
+                    Text(label, color = if (enabled) Ts.text else Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
+                }
+                Text(desc, color = Ts.muted, fontSize = 13.sp)
+            }
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(stringResource(R.string.share_what), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Segments(listOf(stringResource(R.string.share_camera), stringResource(R.string.share_screen)), if (screen) 1 else 0) { screen = it == 1 }
@@ -444,24 +466,23 @@ fun ShareDialog(
                         },
                         color = Ts.muted, fontSize = 13.sp,
                     )
-                    Row(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { withSound = !withSound },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
-                            androidx.compose.material3.Checkbox(
-                                withSound, { withSound = it },
-                                colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
-                            )
-                        }
-                        Text(stringResource(R.string.share_sound), color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 6.dp))
-                    }
-                    Text(
+                    SoundChoice(
+                        stringResource(R.string.share_sound), withSound,
                         stringResource(if (withSound) R.string.share_sound_on_desc else R.string.share_sound_off_desc),
-                        color = Ts.muted, fontSize = 13.sp,
-                    )
+                    ) { withSound = it }
                 } else {
                     Text(stringResource(R.string.share_screen_desc), color = Ts.muted, fontSize = 13.sp)
+                    SoundChoice(
+                        stringResource(R.string.share_screen_sound), withScreenSound && !screenSoundBlocked,
+                        stringResource(
+                            when {
+                                screenSoundBlocked -> R.string.share_screen_sound_watching
+                                withScreenSound -> R.string.share_screen_sound_on_desc
+                                else -> R.string.share_screen_sound_off_desc
+                            },
+                        ),
+                        enabled = !screenSoundBlocked,
+                    ) { withScreenSound = it }
                 }
             }
     }

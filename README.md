@@ -16,7 +16,7 @@ to join.
   password.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
 - **Streams:** watch others' screen and camera streams (also in a small window over other apps), and share your own
-  camera or screen.
+  camera (with your microphone) or screen (with what the phone plays).
 - **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).

@@ -12,7 +12,8 @@ PocketTS talks to the **TeamSpeak servers you connect to**, and sends them what 
 - your nickname and your TeamSpeak identity's public key, and the server and channel passwords you enter;
 - your voice, while you talk;
 - your chat messages, pokes and the pictures you send;
-- your camera (with your microphone's sound, if you choose) and your screen, while you share them.
+- your camera (with your microphone's sound, if you choose) and your screen (with what the phone plays, if you
+  choose), while you share them.
 
 Each server is run by someone else, under their own rules. They see what any TeamSpeak app would show them, such as
 your IP address. Choose servers you trust.
@@ -46,7 +47,8 @@ Removing the app removes all of this. Settings › Advanced can also let go of y
 
 ## Permissions
 
-- **Microphone:** your voice, and a camera stream's sound.
+- **Microphone:** your voice, and a camera stream's sound. Recording what other apps play during a screen share
+  also needs this permission.
 - **Camera:** only while you share your camera.
 - **Screen sharing:** only after Android asks you, and only while you share.
 - **Notifications:** pokes, private messages, and the notification that keeps the connection going.

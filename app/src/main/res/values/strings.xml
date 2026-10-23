@@ -152,6 +152,10 @@
     <string name="share_sound">Stream sound</string>
     <string name="share_sound_on_desc">Viewers hear your microphone with the picture. It goes quiet while your microphone is muted and while you talk in the channel, so you\'re not heard twice.</string>
     <string name="share_sound_off_desc">No sound with the picture: talk in the channel as usual.</string>
+    <string name="share_screen_sound">Phone sound</string>
+    <string name="share_screen_sound_on_desc">Viewers hear what your phone plays, such as a video or a game. Some apps don\'t allow it and stay silent. The channel\'s voices aren\'t included.</string>
+    <string name="share_screen_sound_off_desc">No sound with the picture.</string>
+    <string name="share_screen_sound_watching">Not while you\'re watching a stream: stop watching to share the phone\'s sound too.</string>
     <string name="share_screen_desc">Android asks once more before it starts. Everything on your screen is shown, notifications too.</string>
     <string name="share_sound_quiet">Stream sound quiet</string>
     <string name="share_sound_live">Stream sound on</string>

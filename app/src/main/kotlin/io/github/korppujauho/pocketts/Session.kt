@@ -175,10 +175,17 @@ object Session : TsClient.Listener {
         return s.inputMuted || !s.micAllowed || s.ownId in s.talking
     }
 
+    /** Whether a screen share carries what the phone plays. */
+    fun setScreenSound(on: Boolean) {
+        if (_state.value.voice.screenSound != on) updateVoice(_state.value.voice.copy(screenSound = on))
+    }
+
     /** Screen sharing, with Android's permission ([projection]); the service must say "screen" before it starts. */
     fun shareScreen(projection: android.content.Intent, width: Int, height: Int) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Screen"
-        ConnectionService.onForeground = { streams().shareScreen(projection, width, height, name) }
+        val sound = _state.value.voice.screenSound
+        // Recording what other apps play needs the microphone's permission too
+        ConnectionService.onForeground = { streams().shareScreen(projection, width, height, name, sound && micPermitted()) }
         ConnectionService.start(app, app.getString(R.string.notification_sharing_screen), projection = true)
     }
     private var player: VoicePlayer? = null

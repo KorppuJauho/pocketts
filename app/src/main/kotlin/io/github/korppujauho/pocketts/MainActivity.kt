@@ -88,8 +88,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** The screen: Android asks the person first. */
-    fun shareScreen() {
+    /** The screen ([sound]: with what the phone plays): Android asks the person first. */
+    fun shareScreen(sound: Boolean) {
+        Session.setScreenSound(sound) // remembered now: the app may be made again while Android asks
         val pm = getSystemService(android.media.projection.MediaProjectionManager::class.java)
         askScreen.launch(pm.createScreenCaptureIntent())
     }
@@ -124,7 +125,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppLog.start()
+        AppLog.start(this)
         // The chat's event lines in the app's language (made in the protocol module, which has no text of its own)
         io.github.korppujauho.pocketts.proto.Chat.words = io.github.korppujauho.pocketts.proto.Chat.Words(
             connected = getString(R.string.event_connected),
@@ -326,8 +327,8 @@ private object SessionActions : ServerActions {
     override fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {
         MainActivity.current?.shareCamera(front, quality, sound)
     }
-    override fun shareScreen() {
-        MainActivity.current?.shareScreen()
+    override fun shareScreen(sound: Boolean) {
+        MainActivity.current?.shareScreen(sound)
     }
     override fun stopShare() {
         Session.stopShare()

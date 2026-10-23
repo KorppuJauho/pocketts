@@ -138,6 +138,10 @@
     <string name="share_sound">Sonido de la transmisión</string>
     <string name="share_sound_on_desc">Los espectadores oyen tu micrófono con la imagen. Se queda en silencio mientras tu micrófono está silenciado y mientras hablas en el canal, para que no se te oiga dos veces.</string>
     <string name="share_sound_off_desc">Imagen sin sonido: habla en el canal como siempre.</string>
+    <string name="share_screen_sound">Sonido del teléfono</string>
+    <string name="share_screen_sound_on_desc">Los espectadores oyen lo que reproduce tu teléfono, como un vídeo o un juego. Algunas apps no lo permiten y se quedan en silencio. Las voces del canal no se incluyen.</string>
+    <string name="share_screen_sound_off_desc">Imagen sin sonido.</string>
+    <string name="share_screen_sound_watching">No disponible mientras ves una transmisión: deja de verla para compartir también el sonido del teléfono.</string>
     <string name="share_screen_desc">Android pregunta una vez más antes de empezar. Se ve todo lo que hay en tu pantalla, también las notificaciones.</string>
     <string name="share_sound_quiet">Sonido de la transmisión en silencio</string>
     <string name="share_sound_live">Sonido de la transmisión activado</string>

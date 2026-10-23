@@ -32,7 +32,7 @@ CHANNELS AND CHAT
 
 STREAMS
 • Watch others' screen and camera streams, also in a small window over other apps
-• Share your camera (front or back, with your microphone) or your screen
+• Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
 
 AND MORE
 • Favourite servers, and switching between them

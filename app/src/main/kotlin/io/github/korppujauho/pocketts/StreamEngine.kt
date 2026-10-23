@@ -55,7 +55,7 @@ class StreamEngine(
         val watchMuted: Boolean = false,
         val sharing: Streams.Kind? = null,
         val shareLive: Boolean = false,
-        val shareSound: Boolean = false, // our camera stream carries the microphone
+        val shareSound: Boolean = false, // our stream carries sound (a camera's: the microphone; the screen's: what the phone plays)
         val soundPaused: Boolean = false, // ... silent just now (microphone muted, or talking in the channel)
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
@@ -66,6 +66,7 @@ class StreamEngine(
         val viewers: Int = 0,
         val localVideo: VideoTrack? = null,
         val message: String? = null, // why a share stopped or couldn't start
+        val phoneSoundBlocked: Boolean = false, // a screen share can't have the phone's sound now (watching a stream: factoryForSound)
     )
 
     private val exec = Executors.newSingleThreadExecutor { r -> Thread(r, "streams").apply { isDaemon = true } }
@@ -83,6 +84,8 @@ class StreamEngine(
     private var made: PeerConnectionFactory? = null
     private var madeAudio: JavaAudioDeviceModule? = null
     private var madeEcho = false
+    private var madeRecordless = false // without WebRTC's microphone: the phone's sound fills in (factoryForSound)
+    private var wantRecordless = false
     private var initialized = false
     private val factory: PeerConnectionFactory get() = made ?: makeFactory()
 
@@ -96,7 +99,22 @@ class StreamEngine(
             .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
             .setUseHardwareAcousticEchoCanceler(echo)
             .setUseHardwareNoiseSuppressor(false) // the surroundings are heard (as WebTS does it)
+            // Sharing the screen with its sound, the microphone is off and the phone's sound is put in its place. With
+            // no microphone WebRTC says it recorded nothing (bytes 0) and nothing else keeps its loop to time: the
+            // whole buffer is one piece, the phone's sound or silence, handed out at the pace sound plays (unpaced,
+            // the loop ran flat out and filled the memory)
+            .setAudioBufferCallback { buffer, encoding, channels, rate, bytes, time ->
+                if (bytes == 0) {
+                    val size = buffer.capacity()
+                    phoneSound?.fill(buffer, encoding, channels, rate, size) ?: run {
+                        for (i in 0 until size) buffer.put(i, 0)
+                        idlePace.wait(size, encoding, channels, rate)
+                    }
+                }
+                time
+            }
             .createAudioDeviceModule()
+        if (wantRecordless) audio.setAudioRecordEnabled(false)
         val f = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(DefaultVideoEncoderFactory(egl.eglBaseContext, true, true))
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(egl.eglBaseContext))
@@ -105,17 +123,33 @@ class StreamEngine(
         made = f
         madeAudio = audio
         madeEcho = echo
+        madeRecordless = wantRecordless
         return f
     }
 
-    // Echo cancellation changed since the factory was made: a new one, when nothing uses the old one
-    private fun factoryForSound() {
-        val f = made ?: return
-        if (madeEcho == settings().echoCancellation || state.watching != 0 || viewers.isNotEmpty()) return
+    /**
+     * The factory for a share's sound: [phone] for the phone's sound, with WebRTC's microphone never opened (one it
+     * had opened before and was then told to leave alone made its recording loop fail), else with the microphone and
+     * echo cancellation as set now. A new one when the old one differs and nothing uses it. False when the phone's
+     * sound can't be had now (the factory is in use, with a microphone).
+     */
+    private fun factoryForSound(phone: Boolean): Boolean {
+        wantRecordless = phone
+        val f = made ?: return true
+        if (madeEcho == settings().echoCancellation && madeRecordless == phone) return true
+        if (state.watching != 0 || viewers.isNotEmpty()) {
+            if (madeRecordless == phone) return true // only the echo setting differs: it waits
+            if (phone) return false
+            // Back to the microphone: WebRTC opens it itself when it next records (it had none open)
+            madeAudio?.setAudioRecordEnabled(true)
+            madeRecordless = false
+            return true
+        }
         f.dispose()
         madeAudio?.release()
         made = null
         madeAudio = null
+        return true
     }
     private val decoders by lazy {
         factory // loads WebRTC's library first
@@ -126,7 +160,7 @@ class StreamEngine(
         private set
 
     private fun update(f: (State) -> State) {
-        state = f(state)
+        state = f(state).let { it.copy(phoneSoundBlocked = made != null && !madeRecordless && (it.watching != 0 || viewers.isNotEmpty())) }
         onState(state)
     }
 
@@ -342,6 +376,8 @@ class StreamEngine(
         CameraTurn(context).also { t -> t.onTurn = { deg -> exec.execute { if (state.sharing == Streams.Kind.CAMERA || deg == 0) update { it.copy(phoneTurn = deg) } } } }
     }
     private var dual: DualCamera? = null
+    @Volatile private var phoneSound: ScreenSound? = null
+    private val idlePace = SoundPace() // WebRTC's sound loop without a microphone and without the phone's sound
 
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
@@ -374,10 +410,13 @@ class StreamEngine(
         startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound)
     }
 
-    /** The stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
+    // The phone's sound (a screen share's) goes on while you talk; the microphone's (a camera's) doesn't
+    private fun paused() = phoneSound == null && soundPaused()
+
+    /** The camera stream's sound follows the microphone: silent while it's muted or you talk in the channel (no echo). */
     fun refreshSound() = exec.execute {
         if (sound == null) return@execute
-        val paused = soundPaused()
+        val paused = paused()
         // The microphone muted, not the track: muted, it still delivers (silence) at full time. A track switched off
         // sent nothing, so each pause dropped out of the sound's timeline and viewers heard it that much later.
         madeAudio?.setMicrophoneMute(paused)
@@ -407,7 +446,7 @@ class StreamEngine(
     }
 
     /** Starts sharing the screen, with the permission Android gave ([projection]: its result). */
-    fun shareScreen(projection: Intent, width: Int, height: Int, name: String) = exec.execute {
+    fun shareScreen(projection: Intent, width: Int, height: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
         val cap = ScreenCapturerAndroid(projection, object : MediaProjection.Callback() {
             override fun onStop() = stopShare()
@@ -415,7 +454,7 @@ class StreamEngine(
         // At most 1920 on the long side, the screen's shape kept
         val scale = minOf(1.0, 1920.0 / maxOf(width, height))
         bitrate = 4000
-        startCapture(cap, true, (width * scale).toInt() / 2 * 2, (height * scale).toInt() / 2 * 2, Streams.Kind.SCREEN, name)
+        startCapture(cap, true, (width * scale).toInt() / 2 * 2, (height * scale).toInt() / 2 * 2, Streams.Kind.SCREEN, name, withSound)
     }
 
     private fun startCapture(
@@ -423,29 +462,40 @@ class StreamEngine(
         observer: (org.webrtc.CapturerObserver) -> org.webrtc.CapturerObserver = { it },
     ) {
         try {
-            if (withSound) factoryForSound()
+            val phoneWanted = withSound && cap is ScreenCapturerAndroid
+            val phoneReady = !withSound || factoryForSound(phone = phoneWanted)
             val src = factory.createVideoSource(screen)
             val help = SurfaceTextureHelper.create("capture", egl.eglBaseContext)
             cap.initialize(help, context.applicationContext, observer(src.capturerObserver))
             cap.startCapture(w, h, fps)
             capturer = cap; source = src; helper = help
             track = factory.createVideoTrack("share", src)
-            if (withSound) {
+            // The screen's sound is what the phone plays: recorded through the share's own permission
+            val phone = if (phoneWanted && phoneReady) (cap as ScreenCapturerAndroid).mediaProjection?.let { ScreenSound(it) } else null
+            if (phone != null) {
+                phoneSound = phone
+            } else if (phoneWanted) {
+                log(if (phoneReady) "No screen to record the sound with: sharing without it" else "Watching a stream: the phone's sound can't be shared now, sharing without it")
+            }
+            if (withSound && (cap !is ScreenCapturerAndroid || phone != null)) {
+                fun option(key: String, on: Boolean) = org.webrtc.MediaConstraints.KeyValuePair(key, "$on")
                 val constraints = org.webrtc.MediaConstraints().apply {
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googEchoCancellation", "${settings().echoCancellation}"))
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googNoiseSuppression", "false"))
-                    mandatory.add(org.webrtc.MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
+                    // The phone's sound as it is: no echo cancelling, levelling or filtering meant for a voice
+                    mandatory.add(option("googEchoCancellation", phone == null && settings().echoCancellation))
+                    mandatory.add(option("googNoiseSuppression", false))
+                    mandatory.add(option("googAutoGainControl", phone == null))
+                    if (phone != null) mandatory.add(option("googHighpassFilter", false))
                 }
                 soundSource = factory.createAudioSource(constraints)
                 sound = factory.createAudioTrack("share-sound", soundSource)
             }
             // Without stream sound, the stream's microphone stays muted too (WebRTC would send it on the sound line)
-            madeAudio?.setMicrophoneMute(sound == null || soundPaused())
+            madeAudio?.setMicrophoneMute(sound == null || paused())
             sharePending = true
             update {
                 it.copy(
                     sharing = kind, shareLive = false, viewers = 0, localVideo = track, message = null, rotateLocked = turn.locked,
-                    lockedTurn = turn.extra(false), shareSound = sound != null, soundPaused = sound != null && soundPaused(),
+                    lockedTurn = turn.extra(false), shareSound = sound != null, soundPaused = sound != null && paused(),
                 )
             }
             send(Streams.setup(name, kind, bitrate, audio = sound != null, returnCode = rc("setup")))
@@ -476,15 +526,20 @@ class StreamEngine(
         endShare()
     }
 
-    // While sharing: every 10 s, how the stream keeps time, in the phone's log. The sound captured should keep
-    // up with the clock and the camera's frames with the encoder's; a gap growing shows which side drifts.
+    // While sharing: every 5 s, how the stream keeps time, in the phone's log. The sound captured should keep
+    // up with the clock and the camera's frames with the encoder's; a gap growing shows which side drifts. Packets
+    // waiting long to be sent show the encoder making more than the connection is thought to take.
     private val ticker = java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "stream-stats").apply { isDaemon = true } }
     private var statsTask: java.util.concurrent.ScheduledFuture<*>? = null
 
     private fun startStats() {
         statsTask?.cancel(false)
-        statsTask = ticker.scheduleWithFixedDelay({ exec.execute { logStats() } }, 10, 10, java.util.concurrent.TimeUnit.SECONDS)
+        lastVideo = emptyMap()
+        statsTask = ticker.scheduleWithFixedDelay({ exec.execute { logStats() } }, 5, 5, java.util.concurrent.TimeUnit.SECONDS)
     }
+
+    // The previous stats' video counters, for what happened in between
+    private var lastVideo: Map<String, Double> = emptyMap()
 
     private fun logStats() {
         val v = viewers.values.firstOrNull() ?: return
@@ -493,18 +548,35 @@ class StreamEngine(
             val parts = ArrayList<String>()
             for (s in report.statsMap.values) {
                 val m = s.members
+                fun num(key: String) = (m[key] as? Number)?.toDouble() ?: 0.0
                 when {
                     s.type == "media-source" && m["kind"] == "audio" ->
                         parts.add("sound captured %.1f s".format((m["totalSamplesDuration"] as? Number)?.toDouble() ?: -1.0))
                     s.type == "media-source" && m["kind"] == "video" -> parts.add("camera ${m["frames"]} frames")
                     s.type == "outbound-rtp" && m["kind"] == "audio" -> parts.add("sound ${m["packetsSent"]} packets")
-                    s.type == "outbound-rtp" && m["kind"] == "video" ->
-                        parts.add(
-                            "video ${m["frameWidth"]}x${m["frameHeight"]}, ${m["framesEncoded"]} encoded, ${m["framesSent"]} sent at " +
-                                "${m["framesPerSecond"]} fps (limit ${m["qualityLimitationReason"]}), encoding %.1f s".format((m["totalEncodeTime"] as? Number)?.toDouble() ?: -1.0) +
-                                ", send delay %.1f s".format((m["totalPacketSendDelay"] as? Number)?.toDouble() ?: -1.0)
+                    s.type == "outbound-rtp" && m["kind"] == "video" -> {
+                        val now = mapOf(
+                            "time" to s.timestampUs / 1e6, "bytes" to num("bytesSent"), "packets" to num("packetsSent"),
+                            "delay" to num("totalPacketSendDelay"), "frames" to num("framesEncoded"), "keys" to num("keyFramesEncoded"),
+                            "encode" to num("totalEncodeTime"),
                         )
-                    s.type == "remote-inbound-rtp" -> parts.add("${m["kind"]} round trip ${m["roundTripTime"]} s")
+                        val last = lastVideo
+                        lastVideo = now
+                        fun d(key: String) = (now[key] ?: 0.0) - (last[key] ?: 0.0)
+                        val span = d("time").takeIf { it > 0 } ?: 1.0
+                        parts.add(
+                            "video ${m["frameWidth"]}x${m["frameHeight"]} ${m["encoderImplementation"]}, " +
+                                "%.0f fps, %.0f kbit/s (aim %.0f), %d key frames, ".format(d("frames") / span, d("bytes") * 8 / span / 1000, num("targetBitrate") / 1000, d("keys").toInt()) +
+                                "encoding %.0f ms a frame, waiting to be sent %.0f ms a packet, ".format(
+                                    if (d("frames") > 0) d("encode") / d("frames") * 1000 else 0.0,
+                                    if (d("packets") > 0) d("delay") / d("packets") * 1000 else 0.0,
+                                ) +
+                                "limit ${m["qualityLimitationReason"]}, asked to resend ${m["nackCount"]}, asked for a key frame ${m["pliCount"]}",
+                        )
+                    }
+                    s.type == "candidate-pair" && m["nominated"] == true && m["state"] == "succeeded" ->
+                        parts.add("connection allows %.0f kbit/s".format(num("availableOutgoingBitrate") / 1000))
+                    s.type == "remote-inbound-rtp" -> parts.add("${m["kind"]} round trip ${m["roundTripTime"]} s, lost ${m["packetsLost"]}")
                 }
             }
             log("Share stats after %.0f s: ".format(seconds) + parts.joinToString(", "))
@@ -516,6 +588,8 @@ class StreamEngine(
         statsTask = null
         shareId = null
         sharePending = false
+        // First, so WebRTC's recording loop isn't left waiting for the phone's sound while the viewers are let go
+        phoneSound?.stop()
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
@@ -523,6 +597,7 @@ class StreamEngine(
     }
 
     private fun releaseCapture() {
+        phoneSound?.stop()
         turn.stop()
         try { capturer?.stopCapture() } catch (_: Exception) {}
         capturer?.dispose(); capturer = null
@@ -532,6 +607,10 @@ class StreamEngine(
         sound?.dispose(); sound = null
         soundSource?.dispose(); soundSource = null
         helper?.dispose(); helper = null
+        phoneSound?.let { p ->
+            phoneSound = null
+            p.release()
+        }
     }
 
     /** Someone asks to watch our share: everyone may, so they get our offer right away. */
