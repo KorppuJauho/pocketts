@@ -5,7 +5,9 @@
 - **Buttons at the bottom** (Settings › UI): the microphone, sound, push-to-talk and share buttons and the
   Channels/Chat switch move to the bottom of the screen, within reach of your thumb. The round push-to-talk button
   stays above them, and they step aside while you type in the chat.
-- The push-to-talk button is now the rightmost of the buttons, where a thumb reaches it most easily.
+- The push-to-talk button is now the rightmost of the buttons, where a thumb reaches it most easily. The round
+  push-to-talk buttons (in the app and over other apps) show the same talking person, since the microphone means
+  muting.
 
 ## 1.2.0 (2026-10-22)
 

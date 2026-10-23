@@ -90,7 +90,7 @@ object TalkOverlay {
             style = Paint.Style.STROKE
             strokeWidth = 1.5f * density
         }
-        private val icon = context.getDrawable(R.drawable.ic_mic)!!.mutate()
+        private val icon = context.getDrawable(R.drawable.ic_talk)!!.mutate()
 
         // Same colours as the floating button in the app
         override fun onDraw(c: Canvas) {
