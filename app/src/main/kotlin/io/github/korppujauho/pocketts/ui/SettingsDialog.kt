@@ -85,6 +85,9 @@ interface SettingsActions {
     fun clearChatHistory() {}
     /** Forgets every remembered channel password. */
     fun forgetChannelPasswords() {}
+    /** The app's language as a tag ("" for the phone's), and switching it (the screen is made again). */
+    fun language(): String = ""
+    fun setLanguage(tag: String) {}
 }
 
 /** Who we are on the server, for the profile picture in Settings. */
@@ -122,6 +125,8 @@ fun SettingsContent(
     var tab by rememberSaveable { mutableStateOf(startTab) }
     var v by remember { mutableStateOf(voice) }
     var nick by remember { mutableStateOf(nickname) }
+    val savedLanguage = remember { actions.language() }
+    var language by rememberSaveable { mutableStateOf(savedLanguage) }
 
     // While the settings are open the microphone is measured, nothing is sent
     DisposableEffect(Unit) {
@@ -169,7 +174,10 @@ fun SettingsContent(
                     }
                     1 -> Playback(v, actions) { v = it }
                     2 -> Capture(v, actions) { v = it }
-                    3 -> Ui(v) { v = it }
+                    3 -> {
+                        Ui(v) { v = it }
+                        Language(language) { language = it }
+                    }
                     else -> {
                         Advanced(v) { v = it }
                         ChannelPasswordsGroup(actions)
@@ -178,7 +186,12 @@ fun SettingsContent(
                 }
             }
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
-                PrimaryButton(stringResource(R.string.settings_save)) { actions.save(v, nick.trim()); onDismiss() }
+                PrimaryButton(stringResource(R.string.settings_save)) {
+                    actions.save(v, nick.trim())
+                    onDismiss()
+                    // Last: the screen is made again in the new language
+                    if (language != savedLanguage) actions.setLanguage(language)
+                }
             }
         }
     }
@@ -442,6 +455,15 @@ private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group {
         Check(stringResource(R.string.ui_controls_bottom), v.controlsAtBottom) { onChange(v.copy(controlsAtBottom = it)) }
         Desc(stringResource(R.string.ui_controls_bottom_desc))
+    }
+}
+
+/** The app's language: the phone's, or one of the translations by its own name. */
+@Composable
+private fun Language(tag: String, onChange: (String) -> Unit) {
+    Group(stringResource(R.string.ui_language)) {
+        Radio(stringResource(R.string.ui_language_phone), tag.isEmpty()) { onChange("") }
+        for ((t, name) in io.github.korppujauho.pocketts.AppLanguage.choices) Radio(name, tag == t) { onChange(t) }
     }
 }
 

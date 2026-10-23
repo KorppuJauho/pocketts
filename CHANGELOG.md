@@ -3,7 +3,8 @@
 ## Unreleased
 
 - **In seven languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian. PocketTS follows
-  the phone's language; on Android 13 and later it can also be set for PocketTS alone in Android's app settings.
+  the phone's language, or the one chosen in Settings › UI › Language (on Android 13 and later, the same choice as
+  in Android's app settings).
   TeamSpeak's own words follow the TeamSpeak 5 client's translations. See [TRANSLATIONS.md](TRANSLATIONS.md) to
   help with corrections.
 - **Editing channels** (with Settings › UI › Show admin functions on): holding a channel opens edit mode. The channels
