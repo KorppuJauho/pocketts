@@ -82,7 +82,8 @@ phone.
    shows (a crash in native code leaves no line: then look for a class the native code needs, see
    `app/proguard-rules.pro`).
 6. Publish the draft.
-7. Upload the Play bundle to Google Play: see [docs/play/README.md](docs/play/README.md).
+7. Google Play: the workflow uploads the bundle to the closed test as a draft (once set up); send it for review in
+   Play Console. See [docs/play/README.md](docs/play/README.md).
 
 Anyone can check that a release APK was built by this repository's workflow:
 

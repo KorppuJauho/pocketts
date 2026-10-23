@@ -1,7 +1,8 @@
 # The release: pushing a tag v<version> (the same as versionName in app/build.gradle.kts) builds the signed APK from
 # that commit, records where it was built (a build attestation anyone can check), and makes a draft release with the
-# APK attached. The Google Play version (an app bundle) is built too and kept with the run for uploading to Play.
-# Publishing the draft and uploading to Play stay a person's steps. See DEVELOPING.md, "Releasing".
+# APK attached. The Google Play version (an app bundle) is built too and kept with the run.
+# The bundle goes to the closed test on Google Play as a draft (scripts/play-upload.sh, once its service account is
+# set up). Publishing the GitHub draft and sending the Play draft for review stay a person's steps. See DEVELOPING.md.
 name: Release
 
 on:
@@ -72,6 +73,20 @@ jobs:
           path: play/PocketTS-${{ env.VERSION }}-play.aab
           retention-days: 90
           if-no-files-found: error
+
+      # To the closed test on Google Play, as a draft: "Send for review" in Play Console stays a person's step.
+      # Skipped (with a note) until the service account's key is in this environment's secrets.
+      - name: Upload to Google Play
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_TRACK: alpha
+          PLAY_RELEASE_STATUS: draft
+        run: |
+          # Play's release notes: this version's headlines from the changelog (at most 500 characters)
+          TITLES=$(awk -v v="## $VERSION" 'index($0, v) == 1 {on = 1; next} /^## / {on = 0} on' CHANGELOG.md \
+            | sed -n 's/^- \*\*\([^*]*\)\*\*.*/\1/p' | sed 's/:$//' | grep -v '^For developers' | paste -sd ',' - | sed 's/,/, /g')
+          NOTES="New in $VERSION: ${TITLES:-fixes and improvements}. All changes: https://github.com/$GITHUB_REPOSITORY/releases/tag/$GITHUB_REF_NAME"
+          scripts/play-upload.sh "play/PocketTS-$VERSION-play.aab" "${NOTES:0:500}"
 
       - name: Draft release
         env:
