@@ -439,6 +439,10 @@ private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
         Check(stringResource(R.string.ui_admin), v.adminTools) { onChange(v.copy(adminTools = it)) }
         Desc(stringResource(R.string.ui_admin_desc))
     }
+    Group {
+        Check(stringResource(R.string.ui_controls_bottom), v.controlsAtBottom) { onChange(v.copy(controlsAtBottom = it)) }
+        Desc(stringResource(R.string.ui_controls_bottom_desc))
+    }
 }
 
 @Composable

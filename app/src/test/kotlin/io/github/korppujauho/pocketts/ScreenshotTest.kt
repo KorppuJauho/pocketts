@@ -75,6 +75,20 @@ class ScreenshotTest {
     @Test
     fun chat() = shot("chat") { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
 
+    /** Settings › UI › Buttons at the bottom, with push-to-talk's round button kept above them. */
+    @Test
+    fun buttonsAtBottom() = shot("buttons-at-bottom") {
+        ServerScreen(
+            Example.state().copy(voice = VoiceSettings(controlsAtBottom = true, activation = VoiceSettings.Activation.PTT), micAllowed = true),
+            Example.noActions,
+        )
+    }
+
+    @Test
+    fun chatButtonsAtBottom() = shot("chat-buttons-at-bottom") {
+        ServerScreen(Example.chatState().copy(voice = VoiceSettings(controlsAtBottom = true)), Example.noActions, startView = View.CHAT)
+    }
+
     @Test
     fun poked() = shot("poke") {
         ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions)
