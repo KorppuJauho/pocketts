@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.AccountTree
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Icon
@@ -259,11 +260,12 @@ fun ChannelDialog(
         )
 
         Label(stringResource(R.string.channel_kind))
-        val kinds = ChannelEdits.Kind.entries
-        Segments(
-            listOf(stringResource(R.string.channel_kind_permanent), stringResource(R.string.channel_kind_semi), stringResource(R.string.channel_kind_temporary)),
-            kinds.indexOf(s.kind),
-        ) { s = s.copy(kind = kinds[it]) }
+        // One under another: three long names don't fit side by side on a phone
+        for ((kind, label) in listOf(
+            ChannelEdits.Kind.PERMANENT to R.string.channel_kind_permanent,
+            ChannelEdits.Kind.SEMI_PERMANENT to R.string.channel_kind_semi,
+            ChannelEdits.Kind.TEMPORARY to R.string.channel_kind_temporary,
+        )) Radio(stringResource(label), s.kind == kind) { s = s.copy(kind = kind) }
         Text(
             stringResource(
                 when (s.kind) {
@@ -295,11 +297,11 @@ fun ChannelDialog(
             TsField(maxText, { t -> maxText = t.filter { it.isDigit() }.take(5) }, stringResource(R.string.channel_max_users), keyboard = KeyboardType.Number)
         }
 
-        // Where it is in the tree: tap to choose another place (not inside itself)
+        // Where it is in the tree: tap to choose another place (in a window of its own; not inside itself)
         val parentName = if (s.parent == 0) stringResource(R.string.channel_top_level)
         else flattenTree(tree).firstOrNull { it.node.channel.id == s.parent }?.node?.channel?.let { it.displayName.ifBlank { it.name } } ?: "?"
         Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { choosingParent = !choosingParent }.padding(vertical = 8.dp),
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { choosingParent = true }.padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(stringResource(R.string.channel_parent), color = Ts.muted, fontSize = 14.sp)
@@ -309,12 +311,18 @@ fun ChannelDialog(
         }
         if (choosingParent) {
             val inside = channel?.let { c -> ChannelEdits.subtree(flattenTree(tree).map { it.node.channel }, c.id) }.orEmpty()
-            Column(Modifier.fillMaxWidth().heightIn(max = 220.dp).clip(RoundedCornerShape(8.dp)).background(Pop.field).verticalScroll(rememberScrollState())) {
-                ParentRow(stringResource(R.string.channel_top_level), 0, s.parent == 0) { s = s.copy(parent = 0); choosingParent = false }
-                for (it in flattenTree(tree)) {
-                    val c = it.node.channel
-                    if (c.id in inside || c.spacer != null) continue
-                    ParentRow(c.displayName.ifBlank { c.name }, it.depth + 1, s.parent == c.id) { s = s.copy(parent = c.id); choosingParent = false }
+            TsDialog(
+                onDismiss = { choosingParent = false }, title = stringResource(R.string.channel_parent_title),
+                icon = Icons.Rounded.AccountTree,
+                buttons = { PillButton(stringResource(R.string.cancel)) { choosingParent = false } },
+            ) {
+                Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
+                    ParentRow(stringResource(R.string.channel_top_level), 0, s.parent == 0) { s = s.copy(parent = 0); choosingParent = false }
+                    for (it in flattenTree(tree)) {
+                        val c = it.node.channel
+                        if (c.id in inside || c.spacer != null) continue
+                        ParentRow(c.displayName.ifBlank { c.name }, it.depth + 1, s.parent == c.id) { s = s.copy(parent = c.id); choosingParent = false }
+                    }
                 }
             }
         }
@@ -329,7 +337,8 @@ private fun ParentRow(name: String, depth: Int, selected: Boolean, onClick: () -
     Text(
         name, color = if (selected) Ts.accent else Ts.text, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = (12 + depth * 14).dp, end = 12.dp, top = 9.dp, bottom = 9.dp),
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(onClick = onClick)
+            .padding(start = (8 + depth * 16).dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
     )
 }
 

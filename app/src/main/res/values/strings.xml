@@ -463,6 +463,7 @@
     <string name="channel_parent">Inside</string>
     <string name="channel_top_level">Top level</string>
     <string name="channel_parent_change">Change</string>
+    <string name="channel_parent_title">Where it goes</string>
     <!-- %1$s: the channel -->
     <string name="channel_delete_title">Delete %1$s?</string>
     <string name="channel_delete_subtitle">This can\'t be undone.</string>

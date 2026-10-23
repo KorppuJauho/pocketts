@@ -209,7 +209,7 @@ internal fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) 
 }
 
 @Composable
-private fun Radio(text: String, selected: Boolean, onClick: () -> Unit) {
+internal fun Radio(text: String, selected: Boolean, onClick: () -> Unit) {
     Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
             RadioButton(selected, onClick, colors = RadioButtonDefaults.colors(selectedColor = Ts.accent, unselectedColor = Ts.muted))
