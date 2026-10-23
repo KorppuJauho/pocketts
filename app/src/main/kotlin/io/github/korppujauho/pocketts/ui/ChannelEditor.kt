@@ -29,6 +29,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.AccountTree
 import androidx.compose.material.icons.rounded.DeleteForever
@@ -310,21 +313,11 @@ fun ChannelDialog(
             Text(stringResource(R.string.channel_parent_change), color = Ts.accent, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         }
         if (choosingParent) {
-            val inside = channel?.let { c -> ChannelEdits.subtree(flattenTree(tree).map { it.node.channel }, c.id) }.orEmpty()
-            TsDialog(
-                onDismiss = { choosingParent = false }, title = stringResource(R.string.channel_parent_title),
-                icon = Icons.Rounded.AccountTree,
-                buttons = { PillButton(stringResource(R.string.cancel)) { choosingParent = false } },
-            ) {
-                Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
-                    ParentRow(stringResource(R.string.channel_top_level), 0, s.parent == 0) { s = s.copy(parent = 0); choosingParent = false }
-                    for (it in flattenTree(tree)) {
-                        val c = it.node.channel
-                        if (c.id in inside || c.spacer != null) continue
-                        ParentRow(c.displayName.ifBlank { c.name }, it.depth + 1, s.parent == c.id) { s = s.copy(parent = c.id); choosingParent = false }
-                    }
-                }
-            }
+            LocationDialog(
+                tree, s.parent, channel, s.name.trim().ifEmpty { stringResource(R.string.channel_new_title) },
+                onPick = { s = s.copy(parent = it); choosingParent = false },
+                onDismiss = { choosingParent = false },
+            )
         }
     }
 }
@@ -332,14 +325,102 @@ fun ChannelDialog(
 @Composable
 private fun Label(text: String) = Text(text, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
 
+/**
+ * Choosing where a channel goes: the channels as bars, as in the list. Tapping one picks it, and a dashed bar named
+ * like the channel shows where it will land (last inside the one picked). A channel that's being moved, and what's
+ * under it, are dimmed: it can't go inside itself. Nothing changes until Done.
+ */
 @Composable
-private fun ParentRow(name: String, depth: Int, selected: Boolean, onClick: () -> Unit) {
-    Text(
-        name, color = if (selected) Ts.accent else Ts.text, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(onClick = onClick)
-            .padding(start = (8 + depth * 16).dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
-    )
+internal fun LocationDialog(
+    tree: List<ServerModel.Node>,
+    start: Int,
+    moving: ServerModel.Channel?,
+    name: String,
+    onPick: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var parent by remember { androidx.compose.runtime.mutableIntStateOf(start) }
+    val rows = remember(tree) { flattenTree(tree) }
+    val all = remember(rows) { rows.map { it.node.channel } }
+    val moved = remember(all, moving) { moving?.let { ChannelEdits.subtree(all, it.id) }.orEmpty() }
+    // The preview's place: after everything already inside the chosen channel (or at the end of the top level)
+    val inside = if (parent == 0) all.map { it.id }.toSet() else ChannelEdits.subtree(all, parent)
+    val previewAfter = rows.indexOfLast { it.node.channel.id in inside && it.node.channel.id !in moved }
+    val previewDepth = if (parent == 0) 0 else (rows.firstOrNull { it.node.channel.id == parent }?.depth ?: -1) + 1
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.channel_parent_title), icon = Icons.Rounded.AccountTree,
+        buttons = {
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.channels_done), PillKind.PRIMARY) { onPick(parent) }
+        },
+    ) {
+        Column(Modifier.fillMaxWidth().heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            LocationBar(stringResource(R.string.channel_top_level), 0, top = true, selected = parent == 0) { parent = 0 }
+            if (previewAfter < 0) PreviewBar(name, previewDepth)
+            rows.forEachIndexed { i, row ->
+                val c = row.node.channel
+                // A spacer (a divider) can't hold channels: shown dimmed, as its text or a line
+                val spacer = c.spacer
+                val dim = c.id in moved || spacer != null
+                LocationBar(
+                    if (spacer != null) spacer.text.ifBlank { "———" } else c.displayName.ifBlank { c.name }, row.depth,
+                    selected = c.id == parent, dim = dim, icon = spacer == null,
+                    onClick = if (dim) null else ({ parent = c.id }),
+                )
+                if (i == previewAfter) PreviewBar(name, previewDepth)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocationBar(
+    name: String, depth: Int, top: Boolean = false, selected: Boolean, dim: Boolean = false, icon: Boolean = true, onClick: (() -> Unit)?,
+) {
+    val shape = RoundedCornerShape(8.dp)
+    Row(
+        Modifier.fillMaxWidth().padding(start = (depth * 15).dp).clip(shape)
+            .background(if (selected) Ts.accent.copy(alpha = 0.16f) else Ts.card)
+            .border(1.dp, if (selected) Ts.accent else Color(0x0DFFFFFF), shape)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon) {
+            Icon(
+                if (top) Icons.Filled.Dns else Icons.Filled.MusicNote, contentDescription = null,
+                tint = if (dim) Ts.faint else Ts.accent, modifier = Modifier.size(16.dp),
+            )
+            Spacer(Modifier.width(8.dp))
+        }
+        Text(
+            name, color = if (dim) Ts.faint else Ts.title, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
+    }
+}
+
+// The channel in its new place: a dashed bar in the accent colour
+@Composable
+private fun PreviewBar(name: String, depth: Int) {
+    val accent = Ts.accent
+    Row(
+        Modifier.fillMaxWidth().padding(start = (depth * 15).dp).clip(RoundedCornerShape(8.dp)).background(accent.copy(alpha = 0.08f))
+            .drawBehind {
+                drawRoundRect(
+                    accent, cornerRadius = androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(
+                        width = 1.5.dp.toPx(), pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 5.dp.toPx())),
+                    ),
+                )
+            }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.MusicNote, contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(name, color = accent, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
 }
 
 /** Deleting a channel: always asked, saying what else goes with it. */

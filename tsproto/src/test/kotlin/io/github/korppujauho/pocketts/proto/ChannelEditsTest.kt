@@ -110,8 +110,8 @@ class ChannelEditsTest {
             ChannelEdits.edit(ch, same.copy(name = "Hall", kind = ChannelEdits.Kind.SEMI_PERMANENT, password = false)).map { it.line() },
         )
         assertEquals(
-            listOf("channeledit cid=5 channel_flag_maxclients_unlimited=0 channel_maxclients=4", "channelmove cid=5 cpid=9 order=0"),
-            ChannelEdits.edit(ch, same.copy(maxClients = 4, parent = 9)).map { it.line() },
+            listOf("channeledit cid=5 channel_flag_maxclients_unlimited=0 channel_maxclients=4", "channelmove cid=5 cpid=9 order=12"),
+            ChannelEdits.edit(ch, same.copy(maxClients = 4, parent = 9, after = 12)).map { it.line() },
         )
         assertNull(ChannelEdits.edit(ch, same.copy(parent = 9)).firstOrNull { it.name == "channeledit" })
     }

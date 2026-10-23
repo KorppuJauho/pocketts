@@ -19,7 +19,7 @@ object ChannelEdits {
         val quality: Int = 6, // 0 - 10
         val maxClients: Int = -1, // -1 = unlimited
         val parent: Int = 0,
-        val after: Int = 0, // a new channel's place: the channel it comes after (0 = first)
+        val after: Int = 0, // the channel it comes after (0 = first): a new one's place, or a moved one's in its new parent
     )
 
     /** A command to send: its name and parameters. */
@@ -50,7 +50,10 @@ object ChannelEdits {
         ) + flags(s.kind) + maxClients(s.maxClients),
     )
 
-    /** What to send to make [ch] like [s]: a `channeledit` with what changed, and a `channelmove` for a new parent. */
+    /**
+     * What to send to make [ch] like [s]: a `channeledit` with what changed, and a `channelmove` for a new parent (where
+     * it goes after [Settings.after] there).
+     */
     fun edit(ch: ServerModel.Channel, s: Settings): List<Edit> {
         val out = ArrayList<Edit>()
         val p = ArrayList<Pair<String, Any?>>()
@@ -66,7 +69,7 @@ object ChannelEdits {
         if (s.maxClients != ch.maxClients) p += maxClients(s.maxClients)
         if (p.isNotEmpty()) out += Edit("channeledit", listOf("cid" to ch.id) + p)
         // Into another parent: first there (a channelmove can't stay in the same parent)
-        if (s.parent != ch.parent) out += Edit("channelmove", listOf("cid" to ch.id, "cpid" to s.parent, "order" to 0))
+        if (s.parent != ch.parent) out += Edit("channelmove", listOf("cid" to ch.id, "cpid" to s.parent, "order" to s.after))
         return out
     }
 
