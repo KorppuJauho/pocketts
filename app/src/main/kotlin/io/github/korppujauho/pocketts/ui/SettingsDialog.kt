@@ -199,7 +199,7 @@ private fun Group(label: String? = null, badge: String? = null, content: @Compos
 fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
-private fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+internal fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
             Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
@@ -219,7 +219,7 @@ private fun Radio(text: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun TsSlider(value: Float, range: ClosedFloatingPointRange<Float>, steps: Int, onChange: (Float) -> Unit) {
+internal fun TsSlider(value: Float, range: ClosedFloatingPointRange<Float>, steps: Int, onChange: (Float) -> Unit) {
     Slider(
         value, onChange, valueRange = range, // no tick marks; values are rounded by the caller
         modifier = Modifier.height(32.dp),

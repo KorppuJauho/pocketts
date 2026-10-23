@@ -89,6 +89,35 @@ class ScreenshotTest {
         ServerScreen(Example.chatState().copy(voice = VoiceSettings(controlsAtBottom = true)), Example.noActions, startView = View.CHAT)
     }
 
+    /** Settings › UI › Show admin functions, after holding a channel: edit mode. */
+    @Test
+    fun channelEditing() = shot("channel-editing") {
+        ServerScreen(Example.state().copy(voice = VoiceSettings(adminTools = true)), Example.noActions, startEditing = true)
+    }
+
+    @Test
+    fun channelNew() = popup("popup-channel-new") {
+        io.github.korppujauho.pocketts.ui.ChannelDialog(
+            null, io.github.korppujauho.pocketts.proto.ChannelEdits.Settings("Squad 3", password = true, newPassword = "pw", parent = 0),
+            Example.state().tree, "", onSave = {}, onDelete = null, onDismiss = {},
+        )
+    }
+
+    @Test
+    fun channelEdit() = popup("popup-channel-edit") {
+        val s = Example.state()
+        val ch = s.tree.first { it.channel.name == "Gaming" }.channel.copy(description = "Games every evening.", maxClients = 10)
+        io.github.korppujauho.pocketts.ui.ChannelDialog(
+            ch, io.github.korppujauho.pocketts.proto.ChannelEdits.settingsOf(ch), s.tree, ch.description, onSave = {}, onDelete = {}, onDismiss = {},
+        )
+    }
+
+    @Test
+    fun channelDelete() = popup("popup-channel-delete") {
+        val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        io.github.korppujauho.pocketts.ui.DeleteChannelDialog(ch, subChannels = 2, people = 3, onDelete = {}, onDismiss = {})
+    }
+
     @Test
     fun poked() = shot("poke") {
         ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions)

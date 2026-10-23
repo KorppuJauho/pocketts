@@ -410,7 +410,7 @@ fun ShareDialog(
 }
 
 @Composable
-private fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(14.dp)).padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp),

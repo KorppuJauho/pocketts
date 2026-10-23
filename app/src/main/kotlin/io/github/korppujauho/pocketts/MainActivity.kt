@@ -271,6 +271,12 @@ private object SessionActions : ServerActions {
     override fun moveClient(person: ServerModel.Client, channelId: Int) = Session.moveClient(person, channelId)
     override fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) = Session.kick(person, fromServer, reason)
     override fun ban(person: ServerModel.Client, seconds: Long, reason: String) = Session.ban(person, seconds, reason)
+    override fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) = Session.createChannel(settings)
+    override fun editChannel(channel: ServerModel.Channel, settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) =
+        Session.editChannel(channel, settings)
+    override fun reorderChannel(channel: ServerModel.Channel, after: Int) = Session.reorderChannel(channel, after)
+    override fun deleteChannel(channel: ServerModel.Channel) = Session.deleteChannel(channel)
+    override fun channelDescription(channel: ServerModel.Channel) = Session.channelDescription(channel.id)
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
