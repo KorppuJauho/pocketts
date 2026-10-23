@@ -102,6 +102,7 @@
     <string name="stream_small_window">Pieni ikkuna</string>
     <string name="stream_full_screen">Koko näyttö</string>
     <string name="stream_resize">Vedä muuttaaksesi striimin kokoa</string>
+    <string name="stream_mini">Pieni striimi: napauta suurentaaksesi, vedä siirtääksesi</string>
     <string name="stream_leave_full_screen">Poistu koko näytöstä</string>
     <string name="stream_stop_watching">Lopeta katselu</string>
     <string name="stream_sound_on">Ääni päälle</string>

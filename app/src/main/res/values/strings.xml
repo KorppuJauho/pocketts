@@ -117,6 +117,7 @@
     <string name="stream_small_window">Small window</string>
     <string name="stream_full_screen">Full screen</string>
     <string name="stream_resize">Drag to change the stream\'s size</string>
+    <string name="stream_mini">Small stream: tap to make it bigger, drag to move it</string>
     <string name="stream_leave_full_screen">Leave full screen</string>
     <string name="stream_stop_watching">Stop watching</string>
     <string name="stream_sound_on">Sound on</string>

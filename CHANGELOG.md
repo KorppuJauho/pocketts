@@ -8,8 +8,8 @@
   TeamSpeak's own words follow the TeamSpeak 5 client's translations. See [TRANSLATIONS.md](TRANSLATIONS.md) to
   help with corrections.
 - **A stream's size:** drag the handle under a stream you watch to make it bigger or smaller (remembered). Pulled on
-  past the top it goes to the small window, past the bottom to full screen. At first it takes at most 40 % of the
-  screen, so the channels and the chat stay in view.
+  past the top it shrinks to a small picture over the app that you can drag anywhere (tap it to bring it back). At
+  first it takes at most 40 % of the screen, so the channels and the chat stay in view.
 - **Editing channels** (with Settings › UI › Show admin functions on): holding a channel opens edit mode. The channels
   wiggle; drag one to move it among its neighbours, tap one to change its name, description, type (permanent,
   semi-permanent or temporary), password, voice codec and quality, max users, or where it is in the tree. Add makes
