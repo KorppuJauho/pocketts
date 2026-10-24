@@ -549,6 +549,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">Connexion</string>
+    <string name="notification_mute">Couper le micro</string>
+    <string name="notification_unmute">Activer le micro</string>
+    <string name="notification_sound_off">Couper le son</string>
+    <string name="notification_sound_on">Activer le son</string>
     <string name="notification_messages">Messages et pokes</string>
     <string name="notification_connected">Connecté à %1$s</string>
     <string name="notification_connecting">Connexion à %1$s</string>

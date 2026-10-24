@@ -521,6 +521,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">连接</string>
+    <string name="notification_mute">静音</string>
+    <string name="notification_unmute">取消静音</string>
+    <string name="notification_sound_off">关闭声音</string>
+    <string name="notification_sound_on">打开声音</string>
     <string name="notification_messages">消息和戳一下</string>
     <string name="notification_connected">已连接到 %1$s</string>
     <string name="notification_connecting">正在连接到 %1$s</string>

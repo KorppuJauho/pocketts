@@ -535,6 +535,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">Verbindung</string>
+    <string name="notification_mute">Mikro aus</string>
+    <string name="notification_unmute">Mikro an</string>
+    <string name="notification_sound_off">Ton aus</string>
+    <string name="notification_sound_on">Ton an</string>
     <string name="notification_messages">Nachrichten und Anstupser</string>
     <string name="notification_connected">Verbunden mit %1$s</string>
     <string name="notification_connecting">Verbinde mit %1$s</string>

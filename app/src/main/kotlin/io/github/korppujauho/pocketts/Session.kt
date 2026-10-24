@@ -420,6 +420,7 @@ object Session : TsClient.Listener {
         sender?.muted = muted
         engine?.refreshSound()
         client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
+        if (::app.isInitialized) ConnectionService.refresh(app) // the notification's buttons
     }
 
     // ====== Phone calls ======
@@ -549,6 +550,7 @@ object Session : TsClient.Listener {
         if (cue) UiSounds.play(if (muted) Cue.SOUND_OFF else Cue.SOUND_ON, _state.value.voice, muted)
         player?.muted = muted
         client?.sendCommand(Commands.build("clientupdate", "client_output_muted" to muted))
+        if (::app.isInitialized) ConnectionService.refresh(app) // the notification's buttons
     }
 
     // ====== Chat ======

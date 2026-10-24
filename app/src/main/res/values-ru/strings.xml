@@ -563,6 +563,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">Подключение</string>
+    <string name="notification_mute">Выключить микрофон</string>
+    <string name="notification_unmute">Включить микрофон</string>
+    <string name="notification_sound_off">Выключить звук</string>
+    <string name="notification_sound_on">Включить звук</string>
     <string name="notification_messages">Сообщения и тычки</string>
     <string name="notification_connected">Подключено к %1$s</string>
     <string name="notification_connecting">Подключение к %1$s</string>

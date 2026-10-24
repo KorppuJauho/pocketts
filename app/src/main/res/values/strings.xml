@@ -576,6 +576,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">Connection</string>
+    <string name="notification_mute">Mute</string>
+    <string name="notification_unmute">Unmute</string>
+    <string name="notification_sound_off">Sound off</string>
+    <string name="notification_sound_on">Sound on</string>
     <string name="notification_messages">Messages and pokes</string>
     <!-- %1$s is the server's name or address -->
     <string name="notification_connected">Connected to %1$s</string>
