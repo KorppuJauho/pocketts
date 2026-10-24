@@ -53,7 +53,7 @@ class ServerAddressTest {
         val noDns = ServerAddress.SrvLookup { error("no DNS lookups expected") }
         val r = ServerAddress.resolve(Typed("MyClan", null), noDns, { asked.add(it); "203.0.113.7:10075" })
         assertEquals(ServerAddress.Resolved("203.0.113.7", 10075, "nickname"), r)
-        assertEquals(listOf("myclan"), asked)
+        assertEquals(listOf("MyClan"), asked) // as typed
         // A nickname pointing at a name without a port: the default port
         assertEquals(ServerAddress.Resolved("voice.example.com", 9987, "nickname"), ServerAddress.resolve(Typed("myclan", null), noDns, { "voice.example.com" }))
     }

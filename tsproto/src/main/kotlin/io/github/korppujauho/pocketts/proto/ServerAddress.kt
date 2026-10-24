@@ -102,7 +102,8 @@ object ServerAddress {
         // 0. A server nickname: TeamSpeak's nickname service knows where it is (an unknown one goes on as a name)
         if (nicknames != null && isNickname(Typed(name, null))) {
             try {
-                val answer = nicknames.lookup(name)
+                // As typed: the service doesn't mind the case, but the nickname is the owner's to spell
+                val answer = nicknames.lookup(typed.host.trimEnd('.'))
                 val found = answer?.let { parse(it) }?.takeIf { isIpLiteral(it.host) || HOSTNAME.matches(it.host) }
                 if (found != null) return Resolved(found.host, found.port ?: DEFAULT_PORT, "nickname")
                 if (answer != null) log("Nickname $name: an answer that isn't an address")
