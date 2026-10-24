@@ -110,6 +110,7 @@
     <string name="stream_sound_off">Silenciar</string>
     <string name="stream_requesting">Solicitando acceso…</string>
     <string name="stream_connecting">Conectando…</string>
+    <string name="stream_paused">En pausa</string>
     <string name="stream_waiting_picture">Conectado, esperando la imagen…</string>
     <string name="stream_trying">Problema de conexión, seguimos intentándolo…</string>
     <string name="stream_connection_lost">Conexión perdida.</string>
@@ -147,6 +148,7 @@
     <string name="share_sound_quiet">Sonido de la transmisión en silencio</string>
     <string name="share_sound_live">Sonido de la transmisión activado</string>
     <string name="share_starting">empezando…</string>
+    <string name="share_paused_call">en pausa durante la llamada</string>
     <string name="share_watching">Espectadores</string>
     <string name="share_swap_cameras">Intercambiar las cámaras</string>
     <string name="share_switch_camera">Cambiar de cámara</string>
@@ -181,7 +183,7 @@
     <string name="general_headset_ptt">El botón de los auriculares es pulsar para hablar</string>
     <string name="general_headset_ptt_desc">En el modo pulsar para hablar, pulsa el botón de tus auriculares para empezar a hablar y vuelve a pulsarlo para parar. Funciona también con la pantalla apagada. Mientras está activado, el botón no reproduce ni pausa música.</string>
     <string name="general_call_mute">Silenciar durante las llamadas</string>
-    <string name="general_call_mute_desc">Cuando suena o empieza una llamada, el micrófono y el sonido se apagan (también el sonido de la transmisión que ves), y vuelven al terminar. Lo que hayas silenciado tú sigue silenciado.</string>
+    <string name="general_call_mute_desc">Cuando suena o empieza una llamada, el micrófono y el sonido se apagan (también el sonido de la transmisión que ves), y vuelven al terminar. Una transmisión de pantalla se pausa para que los espectadores no vean la llamada. Lo que hayas silenciado tú sigue silenciado.</string>
     <string name="general_updates">Buscar actualizaciones</string>
     <string name="general_updates_desc">Una vez al día, PocketTS pregunta a GitHub si hay una versión más nueva y lo indica en la pantalla de conexión. No se envía nada sobre ti.</string>
     <string name="general_screen_on">Mantener la pantalla encendida</string>

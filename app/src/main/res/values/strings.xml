@@ -124,6 +124,7 @@
     <string name="stream_sound_off">Sound off</string>
     <string name="stream_requesting">Requesting access…</string>
     <string name="stream_connecting">Connecting…</string>
+    <string name="stream_paused">Paused</string>
     <string name="stream_waiting_picture">Connected, waiting for the picture…</string>
     <string name="stream_trying">Connection problem, still trying…</string>
     <string name="stream_connection_lost">Connection lost.</string>
@@ -161,6 +162,7 @@
     <string name="share_sound_quiet">Stream sound quiet</string>
     <string name="share_sound_live">Stream sound on</string>
     <string name="share_starting">starting…</string>
+    <string name="share_paused_call">paused during the call</string>
     <string name="share_watching">Watching</string>
     <string name="share_swap_cameras">Swap the cameras</string>
     <string name="share_switch_camera">Switch camera</string>
@@ -197,7 +199,7 @@
     <string name="general_headset_ptt">Headset button is push-to-talk</string>
     <string name="general_headset_ptt_desc">In push-to-talk mode, press the button on your headphones to start talking and press it again to stop. Works with the screen off too. While it\'s on, the button doesn\'t play or pause music.</string>
     <string name="general_call_mute">Mute during phone calls</string>
-    <string name="general_call_mute_desc">When a phone call rings or starts, your microphone and sound go off (and the sound of a stream you watch), and come back on when it ends. Anything you had muted yourself stays muted.</string>
+    <string name="general_call_mute_desc">When a phone call rings or starts, your microphone and sound go off (and the sound of a stream you watch), and come back on when it ends. A screen share pauses, so viewers don\'t see the call. Anything you had muted yourself stays muted.</string>
     <string name="general_updates">Check for updates</string>
     <string name="general_updates_desc">Once a day, PocketTS asks GitHub whether a newer version is out, and says so on the connect screen. Nothing about you is sent.</string>
     <string name="general_screen_on">Keep the screen on</string>

@@ -10,6 +10,7 @@ import io.github.korppujauho.pocketts.proto.FileTransfer
 import io.github.korppujauho.pocketts.proto.MessageText
 import io.github.korppujauho.pocketts.proto.ServerAddress
 import io.github.korppujauho.pocketts.proto.ServerModel
+import io.github.korppujauho.pocketts.proto.Streams
 import io.github.korppujauho.pocketts.proto.TsClient
 import io.github.korppujauho.pocketts.UiSounds.Cue
 import java.util.concurrent.Executors
@@ -424,8 +425,11 @@ object Session : TsClient.Listener {
 
     // ====== Phone calls ======
 
-    /** What a phone call turned off, to turn back on after it: the microphone, the sound, a watched stream's sound. */
-    private data class CallMuted(val mic: Boolean, val sound: Boolean, val stream: Boolean)
+    /**
+     * What a phone call turned off, to turn back on after it: the microphone, the sound, a watched stream's sound, and
+     * our screen share (paused: the call's screen, with who is calling, isn't shown to the viewers).
+     */
+    private data class CallMuted(val mic: Boolean, val sound: Boolean, val stream: Boolean, val share: Boolean)
 
     @Volatile private var callMuted: CallMuted? = null // null: no call
 
@@ -435,8 +439,11 @@ object Session : TsClient.Listener {
         val s = _state.value
         if (callMuted != null || s.phase == Phase.IDLE || !s.voice.muteOnCalls) return
         val stream = s.stream.watching != 0 && !s.stream.watchMuted
-        callMuted = CallMuted(mic = !s.inputMuted, sound = !s.outputMuted, stream = stream)
-        AppLog.log("Phone call: microphone and sound off${if (stream) ", and the stream's sound" else ""}")
+        val share = s.stream.sharing == Streams.Kind.SCREEN && !s.stream.sharePaused
+        callMuted = CallMuted(mic = !s.inputMuted, sound = !s.outputMuted, stream = stream, share = share)
+        AppLog.log("Phone call: microphone and sound off${if (stream) ", and the stream's sound" else ""}${if (share) ", screen share paused" else ""}")
+        // The screen first: the call's screen comes up right away
+        if (share) engine?.setSharePaused(true)
         setMic(true, cue = false)
         setSound(true, cue = false)
         if (stream) setWatchMuted(true)
@@ -451,6 +458,7 @@ object Session : TsClient.Listener {
         if (m.sound) setSound(false, cue = false)
         // The same stream still on (a new one starts with its sound on anyway)
         if (m.stream && _state.value.stream.watching != 0) setWatchMuted(false)
+        if (m.share) engine?.setSharePaused(false)
     }
 
     // ====== Talking ======

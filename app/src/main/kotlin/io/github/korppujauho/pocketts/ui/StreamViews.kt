@@ -3,6 +3,7 @@ package io.github.korppujauho.pocketts.ui
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.automirrored.rounded.ScreenShare
 import androidx.compose.material.icons.rounded.Videocam
 import androidx.compose.animation.core.animateFloat
@@ -58,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -617,6 +619,9 @@ fun ShareBar(
             }
             if (!state.shareLive) {
                 Text(stringResource(R.string.share_starting), color = ShareText, fontSize = 14.sp, maxLines = 1)
+            } else if (state.sharePaused) {
+                Icon(Icons.Filled.Pause, contentDescription = null, tint = ShareText, modifier = Modifier.size(16.dp))
+                Text(stringResource(R.string.share_paused_call), color = ShareText, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             } else {
                 Icon(Icons.Filled.Visibility, contentDescription = stringResource(R.string.share_watching), tint = ShareText, modifier = Modifier.size(16.dp))
                 Text("${state.viewers}", color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
