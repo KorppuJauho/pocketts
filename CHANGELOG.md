@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Notification buttons:** the connection's notification has Mute / Unmute (the microphone), Sound off / on and
+  Disconnect, so you can use them without opening the app. They follow what's on and off. Based on Stefan3Dx's work
+  (see [CREDITS.md](CREDITS.md)).
 - **Stream pause:** a stream you share (screen or camera) pauses during a phone call, the way TeamSpeak's own pause
   works, so viewers see it paused instead of the call (and who is calling) or the phone at your ear; it goes on when
   the call ends. Watching a stream its streamer

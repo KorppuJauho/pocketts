@@ -535,6 +535,10 @@
 
     <!-- Notifications -->
     <string name="notification_channel">Yhteys</string>
+    <string name="notification_mute">Mykistä</string>
+    <string name="notification_unmute">Poista mykistys</string>
+    <string name="notification_sound_off">Ääni pois</string>
+    <string name="notification_sound_on">Ääni päälle</string>
     <string name="notification_messages">Viestit ja tökkäykset</string>
     <string name="notification_connected">Yhdistetty: %1$s</string>
     <string name="notification_connecting">Yhdistetään: %1$s</string>

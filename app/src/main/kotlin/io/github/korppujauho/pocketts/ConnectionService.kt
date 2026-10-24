@@ -23,6 +23,8 @@ class ConnectionService : Service() {
         private const val ID = 1
         private const val ACTION_SHOW = "show"
         private const val ACTION_DISCONNECT = "disconnect"
+        private const val ACTION_MIC = "mic" // the notification's buttons
+        private const val ACTION_SOUND = "sound"
         private const val EXTRA_TEXT = "text"
         private const val EXTRA_CAMERA = "camera"
         private const val EXTRA_PROJECTION = "projection"
@@ -45,6 +47,48 @@ class ConnectionService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, ConnectionService::class.java))
+        }
+
+        @Volatile private var shownText = "" // what the notification says now ("" = not shown)
+
+        /** The notification again with the buttons as things are now (the microphone or sound turned on or off). */
+        fun refresh(context: Context) {
+            val text = shownText
+            if (text.isEmpty() || Session.state.value.phase == Session.Phase.IDLE) return
+            try {
+                context.getSystemService(NotificationManager::class.java).notify(ID, build(context.applicationContext, text))
+            } catch (_: SecurityException) {
+                // Notifications not allowed
+            }
+        }
+
+        private fun build(ctx: Context, text: String): Notification {
+            val nm = ctx.getSystemService(NotificationManager::class.java)
+            if (nm.getNotificationChannel(CHANNEL) == null) {
+                nm.createNotificationChannel(
+                    NotificationChannel(CHANNEL, ctx.getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW)
+                )
+            }
+            val open = PendingIntent.getActivity(
+                ctx, 0, Intent(ctx, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            fun button(code: Int, action: String, label: Int) = Notification.Action.Builder(
+                null, ctx.getString(label),
+                PendingIntent.getService(ctx, code, Intent(ctx, ConnectionService::class.java).setAction(action), PendingIntent.FLAG_IMMUTABLE),
+            ).build()
+            // The microphone and the sound in one tap, as the app's own buttons, and leaving
+            val s = Session.state.value
+            return Notification.Builder(ctx, CHANNEL)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(ctx.getString(R.string.app_name))
+                .setContentText(text)
+                .setContentIntent(open)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .addAction(button(2, ACTION_MIC, if (s.inputMuted) R.string.notification_unmute else R.string.notification_mute))
+                .addAction(button(3, ACTION_SOUND, if (s.outputMuted) R.string.notification_sound_on else R.string.notification_sound_off))
+                .addAction(button(1, ACTION_DISCONNECT, R.string.disconnect))
+                .build()
         }
 
         private const val MESSAGES = "messages"
@@ -83,11 +127,23 @@ class ConnectionService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_DISCONNECT) {
-            Session.disconnect()
-            return START_NOT_STICKY
+        when (intent?.action) {
+            ACTION_DISCONNECT -> {
+                Session.disconnect()
+                return START_NOT_STICKY
+            }
+            // (the session shows the change here again)
+            ACTION_MIC -> {
+                Session.toggleMic()
+                return START_NOT_STICKY
+            }
+            ACTION_SOUND -> {
+                Session.toggleSound()
+                return START_NOT_STICKY
+            }
         }
         val text = intent?.getStringExtra(EXTRA_TEXT) ?: getString(R.string.app_name)
+        shownText = text
         // The microphone may be used in the background only with its permission granted (and the service saying so)
         val mic = checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
         val camera = intent?.getBooleanExtra(EXTRA_CAMERA, false) == true &&
@@ -98,10 +154,10 @@ class ConnectionService : Service() {
             (if (camera) ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA else 0) or
             (if (projection) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION else 0)
         try {
-            startForeground(ID, notification(text), types)
+            startForeground(ID, build(this, text), types)
         } catch (e: Exception) {
             AppLog.log("Foreground with kinds $types refused, playback only: $e")
-            startForeground(ID, notification(text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            startForeground(ID, build(this, text), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         }
         onForeground?.let { run ->
             onForeground = null
@@ -118,6 +174,7 @@ class ConnectionService : Service() {
     }
 
     override fun onDestroy() {
+        shownText = ""
         wakeLock?.takeIf { it.isHeld }?.release()
         wifiLock?.takeIf { it.isHeld }?.release()
         wakeLock = null
@@ -129,28 +186,5 @@ class ConnectionService : Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         Session.disconnect()
         super.onTaskRemoved(rootIntent)
-    }
-
-    private fun notification(text: String): Notification {
-        val nm = getSystemService(NotificationManager::class.java)
-        if (nm.getNotificationChannel(CHANNEL) == null) {
-            nm.createNotificationChannel(
-                NotificationChannel(CHANNEL, getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW)
-            )
-        }
-        val open = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-        )
-        val disconnect = PendingIntent.getService(
-            this, 1, Intent(this, ConnectionService::class.java).setAction(ACTION_DISCONNECT), PendingIntent.FLAG_IMMUTABLE,
-        )
-        return Notification.Builder(this, CHANNEL)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(text)
-            .setContentIntent(open)
-            .setOngoing(true)
-            .addAction(Notification.Action.Builder(null, getString(R.string.disconnect), disconnect).build())
-            .build()
     }
 }
