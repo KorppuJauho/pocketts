@@ -12,7 +12,7 @@
     <string name="connect">Conectar</string>
     <string name="disconnect">Desconectar</string>
     <string name="nickname">Apodo</string>
-    <string name="server_address">Dirección del servidor</string>
+    <string name="server_address">Dirección o apodo del servidor</string>
     <string name="server_password">Contraseña del servidor</string>
     <string name="remember_password">Recordar la contraseña</string>
     <string name="channel_password">Contraseña del canal</string>

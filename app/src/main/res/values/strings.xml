@@ -17,7 +17,7 @@
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
     <string name="nickname">Nickname</string>
-    <string name="server_address">Server address</string>
+    <string name="server_address">Server address or nickname</string>
     <string name="server_password">Server password</string>
     <string name="remember_password">Remember the password</string>
     <string name="channel_password">Channel password</string>

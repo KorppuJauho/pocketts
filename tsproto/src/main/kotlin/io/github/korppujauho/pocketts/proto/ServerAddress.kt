@@ -69,12 +69,20 @@ object ServerAddress {
     fun isNickname(typed: Typed): Boolean =
         typed.port == null && '.' !in typed.host && !isIpLiteral(typed.host) && !typed.host.equals("localhost", ignoreCase = true)
 
-    /** "host", "host:port", "[ipv6]:port", an IPv6 address, or a ts3server:// link. */
+    /** "host", "host:port", "[ipv6]:port", an IPv6 address, or a ts3server:// link (its port also as `?port=`). */
     fun parse(input: String): Typed? {
-        val t = input.trim()
-            .removePrefix("ts3server://").removePrefix("ts://")
-            .substringBefore('?').trimEnd('/')
+        val link = input.trim().removePrefix("ts3server://").removePrefix("ts://")
+        val t = link.substringBefore('?').trimEnd('/')
         if (t.isEmpty() || t.any { it.isWhitespace() }) return null
+        // A link's port can come after the address: ts3server://ts.example.com?port=9988&nickname=...
+        // (a port in the address itself wins)
+        val linkPort = link.substringAfter('?', "").split('&').firstOrNull { it.startsWith("port=") }?.removePrefix("port=")
+        if (linkPort != null && t != link) {
+            val typed = parse(t) ?: return null
+            if (typed.port != null) return typed
+            val port = linkPort.toIntOrNull()?.takeIf { it in 1..65535 } ?: return null
+            return typed.copy(port = port)
+        }
         val typed = when {
             t.startsWith("[") -> {
                 if (!t.contains(']')) return null
