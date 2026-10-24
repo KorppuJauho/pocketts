@@ -5,6 +5,10 @@
 - **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
   choose on the phone, with progress and Cancel. A password channel's files need its remembered password. The
   server decides what you may see.
+- **Managing a channel's files:** Upload sends any file from the phone into the open folder (with progress and
+  Cancel), New folder makes one, and holding a file or folder gives Download, Rename and Delete. Deleting always
+  asks first (a folder goes with everything in it), and a name already there is only replaced when you say so. The
+  server decides what you may change; when it refuses, the browser says so.
 - **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and
   quality, talk power needed, password, and its description, with a Join button. With Settings › UI › Show admin
   functions on, it also has Edit (the channel's settings) and Arrange (the edit mode that holding a channel

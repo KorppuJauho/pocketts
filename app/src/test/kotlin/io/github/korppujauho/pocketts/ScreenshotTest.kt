@@ -123,8 +123,17 @@ class ScreenshotTest {
     @Test
     fun files() = popup("popup-files") {
         val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        val files = sampleFiles()
+        io.github.korppujauho.pocketts.ui.FileBrowser(
+            ch, Session.FileDownload("boss-fight.mp4", 19_000_000, 48_234_496), null,
+            list = { _, done -> done(Result.success(files)) },
+            onDownload = { _, _ -> }, onCancelDownload = {}, onResultSeen = {}, onDismiss = {},
+        )
+    }
+
+    private fun sampleFiles(): List<io.github.korppujauho.pocketts.proto.FileTransfer.Entry> {
         val day = Example.T0
-        val files = listOf(
+        return listOf(
             io.github.korppujauho.pocketts.proto.FileTransfer.Entry("Screenshots", folder = true, size = 0, time = day - 86_400_000L * 3),
             io.github.korppujauho.pocketts.proto.FileTransfer.Entry("PocketTS", folder = true, size = 0, time = day - 3_600_000),
             io.github.korppujauho.pocketts.proto.FileTransfer.Entry("raid-plan.pdf", folder = false, size = 245_760, time = day - 86_400_000L * 10),
@@ -132,8 +141,28 @@ class ScreenshotTest {
             io.github.korppujauho.pocketts.proto.FileTransfer.Entry("map.png", folder = false, size = 1_621_351, time = day - 600_000),
             io.github.korppujauho.pocketts.proto.FileTransfer.Entry("theme.ogg", folder = false, size = 3_145_728, time = day - 86_400_000L * 30),
         )
+    }
+
+    /** Deleting a folder from a channel's files: asked first, and its contents go too. */
+    @Test
+    fun filesDelete() = popup("popup-files-delete") {
+        val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        val files = sampleFiles()
         io.github.korppujauho.pocketts.ui.FileBrowser(
-            ch, Session.FileDownload("boss-fight.mp4", 19_000_000, 48_234_496), null,
+            ch, null, null,
+            list = { _, done -> done(Result.success(files)) },
+            onDownload = { _, _ -> }, onCancelDownload = {}, onResultSeen = {}, onDismiss = {},
+            startAsk = io.github.korppujauho.pocketts.ui.FileAsk.Delete(files.first()),
+        )
+    }
+
+    /** A file from the phone on its way into a channel's files. */
+    @Test
+    fun filesUpload() = popup("popup-files-upload") {
+        val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        val files = sampleFiles()
+        io.github.korppujauho.pocketts.ui.FileBrowser(
+            ch, Session.FileDownload("holiday.jpg", 2_400_000, 3_600_000, upload = true), null,
             list = { _, done -> done(Result.success(files)) },
             onDownload = { _, _ -> }, onCancelDownload = {}, onResultSeen = {}, onDismiss = {},
         )

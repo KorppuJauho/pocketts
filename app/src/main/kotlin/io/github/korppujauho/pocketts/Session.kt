@@ -31,8 +31,8 @@ object Session : TsClient.Listener {
     /** A private conversation's tab: whose (by identity) and their name. */
     data class PrivateTab(val uid: String, val name: String)
 
-    /** A file being saved from the file browser: [done] bytes of [size]. */
-    data class FileDownload(val name: String, val done: Long, val size: Long)
+    /** A file being saved from the file browser ([upload]: sent to it): [done] bytes of [size]. */
+    data class FileDownload(val name: String, val done: Long, val size: Long, val upload: Boolean = false)
 
     data class UiState(
         val phase: Phase = Phase.IDLE,
@@ -71,7 +71,7 @@ object Session : TsClient.Listener {
         val away: Boolean = false,
         val awayMessage: String = "",
         val neededLevel: Int = 0, // the server refused our identity's security level: the level it needs
-        val download: FileDownload? = null, // a file from the file browser being saved
+        val download: FileDownload? = null, // a file from the file browser being saved (or one being sent to it)
         val downloadResult: String? = null, // ... and how the last one went, as words
     ) {
         /** Files on this server (for pictures). */
@@ -807,11 +807,12 @@ object Session : TsClient.Listener {
     // A password channel's files need its password, hashed as when joining: the remembered one
     private fun filePassword(cid: Int) = savedChannelPassword(cid)?.let { Crypto.hashPassword(it) }.orEmpty()
 
-    /** Why a channel's files couldn't be read or saved, in the app's language. */
-    private fun fileProblem(e: Exception): String = when ((e as? FileTransfer.Error)?.code) {
+    /** Why a channel's files couldn't be read, saved or [changed], in the app's language. */
+    private fun fileProblem(e: Exception, changed: Boolean = false): String = when ((e as? FileTransfer.Error)?.code) {
         FileTransfer.WRONG_PASSWORD -> app.getString(R.string.files_needs_password)
-        FileTransfer.NO_PERMISSION -> app.getString(R.string.files_no_permission)
-        FileTransfer.FILE_NOT_FOUND -> app.getString(R.string.files_not_found)
+        FileTransfer.NO_PERMISSION -> app.getString(if (changed) R.string.files_no_permission_change else R.string.files_no_permission)
+        FileTransfer.FILE_NOT_FOUND, FileTransfer.INVALID_PATH -> app.getString(if (changed) R.string.files_gone else R.string.files_not_found)
+        FileTransfer.FILE_EXISTS -> app.getString(R.string.files_exists)
         else -> e.message.orEmpty()
     }
 
@@ -875,6 +876,72 @@ object Session : TsClient.Listener {
 
     /** The last download's result was seen. */
     fun downloadResultSeen() = _state.update { it.copy(downloadResult = null) }
+
+    /**
+     * Sends [size] bytes of [source] (a file the person picked) as [path] in channel [cid]'s files; [overwrite] replaces
+     * a file already there (the person said yes). Shown like a download, and stopped the same way.
+     */
+    fun uploadFile(context: Context, cid: Int, path: String, source: android.net.Uri, size: Long, overwrite: Boolean) {
+        val f = files ?: return
+        val name = path.substringAfterLast('/')
+        downloadCancelled = false
+        _state.update { it.copy(download = FileDownload(name, 0, size, upload = true), downloadResult = null) }
+        fileWork.execute {
+            var lastShown = 0L
+            val result = try {
+                val input = context.contentResolver.openInputStream(source) ?: throw java.io.IOException("no file")
+                input.use { i ->
+                    f.upload(
+                        cid, path, i, size, filePassword(cid), overwrite,
+                        progress = { done, all ->
+                            val now = System.nanoTime()
+                            if (done == all || now - lastShown > 200_000_000L) {
+                                lastShown = now
+                                _state.update { it.copy(download = FileDownload(name, done, all, upload = true)) }
+                            }
+                        },
+                        cancelled = { downloadCancelled },
+                    )
+                }
+                AppLog.log("Sent a file of ${size / 1024} KB to the channel's files")
+                app.getString(R.string.files_uploaded, name)
+            } catch (e: FileTransfer.Cancelled) {
+                app.getString(R.string.files_upload_cancelled, name)
+            } catch (e: Exception) {
+                AppLog.log("Sending a file failed: ${e.message}")
+                app.getString(R.string.files_upload_failed, name, fileProblem(e, changed = true))
+            }
+            _state.update { it.copy(download = null, downloadResult = result) }
+        }
+    }
+
+    /** One change to channel [cid]'s files on the file threads; [done] gets null when it went, or why not. */
+    private fun changeFiles(cid: Int, what: String, done: (String?) -> Unit, change: (FileTransfer, String) -> Unit) {
+        val f = files ?: return done(app.getString(R.string.files_not_connected))
+        fileWork.execute {
+            done(
+                try {
+                    change(f, filePassword(cid))
+                    null
+                } catch (e: Exception) {
+                    AppLog.log("$what in channel $cid failed: ${e.message}")
+                    fileProblem(e, changed = true)
+                },
+            )
+        }
+    }
+
+    /** Deletes [path] (a folder with everything in it) from channel [cid]'s files. */
+    fun deleteFile(cid: Int, path: String, done: (String?) -> Unit) =
+        changeFiles(cid, "Deleting a file", done) { f, cpw -> f.delete(cid, path, cpw) }
+
+    /** Renames [from] to [to] in channel [cid]'s files (a name already there is replaced: ask first). */
+    fun renameFile(cid: Int, from: String, to: String, done: (String?) -> Unit) =
+        changeFiles(cid, "Renaming a file", done) { f, cpw -> f.rename(cid, from, to, cpw) }
+
+    /** A new folder [path] in channel [cid]'s files. */
+    fun createFolder(cid: Int, path: String, done: (String?) -> Unit) =
+        changeFiles(cid, "Making a folder", done) { f, cpw -> f.createDirectory(cid, path, cpw) }
 
     // ====== Files: pictures, avatars, icons ======
 
