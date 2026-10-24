@@ -312,6 +312,14 @@ private object SessionActions : ServerActions {
     }
     override fun cancelDownload() = Session.cancelDownload()
     override fun downloadResultSeen() = Session.downloadResultSeen()
+    override fun uploadFile(channel: ServerModel.Channel, path: String, source: android.net.Uri, size: Long, overwrite: Boolean) {
+        val ctx = MainActivity.current?.applicationContext ?: return
+        Session.uploadFile(ctx, channel.id, path, source, size, overwrite)
+    }
+    override fun deleteFile(channel: ServerModel.Channel, path: String, done: (String?) -> Unit) = Session.deleteFile(channel.id, path, done)
+    override fun renameFile(channel: ServerModel.Channel, from: String, to: String, done: (String?) -> Unit) =
+        Session.renameFile(channel.id, from, to, done)
+    override fun createFolder(channel: ServerModel.Channel, path: String, done: (String?) -> Unit) = Session.createFolder(channel.id, path, done)
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)

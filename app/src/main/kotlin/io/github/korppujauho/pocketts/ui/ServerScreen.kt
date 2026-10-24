@@ -86,6 +86,12 @@ interface ServerActions {
     fun cancelDownload() {}
     /** The last download's result was seen. */
     fun downloadResultSeen() {}
+    /** A picked file ([size] bytes) sent as [path] into a channel's files; [overwrite] replaces one there. */
+    fun uploadFile(channel: ServerModel.Channel, path: String, source: android.net.Uri, size: Long, overwrite: Boolean) {}
+    /** Changes to a channel's files; [done] gets null when it went, or why not (on another thread). */
+    fun deleteFile(channel: ServerModel.Channel, path: String, done: (String?) -> Unit) {}
+    fun renameFile(channel: ServerModel.Channel, from: String, to: String, done: (String?) -> Unit) {}
+    fun createFolder(channel: ServerModel.Channel, path: String, done: (String?) -> Unit) {}
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
@@ -465,6 +471,14 @@ fun ServerScreen(
             onDownload = { path, target -> actions.downloadFile(ch, path, target) },
             onCancelDownload = actions::cancelDownload,
             onResultSeen = actions::downloadResultSeen,
+            onUpload = { path, source, size, overwrite -> actions.uploadFile(ch, path, source, size, overwrite) },
+            onChange = { change, done ->
+                when (change) {
+                    is FileChange.Delete -> actions.deleteFile(ch, change.path, done)
+                    is FileChange.Rename -> actions.renameFile(ch, change.from, change.to, done)
+                    is FileChange.NewFolder -> actions.createFolder(ch, change.path, done)
+                }
+            },
             onDismiss = { filesChannel = null },
         )
     }

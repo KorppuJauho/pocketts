@@ -30,6 +30,7 @@ class FileTransfer(
         const val FILE_NOT_FOUND = 2051
         const val WRONG_PASSWORD = 781
         const val NO_PERMISSION = 2568
+        const val INVALID_PATH = 2054 // e.g. deleting a name that isn't there
         private const val EMPTY = 1281 // "database empty result set": an empty folder
         private const val ANSWER_MS = 15_000L
         private const val TRANSFER_MS = 120_000
@@ -211,18 +212,42 @@ class FileTransfer(
     }
 
     /** Uploads [data] as [name] (a full path) into channel [cid]'s files (channel 0: the server's own, e.g. "/avatar"). */
-    fun upload(cid: Int, name: String, data: ByteArray, cpw: String = "", overwrite: Boolean = false) {
+    fun upload(cid: Int, name: String, data: ByteArray, cpw: String = "", overwrite: Boolean = false) =
+        upload(cid, name, data.inputStream(), data.size.toLong(), cpw, overwrite)
+
+    /**
+     * Uploads [size] bytes from [input] as [name] (a full path) into channel [cid]'s files, telling [progress] the bytes
+     * sent so far. A name already there is refused ([FILE_EXISTS]) unless [overwrite]; [cancelled] stops it
+     * ([Cancelled]) between pieces, and the server drops the part it got.
+     */
+    fun upload(
+        cid: Int, name: String, input: java.io.InputStream, size: Long, cpw: String = "", overwrite: Boolean = false,
+        progress: (done: Long, size: Long) -> Unit = { _, _ -> }, cancelled: () -> Boolean = { false },
+    ) {
         slots.acquire()
         try {
             val s = start(
                 "ftinitupload",
-                listOf("name" to name, "cid" to cid, "cpw" to cpw, "size" to data.size, "overwrite" to if (overwrite) 1 else 0, "resume" to 0),
+                listOf("name" to name, "cid" to cid, "cpw" to cpw, "size" to size, "overwrite" to if (overwrite) 1 else 0, "resume" to 0),
                 "notifystartupload",
             )
             socket(s.port).use { sock ->
                 val out = sock.getOutputStream()
                 out.write(s.key.toByteArray(Charsets.US_ASCII))
-                out.write(data)
+                val buf = ByteArray(65536)
+                var done = 0L
+                progress(0, size)
+                while (done < size) {
+                    if (cancelled()) {
+                        if (s.serverftfid.isNotEmpty()) client.sendCommand(Commands.build("ftstop", "serverftfid" to s.serverftfid, "delete" to 1))
+                        throw Cancelled()
+                    }
+                    val n = input.read(buf, 0, minOf(buf.size.toLong(), size - done).toInt())
+                    if (n < 0) throw Error("The file ended early")
+                    out.write(buf, 0, n)
+                    done += n
+                    progress(done, size)
+                }
                 out.flush()
                 sock.shutdownOutput()
                 // Wait for the server to close its side (it has everything then)
@@ -234,5 +259,23 @@ class FileTransfer(
         } finally {
             slots.release()
         }
+    }
+
+    /** Deletes [name] (a full path) from channel [cid]'s files; a folder goes with everything in it. */
+    fun delete(cid: Int, name: String, cpw: String = "") {
+        val rc = "ft-${nextId()}"
+        val (id, msg) = await(Commands.build("ftdeletefile", "cid" to cid, "cpw" to cpw, "name" to name, "return_code" to rc)) { answer(it, rc) }
+        if (id != 0) throw Error(msg.ifEmpty { "refused" }, id)
+    }
+
+    /**
+     * Renames (or moves, with another folder in [to]) [from] to [to], both full paths in channel [cid]'s files. The
+     * server replaces a file already called [to] without a word: check first.
+     */
+    fun rename(cid: Int, from: String, to: String, cpw: String = "") {
+        val rc = "ft-${nextId()}"
+        val cmd = Commands.build("ftrenamefile", "cid" to cid, "cpw" to cpw, "tcid" to cid, "tcpw" to cpw, "oldname" to from, "newname" to to, "return_code" to rc)
+        val (id, msg) = await(cmd) { answer(it, rc) }
+        if (id != 0) throw Error(msg.ifEmpty { "refused" }, id)
     }
 }
