@@ -48,6 +48,39 @@ class ServerAddressTest {
     }
 
     @Test
+    fun nicknameFound() {
+        val asked = mutableListOf<String>()
+        val noDns = ServerAddress.SrvLookup { error("no DNS lookups expected") }
+        val r = ServerAddress.resolve(Typed("MyClan", null), noDns, { asked.add(it); "203.0.113.7:10075" })
+        assertEquals(ServerAddress.Resolved("203.0.113.7", 10075, "nickname"), r)
+        assertEquals(listOf("myclan"), asked)
+        // A nickname pointing at a name without a port: the default port
+        assertEquals(ServerAddress.Resolved("voice.example.com", 9987, "nickname"), ServerAddress.resolve(Typed("myclan", null), noDns, { "voice.example.com" }))
+    }
+
+    @Test
+    fun unknownOrBrokenNicknameGoesOnAsAName() {
+        val asked = mutableListOf<String>()
+        val dns = ServerAddress.SrvLookup { asked.add(it); emptyList() }
+        assertEquals(ServerAddress.Resolved("nas", 9987, "name"), ServerAddress.resolve(Typed("nas", null), dns, { null }))
+        assertEquals(listOf("_ts3._udp.nas", "_tsdns._tcp.nas"), asked)
+        // The service down, or saying something that isn't an address
+        assertEquals("name", ServerAddress.resolve(Typed("nas", null), dns, { throw java.io.IOException("timed out") }).how)
+        assertEquals("name", ServerAddress.resolve(Typed("nas", null), dns, { "<html>oops</html>" }).how)
+    }
+
+    @Test
+    fun onlyNicknamesAreAsked() {
+        val never = ServerAddress.NicknameLookup { error("the nickname service mustn't be asked about $it") }
+        val dns = ServerAddress.SrvLookup { emptyList() }
+        ServerAddress.resolve(Typed("ts.example.com", null), dns, never)
+        ServerAddress.resolve(Typed("myclan", 9987), dns, never)
+        ServerAddress.resolve(Typed("10.0.0.5", null), dns, never)
+        ServerAddress.resolve(Typed("2001:db8::1", null), dns, never)
+        ServerAddress.resolve(Typed("localhost", null), dns, never)
+    }
+
+    @Test
     fun dnsMessages() {
         val query = DnsMessage.srvQuery("_ts3._udp.example.com")
         // An answer: the query's header and question, then one SRV record whose name points back to the question

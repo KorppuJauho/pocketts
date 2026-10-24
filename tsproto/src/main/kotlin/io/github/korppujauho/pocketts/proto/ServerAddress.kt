@@ -6,8 +6,9 @@ import java.net.Socket
 
 /**
  * From what a person types to the server's real address and port, the way TeamSpeak apps do it:
- * a port given → that; else the server's DNS entry (`_ts3._udp.<name>`); else TeamSpeak's name service (TSDNS,
- * found through `_tsdns._tcp.<domain>`); else the name itself on the default port 9987.
+ * a port given → that; a server nickname (a name without a dot) → what TeamSpeak's nickname service says; else the
+ * server's DNS entry (`_ts3._udp.<name>`); else TeamSpeak's name service (TSDNS, found through
+ * `_tsdns._tcp.<domain>`); else the name itself on the default port 9987.
  */
 object ServerAddress {
     const val DEFAULT_PORT = 9987
@@ -22,6 +23,51 @@ object ServerAddress {
     fun interface SrvLookup {
         fun srv(name: String): List<Srv>
     }
+
+    /** Asks TeamSpeak's nickname service: a server nickname in, its "address:port" out (null: no such nickname). */
+    fun interface NicknameLookup {
+        fun lookup(nickname: String): String?
+    }
+
+    /**
+     * TeamSpeak's own nickname service, as the TeamSpeak apps ask it: a plain-text "address:port" for a known
+     * nickname, 404 for an unknown one. Gives up after a few seconds (behind some networks it never answers).
+     */
+    object MyTeamSpeakNicknames : NicknameLookup {
+        private const val SERVICE = "https://named.myteamspeak.com/lookup?name="
+
+        override fun lookup(nickname: String): String? {
+            val c = java.net.URI(SERVICE + java.net.URLEncoder.encode(nickname, "UTF-8")).toURL().openConnection() as java.net.HttpURLConnection
+            c.connectTimeout = 4000
+            c.readTimeout = 4000
+            c.instanceFollowRedirects = false
+            try {
+                return when (val code = c.responseCode) {
+                    200 -> c.inputStream.use { input ->
+                        // An address is short: a few hundred bytes at most
+                        val out = ByteArrayOutputStream()
+                        val buf = ByteArray(300)
+                        while (out.size() < 300) {
+                            val n = input.read(buf, 0, 300 - out.size())
+                            if (n < 0) break
+                            out.write(buf, 0, n)
+                        }
+                        out.toString("UTF-8").trim().ifEmpty { null }
+                    }
+                    404 -> null
+                    else -> throw IllegalStateException("HTTP $code")
+                }
+            } finally {
+                c.disconnect()
+            }
+        }
+    }
+
+    private val HOSTNAME = Regex("""^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*\.?$""")
+
+    /** A name the nickname service may know: no dot, no port, not an address, not this device. */
+    fun isNickname(typed: Typed): Boolean =
+        typed.port == null && '.' !in typed.host && !isIpLiteral(typed.host) && !typed.host.equals("localhost", ignoreCase = true)
 
     /** "host", "host:port", "[ipv6]:port", an IPv6 address, or a ts3server:// link. */
     fun parse(input: String): Typed? {
@@ -48,10 +94,22 @@ object ServerAddress {
     /** The address to connect to, with a note of how it was found. */
     data class Resolved(val host: String, val port: Int, val how: String)
 
-    fun resolve(typed: Typed, dns: SrvLookup, log: (String) -> Unit = {}): Resolved {
+    fun resolve(typed: Typed, dns: SrvLookup, nicknames: NicknameLookup? = null, log: (String) -> Unit = {}): Resolved {
         typed.port?.let { return Resolved(typed.host, it, "as typed") }
         if (isIpLiteral(typed.host)) return Resolved(typed.host, DEFAULT_PORT, "as typed")
         val name = typed.host.trimEnd('.').lowercase()
+
+        // 0. A server nickname: TeamSpeak's nickname service knows where it is (an unknown one goes on as a name)
+        if (nicknames != null && isNickname(Typed(name, null))) {
+            try {
+                val answer = nicknames.lookup(name)
+                val found = answer?.let { parse(it) }?.takeIf { isIpLiteral(it.host) || HOSTNAME.matches(it.host) }
+                if (found != null) return Resolved(found.host, found.port ?: DEFAULT_PORT, "nickname")
+                if (answer != null) log("Nickname $name: an answer that isn't an address")
+            } catch (e: Exception) {
+                log("Nickname lookup for $name failed: ${e.message}")
+            }
+        }
 
         // 1. The server's own DNS entry
         try {
