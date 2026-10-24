@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
+  choose on the phone, with progress and Cancel. A password channel's files need its remembered password. The
+  server decides what you may see.
 - **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and
   quality, talk power needed, password, and its description, with a Join button. With Settings › UI › Show admin
   functions on, it also has Edit (the channel's settings) and Arrange (the edit mode that holding a channel

@@ -31,6 +31,9 @@ object Session : TsClient.Listener {
     /** A private conversation's tab: whose (by identity) and their name. */
     data class PrivateTab(val uid: String, val name: String)
 
+    /** A file being saved from the file browser: [done] bytes of [size]. */
+    data class FileDownload(val name: String, val done: Long, val size: Long)
+
     data class UiState(
         val phase: Phase = Phase.IDLE,
         val error: String? = null,
@@ -68,6 +71,8 @@ object Session : TsClient.Listener {
         val away: Boolean = false,
         val awayMessage: String = "",
         val neededLevel: Int = 0, // the server refused our identity's security level: the level it needs
+        val download: FileDownload? = null, // a file from the file browser being saved
+        val downloadResult: String? = null, // ... and how the last one went, as words
     ) {
         /** Files on this server (for pictures). */
         val serverKey: String get() = address
@@ -792,6 +797,84 @@ object Session : TsClient.Listener {
         }
         return out.distinct()
     }
+
+    // ====== The file browser ======
+
+    // Its own threads: a big download mustn't hold up the session's work (or the pictures)
+    private val fileWork = Executors.newFixedThreadPool(2) { r -> Thread(r, "files").apply { isDaemon = true } }
+    @Volatile private var downloadCancelled = false
+
+    // A password channel's files need its password, hashed as when joining: the remembered one
+    private fun filePassword(cid: Int) = savedChannelPassword(cid)?.let { Crypto.hashPassword(it) }.orEmpty()
+
+    /** Why a channel's files couldn't be read or saved, in the app's language. */
+    private fun fileProblem(e: Exception): String = when ((e as? FileTransfer.Error)?.code) {
+        FileTransfer.WRONG_PASSWORD -> app.getString(R.string.files_needs_password)
+        FileTransfer.NO_PERMISSION -> app.getString(R.string.files_no_permission)
+        FileTransfer.FILE_NOT_FOUND -> app.getString(R.string.files_not_found)
+        else -> e.message.orEmpty()
+    }
+
+    /** A folder of channel [cid]'s files ("/" for the top); [done] gets them, or why not, on a background thread. */
+    fun listFiles(cid: Int, path: String, done: (Result<List<FileTransfer.Entry>>) -> Unit) {
+        val f = files ?: return done(Result.failure(IllegalStateException(app.getString(R.string.files_not_connected))))
+        fileWork.execute {
+            done(
+                try {
+                    Result.success(f.list(cid, path, filePassword(cid)))
+                } catch (e: Exception) {
+                    AppLog.log("File list of $path in channel $cid failed: ${e.message}")
+                    Result.failure(IllegalStateException(fileProblem(e)))
+                },
+            )
+        }
+    }
+
+    /** Saves [path] from channel [cid]'s files into [target] (where the person chose, through Android's Save window). */
+    fun downloadFile(context: Context, cid: Int, path: String, target: android.net.Uri) {
+        val f = files ?: return
+        val name = path.substringAfterLast('/')
+        downloadCancelled = false
+        _state.update { it.copy(download = FileDownload(name, 0, 0), downloadResult = null) }
+        fileWork.execute {
+            var lastShown = 0L
+            val result = try {
+                val out = context.contentResolver.openOutputStream(target, "w") ?: throw java.io.IOException("no file")
+                val size = out.use { o ->
+                    f.download(
+                        cid, path, o, filePassword(cid),
+                        progress = { done, size ->
+                            // At most a few times a second: the screen needn't follow every piece
+                            val now = System.nanoTime()
+                            if (done == size || now - lastShown > 200_000_000L) {
+                                lastShown = now
+                                _state.update { it.copy(download = FileDownload(name, done, size)) }
+                            }
+                        },
+                        cancelled = { downloadCancelled },
+                    )
+                }
+                AppLog.log("Saved a file of ${size / 1024} KB from the channel's files")
+                app.getString(R.string.files_saved, name)
+            } catch (e: FileTransfer.Cancelled) {
+                // Half a file isn't kept
+                try { android.provider.DocumentsContract.deleteDocument(context.contentResolver, target) } catch (_: Exception) {}
+                app.getString(R.string.files_download_cancelled, name)
+            } catch (e: Exception) {
+                AppLog.log("Saving a file failed: ${e.message}")
+                try { android.provider.DocumentsContract.deleteDocument(context.contentResolver, target) } catch (_: Exception) {}
+                app.getString(R.string.files_download_failed, name, fileProblem(e))
+            }
+            _state.update { it.copy(download = null, downloadResult = result) }
+        }
+    }
+
+    fun cancelDownload() {
+        downloadCancelled = true
+    }
+
+    /** The last download's result was seen. */
+    fun downloadResultSeen() = _state.update { it.copy(downloadResult = null) }
 
     // ====== Files: pictures, avatars, icons ======
 

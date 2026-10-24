@@ -119,6 +119,38 @@ class ScreenshotTest {
         io.github.korppujauho.pocketts.ui.LocationDialog(tree, tree.first { it.channel.name == "Gaming" }.channel.id, null, "Squad 3", {}, {})
     }
 
+    /** A channel's files: folders first, a picture being saved at the bottom. */
+    @Test
+    fun files() = popup("popup-files") {
+        val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        val day = Example.T0
+        val files = listOf(
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("Screenshots", folder = true, size = 0, time = day - 86_400_000L * 3),
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("PocketTS", folder = true, size = 0, time = day - 3_600_000),
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("raid-plan.pdf", folder = false, size = 245_760, time = day - 86_400_000L * 10),
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("boss-fight.mp4", folder = false, size = 48_234_496, time = day - 86_400_000L),
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("map.png", folder = false, size = 1_621_351, time = day - 600_000),
+            io.github.korppujauho.pocketts.proto.FileTransfer.Entry("theme.ogg", folder = false, size = 3_145_728, time = day - 86_400_000L * 30),
+        )
+        io.github.korppujauho.pocketts.ui.FileBrowser(
+            ch, Session.FileDownload("boss-fight.mp4", 19_000_000, 48_234_496), null,
+            list = { _, done -> done(Result.success(files)) },
+            onDownload = { _, _ -> }, onCancelDownload = {}, onResultSeen = {}, onDismiss = {},
+        )
+    }
+
+    /** A password channel's files without its password remembered. */
+    @Test
+    fun filesPassword() = popup("popup-files-password") {
+        val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel
+        val why = androidx.compose.ui.res.stringResource(io.github.korppujauho.pocketts.R.string.files_needs_password)
+        io.github.korppujauho.pocketts.ui.FileBrowser(
+            ch, null, null,
+            list = { _, done -> done(Result.failure(IllegalStateException(why))) },
+            onDownload = { _, _ -> }, onCancelDownload = {}, onResultSeen = {}, onDismiss = {},
+        )
+    }
+
     /** Holding a channel: its info, with the admin buttons (the admin functions on). */
     @Test
     fun channelInfo() = popup("popup-channel-info") {
@@ -127,7 +159,7 @@ class ScreenshotTest {
             topic = "Tonight: co-op", maxClients = 10, hasPassword = true, codecQuality = 8,
             description = "[b]Games every evening.[/b]\nAsk Lee for the password. Rules: https://example.com/rules",
         )
-        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {})
+        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {})
     }
 
     @Test

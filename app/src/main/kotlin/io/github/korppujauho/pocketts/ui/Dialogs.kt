@@ -285,6 +285,7 @@ fun ChannelInfoDialog(
     onEdit: (() -> Unit)?,
     onArrange: (() -> Unit)?,
     onDismiss: () -> Unit,
+    onFiles: (() -> Unit)? = null,
 ) {
     // The description comes a moment after asking; empty after that, there's none
     var waited by remember { mutableStateOf(false) }
@@ -349,6 +350,9 @@ fun ChannelInfoDialog(
                     waited -> Text(stringResource(R.string.channel_info_no_description), color = Ts.faint, fontSize = 14.sp)
                     else -> Text(stringResource(R.string.channel_info_loading), color = Ts.faint, fontSize = 14.sp)
                 }
+            }
+            if (onFiles != null) {
+                PillButton(stringResource(R.string.files_title), modifier = Modifier.fillMaxWidth(), onClick = onFiles)
             }
             if (onEdit != null || onArrange != null) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

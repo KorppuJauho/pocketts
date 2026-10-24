@@ -304,6 +304,14 @@ private object SessionActions : ServerActions {
     override fun reorderChannel(channel: ServerModel.Channel, after: Int) = Session.reorderChannel(channel, after)
     override fun deleteChannel(channel: ServerModel.Channel) = Session.deleteChannel(channel)
     override fun channelDescription(channel: ServerModel.Channel) = Session.channelDescription(channel.id)
+    override fun listFiles(channel: ServerModel.Channel, path: String, done: (Result<List<io.github.korppujauho.pocketts.proto.FileTransfer.Entry>>) -> Unit) =
+        Session.listFiles(channel.id, path, done)
+    override fun downloadFile(channel: ServerModel.Channel, path: String, target: android.net.Uri) {
+        val ctx = MainActivity.current?.applicationContext ?: return
+        Session.downloadFile(ctx, channel.id, path, target)
+    }
+    override fun cancelDownload() = Session.cancelDownload()
+    override fun downloadResultSeen() = Session.downloadResultSeen()
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
