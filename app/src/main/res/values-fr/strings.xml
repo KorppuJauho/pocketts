@@ -110,6 +110,7 @@
     <string name="stream_sound_off">Couper le son</string>
     <string name="stream_requesting">Demande d’accès…</string>
     <string name="stream_connecting">Connexion…</string>
+    <string name="stream_paused">En pause</string>
     <string name="stream_waiting_picture">Connecté, en attente de l’image…</string>
     <string name="stream_trying">Problème de connexion, nouvelle tentative…</string>
     <string name="stream_connection_lost">Connexion perdue.</string>
@@ -147,6 +148,7 @@
     <string name="share_sound_quiet">Son de la diffusion coupé</string>
     <string name="share_sound_live">Son de la diffusion actif</string>
     <string name="share_starting">démarrage…</string>
+    <string name="share_paused_call">en pause pendant l’appel</string>
     <string name="share_watching">Spectateurs</string>
     <string name="share_swap_cameras">Échanger les caméras</string>
     <string name="share_switch_camera">Changer de caméra</string>
@@ -181,7 +183,7 @@
     <string name="general_headset_ptt">Le bouton du casque sert à parler</string>
     <string name="general_headset_ptt_desc">En mode appuyer pour parler, appuyez sur le bouton de votre casque pour commencer à parler et appuyez à nouveau pour arrêter. Fonctionne aussi écran éteint. Tant que c’est activé, le bouton ne lance ni ne met en pause la musique.</string>
     <string name="general_call_mute">Couper pendant les appels</string>
-    <string name="general_call_mute_desc">Quand un appel sonne ou commence, le micro et le son se coupent (ainsi que le son du stream que vous regardez), puis reviennent à la fin de l’appel. Ce que vous aviez coupé vous-même le reste.</string>
+    <string name="general_call_mute_desc">Quand un appel sonne ou commence, le micro et le son se coupent (ainsi que le son du stream que vous regardez), puis reviennent à la fin de l’appel. Le stream que vous partagez se met en pause, pour que les spectateurs ne voient pas l’appel. Ce que vous aviez coupé vous-même le reste.</string>
     <string name="general_updates">Rechercher les mises à jour</string>
     <string name="general_updates_desc">Une fois par jour, PocketTS demande à GitHub si une version plus récente est sortie et l’indique sur l’écran de connexion. Rien vous concernant n’est envoyé.</string>
     <string name="general_screen_on">Garder l’écran allumé</string>

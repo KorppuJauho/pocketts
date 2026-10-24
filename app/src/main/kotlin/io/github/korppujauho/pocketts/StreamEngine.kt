@@ -57,6 +57,7 @@ class StreamEngine(
         val shareLive: Boolean = false,
         val shareSound: Boolean = false, // our stream carries sound (a camera's: the microphone; the screen's: what the phone plays)
         val soundPaused: Boolean = false, // ... silent just now (microphone muted, or talking in the channel)
+        val sharePaused: Boolean = false, // our stream paused (as the TeamSpeak app pauses): nothing sent, viewers see it paused
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
@@ -237,6 +238,7 @@ class StreamEngine(
 
     private class Watch(val streamerId: Int, var streamId: String?) {
         var pc: PeerConnection? = null
+        var paused = false // the streamer paused (their last offer sends nothing)
         val pending = ArrayList<IceCandidate>()
         var original: Map<String, String> = emptyMap()
     }
@@ -301,11 +303,24 @@ class StreamEngine(
             setLocal(pc, local)
             val sdp = Streams.withOfferSessionVersion(Streams.restoreH264(pc.localDescription.description, w.original), offerSdp)
             send(Streams.answer(streamId, w.streamerId, sdp, rc("answer")))
-            update { it.copy(watchStatus = text(R.string.stream_connecting)) }
+            // A new offer on a running stream is the streamer pausing or going on; the first one is the connecting
+            val wasPaused = w.paused
+            w.paused = Streams.isPausedOffer(offerSdp)
+            if (w.paused != wasPaused) log(if (w.paused) "Stream paused by the streamer" else "Stream going on")
+            val connected = pc.connectionState() == PeerConnection.PeerConnectionState.CONNECTED
+            update { it.copy(watchStatus = watchStatus(w, connected, it.watchVideo != null)) }
         } catch (e: Throwable) {
             log("Watching failed: $e")
             endWatch(text(R.string.stream_open_failed))
         }
+    }
+
+    /** What the player says over the picture: paused, connecting, waiting for the picture, or nothing. */
+    private fun watchStatus(w: Watch, connected: Boolean, hasVideo: Boolean) = when {
+        w.paused -> text(R.string.stream_paused)
+        !connected -> text(R.string.stream_connecting)
+        !hasVideo -> text(R.string.stream_waiting_picture)
+        else -> ""
     }
 
     private fun createViewerConnection(w: Watch): PeerConnection? {
@@ -319,7 +334,7 @@ class StreamEngine(
                 exec.execute {
                     if (watch !== w) return@execute
                     when (s) {
-                        PeerConnection.PeerConnectionState.CONNECTED -> update { it.copy(watchStatus = if (it.watchVideo != null) "" else text(R.string.stream_waiting_picture)) }
+                        PeerConnection.PeerConnectionState.CONNECTED -> update { it.copy(watchStatus = watchStatus(w, true, it.watchVideo != null)) }
                         PeerConnection.PeerConnectionState.FAILED -> {
                             update { it.copy(watchStatus = text(R.string.stream_trying)) }
                             exec.execute {
@@ -336,7 +351,7 @@ class StreamEngine(
                 exec.execute {
                     if (watch !== w) return@execute
                     when (track) {
-                        is VideoTrack -> update { it.copy(watchVideo = track, watchStatus = "") }
+                        is VideoTrack -> update { it.copy(watchVideo = track, watchStatus = if (w.paused) text(R.string.stream_paused) else "") }
                         is org.webrtc.AudioTrack -> {
                             track.setEnabled(!state.watchMuted)
                             track.setVolume(state.watchVolume.toDouble())
@@ -526,6 +541,34 @@ class StreamEngine(
         endShare()
     }
 
+    /**
+     * Our stream paused or going on, as the TeamSpeak app's pause does it: a new offer to each viewer with every line
+     * `inactive` (nothing is sent, and they show it paused), or `sendonly` again. The capture goes on, so going on
+     * needs no new permission.
+     */
+    fun setSharePaused(paused: Boolean) = exec.execute {
+        if (state.sharing == null || state.sharePaused == paused) return@execute
+        update { it.copy(sharePaused = paused) }
+        log(if (paused) "Share paused" else "Share going on")
+        val id = shareId ?: return@execute
+        for (v in viewers.values.toList()) {
+            try {
+                v.pc.transceivers.forEach { it.setDirection(shareDirection()) }
+                val local = offer(v.pc)
+                setLocal(v.pc, local)
+                applyLimits(v.pc)
+                val relabel = Streams.relabelShareOfferH264(Streams.withoutVideoOrientation(Streams.withoutStrayPayloadLines(v.pc.localDescription.description)))
+                v.original = relabel.original
+                send(Streams.renegotiateOffer(id, v.id, relabel.sdp, rc("pause")))
+            } catch (e: Throwable) {
+                log("Couldn't ${if (paused) "pause" else "go on"} for ${v.id}: $e")
+            }
+        }
+    }
+
+    private fun shareDirection() =
+        if (state.sharePaused) RtpTransceiver.RtpTransceiverDirection.INACTIVE else RtpTransceiver.RtpTransceiverDirection.SEND_ONLY
+
     // While sharing: every 5 s, how the stream keeps time, in the phone's log. The sound captured should keep
     // up with the clock and the camera's frames with the encoder's; a gap growing shows which side drifts. Packets
     // waiting long to be sent show the encoder making more than the connection is thought to take.
@@ -593,7 +636,7 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false) }
     }
 
     private fun releaseCapture() {
@@ -636,15 +679,15 @@ class StreamEngine(
         v = Viewer(clid, pc)
         viewers[clid] = v
         try {
-            val video = pc.addTransceiver(t, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY, listOf("share")))
+            val video = pc.addTransceiver(t, RtpTransceiver.RtpTransceiverInit(shareDirection(), listOf("share")))
             preferH264(video)
             // The sound line: the microphone when the stream has sound, else one without a track (the TeamSpeak app
             // never answers an offer with video only)
             val withSound = sound
-            if (withSound != null) pc.addTransceiver(withSound, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY, listOf("share")))
+            if (withSound != null) pc.addTransceiver(withSound, RtpTransceiver.RtpTransceiverInit(shareDirection(), listOf("share")))
             else {
                 // WebRTC sends the recorded microphone on every sound line, with a track or without: this one sends nothing
-                val quiet = pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY))
+                val quiet = pc.addTransceiver(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO, RtpTransceiver.RtpTransceiverInit(shareDirection()))
                 val p = quiet.sender.parameters
                 p.encodings.forEach { it.active = false }
                 quiet.sender.parameters = p
