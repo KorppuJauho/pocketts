@@ -437,6 +437,12 @@
     <string name="channels_add">Ajouter</string>
     <string name="channels_done">Terminé</string>
     <string name="channels_edit_hint">Maintenez un canal et faites-le glisser pour le déplacer. Touchez-le pour le modifier ou le supprimer.</string>
+    <string name="channel_info_here">Vous êtes dans ce canal</string>
+    <string name="channel_info_talk_power">Permission vocale nécessaire</string>
+    <string name="channel_info_default">Le canal par défaut du serveur</string>
+    <string name="channel_info_no_description">Pas de description</string>
+    <string name="channel_info_loading">Chargement…</string>
+    <string name="channel_info_arrange">Organiser</string>
     <plurals name="channel_people">
         <item quantity="one">%d personne</item>
         <item quantity="many">%d personnes</item>
