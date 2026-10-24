@@ -13,5 +13,6 @@ People who have helped make PocketTS. Thank you!
 Everyone in the Google Play closed test, and everyone who reports problems and ideas in the
 [issues](https://github.com/KorppuJauho/pocketts/issues).
 
-Contributions are welcome: open an issue or a pull request. Translation corrections are welcome too (see
+Contributions are welcome: open an issue or a pull request, or share an idea in the
+[discussions](https://github.com/KorppuJauho/pocketts/discussions). Translation corrections are welcome too (see
 [TRANSLATIONS.md](TRANSLATIONS.md)).
