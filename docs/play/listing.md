@@ -24,24 +24,28 @@ VOICE
 • Noise removal, echo cancellation and gain control
 • A volume for each person, and headset and volume-button push-to-talk
 • Keeps working with the screen off, and reconnects by itself when the network changes
+• Goes quiet during phone calls, and pauses a stream you share
 
 CHANNELS AND CHAT
 • The server's channels and the people in them, with their banners and icons
 • Channel and private chats, pokes, and pictures (a few at once, saved or shared from the viewer)
 • Chat history kept on your phone for 90 days
+• Hold a channel for its info, and browse its files: download, upload, rename and delete (as the server allows)
 
 STREAMS
 • Watch others' screen and camera streams at the size you like, small over the app, or in a small window over other apps
 • Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
 
 AND MORE
+• Connect by address, server nickname or TeamSpeak link
 • Favourite servers, and switching between them
+• Mute, sound and disconnect buttons in the notification
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
 • Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)
 • In English, Finnish, German, Spanish, French, Simplified Chinese and Russian
 
 PRIVATE BY DESIGN
-No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose.
+No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname, TeamSpeak's nickname service).
 
 OPEN SOURCE
 PocketTS is free software (GPL-3.0). The source code, the changelog and the issue tracker are on GitHub: https://github.com/KorppuJauho/pocketts

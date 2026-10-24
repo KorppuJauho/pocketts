@@ -11,15 +11,18 @@ to join.
 ## What it does
 
 - **Voice:** voice activation, push-to-talk (also a floating button over other apps), echo and noise removal. Keeps
-  working with the screen off.
+  working with the screen off, and goes quiet during phone calls.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
-  password.
+  password. Hold a channel for its info.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
+- **Files:** a channel's files: download, upload, rename and delete them, and make folders (as the server allows).
 - **Streams:** watch others' screen and camera streams (at the size you choose, small over the app, or in a small
   window over other apps), and share your own camera (with your microphone) or screen (with what the phone plays).
 - **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
   who may.
-- **Favourites**, settings, sounds for events, and reconnecting by itself when the network changes.
+- **Connecting** by address, server nickname or TeamSpeak link; favourites; reconnecting by itself when the network
+  changes; and mute, sound and disconnect buttons in the notification.
+- **Settings** and sounds for events.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
 
