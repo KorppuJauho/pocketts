@@ -316,7 +316,7 @@ object Session : TsClient.Listener {
                 finish(e.message)
                 return@execute
             }
-            val target = ServerAddress.resolve(typed, AndroidDns) { AppLog.log(it) }
+            val target = ServerAddress.resolve(typed, AndroidDns, ServerAddress.MyTeamSpeakNicknames) { AppLog.log(it) }
             AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
             model.clear()
             if (!keepChat) {

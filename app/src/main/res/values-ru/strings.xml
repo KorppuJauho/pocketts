@@ -12,7 +12,7 @@
     <string name="connect">Подключиться</string>
     <string name="disconnect">Отключиться</string>
     <string name="nickname">Никнейм</string>
-    <string name="server_address">Адрес сервера</string>
+    <string name="server_address">Адрес или никнейм сервера</string>
     <string name="server_password">Пароль сервера</string>
     <string name="remember_password">Запомнить пароль</string>
     <string name="channel_password">Пароль канала</string>

@@ -12,7 +12,7 @@
     <string name="connect">Yhdistä</string>
     <string name="disconnect">Katkaise</string>
     <string name="nickname">Nimimerkki</string>
-    <string name="server_address">Palvelimen osoite</string>
+    <string name="server_address">Palvelimen osoite tai nimimerkki</string>
     <string name="server_password">Palvelimen salasana</string>
     <string name="remember_password">Muista salasana</string>
     <string name="channel_password">Kanavan salasana</string>

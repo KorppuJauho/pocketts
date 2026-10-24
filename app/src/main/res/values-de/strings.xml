@@ -12,7 +12,7 @@
     <string name="connect">Verbinden</string>
     <string name="disconnect">Trennen</string>
     <string name="nickname">Nickname</string>
-    <string name="server_address">Serveradresse</string>
+    <string name="server_address">Serveradresse oder Nickname</string>
     <string name="server_password">Server-Passwort</string>
     <string name="remember_password">Passwort merken</string>
     <string name="channel_password">Channel-Passwort</string>

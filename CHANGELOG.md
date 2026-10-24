@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Server nicknames:** a server's TeamSpeak nickname (such as `myclan`, without a dot) works as its address, looked
+  up from TeamSpeak's nickname service as the TeamSpeak apps do. A name it doesn't know is tried as a normal address.
 - **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
   choose on the phone, with progress and Cancel. A password channel's files need its remembered password. The
   server decides what you may see.
