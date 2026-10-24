@@ -415,6 +415,12 @@
     <string name="channels_add">添加</string>
     <string name="channels_done">完成</string>
     <string name="channels_edit_hint">按住频道并拖动即可移动。轻触频道可修改或删除。</string>
+    <string name="channel_info_here">你在这个频道中</string>
+    <string name="channel_info_talk_power">所需发言权限</string>
+    <string name="channel_info_default">服务器的默认频道</string>
+    <string name="channel_info_no_description">没有描述</string>
+    <string name="channel_info_loading">正在加载…</string>
+    <string name="channel_info_arrange">整理</string>
     <plurals name="channel_people">
         <item quantity="other">%d 人</item>
     </plurals>

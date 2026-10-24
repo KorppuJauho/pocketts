@@ -448,6 +448,12 @@
     <string name="channels_add">Добавить</string>
     <string name="channels_done">Готово</string>
     <string name="channels_edit_hint">Удерживайте канал и перетащите, чтобы переместить. Нажмите на него, чтобы изменить или удалить.</string>
+    <string name="channel_info_here">Вы в этом канале</string>
+    <string name="channel_info_talk_power">Необходимое право для разговора</string>
+    <string name="channel_info_default">Канал сервера по умолчанию</string>
+    <string name="channel_info_no_description">Нет описания</string>
+    <string name="channel_info_loading">Загрузка…</string>
+    <string name="channel_info_arrange">Упорядочить</string>
     <plurals name="channel_people">
         <item quantity="one">%d человек</item>
         <item quantity="few">%d человека</item>

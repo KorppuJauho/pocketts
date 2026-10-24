@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and
+  quality, talk power needed, password, and its description, with a Join button. With Settings › UI › Show admin
+  functions on, it also has Edit (the channel's settings) and Arrange (the edit mode that holding a channel
+  opened before).
+
 ## 1.3.0 (2026-10-23)
 
 - **In seven languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian. PocketTS follows

@@ -463,6 +463,12 @@
     <string name="channels_add">Add</string>
     <string name="channels_done">Done</string>
     <string name="channels_edit_hint">Hold a channel and drag it to move it. Tap it to change or delete it.</string>
+    <string name="channel_info_here">You\'re in this channel</string>
+    <string name="channel_info_talk_power">Needed talk power</string>
+    <string name="channel_info_default">The server\'s default channel</string>
+    <string name="channel_info_no_description">No description</string>
+    <string name="channel_info_loading">Loading…</string>
+    <string name="channel_info_arrange">Arrange</string>
     <plurals name="channel_people">
         <item quantity="one">%d person</item>
         <item quantity="other">%d people</item>

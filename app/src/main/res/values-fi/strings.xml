@@ -426,6 +426,12 @@
     <string name="channels_add">Lisää</string>
     <string name="channels_done">Valmis</string>
     <string name="channels_edit_hint">Pidä kanavaa pohjassa ja vedä siirtääksesi sitä. Napauta muuttaaksesi tai poistaaksesi sen.</string>
+    <string name="channel_info_here">Olet tällä kanavalla</string>
+    <string name="channel_info_talk_power">Vaadittu puheoikeuden taso</string>
+    <string name="channel_info_default">Palvelimen oletuskanava</string>
+    <string name="channel_info_no_description">Ei kuvausta</string>
+    <string name="channel_info_loading">Ladataan…</string>
+    <string name="channel_info_arrange">Järjestä</string>
     <plurals name="channel_people">
         <item quantity="one">%d henkilö</item>
         <item quantity="other">%d henkilöä</item>
