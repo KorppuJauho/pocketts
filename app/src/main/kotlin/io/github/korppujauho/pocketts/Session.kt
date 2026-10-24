@@ -308,6 +308,7 @@ object Session : TsClient.Listener {
             pokes = if (keepChat) prev.pokes else emptyList(), away = prev.away && keepChat, awayMessage = prev.awayMessage,
         )
         watchNetwork()
+        CallWatcher.start(app, ::onPhoneCall)
         ConnectionService.start(app, app.getString(R.string.notification_connecting, address))
         worker.execute {
             val identity = try {
@@ -410,13 +411,40 @@ object Session : TsClient.Listener {
     }
 
     /** Our microphone on/off, as the others see it. */
-    fun toggleMic() {
-        val muted = !_state.value.inputMuted
+    fun toggleMic() = setMic(!_state.value.inputMuted, cue = true)
+
+    private fun setMic(muted: Boolean, cue: Boolean) {
+        if (_state.value.inputMuted == muted) return
         _state.update { it.copy(inputMuted = muted) }
-        UiSounds.play(if (muted) Cue.MIC_OFF else Cue.MIC_ON, _state.value.voice, _state.value.outputMuted)
+        if (cue) UiSounds.play(if (muted) Cue.MIC_OFF else Cue.MIC_ON, _state.value.voice, _state.value.outputMuted)
         sender?.muted = muted
         engine?.refreshSound()
         client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to muted))
+    }
+
+    // ====== Phone calls ======
+
+    // What a phone call turned off (the microphone, the sound), to turn back on after it; null: no call
+    @Volatile private var callMuted: Pair<Boolean, Boolean>? = null
+
+    /** A phone call rang or started ([active]), or ended: quiet during it, as before after it. */
+    private fun onPhoneCall(active: Boolean) {
+        if (!active) return endCall()
+        val s = _state.value
+        if (callMuted != null || s.phase == Phase.IDLE || !s.voice.muteOnCalls) return
+        callMuted = !s.inputMuted to !s.outputMuted
+        AppLog.log("Phone call: microphone and sound off")
+        setMic(true, cue = false)
+        setSound(true, cue = false)
+    }
+
+    /** The call ended (or the connection did): what the call turned off comes back; what you turned off stays off. */
+    private fun endCall() {
+        val (mic, sound) = callMuted ?: return
+        callMuted = null
+        AppLog.log("Phone call over: microphone and sound as before")
+        if (mic) setMic(false, cue = false)
+        if (sound) setSound(false, cue = false)
     }
 
     // ====== Talking ======
@@ -500,10 +528,12 @@ object Session : TsClient.Listener {
     }
 
     /** Our sound on/off: nothing is played, and the others see it. */
-    fun toggleSound() {
-        val muted = !_state.value.outputMuted
+    fun toggleSound() = setSound(!_state.value.outputMuted, cue = true)
+
+    private fun setSound(muted: Boolean, cue: Boolean) {
+        if (_state.value.outputMuted == muted) return
         _state.update { it.copy(outputMuted = muted) }
-        UiSounds.play(if (muted) Cue.SOUND_OFF else Cue.SOUND_ON, _state.value.voice, muted)
+        if (cue) UiSounds.play(if (muted) Cue.SOUND_OFF else Cue.SOUND_ON, _state.value.voice, muted)
         player?.muted = muted
         client?.sendCommand(Commands.build("clientupdate", "client_output_muted" to muted))
     }
@@ -1209,6 +1239,9 @@ object Session : TsClient.Listener {
         stopAudio()
         client = null
         closeHistory()
+        // A call that muted us: as before (a reconnect during the call mutes again)
+        if (::app.isInitialized) CallWatcher.stop(app)
+        endCall()
         val s = _state.value
         _state.value = UiState(
             phase = Phase.IDLE, error = if (level > 0) null else reason, address = s.address, inputMuted = s.inputMuted,

@@ -179,6 +179,8 @@
     <string name="general_volume_ptt_desc">Im Push-to-Talk-Modus sprichst du, solange du eine Lautstärketaste hältst und die App auf dem Bildschirm ist (statt die Lautstärke zu ändern).</string>
     <string name="general_headset_ptt">Headset-Taste ist Push-to-Talk</string>
     <string name="general_headset_ptt_desc">Im Push-to-Talk-Modus startet ein Druck auf die Taste deines Kopfhörers das Sprechen, ein weiterer beendet es. Funktioniert auch bei ausgeschaltetem Bildschirm. Solange das an ist, startet oder pausiert die Taste keine Musik.</string>
+    <string name="general_call_mute">Bei Telefonanrufen stummschalten</string>
+    <string name="general_call_mute_desc">Wenn ein Anruf klingelt oder beginnt, werden Mikrofon und Ton ausgeschaltet und nach dem Anruf wieder eingeschaltet. Was du selbst stummgeschaltet hast, bleibt stumm.</string>
     <string name="general_updates">Nach Updates suchen</string>
     <string name="general_updates_desc">Einmal am Tag fragt PocketTS bei GitHub, ob eine neuere Version erschienen ist, und zeigt es auf dem Verbindungsbildschirm. Über dich wird nichts gesendet.</string>
     <string name="general_screen_on">Bildschirm anlassen</string>

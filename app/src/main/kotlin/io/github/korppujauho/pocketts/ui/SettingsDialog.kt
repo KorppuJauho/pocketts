@@ -431,6 +431,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
         Check(stringResource(R.string.general_headset_ptt), v.headsetPtt) { onChange(v.copy(headsetPtt = it)) }
         Desc(stringResource(R.string.general_headset_ptt_desc))
     }
+    Group {
+        Check(stringResource(R.string.general_call_mute), v.muteOnCalls) { onChange(v.copy(muteOnCalls = it)) }
+        Desc(stringResource(R.string.general_call_mute_desc))
+    }
     if (io.github.korppujauho.pocketts.UpdateCheck.enabled) Group {
         Check(stringResource(R.string.general_updates), v.checkUpdates) { onChange(v.copy(checkUpdates = it)) }
         Desc(stringResource(R.string.general_updates_desc))
