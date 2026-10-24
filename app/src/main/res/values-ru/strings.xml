@@ -10,6 +10,14 @@
     <string name="close">Закрыть</string>
     <string name="advanced">Дополнительно</string>
     <string name="connect">Подключиться</string>
+    <string name="link_title">Подключиться к %1$s?</string>
+    <string name="link_subtitle">Из ссылки TeamSpeak</string>
+    <string name="link_channel">Канал</string>
+    <string name="link_password">Пароль сервера</string>
+    <string name="link_password_given">в ссылке</string>
+    <string name="link_leaving">Сначала вы покинете %1$s.</string>
+    <string name="link_use_key">Использовать ключ привилегий из ссылки</string>
+    <string name="link_use_key_desc">Он даёт вам права на этом сервере, например администратора. Используйте его, только если доверяете отправителю ссылки.</string>
     <string name="disconnect">Отключиться</string>
     <string name="nickname">Никнейм</string>
     <string name="server_address">Адрес или никнейм сервера</string>

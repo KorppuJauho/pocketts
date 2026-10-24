@@ -180,6 +180,15 @@ class ScreenshotTest {
         )
     }
 
+    /** A TeamSpeak link opened while on another server: asked first, with its privilege key left unticked. */
+    @Test
+    fun link() = popup("popup-link") {
+        val link = io.github.korppujauho.pocketts.proto.JoinLink(
+            "voice.example.org:9988", channel = "Games/Raid", password = "x", token = "KEY",
+        )
+        io.github.korppujauho.pocketts.ui.LinkDialog(link, "Jamie", leaving = "Friends", onConnect = {}, onDismiss = {})
+    }
+
     /** Holding a channel: its info, with the admin buttons (the admin functions on). */
     @Test
     fun channelInfo() = popup("popup-channel-info") {

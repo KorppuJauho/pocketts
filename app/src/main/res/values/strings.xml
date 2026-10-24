@@ -15,6 +15,14 @@
     <string name="close">Close</string>
     <string name="advanced">Advanced</string>
     <string name="connect">Connect</string>
+    <string name="link_title">Connect to %1$s?</string>
+    <string name="link_subtitle">From a TeamSpeak link</string>
+    <string name="link_channel">Channel</string>
+    <string name="link_password">Server password</string>
+    <string name="link_password_given">in the link</string>
+    <string name="link_leaving">You\'ll leave %1$s first.</string>
+    <string name="link_use_key">Use the privilege key in the link</string>
+    <string name="link_use_key_desc">It gives you rights on this server, such as admin. Use it only if you trust who sent the link.</string>
     <string name="disconnect">Disconnect</string>
     <string name="nickname">Nickname</string>
     <string name="server_address">Server address or nickname</string>

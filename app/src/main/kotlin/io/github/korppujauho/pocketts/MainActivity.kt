@@ -3,6 +3,7 @@ package io.github.korppujauho.pocketts
 import android.Manifest
 import android.os.Build
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import io.github.korppujauho.pocketts.proto.Chat
+import io.github.korppujauho.pocketts.proto.JoinLink
 import io.github.korppujauho.pocketts.proto.ServerModel
 import io.github.korppujauho.pocketts.ui.ConnectActions
 import io.github.korppujauho.pocketts.ui.ConnectScreen
@@ -159,7 +161,9 @@ class MainActivity : ComponentActivity() {
         current = this
         favorites.value = Favorites.load(this)
         Session.load(this)
-        if (savedInstanceState == null && Session.state.value.phase == Session.Phase.IDLE && !Session.autoConnected) {
+        // A TeamSpeak link that opened the app: asked first, and no favourite connects by itself meanwhile
+        val linked = savedInstanceState == null && openLink(intent)
+        if (savedInstanceState == null && !linked && Session.state.value.phase == Session.Phase.IDLE && !Session.autoConnected) {
             Session.autoConnected = true
             favorites.value.firstOrNull { it.auto }?.let { connectFavorite(applicationContext, it) }
         }
@@ -174,6 +178,23 @@ class MainActivity : ComponentActivity() {
             if (!info.isInPictureInPictureMode && lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) Session.stopWatching()
         }
         setContent { PocketTsTheme { App() } }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        openLink(intent)
+    }
+
+    /** A ts3server:// or teamspeak:// link: asked about before connecting (a web page can open one). True when it was one. */
+    private fun openLink(intent: Intent?): Boolean {
+        val data = intent?.dataString ?: return false
+        if (!JoinLink.isLink(data)) return false
+        // (not the link itself in the log: it can hold passwords and a privilege key)
+        val link = JoinLink.parse(data)
+        AppLog.log(if (link != null) "A TeamSpeak link was opened" else "A TeamSpeak link without a usable address was opened")
+        if (link == null) android.widget.Toast.makeText(this, R.string.not_an_address, android.widget.Toast.LENGTH_LONG).show()
+        else pendingLink.value = link
+        return true
     }
 
     override fun onStart() {
@@ -198,6 +219,9 @@ class MainActivity : ComponentActivity() {
 
 /** The app is a small picture-in-picture window. */
 private val inPip = mutableStateOf(false)
+
+/** A TeamSpeak link waiting for the person's yes or no. */
+private val pendingLink = mutableStateOf<JoinLink?>(null)
 
 /** Whether this phone can use both cameras at once (asked once). */
 private val canBoth by lazy { MainActivity.current?.let { DualCamera.pair(it) != null } ?: false }
@@ -234,16 +258,36 @@ private fun App() {
             if (pip) io.github.korppujauho.pocketts.ui.PipPlayer(state.stream, egl)
         }
     }
+    pendingLink.value?.let { link ->
+        val nickname = settings.nickname.ifBlank { link.nickname }.ifBlank { "PocketTS user" }
+        io.github.korppujauho.pocketts.ui.LinkDialog(
+            link, nickname,
+            leaving = if (state.phase != Session.Phase.IDLE) state.serverName.ifEmpty { state.address } else null,
+            onConnect = { useKey ->
+                pendingLink.value = null
+                Session.switchTo {
+                    connect(
+                        ctx, link.address, nickname, link.password,
+                        channel = link.channel, channelPassword = link.channelPassword, privilegeKey = if (useKey) link.token else "",
+                    )
+                }
+            },
+            onDismiss = { pendingLink.value = null },
+        )
+    }
 }
 
 /** Connects (the microphone is asked for once; talking starts when it's allowed). */
-private fun connect(context: Context, address: String, nickname: String, password: String, filePort: Int? = null) {
+private fun connect(
+    context: Context, address: String, nickname: String, password: String, filePort: Int? = null,
+    channel: String = "", channelPassword: String = "", privilegeKey: String = "",
+) {
     Settings(context).let {
         it.nickname = nickname
         it.address = address
     }
     MainActivity.current?.ensureMic()
-    Session.connect(context, address, nickname, password, filePort)
+    Session.connect(context, address, nickname, password, filePort, channel, channelPassword, privilegeKey)
 }
 
 private fun connectFavorite(context: Context, f: Favorite) =

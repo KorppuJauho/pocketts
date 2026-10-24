@@ -10,6 +10,14 @@
     <string name="close">Sulje</string>
     <string name="advanced">Lisäasetukset</string>
     <string name="connect">Yhdistä</string>
+    <string name="link_title">Yhdistetäänkö palvelimeen %1$s?</string>
+    <string name="link_subtitle">TeamSpeak-linkistä</string>
+    <string name="link_channel">Kanava</string>
+    <string name="link_password">Palvelimen salasana</string>
+    <string name="link_password_given">linkissä</string>
+    <string name="link_leaving">Poistut ensin palvelimelta %1$s.</string>
+    <string name="link_use_key">Käytä linkin oikeusavainta</string>
+    <string name="link_use_key_desc">Se antaa sinulle oikeuksia tällä palvelimella, kuten ylläpitäjän. Käytä sitä vain, jos luotat linkin lähettäjään.</string>
     <string name="disconnect">Katkaise</string>
     <string name="nickname">Nimimerkki</string>
     <string name="server_address">Palvelimen osoite tai nimimerkki</string>

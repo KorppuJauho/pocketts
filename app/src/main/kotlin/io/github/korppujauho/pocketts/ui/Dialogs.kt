@@ -384,3 +384,46 @@ fun span(res: android.content.res.Resources, ms: Long): String {
     if (months < 24) return n(R.plurals.span_months, months)
     return n(R.plurals.span_years, (days / 365.25).toLong())
 }
+
+/**
+ * A TeamSpeak link opened (from a web page or another app): it connects only when the person says so. The server's
+ * address and the channel are shown; a privilege key in the link (it gives that server's rights, such as admin) is
+ * used only when ticked here.
+ */
+@Composable
+fun LinkDialog(
+    link: io.github.korppujauho.pocketts.proto.JoinLink,
+    nickname: String,
+    leaving: String?, // the server we're on now, when connected (it's left first)
+    onConnect: (useKey: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var useKey by remember { mutableStateOf(false) }
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.link_title, link.address),
+        icon = androidx.compose.material.icons.Icons.Rounded.Dns, subtitle = stringResource(R.string.link_subtitle),
+        buttons = {
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.connect), PillKind.PRIMARY) { onConnect(useKey && link.token.isNotEmpty()) }
+        },
+    ) {
+        PopCard {
+            if (link.channel.isNotEmpty()) InfoLine(stringResource(R.string.link_channel), link.channel.removePrefix("/").replace("/", " › "))
+            InfoLine(stringResource(R.string.nickname), nickname)
+            if (link.password.isNotEmpty()) InfoLine(stringResource(R.string.link_password), stringResource(R.string.link_password_given))
+        }
+        if (leaving != null) Text(stringResource(R.string.link_leaving, leaving), color = Ts.text, fontSize = 14.sp)
+        if (link.token.isNotEmpty()) {
+            CheckRow(stringResource(R.string.link_use_key), useKey) { useKey = it }
+            Text(stringResource(R.string.link_use_key_desc), color = Ts.muted, fontSize = 13.sp)
+        }
+    }
+}
+
+@Composable
+private fun InfoLine(label: String, value: String) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(end = 12.dp))
+        Text(value, color = Ts.text, fontSize = 14.sp, textAlign = TextAlign.End, modifier = Modifier.weight(1f), maxLines = 2)
+    }
+}
