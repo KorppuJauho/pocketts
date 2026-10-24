@@ -451,6 +451,12 @@
     <string name="files_no_permission">No tienes permiso para ver estos archivos.</string>
     <string name="files_not_found">Esta carpeta ya no existe.</string>
     <string name="files_not_connected">No hay conexión con el servidor.</string>
+    <string name="channel_info_here">Estás en este canal</string>
+    <string name="channel_info_talk_power">Poder de conversación necesario</string>
+    <string name="channel_info_default">El canal por defecto del servidor</string>
+    <string name="channel_info_no_description">Sin descripción</string>
+    <string name="channel_info_loading">Cargando…</string>
+    <string name="channel_info_arrange">Ordenar</string>
     <plurals name="channel_people">
         <item quantity="one">%d persona</item>
         <item quantity="many">%d personas</item>

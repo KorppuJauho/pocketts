@@ -462,6 +462,12 @@
     <string name="files_no_permission">У вас нет прав на просмотр этих файлов.</string>
     <string name="files_not_found">Этой папки больше нет.</string>
     <string name="files_not_connected">Нет соединения с сервером.</string>
+    <string name="channel_info_here">Вы в этом канале</string>
+    <string name="channel_info_talk_power">Необходимое право для разговора</string>
+    <string name="channel_info_default">Канал сервера по умолчанию</string>
+    <string name="channel_info_no_description">Нет описания</string>
+    <string name="channel_info_loading">Загрузка…</string>
+    <string name="channel_info_arrange">Упорядочить</string>
     <plurals name="channel_people">
         <item quantity="one">%d человек</item>
         <item quantity="few">%d человека</item>

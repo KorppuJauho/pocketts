@@ -477,6 +477,12 @@
     <string name="files_no_permission">You don\'t have permission to see these files.</string>
     <string name="files_not_found">This folder isn\'t there any more.</string>
     <string name="files_not_connected">Not connected to the server.</string>
+    <string name="channel_info_here">You\'re in this channel</string>
+    <string name="channel_info_talk_power">Needed talk power</string>
+    <string name="channel_info_default">The server\'s default channel</string>
+    <string name="channel_info_no_description">No description</string>
+    <string name="channel_info_loading">Loading…</string>
+    <string name="channel_info_arrange">Arrange</string>
     <plurals name="channel_people">
         <item quantity="one">%d person</item>
         <item quantity="other">%d people</item>

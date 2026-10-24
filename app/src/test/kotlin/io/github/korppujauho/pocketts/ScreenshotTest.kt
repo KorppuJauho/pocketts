@@ -151,6 +151,17 @@ class ScreenshotTest {
         )
     }
 
+    /** Holding a channel: its info, with the admin buttons (the admin functions on). */
+    @Test
+    fun channelInfo() = popup("popup-channel-info") {
+        val node = Example.state().tree.first { it.channel.name == "Gaming" }
+        val ch = node.channel.copy(
+            topic = "Tonight: co-op", maxClients = 10, hasPassword = true, codecQuality = 8,
+            description = "[b]Games every evening.[/b]\nAsk Lee for the password. Rules: https://example.com/rules",
+        )
+        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {})
+    }
+
     @Test
     fun channelDelete() = popup("popup-channel-delete") {
         val ch = Example.state().tree.first { it.channel.name == "Gaming" }.channel

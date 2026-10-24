@@ -440,6 +440,12 @@
     <string name="files_no_permission">Sinulla ei ole oikeutta nähdä näitä tiedostoja.</string>
     <string name="files_not_found">Kansiota ei ole enää.</string>
     <string name="files_not_connected">Ei yhteyttä palvelimeen.</string>
+    <string name="channel_info_here">Olet tällä kanavalla</string>
+    <string name="channel_info_talk_power">Vaadittu puheoikeuden taso</string>
+    <string name="channel_info_default">Palvelimen oletuskanava</string>
+    <string name="channel_info_no_description">Ei kuvausta</string>
+    <string name="channel_info_loading">Ladataan…</string>
+    <string name="channel_info_arrange">Järjestä</string>
     <plurals name="channel_people">
         <item quantity="one">%d henkilö</item>
         <item quantity="other">%d henkilöä</item>

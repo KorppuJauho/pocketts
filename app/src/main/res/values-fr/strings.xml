@@ -451,6 +451,12 @@
     <string name="files_no_permission">Vous n’avez pas la permission de voir ces fichiers.</string>
     <string name="files_not_found">Ce dossier n’existe plus.</string>
     <string name="files_not_connected">Pas de connexion au serveur.</string>
+    <string name="channel_info_here">Vous êtes dans ce canal</string>
+    <string name="channel_info_talk_power">Permission vocale nécessaire</string>
+    <string name="channel_info_default">Le canal par défaut du serveur</string>
+    <string name="channel_info_no_description">Pas de description</string>
+    <string name="channel_info_loading">Chargement…</string>
+    <string name="channel_info_arrange">Organiser</string>
     <plurals name="channel_people">
         <item quantity="one">%d personne</item>
         <item quantity="many">%d personnes</item>

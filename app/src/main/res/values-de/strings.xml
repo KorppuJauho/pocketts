@@ -440,6 +440,12 @@
     <string name="files_no_permission">Du hast keine Berechtigung, diese Dateien zu sehen.</string>
     <string name="files_not_found">Diesen Ordner gibt es nicht mehr.</string>
     <string name="files_not_connected">Nicht mit dem Server verbunden.</string>
+    <string name="channel_info_here">Du bist in diesem Channel</string>
+    <string name="channel_info_talk_power">Benötigte Sprachberechtigung</string>
+    <string name="channel_info_default">Der Standard-Channel des Servers</string>
+    <string name="channel_info_no_description">Keine Beschreibung</string>
+    <string name="channel_info_loading">Wird geladen …</string>
+    <string name="channel_info_arrange">Anordnen</string>
     <plurals name="channel_people">
         <item quantity="one">%d Person</item>
         <item quantity="other">%d Personen</item>

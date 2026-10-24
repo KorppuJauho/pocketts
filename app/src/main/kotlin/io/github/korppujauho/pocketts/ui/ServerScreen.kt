@@ -153,6 +153,7 @@ fun ServerScreen(
     var held by remember { mutableStateOf<ServerModel.Channel?>(null) }
     var channelDialog by remember { mutableStateOf<ChannelEditing?>(null) }
     var filesChannel by remember { mutableStateOf<Int?>(null) } // the channel whose files are open
+    var infoChannel by remember { mutableStateOf<Int?>(null) } // the channel whose info is open (held in the list)
     var deleteTarget by remember { mutableStateOf<ServerModel.Channel?>(null) }
     val editMode = editing && state.voice.adminTools && state.phase == Session.Phase.CONNECTED && view == View.CHANNELS
     androidx.activity.compose.BackHandler(editMode) { editing = false }
@@ -337,7 +338,7 @@ fun ServerScreen(
                                     },
                                     onPerson = { person = it },
                                     modifier = Modifier.fillMaxSize(),
-                                    onLongChannel = if (state.voice.adminTools && state.phase == Session.Phase.CONNECTED) ({ ch -> held = ch; editing = true }) else null,
+                                    onLongChannel = if (state.phase == Session.Phase.CONNECTED) ({ ch -> actions.channelDescription(ch); infoChannel = ch.id }) else null,
                                 )
                             }
                         }
@@ -465,6 +466,25 @@ fun ServerScreen(
             onCancelDownload = actions::cancelDownload,
             onResultSeen = actions::downloadResultSeen,
             onDismiss = { filesChannel = null },
+        )
+    }
+    infoChannel?.let { id ->
+        // Gone (deleted, or the connection ended): nothing to show
+        val item = items.firstOrNull { it.node.channel.id == id } ?: return@let
+        val ch = item.node.channel
+        val admin = state.voice.adminTools && state.phase == Session.Phase.CONNECTED
+        ChannelInfoDialog(
+            ch, people = item.node.clients.size, here = ch.id == state.ownChannel,
+            // Joining as a tap does it (a spacer too, from here: holding it was on purpose)
+            onJoin = if (ch.id == state.ownChannel) null else ({
+                infoChannel = null
+                if (!ch.hasPassword) actions.join(ch)
+                else actions.savedPassword(ch)?.let { actions.join(ch, it, remember = true) } ?: actions.join(ch, quiet = true)
+            }),
+            onEdit = if (admin) ({ infoChannel = null; channelDialog = ChannelEditing(ch.id, io.github.korppujauho.pocketts.proto.ChannelEdits.settingsOf(ch)) }) else null,
+            onArrange = if (admin) ({ infoChannel = null; held = ch; editing = true }) else null,
+            onDismiss = { infoChannel = null },
+            onFiles = { infoChannel = null; filesChannel = ch.id },
         )
     }
     channelDialog?.let { d ->

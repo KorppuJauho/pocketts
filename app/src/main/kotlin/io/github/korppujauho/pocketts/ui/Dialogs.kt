@@ -2,6 +2,7 @@ package io.github.korppujauho.pocketts.ui
 
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Dns
+import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.automirrored.rounded.VolumeDown
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -267,6 +268,99 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
                 ).filter { it.isNotEmpty() }.joinToString(" • ")
                 if (version.isNotEmpty()) Text(version, color = Ts.muted, fontSize = 12.sp)
             }
+    }
+}
+
+/**
+ * A channel's info (holding it in the list): its topic, who and how many are in it, its type, voice and password, and
+ * its description (asked of the server when this opens). Join, and with the admin functions on, Edit (its settings)
+ * and Arrange (the channel edit mode).
+ */
+@Composable
+fun ChannelInfoDialog(
+    ch: io.github.korppujauho.pocketts.proto.ServerModel.Channel,
+    people: Int,
+    here: Boolean,
+    onJoin: (() -> Unit)?,
+    onEdit: (() -> Unit)?,
+    onArrange: (() -> Unit)?,
+    onDismiss: () -> Unit,
+    onFiles: (() -> Unit)? = null,
+) {
+    // The description comes a moment after asking; empty after that, there's none
+    var waited by remember { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(ch.id) {
+        kotlinx.coroutines.delay(2000)
+        waited = true
+    }
+    val res = androidx.compose.ui.platform.LocalResources.current
+    TsDialog(
+        onDismiss = onDismiss, title = ch.displayName.ifEmpty { ch.name }, icon = androidx.compose.material.icons.Icons.Rounded.Forum,
+        subtitle = ch.topic.trim().ifEmpty { null },
+        buttons = {
+            PillButton(stringResource(R.string.close), if (onJoin == null) PillKind.PRIMARY else PillKind.SECONDARY, onClick = onDismiss)
+            if (onJoin != null) PillButton(stringResource(R.string.join), PillKind.PRIMARY, onClick = onJoin)
+        },
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (here) Text(stringResource(R.string.channel_info_here), color = Ts.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            val stats = buildList {
+                add(res.getString(R.string.info_users) to if (ch.maxClients >= 0) "$people / ${ch.maxClients}" else "$people")
+                add(
+                    res.getString(R.string.channel_kind) to res.getString(
+                        when {
+                            ch.permanent -> R.string.channel_kind_permanent
+                            ch.semiPermanent -> R.string.channel_kind_semi
+                            else -> R.string.channel_kind_temporary
+                        },
+                    ),
+                )
+                if (ch.neededTalkPower > 0) add(res.getString(R.string.channel_info_talk_power) to "${ch.neededTalkPower}")
+            }
+            for (row in stats.chunked(2)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    for ((k, value) in row) {
+                        InfoBox(Modifier.weight(1f)) {
+                            Text(k, color = Ts.muted, fontSize = 12.sp)
+                            Text(value, color = Ts.text, fontSize = 15.sp)
+                        }
+                    }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+            // The voice on a line of its own: codec and quality don't fit half the width
+            InfoBox {
+                Text(stringResource(R.string.channel_codec), color = Ts.muted, fontSize = 12.sp)
+                Text(
+                    stringResource(if (ch.codec == 5) R.string.channel_codec_music else R.string.channel_codec_voice) + " · " +
+                        stringResource(R.string.channel_quality, ch.codecQuality),
+                    color = Ts.text, fontSize = 15.sp,
+                )
+            }
+            val notes = listOfNotNull(
+                if (ch.hasPassword) stringResource(R.string.channel_password_subtitle) else null,
+                if (ch.isDefault) stringResource(R.string.channel_info_default) else null,
+            )
+            if (notes.isNotEmpty()) Text(notes.joinToString(" · "), color = Ts.muted, fontSize = 13.sp)
+            val description = ch.description.trim()
+            InfoBox {
+                Text(stringResource(R.string.channel_description), color = Ts.muted, fontSize = 12.sp)
+                when {
+                    description.isNotEmpty() -> Text(formatted(description), color = Ts.text, fontSize = 14.sp)
+                    waited -> Text(stringResource(R.string.channel_info_no_description), color = Ts.faint, fontSize = 14.sp)
+                    else -> Text(stringResource(R.string.channel_info_loading), color = Ts.faint, fontSize = 14.sp)
+                }
+            }
+            if (onFiles != null) {
+                PillButton(stringResource(R.string.files_title), modifier = Modifier.fillMaxWidth(), onClick = onFiles)
+            }
+            if (onEdit != null || onArrange != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (onEdit != null) PillButton(stringResource(R.string.edit), modifier = Modifier.weight(1f), onClick = onEdit)
+                    if (onArrange != null) PillButton(stringResource(R.string.channel_info_arrange), modifier = Modifier.weight(1f), onClick = onArrange)
+                }
+            }
+        }
     }
 }
 
