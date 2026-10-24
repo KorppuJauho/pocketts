@@ -63,7 +63,17 @@ RELEASE=$(jq -n --arg code "$VERSION_CODE" --arg status "$STATUS" --arg notes "$
 call -X PUT "${AUTH[@]}" -H "Content-Type: application/json" -d "$RELEASE" \
   "$API/edits/$EDIT/tracks/$TRACK" > /dev/null
 
-# A draft isn't sent for review; a completed release is, unless the app's changes are sent by hand in Play Console
+# A draft isn't sent for review; a completed release is, unless the app's changes are sent by hand in Play Console.
+# Asking not to send them works only with Play Console's managed publishing on; without it Play refuses the question
+# (its changes go for review by themselves), so the edit is then committed without it.
 NOT_SENT=$([ "$STATUS" = draft ] && echo true || echo false)
-call -X POST "${AUTH[@]}" "$API/edits/$EDIT:commit?changesNotSentForReview=$NOT_SENT" > /dev/null
+if ! body=$(curl -sS --fail-with-body -X POST "${AUTH[@]}" "$API/edits/$EDIT:commit?changesNotSentForReview=$NOT_SENT"); then
+  if [ "$NOT_SENT" = true ] && grep -q "changesNotSentForReview must not be set" <<< "$body"; then
+    echo "Managed publishing is off: committing as Play Console does"
+    call -X POST "${AUTH[@]}" "$API/edits/$EDIT:commit" > /dev/null
+  else
+    echo "::error::Google Play: $body" >&2
+    exit 1
+  fi
+fi
 echo "Version $VERSION_CODE is on the $TRACK track as $STATUS"
