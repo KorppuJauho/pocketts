@@ -1,6 +1,7 @@
 // The development page on the home network (scripts/dev.sh devserver up): a phone opens it to install the latest test
 // build, and test builds send their log here (dist/phone.log). It also shows what the stream viewer sees (/viewer,
-// scripts/dev.sh viewer up), and a clock to put on the phone's screen while sharing it, to measure the delay (/clock).
+// scripts/dev.sh viewer up), and a clock to put on the phone's screen while sharing it, to measure the delay (/clock), and
+// TeamSpeak links to the test server to tap on the phone (/links).
 // Only for testing; nothing else is served.
 import { createServer } from "node:http";
 import { appendFileSync, createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -127,6 +128,26 @@ the DELAY) &middot; <a href="/">Test builds</a></p>
     return res.end(CLOCK_PAGE);
   }
 
+  // TeamSpeak links to the test server, to tap on the phone (a typed ts3server:// in a browser's address bar isn't opened)
+  if (req.method === "GET" && url.pathname === "/links") {
+    const host = (req.headers.host || "localhost").replace(/:\d+$/, "");
+    const port = process.env.TS_LINK_PORT || "9989";
+    const base = `ts3server://${host}?port=${port}`;
+    const links = [
+      ["Plain", base],
+      ["With a channel (TestiKanava)", `${base}&channel=TestiKanava`],
+      ["With a nickname (used only when the app has none)", `${base}&nickname=LinkUser`],
+      ["With a privilege key that doesn't exist (the server refuses it)", `${base}&token=NotARealKey`],
+      ["teamspeak://connect form", `teamspeak://connect?address=${host}:${port}`],
+      ["Broken (no address)", "ts3server://?port=9989"],
+    ];
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
+    return res.end(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PocketTS test links</title>
+<style>body{font:16px system-ui,sans-serif;margin:24px;line-height:1.5}a{font-size:1.2em}li{margin:14px 0}code{font-size:.8em;color:#666}</style>
+<h1>TeamSpeak links</h1><ul>${links.map(([t, l]) => `<li><a href="${escape(l)}">${escape(t)}</a><br><code>${escape(l)}</code></li>`).join("")}</ul>`);
+  }
+
   if (req.method === "GET" && url.pathname === "/") {
     const list = apks()
       .map((a) => `<li><a href="/apk/${encodeURIComponent(a.name)}">${escape(a.name)}</a>
@@ -138,7 +159,7 @@ the DELAY) &middot; <a href="/">Test builds</a></p>
 <style>body{font:16px system-ui,sans-serif;margin:24px;line-height:1.5}a{font-size:1.2em}li{margin:12px 0}</style>
 <h1>PocketTS test builds</h1><p>Tap the newest one to download, then open it to install.</p>
 <ul>${list || "<li>No builds yet</li>"}</ul>
-<p><a href="/viewer">Stream viewer</a> &middot; <a href="/clock">Clock</a></p>`);
+<p><a href="/viewer">Stream viewer</a> &middot; <a href="/clock">Clock</a> &middot; <a href="/links">TeamSpeak links</a></p>`);
   }
 
   res.writeHead(404).end("Not found");
