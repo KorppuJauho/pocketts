@@ -31,8 +31,9 @@ Your TeamSpeak identity and saved passwords are encrypted on the phone. No accou
 that off in Settings).
 
 **Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
-[issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Security problems: please report them
-privately, see [SECURITY.md](SECURITY.md).
+[issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Questions, ideas and tips are welcome in
+the [discussions](https://github.com/KorppuJauho/pocketts/discussions); bugs go to the issues. Security problems:
+please report them privately, see [SECURITY.md](SECURITY.md).
 
 ## Install
 
