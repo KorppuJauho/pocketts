@@ -10,7 +10,6 @@ import io.github.korppujauho.pocketts.proto.FileTransfer
 import io.github.korppujauho.pocketts.proto.MessageText
 import io.github.korppujauho.pocketts.proto.ServerAddress
 import io.github.korppujauho.pocketts.proto.ServerModel
-import io.github.korppujauho.pocketts.proto.Streams
 import io.github.korppujauho.pocketts.proto.TsClient
 import io.github.korppujauho.pocketts.UiSounds.Cue
 import java.util.concurrent.Executors
@@ -427,7 +426,7 @@ object Session : TsClient.Listener {
 
     /**
      * What a phone call turned off, to turn back on after it: the microphone, the sound, a watched stream's sound, and
-     * our screen share (paused: the call's screen, with who is calling, isn't shown to the viewers).
+     * our share (paused: viewers don't see the call's screen, with who is calling, or the phone at your ear).
      */
     private data class CallMuted(val mic: Boolean, val sound: Boolean, val stream: Boolean, val share: Boolean)
 
@@ -439,10 +438,10 @@ object Session : TsClient.Listener {
         val s = _state.value
         if (callMuted != null || s.phase == Phase.IDLE || !s.voice.muteOnCalls) return
         val stream = s.stream.watching != 0 && !s.stream.watchMuted
-        val share = s.stream.sharing == Streams.Kind.SCREEN && !s.stream.sharePaused
+        val share = s.stream.sharing != null && !s.stream.sharePaused
         callMuted = CallMuted(mic = !s.inputMuted, sound = !s.outputMuted, stream = stream, share = share)
-        AppLog.log("Phone call: microphone and sound off${if (stream) ", and the stream's sound" else ""}${if (share) ", screen share paused" else ""}")
-        // The screen first: the call's screen comes up right away
+        AppLog.log("Phone call: microphone and sound off${if (stream) ", and the stream's sound" else ""}${if (share) ", share paused" else ""}")
+        // The share first: the call's screen comes up right away (and a camera would show the phone at your ear)
         if (share) engine?.setSharePaused(true)
         setMic(true, cue = false)
         setSound(true, cue = false)

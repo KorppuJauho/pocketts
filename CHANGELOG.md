@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-- **Stream pause:** a screen share pauses during a phone call, the way TeamSpeak's own pause works, so viewers see
-  it paused instead of the call (and who is calling); it goes on when the call ends. Watching a stream its streamer
+- **Stream pause:** a stream you share (screen or camera) pauses during a phone call, the way TeamSpeak's own pause
+  works, so viewers see it paused instead of the call (and who is calling) or the phone at your ear; it goes on when
+  the call ends. Watching a stream its streamer
   paused now says "Paused" instead of "Connecting…". Based on Stefan3Dx's idea (see [CREDITS.md](CREDITS.md)).
 - **Muted during phone calls:** when a phone call rings or starts, the microphone and sound go off (and the sound of
   a stream you watch), and come back on when it ends (what you muted yourself stays muted). It needs no permission.

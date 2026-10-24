@@ -181,7 +181,7 @@
     <string name="general_headset_ptt">耳机按钮用于按键说话</string>
     <string name="general_headset_ptt_desc">在按键说话模式下，按一下耳机上的按钮开始说话，再按一下停止。屏幕关闭时也有效。开启后，该按钮不会播放或暂停音乐。</string>
     <string name="general_call_mute">通话时静音</string>
-    <string name="general_call_mute_desc">来电响铃或通话开始时，麦克风和声音会关闭（包括你正在观看的直播的声音），通话结束后恢复。屏幕共享会暂停，观众看不到来电。你自己静音的仍保持静音。</string>
+    <string name="general_call_mute_desc">来电响铃或通话开始时，麦克风和声音会关闭（包括你正在观看的直播的声音），通话结束后恢复。你共享的直播会暂停，观众看不到来电。你自己静音的仍保持静音。</string>
     <string name="general_updates">检查更新</string>
     <string name="general_updates_desc">PocketTS 每天会向 GitHub 询问一次是否有新版本，并在连接界面上提示。不会发送任何关于你的信息。</string>
     <string name="general_screen_on">保持屏幕常亮</string>
