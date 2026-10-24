@@ -181,7 +181,7 @@
     <string name="general_headset_ptt">Le bouton du casque sert à parler</string>
     <string name="general_headset_ptt_desc">En mode appuyer pour parler, appuyez sur le bouton de votre casque pour commencer à parler et appuyez à nouveau pour arrêter. Fonctionne aussi écran éteint. Tant que c’est activé, le bouton ne lance ni ne met en pause la musique.</string>
     <string name="general_call_mute">Couper pendant les appels</string>
-    <string name="general_call_mute_desc">Quand un appel sonne ou commence, le micro et le son se coupent, puis reviennent à la fin de l’appel. Ce que vous aviez coupé vous-même le reste.</string>
+    <string name="general_call_mute_desc">Quand un appel sonne ou commence, le micro et le son se coupent (ainsi que le son du stream que vous regardez), puis reviennent à la fin de l’appel. Ce que vous aviez coupé vous-même le reste.</string>
     <string name="general_updates">Rechercher les mises à jour</string>
     <string name="general_updates_desc">Une fois par jour, PocketTS demande à GitHub si une version plus récente est sortie et l’indique sur l’écran de connexion. Rien vous concernant n’est envoyé.</string>
     <string name="general_screen_on">Garder l’écran allumé</string>

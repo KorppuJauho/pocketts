@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-- **Muted during phone calls:** when a phone call rings or starts, the microphone and sound go off, and come back on
-  when it ends (what you muted yourself stays muted). It needs no permission. Settings › General can turn it off.
+- **Muted during phone calls:** when a phone call rings or starts, the microphone and sound go off (and the sound of
+  a stream you watch), and come back on when it ends (what you muted yourself stays muted). It needs no permission.
+  Settings › General can turn it off.
   Based on Stefan3Dx's work (see [CREDITS.md](CREDITS.md)).
 - **Server nicknames:** a server's TeamSpeak nickname (such as `myclan`, without a dot) works as its address, looked
   up from TeamSpeak's nickname service as the TeamSpeak apps do. A name it doesn't know is tried as a normal address.

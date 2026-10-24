@@ -180,7 +180,7 @@
     <string name="general_headset_ptt">Kuulokkeiden painike on puhepainike</string>
     <string name="general_headset_ptt_desc">Paina puhuaksesi -tilassa kuulokkeidesi painike aloittaa puhumisen ja toinen painallus lopettaa sen. Toimii myös näytön ollessa pois päältä. Kun tämä on päällä, painike ei toista eikä keskeytä musiikkia.</string>
     <string name="general_call_mute">Mykistä puhelun ajaksi</string>
-    <string name="general_call_mute_desc">Kun puhelin soi tai puhelu alkaa, mikrofoni ja ääni menevät pois päältä ja palaavat, kun puhelu päättyy. Itse mykistämäsi pysyy mykistettynä.</string>
+    <string name="general_call_mute_desc">Kun puhelin soi tai puhelu alkaa, mikrofoni ja ääni menevät pois päältä (myös katsomasi striimin ääni) ja palaavat, kun puhelu päättyy. Itse mykistämäsi pysyy mykistettynä.</string>
     <string name="general_updates">Tarkista päivitykset</string>
     <string name="general_updates_desc">Kerran päivässä PocketTS kysyy GitHubilta, onko uudempi versio julkaistu, ja kertoo siitä yhdistämisnäkymässä. Sinusta ei lähetetä mitään.</string>
     <string name="general_screen_on">Pidä näyttö päällä</string>
