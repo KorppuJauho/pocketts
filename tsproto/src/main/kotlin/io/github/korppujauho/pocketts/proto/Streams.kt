@@ -54,6 +54,19 @@ object Streams {
 
     fun reconnectOffer(streamId: String, viewerId: Int, sdp: String, rc: String) = signal(streamId, viewerId, "reconnectOffer", mapOf("offer" to sdp), rc)
 
+    /** A new offer on a running stream, as the TeamSpeak app sends one to pause (all `inactive`) or go on (`sendonly`). */
+    fun renegotiateOffer(streamId: String, viewerId: Int, sdp: String, rc: String) = signal(streamId, viewerId, "offer", mapOf("offer" to sdp), rc)
+
+    /**
+     * Whether an offer pauses the stream, as the TeamSpeak app's pause does: every media line `inactive` (nothing sent).
+     * A line without a direction is `sendrecv`, so not paused.
+     */
+    fun isPausedOffer(sdp: String): Boolean {
+        val sections = sdp.split(Regex("""\r?\n(?=m=)""")).drop(1)
+        if (sections.isEmpty()) return false
+        return sections.all { section -> section.lines().any { it.trim() == "a=inactive" } }
+    }
+
     /** A signalling message received: its command and arguments. */
     data class Signal(val streamId: String, val from: Int, val cmd: String, val args: Map<String, Any?>) {
         /** An offer or answer it carries. */

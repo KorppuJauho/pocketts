@@ -108,6 +108,7 @@
     <string name="stream_sound_off">关闭声音</string>
     <string name="stream_requesting">正在请求访问…</string>
     <string name="stream_connecting">正在连接…</string>
+    <string name="stream_paused">已暂停</string>
     <string name="stream_waiting_picture">已连接，正在等待画面…</string>
     <string name="stream_trying">连接出现问题，仍在尝试…</string>
     <string name="stream_connection_lost">连接已断开。</string>
@@ -145,6 +146,7 @@
     <string name="share_sound_quiet">直播声音已静音</string>
     <string name="share_sound_live">直播声音已开启</string>
     <string name="share_starting">正在开始…</string>
+    <string name="share_paused_call">通话期间已暂停</string>
     <string name="share_watching">观看人数</string>
     <string name="share_swap_cameras">互换摄像头</string>
     <string name="share_switch_camera">切换摄像头</string>
@@ -179,7 +181,7 @@
     <string name="general_headset_ptt">耳机按钮用于按键说话</string>
     <string name="general_headset_ptt_desc">在按键说话模式下，按一下耳机上的按钮开始说话，再按一下停止。屏幕关闭时也有效。开启后，该按钮不会播放或暂停音乐。</string>
     <string name="general_call_mute">通话时静音</string>
-    <string name="general_call_mute_desc">来电响铃或通话开始时，麦克风和声音会关闭（包括你正在观看的直播的声音），通话结束后恢复。你自己静音的仍保持静音。</string>
+    <string name="general_call_mute_desc">来电响铃或通话开始时，麦克风和声音会关闭（包括你正在观看的直播的声音），通话结束后恢复。屏幕共享会暂停，观众看不到来电。你自己静音的仍保持静音。</string>
     <string name="general_updates">检查更新</string>
     <string name="general_updates_desc">PocketTS 每天会向 GitHub 询问一次是否有新版本，并在连接界面上提示。不会发送任何关于你的信息。</string>
     <string name="general_screen_on">保持屏幕常亮</string>

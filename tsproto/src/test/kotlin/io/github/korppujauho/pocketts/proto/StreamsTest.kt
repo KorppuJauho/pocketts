@@ -24,6 +24,26 @@ class StreamsTest {
     }
 
     @Test
+    fun pausedOffers() {
+        // As the TeamSpeak app sends them: pausing marks every line inactive, going on marks them sendonly again
+        fun offer(video: String?, audio: String?) = listOfNotNull(
+            "v=0", "o=- 1 3 IN IP4 127.0.0.1", "s=-", "t=0 0",
+            "m=video 9 UDP/TLS/RTP/SAVPF 96", "a=mid:0", video, "a=rtpmap:96 H264/90000",
+            "m=audio 9 UDP/TLS/RTP/SAVPF 111", "a=mid:1", audio, "a=rtpmap:111 opus/48000/2", "",
+        ).joinToString("\r\n")
+        assertTrue(Streams.isPausedOffer(offer("a=inactive", "a=inactive")))
+        assertEquals(false, Streams.isPausedOffer(offer("a=sendonly", "a=sendonly")))
+        assertEquals(false, Streams.isPausedOffer(offer("a=inactive", "a=sendonly")))
+        assertEquals(false, Streams.isPausedOffer(offer(null, null))) // no direction: sendrecv
+        assertEquals(false, Streams.isPausedOffer("v=0\r\ns=-\r\n"))
+        // The cmd and the offer, as the TeamSpeak app sends a renegotiation
+        val cmd = Commands.parse(Streams.renegotiateOffer("abc", 5, "v=0", "rc"))
+        val sig = assertNotNull(Streams.readSignal(cmd))
+        assertEquals("offer", sig.cmd)
+        assertEquals("v=0", sig.sdp)
+    }
+
+    @Test
     fun noVideoOrientation() {
         val sdp = listOf(
             "v=0", "m=video 9 UDP/TLS/RTP/SAVPF 96", "a=extmap:3 urn:3gpp:video-orientation",

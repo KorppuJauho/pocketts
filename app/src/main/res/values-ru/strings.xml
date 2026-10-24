@@ -111,6 +111,7 @@
     <string name="stream_sound_off">Выключить звук</string>
     <string name="stream_requesting">Запрос доступа…</string>
     <string name="stream_connecting">Подключение…</string>
+    <string name="stream_paused">На паузе</string>
     <string name="stream_waiting_picture">Подключено, ждём изображение…</string>
     <string name="stream_trying">Проблема с соединением, пробуем снова…</string>
     <string name="stream_connection_lost">Соединение потеряно.</string>
@@ -148,6 +149,7 @@
     <string name="share_sound_quiet">Звук трансляции приглушён</string>
     <string name="share_sound_live">Звук трансляции включён</string>
     <string name="share_starting">запуск…</string>
+    <string name="share_paused_call">на паузе во время звонка</string>
     <string name="share_watching">Смотрят</string>
     <string name="share_swap_cameras">Поменять камеры местами</string>
     <string name="share_switch_camera">Сменить камеру</string>
@@ -182,7 +184,7 @@
     <string name="general_headset_ptt">Кнопка гарнитуры — «Нажми и говори»</string>
     <string name="general_headset_ptt_desc">В режиме «Нажми и говори» нажмите кнопку на наушниках, чтобы начать говорить, и нажмите снова, чтобы закончить. Работает и при выключенном экране. Пока это включено, кнопка не запускает и не ставит на паузу музыку.</string>
     <string name="general_call_mute">Отключать звук во время звонков</string>
-    <string name="general_call_mute_desc">Когда звонит телефон или начинается звонок, микрофон и звук отключаются (и звук трансляции, которую вы смотрите) и включаются снова после его окончания. То, что вы отключили сами, остаётся отключённым.</string>
+    <string name="general_call_mute_desc">Когда звонит телефон или начинается звонок, микрофон и звук отключаются (и звук трансляции, которую вы смотрите) и включаются снова после его окончания. Трансляция экрана ставится на паузу, чтобы зрители не видели звонок. То, что вы отключили сами, остаётся отключённым.</string>
     <string name="general_updates">Проверять обновления</string>
     <string name="general_updates_desc">Раз в день PocketTS спрашивает у GitHub, не вышла ли новая версия, и сообщает об этом на экране подключения. О вас ничего не отправляется.</string>
     <string name="general_screen_on">Не выключать экран</string>
