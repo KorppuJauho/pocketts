@@ -10,6 +10,14 @@
     <string name="close">Schließen</string>
     <string name="advanced">Erweitert</string>
     <string name="connect">Verbinden</string>
+    <string name="link_title">Mit %1$s verbinden?</string>
+    <string name="link_subtitle">Aus einem TeamSpeak-Link</string>
+    <string name="link_channel">Channel</string>
+    <string name="link_password">Serverpasswort</string>
+    <string name="link_password_given">im Link</string>
+    <string name="link_leaving">Du verlässt zuerst %1$s.</string>
+    <string name="link_use_key">Berechtigungsschlüssel aus dem Link verwenden</string>
+    <string name="link_use_key_desc">Er gibt dir Rechte auf diesem Server, etwa Admin-Rechte. Verwende ihn nur, wenn du dem Absender des Links vertraust.</string>
     <string name="disconnect">Trennen</string>
     <string name="nickname">Nickname</string>
     <string name="server_address">Serveradresse oder Nickname</string>

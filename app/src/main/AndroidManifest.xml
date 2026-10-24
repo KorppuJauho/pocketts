@@ -38,6 +38,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- TeamSpeak links from web pages and other apps (asked about before connecting) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="ts3server" />
+                <data android:scheme="teamspeak" />
+            </intent-filter>
         </activity>
 
         <!-- Photos taken for the chat or a profile picture are written here first -->

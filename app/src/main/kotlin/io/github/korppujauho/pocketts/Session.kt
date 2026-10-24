@@ -252,7 +252,11 @@ object Session : TsClient.Listener {
         }
 
     /** What the last connect asked for, to get a lost connection back. */
-    private data class Target(val address: String, val nickname: String, val password: String, val filePort: Int? = null)
+    private data class Target(
+        val address: String, val nickname: String, val password: String, val filePort: Int? = null,
+        // From a TeamSpeak link: the channel to join first, and a privilege key the person agreed to use (once)
+        val channel: String = "", val channelPassword: String = "", val privilegeKey: String = "",
+    )
     private var target: Target? = null
     private var retries = 0
     private var oldWaits = 0 // tries refused because the server still had our old connection
@@ -261,13 +265,16 @@ object Session : TsClient.Listener {
     private var retryTask: java.util.concurrent.ScheduledFuture<*>? = null
     private var network: android.net.ConnectivityManager.NetworkCallback? = null
 
-    fun connect(context: Context, address: String, nickname: String, serverPassword: String, filePort: Int? = null) {
+    fun connect(
+        context: Context, address: String, nickname: String, serverPassword: String, filePort: Int? = null,
+        channel: String = "", channelPassword: String = "", privilegeKey: String = "",
+    ) {
         app = context.applicationContext
         if (_state.value.phase != Phase.IDLE) return
         retries = 0
         oldWaits = 0
         wasConnected = false
-        target = Target(address, nickname, serverPassword, filePort)
+        target = Target(address, nickname, serverPassword, filePort, channel, channelPassword, privilegeKey)
         start(keepChat = false)
     }
 
@@ -293,7 +300,8 @@ object Session : TsClient.Listener {
 
     /** Connects to [target]; a reconnect keeps the chat and the pokes. */
     private fun start(keepChat: Boolean) {
-        val (address, nickname, serverPassword, filePort) = target ?: return
+        val t = this.target ?: return
+        val (address, nickname, serverPassword, filePort) = t
         val typed = ServerAddress.parse(address) ?: run {
             _state.update { it.copy(error = app.getString(R.string.not_an_address)) }
             return
@@ -331,6 +339,7 @@ object Session : TsClient.Listener {
                     TsClient.Options(
                         host = target.host, port = target.port, identity = identity,
                         nickname = nickname.ifBlank { "PocketTS user" }, serverPassword = serverPassword,
+                        defaultChannel = t.channel, defaultChannelPassword = t.channelPassword,
                     )
                 )
             }
@@ -772,6 +781,12 @@ object Session : TsClient.Listener {
         if (s.away) client?.sendCommand(Commands.build("clientupdate", "client_away" to true, "client_away_message" to s.awayMessage))
         if (s.inputMuted || s.outputMuted) {
             client?.sendCommand(Commands.build("clientupdate", "client_input_muted" to s.inputMuted, "client_output_muted" to s.outputMuted))
+        }
+        // A link's privilege key the person agreed to use: once (a key works only once anyway); a refusal shows as an error
+        target?.takeIf { it.privilegeKey.isNotEmpty() }?.let { t ->
+            target = t.copy(privilegeKey = "")
+            AppLog.log("Using the link's privilege key")
+            client?.sendCommand(Commands.build("privilegekeyuse", "token" to t.privilegeKey, "return_code" to "token"))
         }
         // The groups (for their icons) and the rest of the server's info; refused ones just stay out
         for ((i, cmd) in listOf("servergrouplist", "channelgrouplist", "servergetvariables").withIndex()) {

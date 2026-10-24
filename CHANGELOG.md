@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **TeamSpeak links:** `ts3server://` and `teamspeak://` links from web pages and other apps open PocketTS, which
+  asks before connecting (leaving the server you're on first). A link's port, server password and channel are used.
+  A privilege key in a link is used only when you tick it, since it gives rights on that server. Based on Stefan3Dx's
+  work (see [CREDITS.md](CREDITS.md)).
 - **Notification buttons:** the connection's notification has Mute / Unmute (the microphone), Sound off / on and
   Disconnect, so you can use them without opening the app. They follow what's on and off. Based on Stefan3Dx's work
   (see [CREDITS.md](CREDITS.md)).

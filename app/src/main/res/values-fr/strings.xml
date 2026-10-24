@@ -10,6 +10,14 @@
     <string name="close">Fermer</string>
     <string name="advanced">Avancé</string>
     <string name="connect">Se connecter</string>
+    <string name="link_title">Se connecter à %1$s ?</string>
+    <string name="link_subtitle">Depuis un lien TeamSpeak</string>
+    <string name="link_channel">Canal</string>
+    <string name="link_password">Mot de passe du serveur</string>
+    <string name="link_password_given">dans le lien</string>
+    <string name="link_leaving">Vous quitterez d’abord %1$s.</string>
+    <string name="link_use_key">Utiliser la clé de privilège du lien</string>
+    <string name="link_use_key_desc">Elle vous donne des droits sur ce serveur, comme ceux d’administrateur. Ne l’utilisez que si vous faites confiance à l’expéditeur du lien.</string>
     <string name="disconnect">Déconnecter</string>
     <string name="nickname">Pseudo</string>
     <string name="server_address">Adresse ou pseudo du serveur</string>

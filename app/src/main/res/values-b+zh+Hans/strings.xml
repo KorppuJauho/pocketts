@@ -10,6 +10,14 @@
     <string name="close">关闭</string>
     <string name="advanced">高级</string>
     <string name="connect">连接</string>
+    <string name="link_title">连接到 %1$s？</string>
+    <string name="link_subtitle">来自 TeamSpeak 链接</string>
+    <string name="link_channel">频道</string>
+    <string name="link_password">服务器密码</string>
+    <string name="link_password_given">在链接中</string>
+    <string name="link_leaving">你将先离开 %1$s。</string>
+    <string name="link_use_key">使用链接中的权限密钥</string>
+    <string name="link_use_key_desc">它会给你这个服务器上的权限，例如管理员权限。只有在你信任链接发送者时才使用。</string>
     <string name="disconnect">断开连接</string>
     <string name="nickname">昵称</string>
     <string name="server_address">服务器地址或昵称</string>
