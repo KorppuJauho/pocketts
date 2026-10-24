@@ -144,6 +144,11 @@ class ServerTest {
             val ref = Pictures.channelPictures(line["msg"]!!).first.single()
             assertContentEquals(picture, b.files.download(ref.cid, ref.path, Pictures.PICTURE_MAX_BYTES))
             println("Picture sent and received through the channel's files")
+            // The file browser: the picture folder at the top of the channel's files, the picture in it with its size
+            assertTrue(b.files.list(home, "/").any { it.folder && it.name == Pictures.PICTURE_FOLDER.trimStart('/') })
+            val listed = b.files.list(home, Pictures.PICTURE_FOLDER).single { it.name == pictureName }
+            assertEquals(picture.size.toLong(), listed.size)
+            assertTrue(!listed.folder && listed.time > 0)
         } catch (e: FileTransfer.Error) {
             println("Pictures not allowed here (${e.code}: ${e.message})")
         }

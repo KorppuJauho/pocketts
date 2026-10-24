@@ -79,6 +79,13 @@ interface ServerActions {
     fun deleteChannel(channel: ServerModel.Channel) {}
     /** A channel's description, which the server sends only when asked. */
     fun channelDescription(channel: ServerModel.Channel) {}
+    /** A folder of a channel's files ("/" for the top); [done] gets them, or why not (on another thread). */
+    fun listFiles(channel: ServerModel.Channel, path: String, done: (Result<List<io.github.korppujauho.pocketts.proto.FileTransfer.Entry>>) -> Unit) {}
+    /** A file from a channel's files saved where the person chose ([target]). */
+    fun downloadFile(channel: ServerModel.Channel, path: String, target: android.net.Uri) {}
+    fun cancelDownload() {}
+    /** The last download's result was seen. */
+    fun downloadResultSeen() {}
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
@@ -145,6 +152,7 @@ fun ServerScreen(
     var editing by rememberSaveable { mutableStateOf(startEditing) }
     var held by remember { mutableStateOf<ServerModel.Channel?>(null) }
     var channelDialog by remember { mutableStateOf<ChannelEditing?>(null) }
+    var filesChannel by remember { mutableStateOf<Int?>(null) } // the channel whose files are open
     var deleteTarget by remember { mutableStateOf<ServerModel.Channel?>(null) }
     val editMode = editing && state.voice.adminTools && state.phase == Session.Phase.CONNECTED && view == View.CHANNELS
     androidx.activity.compose.BackHandler(editMode) { editing = false }
@@ -447,6 +455,18 @@ fun ServerScreen(
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })
     }
     if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
+    filesChannel?.let { id ->
+        // Gone (deleted, or the connection ended): closed
+        val ch = state.channel(id)?.takeIf { state.phase == Session.Phase.CONNECTED } ?: return@let
+        FileBrowser(
+            ch, state.download, state.downloadResult,
+            list = { path, done -> actions.listFiles(ch, path, done) },
+            onDownload = { path, target -> actions.downloadFile(ch, path, target) },
+            onCancelDownload = actions::cancelDownload,
+            onResultSeen = actions::downloadResultSeen,
+            onDismiss = { filesChannel = null },
+        )
+    }
     channelDialog?.let { d ->
         val ch = d.id?.let { state.channel(it) }
         if (d.id == null || ch != null) androidx.compose.runtime.key(d) {

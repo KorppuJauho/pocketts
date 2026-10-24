@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
+  choose on the phone, with progress and Cancel. A password channel's files need its remembered password. The
+  server decides what you may see.
+
 ## 1.3.0 (2026-10-23)
 
 - **In seven languages:** English, Finnish, German, Spanish, French, Simplified Chinese and Russian. PocketTS follows

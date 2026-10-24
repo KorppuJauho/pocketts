@@ -27,6 +27,10 @@ class FileTransfer(
 
     companion object {
         const val FILE_EXISTS = 2050
+        const val FILE_NOT_FOUND = 2051
+        const val WRONG_PASSWORD = 781
+        const val NO_PERMISSION = 2568
+        private const val EMPTY = 1281 // "database empty result set": an empty folder
         private const val ANSWER_MS = 15_000L
         private const val TRANSFER_MS = 120_000
     }
@@ -76,6 +80,46 @@ class FileTransfer(
         return (cmd["id"]?.toIntOrNull() ?: 0) to cmd["msg"].orEmpty()
     }
 
+    /** A file or folder in a channel's files; [time] in milliseconds (0 when the server gave none). */
+    data class Entry(val name: String, val folder: Boolean, val size: Long, val time: Long)
+
+    /**
+     * What's in a folder of channel [cid]'s files ([path] "/" for the top). An empty folder is an empty list (the server
+     * says "empty result set"); a missing one, a wrong password or no permission is an [Error] with the server's code.
+     * [cpw] is the channel's password hashed, as when joining.
+     */
+    fun list(cid: Int, path: String, cpw: String = ""): List<Entry> {
+        val rc = "ft-${nextId()}"
+        val found = ArrayList<Entry>()
+        var ours = false // the list's lines come in batches; the first says which folder it is
+        await(Commands.build("ftgetfilelist", "cid" to cid, "cpw" to cpw, "path" to path, "return_code" to rc)) { c ->
+            when (c.name) {
+                "notifyfilelist" -> {
+                    val first = c.groups.firstOrNull()
+                    if (first?.get("cid") != null) ours = first["cid"] == "$cid" && first["path"] == path
+                    if (ours) for (g in c.groups) entry(g)?.let { found.add(it) }
+                    null
+                }
+                "notifyfilelistfinished" -> if (c["cid"] == "$cid" && c["path"] == path) true else null
+                else -> answer(c, rc)?.let { (id, msg) ->
+                    when (id) {
+                        0 -> null // the list itself ends with notifyfilelistfinished
+                        EMPTY -> true
+                        else -> throw Error(msg.ifEmpty { "refused" }, id)
+                    }
+                }
+            }
+        }
+        return found
+    }
+
+    private fun entry(g: Map<String, String>): Entry? {
+        val name = g["name"]?.takeIf { it.isNotEmpty() } ?: return null
+        // TeamSpeak 6 gives milliseconds, TeamSpeak 3 seconds
+        val time = g["datetime"]?.toLongOrNull()?.let { if (it > 100_000_000_000L) it else it * 1000 } ?: 0
+        return Entry(name, folder = g["type"] == "0", size = g["size"]?.toLongOrNull() ?: 0, time = time)
+    }
+
     /** A folder in a channel's files ("/PocketTS"); one that already exists is fine. */
     fun createDirectory(cid: Int, dirname: String, cpw: String = "") {
         val rc = "ft-${nextId()}"
@@ -115,25 +159,51 @@ class FileTransfer(
 
     /** Downloads [name] (a full path) from channel [cid]'s files; refused before reading when over [maxBytes]. */
     fun download(cid: Int, name: String, maxBytes: Long, cpw: String = ""): ByteArray {
+        val out = ByteArrayOutputStream()
+        download(cid, name, out, cpw, maxBytes)
+        return out.toByteArray()
+    }
+
+    class Cancelled : Exception("Cancelled")
+
+    /**
+     * Downloads [name] (a full path) from channel [cid]'s files into [out] as it comes, telling [progress] the bytes so
+     * far and the size. Refused before reading when over [maxBytes]; [cancelled] stops it ([Cancelled]) between pieces.
+     * Returns the size.
+     */
+    fun download(
+        cid: Int, name: String, out: java.io.OutputStream, cpw: String = "", maxBytes: Long = Long.MAX_VALUE,
+        progress: (done: Long, size: Long) -> Unit = { _, _ -> }, cancelled: () -> Boolean = { false },
+    ): Long {
         slots.acquire()
         try {
             val s = start("ftinitdownload", listOf("name" to name, "cid" to cid, "cpw" to cpw, "seekpos" to 0), "notifystartdownload")
-            if (s.size > maxBytes) {
+            fun stop() {
                 if (s.serverftfid.isNotEmpty()) client.sendCommand(Commands.build("ftstop", "serverftfid" to s.serverftfid, "delete" to 0))
+            }
+            if (s.size > maxBytes) {
+                stop()
                 throw Error("The file is too big")
             }
-            if (s.size == 0L) return ByteArray(0)
+            if (s.size == 0L) return 0
             socket(s.port).use { sock ->
                 sock.getOutputStream().apply { write(s.key.toByteArray(Charsets.US_ASCII)); flush() }
                 val input = sock.getInputStream()
-                val out = ByteArrayOutputStream(s.size.toInt())
-                val buf = ByteArray(16384)
-                while (out.size() < s.size) {
-                    val n = input.read(buf, 0, minOf(buf.size.toLong(), s.size - out.size()).toInt())
+                val buf = ByteArray(65536)
+                var done = 0L
+                progress(0, s.size)
+                while (done < s.size) {
+                    if (cancelled()) {
+                        stop()
+                        throw Cancelled()
+                    }
+                    val n = input.read(buf, 0, minOf(buf.size.toLong(), s.size - done).toInt())
                     if (n < 0) throw Error("The download connection closed early")
                     out.write(buf, 0, n)
+                    done += n
+                    progress(done, s.size)
                 }
-                return out.toByteArray()
+                return s.size
             }
         } finally {
             slots.release()
