@@ -54,8 +54,27 @@ class ServerAddressTest {
         val r = ServerAddress.resolve(Typed("MyClan", null), noDns, { asked.add(it); "203.0.113.7:10075" })
         assertEquals(ServerAddress.Resolved("203.0.113.7", 10075, "nickname"), r)
         assertEquals(listOf("MyClan"), asked) // as typed
-        // A nickname pointing at a name without a port: the default port
-        assertEquals(ServerAddress.Resolved("voice.example.com", 9987, "nickname"), ServerAddress.resolve(Typed("myclan", null), noDns, { "voice.example.com" }))
+    }
+
+    @Test
+    fun nicknameToANameGoesOnThroughDns() {
+        // The nickname names a host without a port; that host's DNS entry says where the server really is
+        val dns = ServerAddress.SrvLookup { name ->
+            if (name == "_ts3._udp.ts.example.com") listOf(Srv(0, 0, 9987, "vpn.example.com.")) else emptyList()
+        }
+        assertEquals(
+            ServerAddress.Resolved("vpn.example.com", 9987, "nickname, then DNS entry"),
+            ServerAddress.resolve(Typed("myclan", null), dns, { "ts.example.com" }),
+        )
+        // No DNS entry: the name itself on the default port
+        assertEquals(
+            ServerAddress.Resolved("voice.example.com", 9987, "nickname, then name"),
+            ServerAddress.resolve(Typed("myclan", null), { emptyList() }, { "voice.example.com" }),
+        )
+        // A nickname pointing at another dotless name isn't looked up again
+        val asked = mutableListOf<String>()
+        ServerAddress.resolve(Typed("myclan", null), { emptyList() }, { asked.add(it); "otherclan" })
+        assertEquals(listOf("myclan"), asked)
     }
 
     @Test

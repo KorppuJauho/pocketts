@@ -105,7 +105,12 @@ object ServerAddress {
                 // As typed: the service doesn't mind the case, but the nickname is the owner's to spell
                 val answer = nicknames.lookup(typed.host.trimEnd('.'))
                 val found = answer?.let { parse(it) }?.takeIf { isIpLiteral(it.host) || HOSTNAME.matches(it.host) }
-                if (found != null) return Resolved(found.host, found.port ?: DEFAULT_PORT, "nickname")
+                if (found != null) {
+                    // A name without a port goes through the usual steps (its DNS entry may name another host and port)
+                    if (found.port != null || isIpLiteral(found.host)) return Resolved(found.host, found.port ?: DEFAULT_PORT, "nickname")
+                    val r = resolve(found, dns, null, log)
+                    return r.copy(how = "nickname, then ${r.how}")
+                }
                 if (answer != null) log("Nickname $name: an answer that isn't an address")
             } catch (e: Exception) {
                 log("Nickname lookup for $name failed: ${e.message}")
