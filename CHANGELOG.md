@@ -1,35 +1,30 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 (2026-10-24)
 
-- **TeamSpeak links:** `ts3server://` and `teamspeak://` links from web pages and other apps open PocketTS, which
-  asks before connecting (leaving the server you're on first). A link's port, server password and channel are used.
-  A privilege key in a link is used only when you tick it, since it gives rights on that server. Based on Stefan3Dx's
-  work (see [CREDITS.md](CREDITS.md)).
-- **Notification buttons:** the connection's notification has Mute / Unmute (the microphone), Sound off / on and
-  Disconnect, so you can use them without opening the app. They follow what's on and off. Based on Stefan3Dx's work
-  (see [CREDITS.md](CREDITS.md)).
-- **Stream pause:** a stream you share (screen or camera) pauses during a phone call, the way TeamSpeak's own pause
-  works, so viewers see it paused instead of the call (and who is calling) or the phone at your ear; it goes on when
-  the call ends. Watching a stream its streamer
-  paused now says "Paused" instead of "Connecting…". Based on Stefan3Dx's idea (see [CREDITS.md](CREDITS.md)).
-- **Muted during phone calls:** when a phone call rings or starts, the microphone and sound go off (and the sound of
-  a stream you watch), and come back on when it ends (what you muted yourself stays muted). It needs no permission.
-  Settings › General can turn it off.
-  Based on Stefan3Dx's work (see [CREDITS.md](CREDITS.md)).
-- **Server nicknames:** a server's TeamSpeak nickname (such as `myclan`, without a dot) works as its address, looked
-  up from TeamSpeak's nickname service as the TeamSpeak apps do. A name it doesn't know is tried as a normal address.
-- **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
-  choose on the phone, with progress and Cancel. A password channel's files need its remembered password. The
-  server decides what you may see.
-- **Managing a channel's files:** Upload sends any file from the phone into the open folder (with progress and
-  Cancel), New folder makes one, and holding a file or folder gives Download, Rename and Delete. Deleting always
-  asks first (a folder goes with everything in it), and a name already there is only replaced when you say so. The
-  server decides what you may change; when it refuses, the browser says so.
 - **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and
   quality, talk power needed, password, and its description, with a Join button. With Settings › UI › Show admin
   functions on, it also has Edit (the channel's settings) and Arrange (the edit mode that holding a channel
   opened before).
+- **A channel's files:** browse a channel's files (folders first, with sizes and dates) and save any file where you
+  choose on the phone, with progress and Cancel. Upload sends any file from the phone into the open folder, New
+  folder makes one, and holding a file or folder gives Download, Rename and Delete. Deleting always asks first (a
+  folder goes with everything in it), and a name already there is only replaced when you say so. The server decides
+  what you may see and change; a password channel's files need its remembered password.
+- **Server nicknames:** a server's TeamSpeak nickname (such as `myclan`, without a dot) works as its address, looked
+  up from TeamSpeak's nickname service as the TeamSpeak apps do. A name it doesn't know is tried as a normal address.
+- **TeamSpeak links:** `ts3server://` and `teamspeak://` links from web pages and other apps open PocketTS, which
+  asks before connecting (leaving the server you're on first). A link's port, server password and channel are used.
+  A privilege key in a link is used only when you tick it, since it gives rights on that server.
+- **Muted during phone calls:** when a phone call rings or starts, the microphone and sound go off (and the sound of
+  a stream you watch), and come back on when it ends (what you muted yourself stays muted). A stream you share
+  (screen or camera) pauses, the way TeamSpeak's own pause works, so viewers don't see the call or the phone at your
+  ear. It needs no permission; Settings › General can turn it off.
+- **Paused streams:** watching a stream its streamer paused says "Paused" instead of "Connecting…".
+- **Notification buttons:** the connection's notification has Mute / Unmute (the microphone), Sound off / on and
+  Disconnect, so you can use them without opening the app.
+- **Credits:** [CREDITS.md](CREDITS.md) lists the people who have helped. The phone call muting, the share pause,
+  the notification buttons and the links are based on Stefan3Dx's work.
 
 ## 1.3.0 (2026-10-23)
 

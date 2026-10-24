@@ -11,7 +11,7 @@ PocketTS talks to the **TeamSpeak servers you connect to**, and sends them what 
 
 - your nickname and your TeamSpeak identity's public key, and the server and channel passwords you enter;
 - your voice, while you talk;
-- your chat messages, pokes and the pictures you send;
+- your chat messages, pokes and the pictures you send, and the files you upload to a channel's files;
 - your camera (with your microphone's sound, if you choose) and your screen (with what the phone plays, if you
   choose), while you share them.
 

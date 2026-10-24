@@ -71,10 +71,11 @@ developer's partners, and the user chooses them, so nothing counts as shared.
 | Personal info | User IDs | Required | The TeamSpeak identity (a public key) |
 | Messages | Other in-app messages | Optional | Chat messages and pokes |
 | Photos and videos | Photos | Optional | Pictures sent in the chat |
+| Files and docs | Files and docs | Optional | Files uploaded to a channel's files |
 | Photos and videos | Videos | Optional | Camera and screen streams |
 | Audio | Voice or sound recordings | Optional | Voice, and a stream's sound |
 
-Not collected: location, financial info, health, contacts, calendar, files, app activity, web browsing, app info and
+Not collected: location, financial info, health, contacts, calendar, app activity, web browsing, app info and
 performance (no crash reports), device or other IDs (no advertising ID).
 
 ## Advertising ID
