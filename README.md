@@ -47,6 +47,10 @@ Download the APK from [Releases](https://github.com/KorppuJauho/pocketts/release
 
 See [DEVELOPING.md](DEVELOPING.md).
 
+## Credits
+
+The people who have helped are in [CREDITS.md](CREDITS.md).
+
 ## License
 
 [GNU General Public License v3.0](LICENSE). You're welcome to fork PocketTS, change it and share your version, as
