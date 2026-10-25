@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **TeamSpeak invites:** invite links (`tmspk.gg/…`, made with "Create Invite" in the TeamSpeak app) open PocketTS,
+  which looks the invite up from TeamSpeak's invite service and asks before connecting, with the server's name and
+  the invited channel. An expired invite says so. Invites and `teamspeak://` links can also be pasted into the address
+  field.
+
 ## 1.4.0 (2026-10-24)
 
 - **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and

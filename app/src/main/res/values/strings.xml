@@ -17,6 +17,10 @@
     <string name="connect">Connect</string>
     <string name="link_title">Connect to %1$s?</string>
     <string name="link_subtitle">From a TeamSpeak link</string>
+    <string name="link_subtitle_invite">From a TeamSpeak invite</string>
+    <string name="link_address">Address</string>
+    <string name="invite_expired">This invite has expired or doesn\'t exist. Ask for a new one, or for the server\'s address.</string>
+    <string name="invite_failed">Couldn\'t look up the invite. Check the connection and try again.</string>
     <string name="link_channel">Channel</string>
     <string name="link_password">Server password</string>
     <string name="link_password_given">in the link</string>
