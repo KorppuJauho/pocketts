@@ -23,6 +23,10 @@ scripts/dev.sh gradle <task>                          # any other Gradle task
 
 The build image accepts the Android SDK license, which is why that variable has to be set.
 
+`scripts/dev.sh screenshots` also makes the Google Play pictures (`docs/screenshots/play/`) and GitHub's social
+preview (`docs/screenshots/social-preview.png`, the picture shown when the repository is shared or found in search).
+When the social preview changes, upload it again in the repository's Settings › General › Social preview.
+
 `dev.env` holds this computer's own settings (addresses, container names) and is never committed.
 
 ## Testing on a phone
