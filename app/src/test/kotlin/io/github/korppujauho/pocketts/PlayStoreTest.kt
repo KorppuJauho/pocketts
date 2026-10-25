@@ -2,12 +2,14 @@ package io.github.korppujauho.pocketts
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -41,7 +44,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * The pictures for the Google Play store page (scripts/dev.sh screenshots → docs/screenshots/play/): phone
- * screenshots in Play's 9:16 shape (1215 × 2160), the 512 × 512 icon and the 1024 × 500 feature graphic.
+ * screenshots in Play's 9:16 shape (1215 × 2160), the 512 × 512 icon and the 1024 × 500 feature graphic; and GitHub's
+ * 1280 × 640 social preview (docs/screenshots/social-preview.png).
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -122,6 +126,46 @@ class PlayStoreTest {
                     Text("PocketTS", color = Color.White, fontSize = 88.sp, fontWeight = FontWeight.Bold)
                     Text("Voice chat for TeamSpeak servers", color = Color(0xFFB8C4DA), fontSize = 34.sp)
                 }
+            }
+        }
+    }
+
+    // A phone screen: the real app at its 405 × 720 size, shrunk into a rounded frame
+    @Composable
+    private fun Phone(scale: Float, content: @Composable () -> Unit) {
+        Box(
+            Modifier.size((405 * scale).dp, (720 * scale).dp).clip(RoundedCornerShape(28.dp))
+                .border(3.dp, Color(0x33FFFFFF), RoundedCornerShape(28.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(Modifier.requiredSize(405.dp, 720.dp).scale(scale)) { PocketTsTheme { content() } }
+        }
+    }
+
+    // GitHub's social preview (repository Settings › General › Social preview): the name on the left, the channels
+    // and the chat on the right. In docs/screenshots/, not with Play's pictures.
+    @Test
+    @Config(qualifiers = "w1280dp-h640dp-mdpi")
+    fun socialPreview() = captureRoboImage("${roborazziSystemPropertyOutputDirectory()}/social-preview.png") {
+        Box(
+            Modifier.size(1280.dp, 640.dp).background(
+                Brush.linearGradient(listOf(Color(0xFF111318), Color(0xFF1B2A4A)), Offset.Zero, Offset(1280f, 640f)),
+            ),
+        ) {
+            Column(Modifier.padding(start = 96.dp).align(Alignment.CenterStart), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Box(Modifier.size(150.dp).clip(RoundedCornerShape(33.dp)).background(IconBackground), contentAlignment = Alignment.Center) {
+                    Image(painterResource(R.drawable.ic_launcher_foreground), null, Modifier.requiredSize(150.dp * 108 / 72))
+                }
+                Spacer(Modifier.size(6.dp))
+                Text("PocketTS", color = Color.White, fontSize = 92.sp, fontWeight = FontWeight.Bold)
+                Text("Voice chat for TeamSpeak servers", color = Color(0xFFB8C4DA), fontSize = 34.sp)
+                Text("Android · Free and open source", color = Color(0xFF7F8BA3), fontSize = 26.sp)
+            }
+            Box(Modifier.align(Alignment.CenterEnd).padding(end = 70.dp)) {
+                Box(Modifier.offset(x = (-230).dp, y = 40.dp)) {
+                    Phone(0.74f) { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+                }
+                Phone(0.80f) { ServerScreen(Example.state(), Example.noActions) }
             }
         }
     }
