@@ -327,6 +327,13 @@
 
     <!-- Server info -->
     <string name="info_title">Palvelimen tiedot</string>
+    <string name="key_button">Oikeusavain</string>
+    <string name="key_title">Käytä oikeusavainta</string>
+    <string name="key_subtitle">Palvelimen ylläpitäjältä</string>
+    <string name="key_field">Oikeusavain</string>
+    <string name="key_use">Käytä</string>
+    <string name="key_desc">Oikeusavain antaa sinulle oikeuksia tällä palvelimella, esimerkiksi palvelinryhmän. Kukin avain toimii kerran. Käytä vain luotettavalta saatuja avaimia.</string>
+    <string name="key_used">Oikeusavain käytetty: uudet oikeutesi ovat voimassa.</string>
     <string name="info_users">Käyttäjät</string>
     <string name="info_channels">Kanavat</string>
     <string name="info_uptime">Käynnissä</string>

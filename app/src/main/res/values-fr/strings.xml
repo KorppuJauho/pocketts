@@ -330,6 +330,13 @@
 
     <!-- Server info -->
     <string name="info_title">Infos du serveur</string>
+    <string name="key_button">Clé de privilège</string>
+    <string name="key_title">Utiliser une clé de privilège</string>
+    <string name="key_subtitle">De l’administrateur du serveur</string>
+    <string name="key_field">Clé de privilège</string>
+    <string name="key_use">Utiliser</string>
+    <string name="key_desc">Une clé de privilège vous donne des droits sur ce serveur, comme un groupe de serveur. Chaque clé ne fonctionne qu’une fois. N’utilisez que des clés venant de quelqu’un de confiance.</string>
+    <string name="key_used">Clé de privilège utilisée : vos nouveaux droits sont actifs.</string>
     <string name="info_users">Utilisateurs</string>
     <string name="info_channels">Canaux</string>
     <string name="info_uptime">En ligne depuis</string>

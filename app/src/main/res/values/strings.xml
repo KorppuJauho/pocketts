@@ -350,6 +350,13 @@
 
     <!-- Server info -->
     <string name="info_title">Server info</string>
+    <string name="key_button">Privilege key</string>
+    <string name="key_title">Use a privilege key</string>
+    <string name="key_subtitle">From the server\'s admin</string>
+    <string name="key_field">Privilege key</string>
+    <string name="key_use">Use</string>
+    <string name="key_desc">A privilege key gives you rights on this server, such as a server group. Each key works once. Only use keys from someone you trust.</string>
+    <string name="key_used">Privilege key used: your new rights are on.</string>
     <string name="info_users">Users</string>
     <string name="info_channels">Channels</string>
     <string name="info_uptime">Uptime</string>

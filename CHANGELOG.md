@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Privilege keys:** the server info window (tap the server's name) has a Privilege key button: paste a key from
+  the server's admin to get the rights it carries, such as a server group. A used key says so; a refused one shows the
+  server's answer.
+
 ## 1.4.0 (2026-10-24)
 
 - **Channel info:** holding a channel shows its topic, how many are in it (and the limit), its type, voice codec and

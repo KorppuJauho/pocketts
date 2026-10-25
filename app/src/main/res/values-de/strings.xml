@@ -327,6 +327,13 @@
 
     <!-- Server info -->
     <string name="info_title">Server-Info</string>
+    <string name="key_button">Berechtigungsschlüssel</string>
+    <string name="key_title">Berechtigungsschlüssel verwenden</string>
+    <string name="key_subtitle">Vom Admin des Servers</string>
+    <string name="key_field">Berechtigungsschlüssel</string>
+    <string name="key_use">Verwenden</string>
+    <string name="key_desc">Ein Berechtigungsschlüssel gibt dir Rechte auf diesem Server, etwa eine Servergruppe. Jeder Schlüssel funktioniert einmal. Verwende nur Schlüssel von jemandem, dem du vertraust.</string>
+    <string name="key_used">Berechtigungsschlüssel verwendet: deine neuen Rechte gelten.</string>
     <string name="info_users">Benutzer</string>
     <string name="info_channels">Channels</string>
     <string name="info_uptime">Laufzeit</string>

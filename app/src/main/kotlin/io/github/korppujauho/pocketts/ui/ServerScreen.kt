@@ -79,6 +79,8 @@ interface ServerActions {
     fun deleteChannel(channel: ServerModel.Channel) {}
     /** A channel's description, which the server sends only when asked. */
     fun channelDescription(channel: ServerModel.Channel) {}
+    /** A privilege key the server's admin gave (its answer comes as a message). */
+    fun usePrivilegeKey(key: String) {}
     /** A folder of a channel's files ("/" for the top); [done] gets them, or why not (on another thread). */
     fun listFiles(channel: ServerModel.Channel, path: String, done: (Result<List<io.github.korppujauho.pocketts.proto.FileTransfer.Entry>>) -> Unit) {}
     /** A file from a channel's files saved where the person chose ([target]). */
@@ -154,6 +156,7 @@ fun ServerScreen(
     var kickTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var banTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
+    var keyDialog by remember { mutableStateOf(false) }
     // Editing the channels (Settings › UI › Show admin functions, then holding a channel)
     var editing by rememberSaveable { mutableStateOf(startEditing) }
     var held by remember { mutableStateOf<ServerModel.Channel?>(null) }
@@ -461,7 +464,8 @@ fun ServerScreen(
     pokeTarget?.let { p ->
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })
     }
-    if (serverInfo) ServerInfoDialog(state) { serverInfo = false }
+    if (serverInfo) ServerInfoDialog(state, onDismiss = { serverInfo = false }, onPrivilegeKey = { serverInfo = false; keyDialog = true })
+    if (keyDialog) PrivilegeKeyDialog(onUse = { keyDialog = false; actions.usePrivilegeKey(it) }, onDismiss = { keyDialog = false })
     filesChannel?.let { id ->
         // Gone (deleted, or the connection ended): closed
         val ch = state.channel(id)?.takeIf { state.phase == Session.Phase.CONNECTED } ?: return@let
