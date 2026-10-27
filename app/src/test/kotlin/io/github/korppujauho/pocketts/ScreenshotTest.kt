@@ -198,6 +198,12 @@ class ScreenshotTest {
         io.github.korppujauho.pocketts.ui.LinkDialog(link, "Jamie", leaving = null, onConnect = {}, onDismiss = {})
     }
 
+    /** Using a privilege key from the server's admin (from the server info window). */
+    @Test
+    fun privilegeKey() = popup("popup-privilege-key") {
+        io.github.korppujauho.pocketts.ui.PrivilegeKeyDialog(onUse = {}, onDismiss = {})
+    }
+
     /** Holding a channel: its info, with the admin buttons (the admin functions on). */
     @Test
     fun channelInfo() = popup("popup-channel-info") {

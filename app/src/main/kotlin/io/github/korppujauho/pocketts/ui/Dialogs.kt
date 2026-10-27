@@ -2,6 +2,7 @@ package io.github.korppujauho.pocketts.ui
 
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Dns
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.automirrored.rounded.VolumeDown
@@ -204,13 +205,16 @@ fun PokeCards(pokes: List<Chat.Poke>, onDismiss: (Long) -> Unit, modifier: Modif
 
 /** The server's info, like the desktop app: welcome message, users, channels, age, website, version. */
 @Composable
-fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit) {
+fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeKey: () -> Unit = {}) {
     val v = state.server
     val uri = LocalUriHandler.current
     TsDialog(
         onDismiss = onDismiss, title = state.serverName.ifEmpty { stringResource(R.string.info_title) }, icon = androidx.compose.material.icons.Icons.Rounded.Dns,
         subtitle = state.address,
-        buttons = { PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss) },
+        buttons = {
+            PillButton(stringResource(R.string.key_button), onClick = onPrivilegeKey)
+            PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss)
+        },
     ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // The server's banner: a web address, or a picture in the server's own files (as channel banners)
@@ -429,5 +433,22 @@ private fun InfoLine(label: String, value: String) {
     Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(end = 12.dp))
         Text(value, color = Ts.text, fontSize = 14.sp, textAlign = TextAlign.End, modifier = Modifier.weight(1f), maxLines = 2)
+    }
+}
+
+/** Using a privilege key the server's admin gave: pasted in, used once. */
+@Composable
+fun PrivilegeKeyDialog(onUse: (String) -> Unit, onDismiss: () -> Unit) {
+    var key by remember { mutableStateOf("") }
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.key_title), icon = androidx.compose.material.icons.Icons.Rounded.Key,
+        subtitle = stringResource(R.string.key_subtitle),
+        buttons = {
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.key_use), PillKind.PRIMARY, enabled = key.isNotBlank()) { onUse(key.trim()) }
+        },
+    ) {
+        TsField(key, { key = it.take(200) }, stringResource(R.string.key_field), imeAction = androidx.compose.ui.text.input.ImeAction.Done)
+        Text(stringResource(R.string.key_desc), color = Ts.muted, fontSize = 13.sp)
     }
 }

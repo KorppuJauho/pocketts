@@ -334,6 +334,13 @@
 
     <!-- Server info -->
     <string name="info_title">Información del servidor</string>
+    <string name="key_button">Clave de privilegios</string>
+    <string name="key_title">Usar una clave de privilegios</string>
+    <string name="key_subtitle">Del administrador del servidor</string>
+    <string name="key_field">Clave de privilegios</string>
+    <string name="key_use">Usar</string>
+    <string name="key_desc">Una clave de privilegios te da permisos en este servidor, como un grupo de servidor. Cada clave funciona una vez. Usa solo claves de alguien en quien confíes.</string>
+    <string name="key_used">Clave de privilegios usada: tus nuevos permisos están activos.</string>
     <string name="info_users">Usuarios</string>
     <string name="info_channels">Canales</string>
     <string name="info_uptime">Tiempo activo</string>

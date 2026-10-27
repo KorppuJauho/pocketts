@@ -337,6 +337,13 @@
 
     <!-- Server info -->
     <string name="info_title">Информация о сервере</string>
+    <string name="key_button">Ключ привилегий</string>
+    <string name="key_title">Использовать ключ привилегий</string>
+    <string name="key_subtitle">От администратора сервера</string>
+    <string name="key_field">Ключ привилегий</string>
+    <string name="key_use">Использовать</string>
+    <string name="key_desc">Ключ привилегий даёт вам права на этом сервере, например группу сервера. Каждый ключ работает один раз. Используйте только ключи от тех, кому доверяете.</string>
+    <string name="key_used">Ключ привилегий использован: ваши новые права действуют.</string>
     <string name="info_users">Пользователи</string>
     <string name="info_channels">Каналы</string>
     <string name="info_uptime">Время работы</string>

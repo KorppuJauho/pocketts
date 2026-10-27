@@ -328,6 +328,13 @@
 
     <!-- Server info -->
     <string name="info_title">服务器信息</string>
+    <string name="key_button">权限密钥</string>
+    <string name="key_title">使用权限密钥</string>
+    <string name="key_subtitle">来自服务器管理员</string>
+    <string name="key_field">权限密钥</string>
+    <string name="key_use">使用</string>
+    <string name="key_desc">权限密钥会给你这个服务器上的权限，例如某个服务器组。每个密钥只能使用一次。只使用你信任的人给的密钥。</string>
+    <string name="key_used">已使用权限密钥：你的新权限已生效。</string>
     <string name="info_users">用户</string>
     <string name="info_channels">频道</string>
     <string name="info_uptime">运行时间</string>

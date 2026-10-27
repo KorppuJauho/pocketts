@@ -486,6 +486,17 @@ object Session : TsClient.Listener {
         }
     }
 
+    /**
+     * A privilege key from the server's admin: the rights it carries (a server or channel group) for our identity on
+     * this server. A key works once. How it went comes as a message.
+     */
+    fun usePrivilegeKey(key: String) {
+        val k = key.trim()
+        if (k.isEmpty()) return
+        AppLog.log("Using a privilege key")
+        client?.sendCommand(Commands.build("privilegekeyuse", "token" to k, "return_code" to "token"))
+    }
+
     /** A new nickname, now (also kept for next time by the caller). */
     fun setNickname(name: String) {
         client?.sendCommand(Commands.build("clientupdate", "client_nickname" to name))
@@ -1113,6 +1124,13 @@ object Session : TsClient.Listener {
                     joinAnswered(it, cmd)
                 }
                 cmd["return_code"]?.let { adminAsked.remove(it) }?.let { adminAnswered(it, cmd) }
+                // A privilege key worked (from the server info, or a link); a refused one shows the server's words below
+                if (cmd["return_code"] == "token" && cmd["id"] == "0") {
+                    AppLog.log("The privilege key was used")
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        android.widget.Toast.makeText(app, R.string.key_used, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                }
                 if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") || it.startsWith("admin-") } != true) {
                     AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
                     if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }

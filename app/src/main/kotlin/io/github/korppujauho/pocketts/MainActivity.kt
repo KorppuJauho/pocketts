@@ -392,6 +392,7 @@ private object SessionActions : ServerActions {
     override fun reorderChannel(channel: ServerModel.Channel, after: Int) = Session.reorderChannel(channel, after)
     override fun deleteChannel(channel: ServerModel.Channel) = Session.deleteChannel(channel)
     override fun channelDescription(channel: ServerModel.Channel) = Session.channelDescription(channel.id)
+    override fun usePrivilegeKey(key: String) = Session.usePrivilegeKey(key)
     override fun listFiles(channel: ServerModel.Channel, path: String, done: (Result<List<io.github.korppujauho.pocketts.proto.FileTransfer.Entry>>) -> Unit) =
         Session.listFiles(channel.id, path, done)
     override fun downloadFile(channel: ServerModel.Channel, path: String, target: android.net.Uri) {
