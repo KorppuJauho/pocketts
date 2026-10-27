@@ -88,7 +88,10 @@ fun TsIcon(id: Long, server: String, size: Dp = 16.dp) {
         return
     }
     val file = TsFile.icon(server, id) ?: return
-    AsyncImage(file, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size))
+    // One that can't be shown takes no room (no empty gap among a person's badges)
+    var failed by remember(id, server) { mutableStateOf(false) }
+    if (failed) return
+    AsyncImage(file, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size), onError = { failed = true })
 }
 
 /**

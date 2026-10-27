@@ -52,10 +52,14 @@ object Pictures {
     fun avatarFlag(data: ByteArray): String = MessageDigest.getInstance("MD5").digest(data).joinToString("") { "%02x".format(it) }
 
     enum class Type(val ext: String, val mime: String) {
-        JPG("jpg", "image/jpeg"), PNG("png", "image/png"), GIF("gif", "image/gif"), WEBP("webp", "image/webp"), SVG("svg", "image/svg+xml")
+        JPG("jpg", "image/jpeg"), PNG("png", "image/png"), GIF("gif", "image/gif"), WEBP("webp", "image/webp"), SVG("svg", "image/svg+xml"),
+        BMP("bmp", "image/bmp"), ICO("ico", "image/x-icon"),
     }
 
-    /** What the bytes really are (never the name): JPEG, PNG, GIF, WebP, or (for icons) SVG. */
+    /**
+     * What the bytes really are (never the name): JPEG, PNG, GIF, WebP, or (for icons and avatars, [svgAllowed]) also
+     * SVG, BMP and ICO, which older TeamSpeak servers' icons can be.
+     */
     fun type(b: ByteArray, svgAllowed: Boolean = false): Type? {
         fun at(i: Int, vararg bytes: Int) = b.size >= i + bytes.size && bytes.indices.all { (b[i + it].toInt() and 0xff) == bytes[it] }
         fun ascii(i: Int, s: String) = at(i, *s.map { it.code }.toIntArray())
@@ -64,6 +68,8 @@ object Pictures {
             at(0, 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a) -> Type.PNG
             ascii(0, "GIF87a") || ascii(0, "GIF89a") -> Type.GIF
             ascii(0, "RIFF") && ascii(8, "WEBP") -> Type.WEBP
+            svgAllowed && ascii(0, "BM") && b.size > 26 -> Type.BMP
+            svgAllowed && at(0, 0, 0, 1, 0) && b.size > 22 -> Type.ICO
             svgAllowed -> {
                 val head = String(b, 0, minOf(b.size, 4096), Charsets.UTF_8).trimStart('﻿').trimStart()
                 if (Regex("^(<\\?xml|<svg|<!--|<!DOCTYPE svg)", RegexOption.IGNORE_CASE).containsMatchIn(head) &&

@@ -100,6 +100,8 @@ object ServerFiles {
                 }
             }
             synchronized(missing) { missing[f.key] = System.currentTimeMillis() + 10 * 60_000 }
+            // Once per file every 10 minutes (it's then left alone): which file, and why
+            AppLog.log("Server file ${f.paths.first()} (channel ${f.cid}) couldn't be shown: ${last?.message ?: "not found"}")
             throw last ?: IllegalStateException("not found")
         }
     }

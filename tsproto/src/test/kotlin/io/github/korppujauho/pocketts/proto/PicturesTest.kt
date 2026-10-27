@@ -42,6 +42,13 @@ class PicturesTest {
     @Test
     fun types() {
         assertEquals(Pictures.Type.PNG, Pictures.type(byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0)))
+        // BMP and ICO only as the server's icons (older servers' icons can be them), never as chat pictures
+        val bmp = "BM".toByteArray() + ByteArray(40)
+        val ico = byteArrayOf(0, 0, 1, 0) + ByteArray(40)
+        assertEquals(Pictures.Type.BMP, Pictures.type(bmp, svgAllowed = true))
+        assertEquals(Pictures.Type.ICO, Pictures.type(ico, svgAllowed = true))
+        assertNull(Pictures.type(bmp))
+        assertNull(Pictures.type(ico))
         assertEquals(Pictures.Type.JPG, Pictures.type(byteArrayOf(0xff.toByte(), 0xd8.toByte(), 0xff.toByte(), 0)))
         assertEquals(Pictures.Type.GIF, Pictures.type("GIF89a....".toByteArray()))
         assertNull(Pictures.type("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>".toByteArray()))
