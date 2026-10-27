@@ -31,6 +31,23 @@ class JoinLinkTest {
     }
 
     @Test
+    fun tmspkLinks() {
+        // An invite: only its code, however it comes
+        val invite = JoinLink(address = "", invite = "Ab3dE9xY")
+        assertEquals(invite, JoinLink.parse("https://tmspk.gg/Ab3dE9xY"))
+        assertEquals(invite, JoinLink.parse("tmspk.gg/Ab3dE9xY/"))
+        assertEquals(invite, JoinLink.parse("teamspeak://invite=Ab3dE9xY"))
+        assertTrue(JoinLink.isLink("https://tmspk.gg/Ab3dE9xY"))
+        assertNull(JoinLink.parse("teamspeak://invite=no spaces"))
+        assertNull(JoinLink.parse("https://tmspk.gg/"))
+        // s= is an address, as teamspeak://
+        assertEquals("ts.example.com:9988", JoinLink.parse("https://tmspk.gg/s=ts.example.com?port=9988&nickname=Lee")?.address)
+        assertEquals("Lee", JoinLink.parse("https://tmspk.gg/s=ts.example.com?port=9988&nickname=Lee")?.nickname)
+        // Not TeamSpeak's
+        assertEquals(false, JoinLink.isLink("https://tmspk.gg.example.com/x"))
+    }
+
+    @Test
     fun notLinks() {
         assertNull(JoinLink.parse("https://ts.example.com"))
         assertNull(JoinLink.parse("ts3server://"))

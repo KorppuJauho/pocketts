@@ -400,15 +400,19 @@ fun LinkDialog(
 ) {
     var useKey by remember { mutableStateOf(false) }
     TsDialog(
-        onDismiss = onDismiss, title = stringResource(R.string.link_title, link.address),
-        icon = androidx.compose.material.icons.Icons.Rounded.Dns, subtitle = stringResource(R.string.link_subtitle),
+        // An invite names its server: the name in the title, and the address below
+        onDismiss = onDismiss, title = stringResource(R.string.link_title, link.serverName.ifEmpty { link.address }),
+        icon = androidx.compose.material.icons.Icons.Rounded.Dns,
+        subtitle = stringResource(if (link.serverName.isNotEmpty()) R.string.link_subtitle_invite else R.string.link_subtitle),
         buttons = {
             PillButton(stringResource(R.string.cancel), onClick = onDismiss)
             PillButton(stringResource(R.string.connect), PillKind.PRIMARY) { onConnect(useKey && link.token.isNotEmpty()) }
         },
     ) {
         PopCard {
-            if (link.channel.isNotEmpty()) InfoLine(stringResource(R.string.link_channel), link.channel.removePrefix("/").replace("/", " › "))
+            if (link.serverName.isNotEmpty()) InfoLine(stringResource(R.string.link_address), link.address)
+            val channel = link.channelName.ifEmpty { link.channel.removePrefix("/").replace("/", " › ") }
+            if (channel.isNotEmpty()) InfoLine(stringResource(R.string.link_channel), channel)
             InfoLine(stringResource(R.string.nickname), nickname)
             if (link.password.isNotEmpty()) InfoLine(stringResource(R.string.link_password), stringResource(R.string.link_password_given))
         }

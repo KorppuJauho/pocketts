@@ -12,6 +12,10 @@
     <string name="connect">Verbinden</string>
     <string name="link_title">Mit %1$s verbinden?</string>
     <string name="link_subtitle">Aus einem TeamSpeak-Link</string>
+    <string name="link_subtitle_invite">Aus einer TeamSpeak-Einladung</string>
+    <string name="link_address">Adresse</string>
+    <string name="invite_expired">Diese Einladung ist abgelaufen oder existiert nicht. Bitte um eine neue oder um die Adresse des Servers.</string>
+    <string name="invite_failed">Die Einladung konnte nicht abgerufen werden. Prüfe die Verbindung und versuche es erneut.</string>
     <string name="link_channel">Channel</string>
     <string name="link_password">Serverpasswort</string>
     <string name="link_password_given">im Link</string>

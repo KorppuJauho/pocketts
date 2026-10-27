@@ -12,6 +12,10 @@
     <string name="connect">连接</string>
     <string name="link_title">连接到 %1$s？</string>
     <string name="link_subtitle">来自 TeamSpeak 链接</string>
+    <string name="link_subtitle_invite">来自 TeamSpeak 邀请</string>
+    <string name="link_address">地址</string>
+    <string name="invite_expired">此邀请已过期或不存在。请索要新的邀请或服务器地址。</string>
+    <string name="invite_failed">无法查询该邀请。请检查网络连接后重试。</string>
     <string name="link_channel">频道</string>
     <string name="link_password">服务器密码</string>
     <string name="link_password_given">在链接中</string>
