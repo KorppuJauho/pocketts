@@ -12,6 +12,10 @@
     <string name="connect">Yhdistä</string>
     <string name="link_title">Yhdistetäänkö palvelimeen %1$s?</string>
     <string name="link_subtitle">TeamSpeak-linkistä</string>
+    <string name="link_subtitle_invite">TeamSpeak-kutsusta</string>
+    <string name="link_address">Osoite</string>
+    <string name="invite_expired">Kutsu on vanhentunut tai sitä ei ole. Pyydä uusi kutsu tai palvelimen osoite.</string>
+    <string name="invite_failed">Kutsua ei voitu tarkistaa. Tarkista yhteys ja yritä uudelleen.</string>
     <string name="link_channel">Kanava</string>
     <string name="link_password">Palvelimen salasana</string>
     <string name="link_password_given">linkissä</string>

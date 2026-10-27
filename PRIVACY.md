@@ -25,6 +25,8 @@ PocketTS also connects to:
 - **TeamSpeak's server nickname service (named.myteamspeak.com)**, only when what you type has no dot in it (a
   server nickname, such as `myclan`), to find the server it stands for. It gets that name and, like any website,
   your IP address. Normal addresses are never sent there.
+- **TeamSpeak's invite service (invites.teamspeak.com)**, only when you open or paste a TeamSpeak invite
+  (`tmspk.gg/…`), to find the server it invites to. It gets the invite's code and, like any website, your IP address.
 - **Websites that servers and people link to.** A server's banner, avatars from myTeamSpeak, and pictures in the
   chat are loaded from where they're kept. Those sites see your IP address.
 - **A relay (TURN) server for streams**, only if you set one in the settings.
@@ -68,4 +70,4 @@ Changes to this policy are made in this file, and its history shows every change
 project's [issues](https://github.com/KorppuJauho/pocketts/issues). For something private, use the private reporting
 described in [SECURITY.md](SECURITY.md).
 
-Last updated: 24 October 2026.
+Last updated: 25 October 2026.

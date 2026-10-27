@@ -12,6 +12,10 @@
     <string name="connect">Подключиться</string>
     <string name="link_title">Подключиться к %1$s?</string>
     <string name="link_subtitle">Из ссылки TeamSpeak</string>
+    <string name="link_subtitle_invite">Из приглашения TeamSpeak</string>
+    <string name="link_address">Адрес</string>
+    <string name="invite_expired">Это приглашение истекло или не существует. Попросите новое или адрес сервера.</string>
+    <string name="invite_failed">Не удалось проверить приглашение. Проверьте подключение и попробуйте снова.</string>
     <string name="link_channel">Канал</string>
     <string name="link_password">Пароль сервера</string>
     <string name="link_password_given">в ссылке</string>

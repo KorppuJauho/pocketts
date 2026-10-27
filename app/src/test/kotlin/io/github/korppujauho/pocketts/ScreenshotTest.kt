@@ -189,6 +189,15 @@ class ScreenshotTest {
         io.github.korppujauho.pocketts.ui.LinkDialog(link, "Jamie", leaving = "Friends", onConnect = {}, onDismiss = {})
     }
 
+    /** A TeamSpeak invite, looked up: the server's name, its address and the invited channel. */
+    @Test
+    fun invite() = popup("popup-invite") {
+        val link = io.github.korppujauho.pocketts.proto.JoinLink(
+            "voice.example.org:9987", serverName = "Friends", channel = "/5", channelName = "Games",
+        )
+        io.github.korppujauho.pocketts.ui.LinkDialog(link, "Jamie", leaving = null, onConnect = {}, onDismiss = {})
+    }
+
     /** Using a privilege key from the server's admin (from the server info window). */
     @Test
     fun privilegeKey() = popup("popup-privilege-key") {

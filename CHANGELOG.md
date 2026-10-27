@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **TeamSpeak invites:** invite links (`tmspk.gg/…`, made with "Create Invite" in the TeamSpeak app) open PocketTS,
+  which looks the invite up from TeamSpeak's invite service and asks before connecting, with the server's name and
+  the invited channel. An expired invite says so. Invites and `teamspeak://` links can also be pasted into the address
+  field.
 - **Privilege keys:** the server info window (tap the server's name) has a Privilege key button: paste a key from
   the server's admin to get the rights it carries, such as a server group. A used key says so; a refused one shows the
   server's answer.

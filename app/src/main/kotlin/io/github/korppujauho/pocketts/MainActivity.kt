@@ -189,11 +189,7 @@ class MainActivity : ComponentActivity() {
     private fun openLink(intent: Intent?): Boolean {
         val data = intent?.dataString ?: return false
         if (!JoinLink.isLink(data)) return false
-        // (not the link itself in the log: it can hold passwords and a privilege key)
-        val link = JoinLink.parse(data)
-        AppLog.log(if (link != null) "A TeamSpeak link was opened" else "A TeamSpeak link without a usable address was opened")
-        if (link == null) android.widget.Toast.makeText(this, R.string.not_an_address, android.widget.Toast.LENGTH_LONG).show()
-        else pendingLink.value = link
+        openLinkText(this, data)
         return true
     }
 
@@ -222,6 +218,47 @@ private val inPip = mutableStateOf(false)
 
 /** A TeamSpeak link waiting for the person's yes or no. */
 private val pendingLink = mutableStateOf<JoinLink?>(null)
+
+/**
+ * A TeamSpeak link (opened, or pasted into the address field): asked about before connecting. An invite's server is
+ * looked up from TeamSpeak's invite service first (in the background); one it doesn't know has expired.
+ */
+private fun openLinkText(context: Context, text: String) {
+    val app = context.applicationContext
+    fun say(text: Int) = android.widget.Toast.makeText(app, text, android.widget.Toast.LENGTH_LONG).show()
+    // (not the link itself in the log: it can hold passwords and a privilege key)
+    val link = JoinLink.parse(text)
+    if (link == null) {
+        AppLog.log("A TeamSpeak link without a usable address was opened")
+        say(R.string.not_an_address)
+        return
+    }
+    if (link.invite.isEmpty()) {
+        AppLog.log("A TeamSpeak link was opened")
+        pendingLink.value = link
+        return
+    }
+    AppLog.log("A TeamSpeak invite was opened: looking it up")
+    val main = android.os.Handler(android.os.Looper.getMainLooper())
+    kotlin.concurrent.thread(name = "invite", isDaemon = true) {
+        val found = try {
+            Result.success(io.github.korppujauho.pocketts.proto.Invites.resolve(link))
+        } catch (e: Exception) {
+            AppLog.log("Looking up the invite failed: ${e.message}")
+            Result.failure(e)
+        }
+        main.post {
+            found.onSuccess { resolved ->
+                if (resolved == null) {
+                    AppLog.log("The invite has expired or doesn't exist")
+                    say(R.string.invite_expired)
+                } else {
+                    pendingLink.value = resolved
+                }
+            }.onFailure { say(R.string.invite_failed) }
+        }
+    }
+}
 
 /** Whether this phone can use both cameras at once (asked once). */
 private val canBoth by lazy { MainActivity.current?.let { DualCamera.pair(it) != null } ?: false }
@@ -306,6 +343,13 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
         settings.nickname, settings.address, settings.serverPassword, favs, state.error,
         actions = object : ConnectActions {
             override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {
+                // A teamspeak:// or tmspk.gg link pasted in: as when it's opened (an invite is looked up, then asked
+                // about). A ts3server:// one connects as before.
+                if (JoinLink.isLink(address) && !address.trim().startsWith("ts3server://", ignoreCase = true)) {
+                    settings.nickname = nickname
+                    openLinkText(ctx, address)
+                    return
+                }
                 settings.serverPassword = if (remember) password else ""
                 if (favorite) saveFavorites(ctx, favs + Favorite(address, password = if (remember) password else ""))
                 connect(ctx, address, nickname, password)
