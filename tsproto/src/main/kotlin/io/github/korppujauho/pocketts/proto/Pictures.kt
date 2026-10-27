@@ -52,10 +52,14 @@ object Pictures {
     fun avatarFlag(data: ByteArray): String = MessageDigest.getInstance("MD5").digest(data).joinToString("") { "%02x".format(it) }
 
     enum class Type(val ext: String, val mime: String) {
-        JPG("jpg", "image/jpeg"), PNG("png", "image/png"), GIF("gif", "image/gif"), WEBP("webp", "image/webp"), SVG("svg", "image/svg+xml")
+        JPG("jpg", "image/jpeg"), PNG("png", "image/png"), GIF("gif", "image/gif"), WEBP("webp", "image/webp"), SVG("svg", "image/svg+xml"),
+        BMP("bmp", "image/bmp"), ICO("ico", "image/x-icon"),
     }
 
-    /** What the bytes really are (never the name): JPEG, PNG, GIF, WebP, or (for icons) SVG. */
+    /**
+     * What the bytes really are (never the name): JPEG, PNG, GIF, WebP, or (for icons and avatars, [svgAllowed]) also
+     * SVG, BMP and ICO, which older TeamSpeak servers' icons can be.
+     */
     fun type(b: ByteArray, svgAllowed: Boolean = false): Type? {
         fun at(i: Int, vararg bytes: Int) = b.size >= i + bytes.size && bytes.indices.all { (b[i + it].toInt() and 0xff) == bytes[it] }
         fun ascii(i: Int, s: String) = at(i, *s.map { it.code }.toIntArray())
@@ -64,6 +68,8 @@ object Pictures {
             at(0, 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a) -> Type.PNG
             ascii(0, "GIF87a") || ascii(0, "GIF89a") -> Type.GIF
             ascii(0, "RIFF") && ascii(8, "WEBP") -> Type.WEBP
+            svgAllowed && ascii(0, "BM") && b.size > 26 -> Type.BMP
+            svgAllowed && at(0, 0, 0, 1, 0) && b.size > 22 -> Type.ICO
             svgAllowed -> {
                 val head = String(b, 0, minOf(b.size, 4096), Charsets.UTF_8).trimStart('﻿').trimStart()
                 if (Regex("^(<\\?xml|<svg|<!--|<!DOCTYPE svg)", RegexOption.IGNORE_CASE).containsMatchIn(head) &&
@@ -71,6 +77,29 @@ object Pictures {
                 ) Type.SVG else null
             }
             else -> null
+        }
+    }
+
+    private val ORIGIN_TAG = Regex("<[A-Za-z][^<>]*transform-origin[^<>]*>")
+    private val ORIGIN = Regex("""transform-origin\s*:\s*(-?[\d.]+)(?:px)?\s+(-?[\d.]+)(?:px)?[^;"']*;?\s*""")
+    private val TRANSFORM = Regex("""\stransform\s*=\s*(["'])(.*?)\1""")
+
+    /**
+     * An SVG with its shapes' CSS transform-origin (as some editors write them) made into plain transforms, which the
+     * phone's SVG library understands: it leaves transform-origin out, and a shape turned about its own middle is then
+     * turned about the picture's corner instead, out of sight (a blank icon).
+     */
+    fun svgWithoutTransformOrigin(svg: String): String {
+        if (!svg.contains("transform-origin")) return svg
+        fun neg(n: String) = if (n.startsWith("-")) n.drop(1) else "-$n"
+        return ORIGIN_TAG.replace(svg) { tag ->
+            val t = tag.value
+            val origin = ORIGIN.find(t) ?: return@replace t
+            val transform = TRANSFORM.find(t) ?: return@replace t
+            val (x, y) = origin.destructured
+            val q = transform.groupValues[1]
+            t.replaceRange(transform.range, " transform=${q}translate($x $y) ${transform.groupValues[2]} translate(${neg(x)} ${neg(y)})$q")
+                .replace(ORIGIN, "")
         }
     }
 

@@ -42,10 +42,30 @@ class PicturesTest {
     @Test
     fun types() {
         assertEquals(Pictures.Type.PNG, Pictures.type(byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0)))
+        // BMP and ICO only as the server's icons (older servers' icons can be them), never as chat pictures
+        val bmp = "BM".toByteArray() + ByteArray(40)
+        val ico = byteArrayOf(0, 0, 1, 0) + ByteArray(40)
+        assertEquals(Pictures.Type.BMP, Pictures.type(bmp, svgAllowed = true))
+        assertEquals(Pictures.Type.ICO, Pictures.type(ico, svgAllowed = true))
+        assertNull(Pictures.type(bmp))
+        assertNull(Pictures.type(ico))
         assertEquals(Pictures.Type.JPG, Pictures.type(byteArrayOf(0xff.toByte(), 0xd8.toByte(), 0xff.toByte(), 0)))
         assertEquals(Pictures.Type.GIF, Pictures.type("GIF89a....".toByteArray()))
         assertNull(Pictures.type("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>".toByteArray()))
         assertEquals(Pictures.Type.SVG, Pictures.type("<?xml version=\"1.0\"?><svg viewBox=\"0 0 1 1\"></svg>".toByteArray(), svgAllowed = true))
+    }
+
+    @Test
+    fun svgTransformOrigins() {
+        // Turned about its own middle (CSS), made into turns the phone's SVG library draws the same
+        val svg = """<svg viewBox="0 0 64 64"><path d="M0 0" style="fill: red; transform-origin: 27.025px -45.5px 0px;" transform="matrix(-1, 0, 0, -1, 0, 0)"/><path d="M1 1"/></svg>"""
+        assertEquals(
+            """<svg viewBox="0 0 64 64"><path d="M0 0" style="fill: red; " transform="translate(27.025 -45.5) matrix(-1, 0, 0, -1, 0, 0) translate(-27.025 45.5)"/><path d="M1 1"/></svg>""",
+            Pictures.svgWithoutTransformOrigin(svg),
+        )
+        // Without a transform, or without transform-origin, it stays as it is
+        val plain = """<svg><path style="transform-origin: 5px 5px" d="M0 0"/><g transform="rotate(5)"/></svg>"""
+        assertEquals(plain, Pictures.svgWithoutTransformOrigin(plain))
     }
 
     @Test
