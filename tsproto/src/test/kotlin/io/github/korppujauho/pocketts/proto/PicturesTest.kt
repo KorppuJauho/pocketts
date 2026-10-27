@@ -56,6 +56,19 @@ class PicturesTest {
     }
 
     @Test
+    fun svgTransformOrigins() {
+        // Turned about its own middle (CSS), made into turns the phone's SVG library draws the same
+        val svg = """<svg viewBox="0 0 64 64"><path d="M0 0" style="fill: red; transform-origin: 27.025px -45.5px 0px;" transform="matrix(-1, 0, 0, -1, 0, 0)"/><path d="M1 1"/></svg>"""
+        assertEquals(
+            """<svg viewBox="0 0 64 64"><path d="M0 0" style="fill: red; " transform="translate(27.025 -45.5) matrix(-1, 0, 0, -1, 0, 0) translate(-27.025 45.5)"/><path d="M1 1"/></svg>""",
+            Pictures.svgWithoutTransformOrigin(svg),
+        )
+        // Without a transform, or without transform-origin, it stays as it is
+        val plain = """<svg><path style="transform-origin: 5px 5px" d="M0 0"/><g transform="rotate(5)"/></svg>"""
+        assertEquals(plain, Pictures.svgWithoutTransformOrigin(plain))
+    }
+
+    @Test
     fun badges() {
         val m = ServerModel()
         m.apply(Commands.parse("notifyservergrouplist sgid=6 name=Admin iconid=300 sortid=10|sgid=8 name=Guest iconid=0 sortid=20|sgid=9 name=VIP iconid=-1294967296 sortid=5"))

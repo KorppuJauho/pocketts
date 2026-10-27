@@ -22,6 +22,7 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.Buffer
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 
@@ -124,9 +125,16 @@ object ServerFiles {
                 val file = get(data)
                 file to file.inputStream().use { input -> ByteArray(4096).let { it.copyOf(maxOf(0, input.read(it))) } }
             }
+            val type = Pictures.type(head, svgAllowed = true)
+            val source = if (type == Pictures.Type.SVG) {
+                val svg = withContext(Dispatchers.IO) { file.readText() }
+                ImageSource(Buffer().writeUtf8(Pictures.svgWithoutTransformOrigin(svg)), FileSystem.SYSTEM)
+            } else {
+                ImageSource(file.toOkioPath(), FileSystem.SYSTEM)
+            }
             return SourceFetchResult(
-                source = ImageSource(file.toOkioPath(), FileSystem.SYSTEM),
-                mimeType = Pictures.type(head, svgAllowed = true)?.mime,
+                source = source,
+                mimeType = type?.mime,
                 dataSource = DataSource.DISK,
             )
         }

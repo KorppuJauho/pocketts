@@ -80,6 +80,29 @@ object Pictures {
         }
     }
 
+    private val ORIGIN_TAG = Regex("<[A-Za-z][^<>]*transform-origin[^<>]*>")
+    private val ORIGIN = Regex("""transform-origin\s*:\s*(-?[\d.]+)(?:px)?\s+(-?[\d.]+)(?:px)?[^;"']*;?\s*""")
+    private val TRANSFORM = Regex("""\stransform\s*=\s*(["'])(.*?)\1""")
+
+    /**
+     * An SVG with its shapes' CSS transform-origin (as some editors write them) made into plain transforms, which the
+     * phone's SVG library understands: it leaves transform-origin out, and a shape turned about its own middle is then
+     * turned about the picture's corner instead, out of sight (a blank icon).
+     */
+    fun svgWithoutTransformOrigin(svg: String): String {
+        if (!svg.contains("transform-origin")) return svg
+        fun neg(n: String) = if (n.startsWith("-")) n.drop(1) else "-$n"
+        return ORIGIN_TAG.replace(svg) { tag ->
+            val t = tag.value
+            val origin = ORIGIN.find(t) ?: return@replace t
+            val transform = TRANSFORM.find(t) ?: return@replace t
+            val (x, y) = origin.destructured
+            val q = transform.groupValues[1]
+            t.replaceRange(transform.range, " transform=${q}translate($x $y) ${transform.groupValues[2]} translate(${neg(x)} ${neg(y)})$q")
+                .replace(ORIGIN, "")
+        }
+    }
+
     /** A picture in a channel's files. */
     data class ChannelPicture(val cid: Int, val folder: String, val name: String) {
         val path: String get() = "${folder.trimEnd('/')}/$name"
