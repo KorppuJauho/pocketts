@@ -60,8 +60,11 @@ object Invites {
         if (type != null && type != "server") return null
         val expires = (m["expires"] as? Number)?.toLong()
         if (expires != null && expires in 1 until now) return null
-        val address = m["address"]?.toString()?.trim().orEmpty()
-        if (ServerAddress.parse(address) == null) return null
+        val given = m["address"]?.toString()?.trim().orEmpty()
+        val typed = ServerAddress.parse(given) ?: return null
+        // The TeamSpeak app writes the default port into the invite even when the server was typed without one: for a
+        // name, that's left off, so its DNS entry (which may name another host and port) is used as for a typed name
+        val address = if (typed.port == ServerAddress.DEFAULT_PORT && !ServerAddress.isIpLiteral(typed.host)) typed.host else given
         val channelId = m["channel_id"]?.toString()?.toIntOrNull()?.takeIf { it > 0 }
         return Invite(
             address = address,

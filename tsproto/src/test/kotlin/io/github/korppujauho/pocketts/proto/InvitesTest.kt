@@ -14,7 +14,12 @@ class InvitesTest {
 
     @Test
     fun parsing() {
-        assertEquals(Invites.Invite("ts.example.com:9987", "Friends", 5, "Games"), Invites.parse(answer, now))
+        // The default port, as the TeamSpeak app writes it, is left off a name (its DNS entry decides); kept for an IP or
+        // another port
+        assertEquals(Invites.Invite("ts.example.com", "Friends", 5, "Games"), Invites.parse(answer, now))
+        assertEquals("203.0.113.5:9987", Invites.parse(answer.replace("ts.example.com:9987", "203.0.113.5:9987"), now)?.address)
+        assertEquals("ts.example.com:9988", Invites.parse(answer.replace("ts.example.com:9987", "ts.example.com:9988"), now)?.address)
+        assertEquals("[2001:db8::1]:9987", Invites.parse(answer.replace("ts.example.com:9987", "[2001:db8::1]:9987"), now)?.address)
         // Without a channel, or with channel 0
         val plain = """{"id":"x","type":"server","address":"ts.example.com","name":"Friends"}"""
         assertEquals(Invites.Invite("ts.example.com", "Friends", null, ""), Invites.parse(plain, now))
@@ -33,7 +38,7 @@ class InvitesTest {
         val found = Invites.resolve(link, { asked.add(it); answer.replace("${now + 86_400}", "0") })
         assertEquals(listOf("Ab3dE9xY"), asked)
         assertEquals(
-            JoinLink(address = "ts.example.com:9987", serverName = "Friends", channel = "/5", channelName = "Games"),
+            JoinLink(address = "ts.example.com", serverName = "Friends", channel = "/5", channelName = "Games"),
             found,
         )
         // Unknown or expired: null; the service unreachable: thrown
