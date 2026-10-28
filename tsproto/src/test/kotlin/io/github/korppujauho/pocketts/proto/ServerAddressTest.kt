@@ -63,6 +63,25 @@ class ServerAddressTest {
     }
 
     @Test
+    fun nicknameWithSeveralAddresses() {
+        // An address a line, as the service answers for some nicknames: IPv4 is used, whichever comes first
+        val noDns = ServerAddress.SrvLookup { error("no DNS lookups expected") }
+        assertEquals(
+            ServerAddress.Resolved("203.0.113.7", 9987, "nickname"),
+            ServerAddress.resolve(Typed("clan", null), noDns, { "203.0.113.7\n2001:db8:1::64" }),
+        )
+        assertEquals(
+            ServerAddress.Resolved("203.0.113.7", 10075, "nickname"),
+            ServerAddress.resolve(Typed("clan", null), noDns, { "[2001:db8::1]:10075\r\n203.0.113.7:10075\n" }),
+        )
+        // Only IPv6, and a line that isn't an address skipped
+        assertEquals(
+            ServerAddress.Resolved("2001:db8:1::64", 9987, "nickname"),
+            ServerAddress.resolve(Typed("clan", null), noDns, { "not an address!\n2001:db8:1::64" }),
+        )
+    }
+
+    @Test
     fun nicknameToANameGoesOnThroughDns() {
         // The nickname names a host without a port; that host's DNS entry says where the server really is
         val dns = ServerAddress.SrvLookup { name ->

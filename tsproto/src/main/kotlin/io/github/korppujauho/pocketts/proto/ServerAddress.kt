@@ -31,7 +31,7 @@ object ServerAddress {
 
     /**
      * TeamSpeak's own nickname service, as the TeamSpeak apps ask it: a plain-text "address:port" for a known
-     * nickname, 404 for an unknown one. Gives up after a few seconds (behind some networks it never answers).
+     * nickname (or an address a line, such as an IPv4 and an IPv6 one), 404 for an unknown one. Gives up after a few seconds (behind some networks it never answers).
      */
     object MyTeamSpeakNicknames : NicknameLookup {
         private const val SERVICE = "https://named.myteamspeak.com/lookup?name="
@@ -112,7 +112,11 @@ object ServerAddress {
             try {
                 // As typed: the service doesn't mind the case, but the nickname is the owner's to spell
                 val answer = nicknames.lookup(typed.host.trimEnd('.'))
-                val found = answer?.let { parse(it) }?.takeIf { isIpLiteral(it.host) || HOSTNAME.matches(it.host) }
+                // An address a line: some nicknames have two (IPv4, then IPv6). IPv4 first, which every network reaches
+                val found = answer?.lines().orEmpty()
+                    .mapNotNull { line -> parse(line.trim())?.takeIf { isIpLiteral(it.host) || HOSTNAME.matches(it.host) } }
+                    .sortedBy { ':' in it.host }
+                    .firstOrNull()
                 if (found != null) {
                     // A name without a port goes through the usual steps (its DNS entry may name another host and port)
                     if (found.port != null || isIpLiteral(found.host)) return Resolved(found.host, found.port ?: DEFAULT_PORT, "nickname")

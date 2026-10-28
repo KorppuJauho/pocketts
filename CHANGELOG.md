@@ -9,6 +9,8 @@
 - **Privilege keys:** the server info window (tap the server's name) has a Privilege key button: paste a key from
   the server's admin to get the rights it carries, such as a server group. A used key says so; a refused one shows the
   server's answer.
+- **Server nicknames with two addresses:** a nickname whose server has both an IPv4 and an IPv6 address (the
+  nickname service then answers both) now connects, through IPv4.
 - **Whisper:** talk to chosen people or channels only, wherever they are. Tap someone and Whisper, or hold a channel
   and Whisper to channel, to put them on the whisper list; a Hold to whisper button then appears next to the others, and
   only the list hears you while it's held (in any voice activation mode). Someone whispering to you shows in the
