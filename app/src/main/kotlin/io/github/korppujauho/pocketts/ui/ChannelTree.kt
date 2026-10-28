@@ -83,6 +83,7 @@ data class TreeContext(
     val server: String = "",
     val badges: Map<Int, List<Long>> = emptyMap(),
     val onWatch: ((ServerModel.Client) -> Unit)? = null,
+    val whispering: Set<Int> = emptySet(), // talking as a whisper: drawn in the whisper colour
     val canTalk: (ServerModel.Client) -> Boolean,
 )
 
@@ -283,18 +284,19 @@ private fun androidx.compose.foundation.layout.RowScope.SpacerTitle(s: ServerMod
 private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Unit) {
     val talking = c.id in ctx.talking
     val self = c.id == ctx.ownId
-    val bg = if (talking) Ts.talking.copy(alpha = 0.1f) else Ts.row
+    val voice = if (c.id in ctx.whispering) Ts.whisper else Ts.talking
+    val bg = if (talking) voice.copy(alpha = 0.1f) else Ts.row
     Row(
         Modifier.fillMaxWidth().padding(vertical = 1.dp).background(bg).clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.width(2.dp).height(34.dp).background(if (talking) Ts.talking else Color.Transparent))
+        Box(Modifier.width(2.dp).height(34.dp).background(if (talking) voice else Color.Transparent))
         Spacer(Modifier.width(25.dp))
-        PersonAvatar(c, ctx.server, 24, talking)
+        PersonAvatar(c, ctx.server, 24, talking, ring = if (c.id in ctx.whispering) Ts.whisper else Ts.green)
         Spacer(Modifier.width(8.dp))
         Text(
             c.nickname,
-            color = if (talking) Ts.talking else Ts.username,
+            color = if (talking) voice else Ts.username,
             fontWeight = FontWeight.Medium, fontSize = 13.5.sp,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f).padding(vertical = 4.dp),

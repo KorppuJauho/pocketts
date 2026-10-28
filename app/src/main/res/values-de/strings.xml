@@ -565,4 +565,14 @@
     <string name="notification_sharing_camera">Du teilst deine Kamera</string>
     <string name="notification_sharing_cameras">Du teilst deine Kameras</string>
     <string name="notification_sharing_screen">Du teilst deinen Bildschirm</string>
+    <string name="whisper">Flüstern</string>
+    <string name="hold_to_whisper">Halten zum Flüstern</string>
+    <string name="whispering_to_you">%1$s flüstert dir zu</string>
+    <string name="whisper_list_line">Flüstern: %1$s</string>
+    <string name="whisper_clear">Alle entfernen</string>
+    <string name="whisper_remove">Von der Liste entfernen</string>
+    <string name="whisper_channel">In den Channel flüstern</string>
+    <string name="whisper_channel_off">Nicht mehr in den Channel flüstern</string>
+    <string name="whisper_list_title">Flüsterliste</string>
+    <string name="whisper_list_subtitle">Solange du die Flüstertaste hältst, hören dich nur diese.</string>
 </resources>

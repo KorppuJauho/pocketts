@@ -607,4 +607,14 @@
     <string name="notification_sharing_camera">Sharing your camera</string>
     <string name="notification_sharing_cameras">Sharing your cameras</string>
     <string name="notification_sharing_screen">Sharing your screen</string>
+    <string name="whisper">Whisper</string>
+    <string name="hold_to_whisper">Hold to whisper</string>
+    <string name="whispering_to_you">%1$s is whispering to you</string>
+    <string name="whisper_list_line">Whisper: %1$s</string>
+    <string name="whisper_clear">Clear all</string>
+    <string name="whisper_remove">Remove from the list</string>
+    <string name="whisper_channel">Whisper to channel</string>
+    <string name="whisper_channel_off">Stop whispering to channel</string>
+    <string name="whisper_list_title">Whisper list</string>
+    <string name="whisper_list_subtitle">While you hold the whisper button, only these hear you.</string>
 </resources>

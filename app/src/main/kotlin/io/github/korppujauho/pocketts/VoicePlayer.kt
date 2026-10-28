@@ -24,7 +24,7 @@ class VoicePlayer(
         const val MAX_QUEUE = 50 // 1 s; more means we fell behind: drop the oldest
     }
 
-    private class Talker(val id: Int, val codec: Int) {
+    private class Talker(val id: Int, val codec: Int, val whisper: Boolean) {
         val packets = TreeMap<Long, ByteArray>()
         var lastSeq = -1L // the last packet's sequence number (the 16-bit id, unwrapped)
         var playedSeq = -1L
@@ -51,9 +51,10 @@ class VoicePlayer(
         if (v.codec != 4 && v.codec != 5) return // only Opus
         synchronized(lock) {
             var t = talkers[v.clientId]
-            if (t == null || t.codec != v.codec) {
+            // A whisper is counted apart from talking (packet ids of their own): a new start
+            if (t == null || t.codec != v.codec || t.whisper != v.whisper) {
                 t?.decoder?.close()
-                t = Talker(v.clientId, v.codec)
+                t = Talker(v.clientId, v.codec, v.whisper)
                 talkers[v.clientId] = t
             }
             if (v.data.isEmpty()) {

@@ -579,4 +579,14 @@
     <string name="notification_sharing_camera">Vous partagez votre caméra</string>
     <string name="notification_sharing_cameras">Vous partagez vos caméras</string>
     <string name="notification_sharing_screen">Vous partagez votre écran</string>
+    <string name="whisper">Chuchoter</string>
+    <string name="hold_to_whisper">Maintenir pour chuchoter</string>
+    <string name="whispering_to_you">%1$s vous chuchote</string>
+    <string name="whisper_list_line">Chuchotement : %1$s</string>
+    <string name="whisper_clear">Tout retirer</string>
+    <string name="whisper_remove">Retirer de la liste</string>
+    <string name="whisper_channel">Chuchoter au canal</string>
+    <string name="whisper_channel_off">Ne plus chuchoter au canal</string>
+    <string name="whisper_list_title">Liste de chuchotement</string>
+    <string name="whisper_list_subtitle">Tant que vous maintenez le bouton de chuchotement, seuls ceux-ci vous entendent.</string>
 </resources>

@@ -10,8 +10,8 @@ to join.
 
 ## What it does
 
-- **Voice:** voice activation, push-to-talk (also a floating button over other apps), echo and noise removal. Keeps
-  working with the screen off, and goes quiet during phone calls.
+- **Voice:** voice activation, push-to-talk (also a floating button over other apps), whispering to chosen people or
+  channels, echo and noise removal. Keeps working with the screen off, and goes quiet during phone calls.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
   password. Hold a channel for its info.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.

@@ -60,10 +60,10 @@ import io.github.korppujauho.pocketts.proto.ServerModel
  * a grey default figure (which stays for people without one, or while it loads).
  */
 @Composable
-fun PersonAvatar(person: ServerModel.Client?, server: String, size: Int = 24, talking: Boolean = false) {
-    val ring = if (talking) Modifier.border(2.dp, Ts.green, CircleShape) else Modifier
+fun PersonAvatar(person: ServerModel.Client?, server: String, size: Int = 24, talking: Boolean = false, ring: Color = Ts.green) {
+    val border = if (talking) Modifier.border(2.dp, ring, CircleShape) else Modifier
     Box(
-        Modifier.size(size.dp).then(ring).clip(CircleShape).background(Color(0xFF3F4147)),
+        Modifier.size(size.dp).then(border).clip(CircleShape).background(Color(0xFF3F4147)),
         contentAlignment = Alignment.BottomCenter,
     ) {
         Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFF8E9297), modifier = Modifier.size((size * 0.95).dp))

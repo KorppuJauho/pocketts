@@ -31,6 +31,11 @@ object Session : TsClient.Listener {
     /** A private conversation's tab: whose (by identity) and their name. */
     data class PrivateTab(val uid: String, val name: String)
 
+    /** Who whispering goes to: people (by client id) and channels, in the order added. */
+    data class WhisperList(val people: List<Int> = emptyList(), val channels: List<Int> = emptyList()) {
+        val isEmpty: Boolean get() = people.isEmpty() && channels.isEmpty()
+    }
+
     /** A file being saved from the file browser ([upload]: sent to it): [done] bytes of [size]. */
     data class FileDownload(val name: String, val done: Long, val size: Long, val upload: Boolean = false)
 
@@ -57,6 +62,9 @@ object Session : TsClient.Listener {
         val voice: VoiceSettings = VoiceSettings(),
         val micAllowed: Boolean = false, // the microphone permission
         val pttHeld: Boolean = false,
+        val whisperTo: WhisperList = WhisperList(),
+        val whisperHeld: Boolean = false,
+        val whispering: Set<Int> = emptySet(), // people whispering to us (and we, while we whisper)
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
@@ -195,6 +203,7 @@ object Session : TsClient.Listener {
     }
     private var player: VoicePlayer? = null
     private var sender: MicSender? = null
+    @Volatile private var whisperTargets = WhisperList() // [UiState.whisperTo], for the microphone thread
     private var route: AudioRoute? = null
     @Volatile private var ownCodec = 4 // our channel's (Opus Voice 4 or Opus Music 5)
     // Used on the connection's thread only
@@ -508,6 +517,38 @@ object Session : TsClient.Listener {
         if (_state.value.pttHeld != held) _state.update { it.copy(pttHeld = held) }
     }
 
+    /** Whisper held or let go: only the whisper list hears us while it's held (nothing without a list). */
+    fun setWhisper(held: Boolean) {
+        val on = held && !_state.value.whisperTo.isEmpty
+        sender?.whisperHeld = on
+        if (_state.value.whisperHeld != on) _state.update { it.copy(whisperHeld = on) }
+    }
+
+    /** Someone on the whisper list, or off it. */
+    fun toggleWhisperPerson(clientId: Int) = changeWhisper { w ->
+        w.copy(people = if (clientId in w.people) w.people - clientId else w.people + clientId)
+    }
+
+    /** A channel (everyone in it) on the whisper list, or off it. */
+    fun toggleWhisperChannel(channelId: Int) = changeWhisper { w ->
+        w.copy(channels = if (channelId in w.channels) w.channels - channelId else w.channels + channelId)
+    }
+
+    fun clearWhisper() = changeWhisper { WhisperList() }
+
+    private fun changeWhisper(change: (WhisperList) -> WhisperList) {
+        _state.update { it.copy(whisperTo = change(it.whisperTo)) }
+        whisperTargets = _state.value.whisperTo
+        if (whisperTargets.isEmpty) setWhisper(false)
+    }
+
+    /** Those who left (and channels that went) off the whisper list. */
+    private fun pruneWhisper() {
+        val w = _state.value.whisperTo
+        val kept = WhisperList(w.people.filter { it in model.clients }, w.channels.filter { it in model.channels })
+        if (kept != w) changeWhisper { kept }
+    }
+
     /** The microphone's level and whether it's "on", for the settings' meter. */
     fun micLevel(): Pair<Float, Boolean> = sender?.let { it.level to it.active } ?: (0f to false)
 
@@ -545,11 +586,19 @@ object Session : TsClient.Listener {
     private fun startSender() {
         sender = MicSender(
             settings = { _state.value.voice },
-            canSend = { _state.value.phase == Phase.CONNECTED && _state.value.ownId !in _state.value.cannotTalk },
-            send = { client?.sendVoice(ownCodec, it) },
-            sendStop = { client?.sendVoiceStop(ownCodec) },
-            onTalking = { talking -> _state.value.ownId.takeIf { it > 0 }?.let { setTalking(it, talking) } },
-        ).also { it.muted = _state.value.inputMuted }
+            // Whispering doesn't need the channel's talk power (the server decides who may be whispered to)
+            canSend = { whisper -> _state.value.phase == Phase.CONNECTED && (whisper || _state.value.ownId !in _state.value.cannotTalk) },
+            send = { frame, whisper ->
+                if (whisper) whisperTargets.let { client?.sendWhisper(ownCodec, frame, it.channels, it.people) } else client?.sendVoice(ownCodec, frame)
+            },
+            sendStop = { whisper ->
+                if (whisper) whisperTargets.let { client?.sendWhisper(ownCodec, ByteArray(0), it.channels, it.people) } else client?.sendVoiceStop(ownCodec)
+            },
+            onTalking = { talking, whisper -> _state.value.ownId.takeIf { it > 0 }?.let { setTalking(it, talking, whisper) } },
+        ).also {
+            it.muted = _state.value.inputMuted
+            it.whisperHeld = _state.value.whisperHeld
+        }
     }
 
     private fun stopAudio() {
@@ -1158,11 +1207,16 @@ object Session : TsClient.Listener {
         if (changed) {
             publish(_state.value.phase)
             if (cmd.name.startsWith("notifycliententerview") || cmd.name == "notifyclientleftview") updateGains()
+            if (cmd.name == "notifyclientleftview" || cmd.name == "notifychanneldeleted") pruneWhisper()
         }
     }
 
     override fun onVoice(voice: TsClient.Voice) {
         player?.onVoice(voice)
+        // Who's whispering to us (until they stop, or talk to the channel instead)
+        if (voice.data.isNotEmpty() && (voice.clientId in _state.value.whispering) != voice.whisper) {
+            _state.update { s -> s.copy(whispering = if (voice.whisper) s.whispering + voice.clientId else s.whispering - voice.clientId) }
+        }
     }
 
     override fun onDisconnected(reason: String?) {
@@ -1191,9 +1245,10 @@ object Session : TsClient.Listener {
             _state.update {
                 it.copy(
                     phase = Phase.CONNECTING, reconnecting = retries, waitingForOld = oldStillThere,
-                    error = if (oldStillThere) null else text, talking = emptySet(),
+                    error = if (oldStillThere) null else text, talking = emptySet(), whispering = emptySet(),
                 )
             }
+            clearWhisper() // people come back with new ids
             ConnectionService.start(app, app.getString(R.string.notification_reconnecting, _state.value.address))
             scheduleRetry(if (oldStillThere) 3L else minOf(30L, 2L * retries))
             return
@@ -1287,6 +1342,7 @@ object Session : TsClient.Listener {
         stopAudio()
         client = null
         closeHistory()
+        whisperTargets = WhisperList()
         // A call that muted us: as before (a reconnect during the call mutes again)
         if (::app.isInitialized) CallWatcher.stop(app)
         endCall()
@@ -1302,8 +1358,14 @@ object Session : TsClient.Listener {
         }
     }
 
-    private fun setTalking(clientId: Int, talking: Boolean) {
-        _state.update { s -> s.copy(talking = if (talking) s.talking + clientId else s.talking - clientId) }
+    /** Someone started or stopped talking; [whisper]: we started whispering (others' whispers come from [onVoice]). */
+    private fun setTalking(clientId: Int, talking: Boolean, whisper: Boolean = false) {
+        _state.update { s ->
+            s.copy(
+                talking = if (talking) s.talking + clientId else s.talking - clientId,
+                whispering = if (!talking) s.whispering - clientId else if (whisper) s.whispering + clientId else s.whispering,
+            )
+        }
         if (clientId == _state.value.ownId) engine?.refreshSound()
     }
 

@@ -565,4 +565,14 @@
     <string name="notification_sharing_camera">Jaat kameraasi</string>
     <string name="notification_sharing_cameras">Jaat kameroitasi</string>
     <string name="notification_sharing_screen">Jaat näyttöäsi</string>
+    <string name="whisper">Kuiskaa</string>
+    <string name="hold_to_whisper">Pidä pohjassa kuiskataksesi</string>
+    <string name="whispering_to_you">%1$s kuiskaa sinulle</string>
+    <string name="whisper_list_line">Kuiskaus: %1$s</string>
+    <string name="whisper_clear">Tyhjennä</string>
+    <string name="whisper_remove">Poista listalta</string>
+    <string name="whisper_channel">Kuiskaa kanavalle</string>
+    <string name="whisper_channel_off">Lopeta kuiskaus kanavalle</string>
+    <string name="whisper_list_title">Kuiskauslista</string>
+    <string name="whisper_list_subtitle">Kun pidät kuiskausnappia pohjassa, vain nämä kuulevat sinut.</string>
 </resources>

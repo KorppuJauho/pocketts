@@ -11,15 +11,15 @@ import kotlin.math.sqrt
 
 /**
  * The microphone: 20 ms at a time, its level, whether it's "on" by the activation (voice activation, push-to-talk,
- * continuous), and the Opus frames sent while it is.
+ * continuous), and the Opus frames sent while it is. Holding whisper sends them as a whisper instead, in any activation.
  */
 class MicSender(
     private val settings: () -> VoiceSettings,
-    /** Whether anything may go out now (connected, can talk in this channel). */
-    private val canSend: () -> Boolean,
-    private val send: (ByteArray) -> Unit,
-    private val sendStop: () -> Unit,
-    private val onTalking: (Boolean) -> Unit,
+    /** Whether anything may go out now: connected, and can talk in this channel (or, [whisper], may whisper). */
+    private val canSend: (whisper: Boolean) -> Boolean,
+    private val send: (frame: ByteArray, whisper: Boolean) -> Unit,
+    private val sendStop: (whisper: Boolean) -> Unit,
+    private val onTalking: (talking: Boolean, whisper: Boolean) -> Unit,
 ) {
     private companion object {
         const val RATE = 48000
@@ -27,6 +27,8 @@ class MicSender(
     }
 
     @Volatile var pttHeld = false
+    /** Whisper held: what goes out is whispered, whatever the activation. */
+    @Volatile var whisperHeld = false
     /** Microphone off: nothing is recorded (the phone's microphone indicator goes away too). */
     @Volatile var muted = false
         set(value) { field = value; wake() }
@@ -95,6 +97,7 @@ class MicSender(
         val pcm = ShortArray(FRAME)
         var lastSpeech = 0L
         var sending = false
+        var sentWhisper = false // what [sending] is: a whisper or talking
         AppLog.log("Microphone on (echo ${s.echoCancellation}, noise ${s.noiseSuppression}, gain ${s.autoGainControl})")
         try {
             rec.startRecording()
@@ -117,7 +120,8 @@ class MicSender(
                 val rms = sqrt(sum / pcm.size).toFloat()
                 level = rms
                 val now = System.currentTimeMillis()
-                val on = when (cfg.activation) {
+                val whisper = whisperHeld
+                val on = whisper || when (cfg.activation) {
                     VoiceSettings.Activation.CONTINUOUS -> true
                     VoiceSettings.Activation.PTT -> pttHeld
                     VoiceSettings.Activation.VAD -> {
@@ -126,20 +130,26 @@ class MicSender(
                     }
                 }
                 active = on
-                val go = on && !muted && !testing && canSend()
+                val go = on && !muted && !testing && canSend(whisper)
+                if (go && sending && sentWhisper != whisper) {
+                    // From talking to whispering, or back: the one ends, the other starts
+                    sendStop(sentWhisper)
+                    onTalking(false, sentWhisper)
+                    sending = false
+                }
                 if (go) {
-                    if (!sending) { sending = true; onTalking(true) }
-                    encoder.encode(pcm) { send(it) }
+                    if (!sending) { sending = true; sentWhisper = whisper; onTalking(true, whisper) }
+                    encoder.encode(pcm) { send(it, whisper) }
                 } else if (sending) {
                     sending = false
-                    sendStop()
-                    onTalking(false)
+                    sendStop(sentWhisper)
+                    onTalking(false, sentWhisper)
                 }
             }
         } finally {
             if (sending) {
-                sendStop()
-                onTalking(false)
+                sendStop(sentWhisper)
+                onTalking(false, sentWhisper)
             }
             active = false
             level = 0f

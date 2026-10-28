@@ -80,6 +80,25 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
         const val VERSION = "3.?.? [Build: 5680278000]"
         const val PLATFORM = "Linux"
         const val VERSION_SIGN = "Hjd+N58Gv3ENhoKmGYy2bNRBsNNgm5kpiaQWxOj5HN2DXttG6REjymSwJtpJ8muC2gSwRuZi0R+8Laan5ts5CQ=="
+
+        /** At most this many channels, and as many people, in one whisper (each count is one byte). */
+        const val WHISPER_MAX = 255
+
+        /**
+         * A whisper packet's contents: room for the packet id (2), the codec, how many channels and people, the
+         * channels (8 bytes each), the people (2 bytes each), then the frame.
+         */
+        fun whisperPacket(codec: Int, opus: ByteArray, channels: List<Int>, clients: List<Int>): ByteArray {
+            val ch = channels.take(WHISPER_MAX)
+            val cl = clients.take(WHISPER_MAX)
+            val b = ByteBuffer.allocate(5 + ch.size * 8 + cl.size * 2 + opus.size)
+            b.position(2)
+            b.put(codec.toByte()).put(ch.size.toByte()).put(cl.size.toByte())
+            ch.forEach { b.putLong(it.toLong() and 0xffffffffL) }
+            cl.forEach { b.putShort(it.toShort()) }
+            b.put(opus)
+            return b.array()
+        }
     }
 
     private val exec: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor { r ->
@@ -207,6 +226,17 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
 
     /** The end of talking: an empty voice packet. */
     fun sendVoiceStop(codec: Int) = sendVoice(codec, ByteArray(0))
+
+    /**
+     * One Opus frame whispered: only [clients] (by client id) and everyone in [channels] hear it, wherever they are.
+     * An empty frame ends it, as with [sendVoice]. The server drops it for whoever we may not whisper to.
+     */
+    fun sendWhisper(codec: Int, opus: ByteArray, channels: List<Int>, clients: List<Int>) {
+        exec.execute {
+            if (state != State.CONNECTED) return@execute
+            sendOutgoing(whisperPacket(codec, opus, channels, clients), Type.VOICE_WHISPER)
+        }
+    }
 
     // ====== Connecting ======
 
