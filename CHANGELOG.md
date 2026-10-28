@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 (2026-10-28)
 
+- **Whisper:** talk to chosen people or channels only, wherever they are. Tap someone and Whisper, or hold a channel
+  and Whisper to channel, to put them on the whisper list; a Hold to whisper button then appears next to the others, and
+  only the list hears you while it's held (in any voice activation mode). Someone whispering to you shows in the
+  whisper colour, with a line saying so. The list lasts until you disconnect.
 - **TeamSpeak invites:** invite links (`tmspk.gg/…`, made with "Create Invite" in the TeamSpeak app) open PocketTS,
   which looks the invite up from TeamSpeak's invite service and asks before connecting, with the server's name and
   the invited channel. An expired invite says so. Invites and `teamspeak://` links can also be pasted into the address
@@ -11,10 +15,8 @@
   server's answer.
 - **Server nicknames with two addresses:** a nickname whose server has both an IPv4 and an IPv6 address (the
   nickname service then answers both) now connects, through IPv4.
-- **Whisper:** talk to chosen people or channels only, wherever they are. Tap someone and Whisper, or hold a channel
-  and Whisper to channel, to put them on the whisper list; a Hold to whisper button then appears next to the others, and
-  only the list hears you while it's held (in any voice activation mode). Someone whispering to you shows in the
-  whisper colour, with a line saying so. The list lasts until you disconnect.
+- **Server icons:** SVG icons made with some editors (shapes turned with CSS transform-origin) show instead of
+  staying blank, as do older servers' BMP and ICO icons; an icon that can't be shown leaves no empty gap.
 
 ## 1.4.0 (2026-10-24)
 
