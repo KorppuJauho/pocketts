@@ -44,6 +44,7 @@ object Ts {
     val afkBorder = Color(0x4DEAB308)
     val you = Color(0xFFC084FC)
     val youBorder = Color(0xFFA855F7)
+    val whisper = Color(0xFFF59E0B) // whispering: the hold button, the list, and who whispers
 }
 
 @Composable

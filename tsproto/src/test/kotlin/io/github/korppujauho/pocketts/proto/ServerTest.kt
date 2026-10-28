@@ -125,6 +125,20 @@ class ServerTest {
         assertTrue(heard.all { it.codec == 4 })
         b.await("B hears A stop") { b.voices.any { it.clientId == aId && it.data.isEmpty() } }
 
+        // A whispers to B, then to B's channel: B hears both as whispers
+        for ((how, channels, clients) in listOf(Triple("B", emptyList<Int>(), listOf(bId)), Triple("B's channel", listOf(home), emptyList<Int>()))) {
+            val before = b.voices.size
+            val whispered = frames.take(5)
+            for (f in whispered) {
+                a.client.sendWhisper(4, f, channels, clients)
+                Thread.sleep(20)
+            }
+            a.client.sendWhisper(4, ByteArray(0), channels, clients)
+            b.await("B hears A whisper to $how") { b.voices.drop(before).count { it.clientId == aId && it.whisper && it.data.isNotEmpty() } >= whispered.size }
+            assertEquals(whispered.map { it.toList() }, b.voices.drop(before).filter { it.clientId == aId && it.data.isNotEmpty() }.sortedBy { it.packetId }.map { it.data.toList() })
+            println("Whispered to $how")
+        }
+
         // A chat message in the channel
         val text = "Hei | kaikki / ä ö ${'$'}run"
         a.client.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to home, "msg" to text))

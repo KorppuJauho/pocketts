@@ -551,4 +551,14 @@
     <string name="notification_sharing_camera">正在分享你的摄像头</string>
     <string name="notification_sharing_cameras">正在分享你的摄像头</string>
     <string name="notification_sharing_screen">正在分享你的屏幕</string>
+    <string name="whisper">悄悄话</string>
+    <string name="hold_to_whisper">按住说悄悄话</string>
+    <string name="whispering_to_you">%1$s 正在对你说悄悄话</string>
+    <string name="whisper_list_line">悄悄话：%1$s</string>
+    <string name="whisper_clear">全部清除</string>
+    <string name="whisper_remove">从列表中移除</string>
+    <string name="whisper_channel">对频道说悄悄话</string>
+    <string name="whisper_channel_off">停止对频道说悄悄话</string>
+    <string name="whisper_list_title">悄悄话列表</string>
+    <string name="whisper_list_subtitle">按住悄悄话按钮时，只有这些人能听到你。</string>
 </resources>

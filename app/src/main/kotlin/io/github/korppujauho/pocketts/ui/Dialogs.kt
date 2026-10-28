@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.filled.Hearing
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Dns
 import androidx.compose.material.icons.rounded.Key
@@ -56,7 +58,7 @@ import io.github.korppujauho.pocketts.proto.ServerModel
 import java.util.Date
 import kotlin.math.roundToInt
 
-/** WebTS's person menu: who it is, how loud they are for you, poke, chat; for admins also move, kick and ban. */
+/** WebTS's person menu: who it is, how loud they are for you, poke, chat, whisper (on the list or off); for admins also move, kick and ban. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonSheet(
@@ -75,6 +77,8 @@ fun PersonSheet(
     onMove: () -> Unit = {},
     onKick: () -> Unit = {},
     onBan: () -> Unit = {},
+    whispered: Boolean = false,
+    onWhisper: (() -> Unit)? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss, containerColor = Pop.bottom,
@@ -140,6 +144,12 @@ fun PersonSheet(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ActionTile(androidx.compose.material.icons.Icons.Rounded.NotificationsActive, stringResource(R.string.poke), Modifier.weight(1f), onClick = onPoke)
                 ActionTile(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.Chat, stringResource(R.string.chat), Modifier.weight(1f), onClick = onChat)
+                if (onWhisper != null) {
+                    ActionTile(
+                        androidx.compose.material.icons.Icons.Filled.Hearing, stringResource(R.string.whisper), Modifier.weight(1f),
+                        tint = Ts.whisper, selected = whispered, onClick = onWhisper,
+                    )
+                }
             }
             if (admin) AdminTiles(onMove, onKick, onBan)
         }
@@ -290,6 +300,8 @@ fun ChannelInfoDialog(
     onArrange: (() -> Unit)?,
     onDismiss: () -> Unit,
     onFiles: (() -> Unit)? = null,
+    whispered: Boolean = false,
+    onWhisper: (() -> Unit)? = null,
 ) {
     // The description comes a moment after asking; empty after that, there's none
     var waited by remember { mutableStateOf(false) }
@@ -357,6 +369,12 @@ fun ChannelInfoDialog(
             }
             if (onFiles != null) {
                 PillButton(stringResource(R.string.files_title), modifier = Modifier.fillMaxWidth(), onClick = onFiles)
+            }
+            if (onWhisper != null) {
+                // Everyone in it hears a whisper (not its sub-channels)
+                PillButton(
+                    stringResource(if (whispered) R.string.whisper_channel_off else R.string.whisper_channel), modifier = Modifier.fillMaxWidth(), onClick = onWhisper,
+                )
             }
             if (onEdit != null || onArrange != null) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -450,5 +468,35 @@ fun PrivilegeKeyDialog(onUse: (String) -> Unit, onDismiss: () -> Unit) {
     ) {
         TsField(key, { key = it.take(200) }, stringResource(R.string.key_field), imeAction = androidx.compose.ui.text.input.ImeAction.Done)
         Text(stringResource(R.string.key_desc), color = Ts.muted, fontSize = 13.sp)
+    }
+}
+
+/** The whisper list: everyone and every channel on it, each with a cross to take it off, and Clear for all. */
+@Composable
+fun WhisperListDialog(entries: List<Pair<String, () -> Unit>>, onClear: () -> Unit, onDismiss: () -> Unit) {
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.whisper_list_title), icon = androidx.compose.material.icons.Icons.Filled.Hearing,
+        subtitle = stringResource(R.string.whisper_list_subtitle), tint = Ts.whisper,
+        buttons = {
+            PillButton(stringResource(R.string.whisper_clear), PillKind.DANGER_TEXT) { onClear(); onDismiss() }
+            PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss)
+        },
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            for ((name, remove) in entries) {
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).padding(start = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(name, color = Ts.text, fontSize = 15.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                    Box(Modifier.size(44.dp).clickable(onClick = remove), contentAlignment = Alignment.Center) {
+                        androidx.compose.material3.Icon(
+                            androidx.compose.material.icons.Icons.Rounded.Close, contentDescription = stringResource(R.string.whisper_remove),
+                            tint = Ts.muted, modifier = Modifier.size(20.dp),
+                        )
+                    }
+                }
+            }
+        }
     }
 }

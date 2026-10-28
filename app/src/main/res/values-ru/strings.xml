@@ -593,4 +593,14 @@
     <string name="notification_sharing_camera">Идёт трансляция камеры</string>
     <string name="notification_sharing_cameras">Идёт трансляция камер</string>
     <string name="notification_sharing_screen">Идёт трансляция экрана</string>
+    <string name="whisper">Шептать</string>
+    <string name="hold_to_whisper">Удерживайте, чтобы шептать</string>
+    <string name="whispering_to_you">%1$s шепчет вам</string>
+    <string name="whisper_list_line">Шёпот: %1$s</string>
+    <string name="whisper_clear">Очистить всё</string>
+    <string name="whisper_remove">Убрать из списка</string>
+    <string name="whisper_channel">Шептать в канал</string>
+    <string name="whisper_channel_off">Не шептать в канал</string>
+    <string name="whisper_list_title">Список шёпота</string>
+    <string name="whisper_list_subtitle">Пока вы удерживаете кнопку шёпота, вас слышат только они.</string>
 </resources>

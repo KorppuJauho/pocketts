@@ -579,4 +579,14 @@
     <string name="notification_sharing_camera">Compartiendo tu cámara</string>
     <string name="notification_sharing_cameras">Compartiendo tus cámaras</string>
     <string name="notification_sharing_screen">Compartiendo tu pantalla</string>
+    <string name="whisper">Susurrar</string>
+    <string name="hold_to_whisper">Mantén pulsado para susurrar</string>
+    <string name="whispering_to_you">%1$s te está susurrando</string>
+    <string name="whisper_list_line">Susurro: %1$s</string>
+    <string name="whisper_clear">Quitar todo</string>
+    <string name="whisper_remove">Quitar de la lista</string>
+    <string name="whisper_channel">Susurrar al canal</string>
+    <string name="whisper_channel_off">Dejar de susurrar al canal</string>
+    <string name="whisper_list_title">Lista de susurro</string>
+    <string name="whisper_list_subtitle">Mientras mantienes pulsado el botón de susurro, solo estos te oyen.</string>
 </resources>

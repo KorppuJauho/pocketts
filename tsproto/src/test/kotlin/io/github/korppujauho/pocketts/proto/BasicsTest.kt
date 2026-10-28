@@ -11,6 +11,17 @@ class BasicsTest {
     private fun hex(s: String) = Identity.hex(s)
 
     @Test
+    fun whisperPacket() {
+        // Room for the packet id, the codec, 2 channels and 1 person (big-endian, 8 and 2 bytes), then the frame
+        assertContentEquals(
+            hex("0000" + "04" + "02" + "01" + "0000000000000005" + "00000000000000ff" + "0102" + "aabb"),
+            TsClient.whisperPacket(4, hex("aabb"), listOf(5, 255), listOf(258)),
+        )
+        // The end of a whisper: the same, without a frame
+        assertContentEquals(hex("0000" + "05" + "00" + "01" + "0007"), TsClient.whisperPacket(5, ByteArray(0), emptyList(), listOf(7)))
+    }
+
+    @Test
     fun eaxPublishedVectors() {
         // From the EAX paper (Bellare, Rogaway, Wagner), with the full 16-byte tag
         val sealed = Crypto.eaxEncrypt(

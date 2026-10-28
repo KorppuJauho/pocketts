@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
@@ -182,6 +183,50 @@ fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
     }
 }
 
+/** Hold to whisper (in the controls bar while the whisper list has someone): only the list hears you. */
+@Composable
+fun WhisperButton(held: Boolean, onHold: (Boolean) -> Unit) {
+    Box(
+        Modifier.size(48.dp).clip(CircleShape).background(if (held) Ts.whisper.copy(alpha = 0.25f) else Ts.button)
+            .border(1.dp, if (held) Ts.whisper else Ts.whisper.copy(alpha = 0.5f), CircleShape).holdToTalk(onHold),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(Icons.Filled.Hearing, contentDescription = stringResource(R.string.hold_to_whisper), tint = Ts.whisper, modifier = Modifier.upright())
+    }
+}
+
+/**
+ * Whispering, under the controls bar: who whispers to you now, and who your whisper list is (tap it to change the list,
+ * the cross clears it). Nothing when neither.
+ */
+@Composable
+fun WhisperStrip(incoming: List<String>, list: List<String>, onList: () -> Unit, onClear: () -> Unit) {
+    if (incoming.isEmpty() && list.isEmpty()) return
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.whisper.copy(alpha = 0.1f))
+            .border(1.dp, Ts.whisper.copy(alpha = 0.35f), RoundedCornerShape(12.dp)),
+    ) {
+        for (name in incoming) {
+            Text(
+                stringResource(R.string.whispering_to_you, name), color = Ts.whisper, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+        }
+        if (list.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth().clickable(onClick = onList), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Hearing, contentDescription = null, tint = Ts.whisper, modifier = Modifier.padding(start = 14.dp).size(18.dp))
+                Text(
+                    stringResource(R.string.whisper_list_line, list.joinToString(", ")), color = Ts.text, fontSize = 13.sp,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(horizontal = 10.dp, vertical = 10.dp),
+                )
+                Box(Modifier.size(40.dp).clickable(onClick = onClear), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.whisper_clear), tint = Ts.muted, modifier = Modifier.size(18.dp))
+                }
+            }
+        }
+    }
+}
+
 /** The floating push-to-talk button: round, at the bottom right, bigger while held. */
 @Composable
 fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = Modifier) {
@@ -197,13 +242,14 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
     }
 }
 
-/** The bar with the microphone, sound and settings buttons (and "Hold to talk" in push-to-talk mode). */
+/** The bar with the microphone, sound and share buttons (and "Hold to whisper" with a whisper list, "Hold to talk" in push-to-talk mode). */
 @Composable
 fun ControlsBar(
     micOff: Boolean, soundOff: Boolean, onMic: () -> Unit, onSound: () -> Unit,
     ptt: (@Composable () -> Unit)? = null,
     sharing: Boolean = false,
     onShare: (() -> Unit)? = null,
+    whisper: (@Composable () -> Unit)? = null,
 ) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
@@ -224,6 +270,7 @@ fun ControlsBar(
                 Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
             }
         }
+        whisper?.invoke()
         // Push-to-talk last: on the right, where a thumb reaches it most easily
         ptt?.invoke()
     }

@@ -235,6 +235,19 @@ class ScreenshotTest {
         )
     }
 
+    /** Whispering: Lee whispers to you while you hold the whisper button, your list being Alex and a channel. */
+    @Test
+    fun whisper() = shot("whisper") {
+        val s = Example.state()
+        ServerScreen(
+            s.copy(
+                micAllowed = true, whisperTo = Session.WhisperList(people = listOf(5), channels = listOf(6)), whisperHeld = true,
+                talking = s.talking + 1 + 3, whispering = setOf(1, 3),
+            ),
+            Example.noActions,
+        )
+    }
+
     @get:Rule
     val compose = androidx.compose.ui.test.junit4.createComposeRule()
 
@@ -254,7 +267,7 @@ class ScreenshotTest {
     @Test
     fun personPopup() = popup("popup-person") {
         val s = Example.state()
-        io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {})
+        io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {}, whispered = true, onWhisper = {})
     }
 
     /** The app icon as launchers cut it (rounded square, circle), its themed one-colour version, and the notification icon. */

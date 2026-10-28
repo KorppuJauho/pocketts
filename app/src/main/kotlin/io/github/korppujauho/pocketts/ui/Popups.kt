@@ -140,9 +140,11 @@ fun PopCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -
 
 /** A big square-ish action in a sheet: its icon over its name. */
 @Composable
-fun ActionTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, tint: Color = Ts.accent, onClick: () -> Unit) {
+fun ActionTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, tint: Color = Ts.accent, selected: Boolean = false, onClick: () -> Unit) {
+    // [selected]: on (such as on the whisper list), in its colour
     Column(
-        modifier.height(76.dp).clip(RoundedCornerShape(18.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(18.dp))
+        modifier.height(76.dp).clip(RoundedCornerShape(18.dp)).background(if (selected) tint.copy(alpha = 0.16f) else Pop.field)
+            .border(1.dp, if (selected) tint else Color(0x0AFFFFFF), RoundedCornerShape(18.dp))
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,

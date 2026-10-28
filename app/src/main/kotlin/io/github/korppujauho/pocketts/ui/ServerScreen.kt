@@ -97,6 +97,13 @@ interface ServerActions {
     fun dismissPoke(id: Long)
     fun setVolume(person: ServerModel.Client, volume: Float)
     fun setPtt(held: Boolean)
+    /** Whisper held or let go (only the whisper list hears it). */
+    fun setWhisper(held: Boolean) {}
+    /** Someone on the whisper list, or off it. */
+    fun toggleWhisperPerson(person: ServerModel.Client) {}
+    /** A channel (everyone in it) on the whisper list, or off it. */
+    fun toggleWhisperChannel(channel: ServerModel.Channel) {}
+    fun clearWhisper() {}
     fun sendPictures(uris: List<android.net.Uri>, text: String)
     fun setAway(away: Boolean, message: String)
     /** Another server from the favourites (this one is left). */
@@ -163,6 +170,7 @@ fun ServerScreen(
     var channelDialog by remember { mutableStateOf<ChannelEditing?>(null) }
     var filesChannel by remember { mutableStateOf<Int?>(null) } // the channel whose files are open
     var infoChannel by remember { mutableStateOf<Int?>(null) } // the channel whose info is open (held in the list)
+    var whisperList by remember { mutableStateOf(false) } // the whisper list open, to change it
     var deleteTarget by remember { mutableStateOf<ServerModel.Channel?>(null) }
     val editMode = editing && state.voice.adminTools && state.phase == Session.Phase.CONNECTED && view == View.CHANNELS
     androidx.activity.compose.BackHandler(editMode) { editing = false }
@@ -261,13 +269,22 @@ fun ServerScreen(
                 // Settings › UI › Buttons at the bottom: the buttons and the switch go under the view, closer to the thumb
                 val bottom = state.voice.controlsAtBottom
                 val controls = @Composable {
-                    ControlsBar(
-                        micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
-                        onMic = actions::toggleMic, onSound = actions::toggleSound,
-                        ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
-                        sharing = state.stream.sharing != null,
-                        onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ControlsBar(
+                            micOff = state.inputMuted || !state.micAllowed, soundOff = state.outputMuted,
+                            onMic = actions::toggleMic, onSound = actions::toggleSound,
+                            ptt = if (ptt) ({ PttButton(state.pttHeld, actions::setPtt) }) else null,
+                            sharing = state.stream.sharing != null,
+                            onShare = if (state.phase == Session.Phase.CONNECTED) ({ if (state.stream.sharing != null) actions.stopShare() else shareDialog = true }) else null,
+                            whisper = if (state.whisperTo.isEmpty) null else ({ WhisperButton(state.whisperHeld, actions::setWhisper) }),
+                        )
+                        WhisperStrip(
+                            incoming = state.whispering.filter { it != state.ownId }.mapNotNull { state.client(it)?.nickname },
+                            list = state.whisperTo.people.mapNotNull { state.client(it)?.nickname } +
+                                state.whisperTo.channels.mapNotNull { id -> state.channel(id)?.let { it.displayName.ifEmpty { it.name } } },
+                            onList = { whisperList = true }, onClear = actions::clearWhisper,
+                        )
+                    }
                 }
                 if (!typing && !bottom) controls()
                 if (egl != null) {
@@ -334,7 +351,7 @@ fun ServerScreen(
                             } else {
                                 ChannelTree(
                                     items,
-                                    TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
+                                    TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch, whispering = state.whispering) { it.id !in state.cannotTalk },
                                     onChannel = { ch ->
                                         if (ch.id == state.ownChannel) return@ChannelTree
                                         // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
@@ -444,7 +461,14 @@ fun ServerScreen(
             onMove = { person = null; moveTarget = p },
             onKick = { person = null; kickTarget = p },
             onBan = { person = null; banTarget = p },
+            whispered = p.id in state.whisperTo.people,
+            onWhisper = if (state.phase == Session.Phase.CONNECTED) ({ actions.toggleWhisperPerson(p) }) else null,
         )
+    }
+    if (whisperList && !state.whisperTo.isEmpty) {
+        val entries = state.whisperTo.people.mapNotNull { id -> state.client(id)?.let { p -> p.nickname to { actions.toggleWhisperPerson(p) } } } +
+            state.whisperTo.channels.mapNotNull { id -> state.channel(id)?.let { ch -> ch.displayName.ifEmpty { ch.name } to { actions.toggleWhisperChannel(ch) } } }
+        WhisperListDialog(entries, onClear = actions::clearWhisper, onDismiss = { whisperList = false })
     }
     moveTarget?.let { p ->
         MoveDialog(
@@ -503,6 +527,8 @@ fun ServerScreen(
             onArrange = if (admin) ({ infoChannel = null; held = ch; editing = true }) else null,
             onDismiss = { infoChannel = null },
             onFiles = { infoChannel = null; filesChannel = ch.id },
+            whispered = ch.id in state.whisperTo.channels,
+            onWhisper = if (state.phase == Session.Phase.CONNECTED) ({ actions.toggleWhisperChannel(ch) }) else null,
         )
     }
     channelDialog?.let { d ->

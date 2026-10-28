@@ -412,6 +412,10 @@ private object SessionActions : ServerActions {
     override fun dismissPoke(id: Long) = Session.dismissPoke(id)
     override fun setVolume(person: ServerModel.Client, volume: Float) = Session.setVolume(person, volume)
     override fun setPtt(held: Boolean) = Session.setPtt(held)
+    override fun setWhisper(held: Boolean) = Session.setWhisper(held)
+    override fun toggleWhisperPerson(person: ServerModel.Client) = Session.toggleWhisperPerson(person.id)
+    override fun toggleWhisperChannel(channel: ServerModel.Channel) = Session.toggleWhisperChannel(channel.id)
+    override fun clearWhisper() = Session.clearWhisper()
     override fun sendPictures(uris: List<android.net.Uri>, text: String) {
         MainActivity.current?.let { Session.sendPictures(it.applicationContext, uris, text) }
     }
