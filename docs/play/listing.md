@@ -21,6 +21,7 @@ PocketTS is a voice chat app for TeamSpeak servers, made for phones. Connect to 
 
 VOICE
 • Voice activation, push-to-talk or always on
+• Whisper to chosen people or channels, wherever they are
 • Noise removal, echo cancellation and gain control
 • A volume for each person, and headset and volume-button push-to-talk
 • Keeps working with the screen off, and reconnects by itself when the network changes
@@ -37,7 +38,8 @@ STREAMS
 • Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
 
 AND MORE
-• Connect by address, server nickname or TeamSpeak link
+• Connect by address, server nickname, TeamSpeak link or invite
+• Use a privilege key from a server's admin
 • Favourite servers, and switching between them
 • Mute, sound and disconnect buttons in the notification
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
@@ -45,7 +47,7 @@ AND MORE
 • In English, Finnish, German, Spanish, French, Simplified Chinese and Russian
 
 PRIVATE BY DESIGN
-No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname, TeamSpeak's nickname service).
+No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname or an invite, TeamSpeak's nickname or invite service).
 
 OPEN SOURCE
 PocketTS is free software (GPL-3.0). The source code, the changelog and the issue tracker are on GitHub: https://github.com/KorppuJauho/pocketts
