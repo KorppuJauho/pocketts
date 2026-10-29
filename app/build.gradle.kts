@@ -41,6 +41,17 @@ android {
         }
     }
 
+    // Native code: RNNoise (the AI noise removal), downloaded and built by src/main/cpp/CMakeLists.txt
+    ndkVersion = "29.0.14206865"
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.31.6"
+            // Next to the rest of the build (scripts/dev.sh), not in the source folder
+            System.getenv("POCKETTS_BUILD_ROOT")?.takeIf { it.isNotEmpty() }?.let { buildStagingDirectory = file("$it/cxx") }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"

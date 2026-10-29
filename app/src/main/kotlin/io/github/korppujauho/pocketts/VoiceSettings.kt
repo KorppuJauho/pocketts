@@ -10,6 +10,7 @@ data class VoiceSettings(
     val voiceVolumeDb: Int = 0, // everyone's voice, -20 to +12 dB
     val micVolume: Float = 1f, // the microphone, 0 - 3
     val noiseSuppression: Boolean = true,
+    val aiNoiseRemoval: Boolean = false, // RNNoise, on the phone: removes noise the phone's own removal lets through
     val echoCancellation: Boolean = true,
     val autoGainControl: Boolean = false,
     val floatingPtt: Boolean = true, // the round push-to-talk button
@@ -49,6 +50,7 @@ data class VoiceSettings(
                 voiceVolumeDb = p.getInt("voiceVolumeDb", d.voiceVolumeDb),
                 micVolume = p.getFloat("micVolume", d.micVolume),
                 noiseSuppression = p.getBoolean("noiseSuppression", d.noiseSuppression),
+                aiNoiseRemoval = p.getBoolean("aiNoiseRemoval", d.aiNoiseRemoval),
                 echoCancellation = p.getBoolean("echoCancellation", d.echoCancellation),
                 autoGainControl = p.getBoolean("autoGainControl", d.autoGainControl),
                 floatingPtt = p.getBoolean("floatingPtt", d.floatingPtt),
@@ -87,6 +89,7 @@ data class VoiceSettings(
             .putInt("voiceVolumeDb", voiceVolumeDb)
             .putFloat("micVolume", micVolume)
             .putBoolean("noiseSuppression", noiseSuppression)
+            .putBoolean("aiNoiseRemoval", aiNoiseRemoval)
             .putBoolean("echoCancellation", echoCancellation)
             .putBoolean("autoGainControl", autoGainControl)
             .putBoolean("floatingPtt", floatingPtt)

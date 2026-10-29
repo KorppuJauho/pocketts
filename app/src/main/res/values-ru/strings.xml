@@ -603,4 +603,7 @@
     <string name="whisper_channel_off">Не шептать в канал</string>
     <string name="whisper_list_title">Список шёпота</string>
     <string name="whisper_list_subtitle">Пока вы удерживаете кнопку шёпота, вас слышат только они.</string>
+    <string name="capture_ai_noise">ИИ-шумоподавление (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Убирает также щелчки клавиатуры, вентилятор, телевизор и другой шум, который пропускает шумоподавление телефона, с помощью небольшой нейросети на телефоне. Расходует немного больше заряда.</string>
+    <string name="capture_ai_noise_license">Лицензия RNNoise</string>
 </resources>

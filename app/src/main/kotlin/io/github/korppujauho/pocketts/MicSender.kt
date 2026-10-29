@@ -94,6 +94,10 @@ class MicSender(
             if (AutomaticGainControl.isAvailable()) AutomaticGainControl.create(rec.audioSessionId)?.apply { enabled = s.autoGainControl } else null,
         )
         val encoder = OpusEncoder()
+        var rnnoise: Rnnoise? = null // AI noise removal, while it's on in the settings
+        var rnnoiseOn = false // ... the setting as last seen
+        var rnnoiseFrames = 0
+        var rnnoiseNanos = 0L
         val pcm = ShortArray(FRAME)
         var lastSpeech = 0L
         var sending = false
@@ -109,6 +113,20 @@ class MicSender(
                     got += n
                 }
                 val cfg = settings()
+                // AI noise removal first, on the microphone's own sound (turned on and off as the setting changes)
+                if (cfg.aiNoiseRemoval != rnnoiseOn) {
+                    rnnoiseOn = cfg.aiNoiseRemoval
+                    rnnoise?.close()
+                    rnnoise = if (rnnoiseOn) Rnnoise.open() else null
+                    AppLog.log("AI noise removal " + if (rnnoise != null) "on" else "off")
+                }
+                rnnoise?.let {
+                    val start = System.nanoTime()
+                    it.process(pcm)
+                    // Once after 10 s: how much of each 20 ms it takes on this phone
+                    rnnoiseNanos += System.nanoTime() - start
+                    if (++rnnoiseFrames == 500) AppLog.log("AI noise removal takes %.2f ms per 20 ms".format(rnnoiseNanos / 500 / 1e6))
+                }
                 // Microphone volume, then the level
                 var sum = 0.0
                 for (i in pcm.indices) {
@@ -157,6 +175,7 @@ class MicSender(
             effects.forEach { it.release() }
             rec.release()
             encoder.close()
+            rnnoise?.close()
         }
     }
 }

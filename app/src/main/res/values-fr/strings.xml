@@ -589,4 +589,7 @@
     <string name="whisper_channel_off">Ne plus chuchoter au canal</string>
     <string name="whisper_list_title">Liste de chuchotement</string>
     <string name="whisper_list_subtitle">Tant que vous maintenez le bouton de chuchotement, seuls ceux-ci vous entendent.</string>
+    <string name="capture_ai_noise">Suppression du bruit par IA (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Supprime aussi les clics du clavier, un ventilateur, la télévision et les autres bruits que la suppression du téléphone laisse passer, grâce à un petit réseau de neurones sur le téléphone. Consomme un peu plus de batterie.</string>
+    <string name="capture_ai_noise_license">Licence de RNNoise</string>
 </resources>
