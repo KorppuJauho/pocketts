@@ -592,4 +592,7 @@
     <string name="capture_ai_noise">Suppression du bruit par IA (RNNoise)</string>
     <string name="capture_ai_noise_desc">Supprime aussi les clics du clavier, un ventilateur, la télévision et les autres bruits que la suppression du téléphone laisse passer, grâce à un petit réseau de neurones sur le téléphone. Consomme un peu plus de batterie.</string>
     <string name="capture_ai_noise_license">Licence de RNNoise</string>
+    <string name="share_torch_on">Lampe torche allumée (touchez pour éteindre)</string>
+    <string name="share_torch_off">Lampe torche : éclaire ce que filme la caméra arrière</string>
+    <string name="share_camera_lost">La caméra s’est arrêtée : un appel, une autre application ou le téléphone l’a prise.</string>
 </resources>

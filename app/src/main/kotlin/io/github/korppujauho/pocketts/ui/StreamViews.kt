@@ -1,6 +1,8 @@
 package io.github.korppujauho.pocketts.ui
 
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.FlashlightOff
+import androidx.compose.material.icons.filled.FlashlightOn
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Pause
@@ -569,8 +571,9 @@ internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> U
 /**
  * WebTS's share bar: a green box with your own picture small (tap: bigger, inside the box, at most half the screen;
  * tap again: small), a live dot with what's shared and how many watch, and round buttons to switch the camera, turn
- * or lock the picture, and Stop. [screenTurn] is how far the phone is turned from the screen's upright (clockwise):
- * the preview is turned back by it, so it's the right way up to you while the stream is upright for viewers.
+ * or lock the picture, light it (the ring light with the front camera, the flashlight with the back one), and Stop.
+ * [screenTurn] is how far the phone is turned from the screen's upright (clockwise): the preview is turned back by it,
+ * so it's the right way up to you while the stream is upright for viewers.
  */
 @Composable
 fun ShareBar(
@@ -578,6 +581,8 @@ fun ShareBar(
     screenTurn: Int = 0,
     light: Boolean? = null, // the ring light, when it can be had (the front camera): on or off
     onLight: (Boolean) -> Unit = {},
+    torch: Boolean? = null, // the back camera's flashlight, when it has one: on or off
+    onTorch: (Boolean) -> Unit = {},
 ) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
@@ -643,6 +648,13 @@ fun ShareBar(
                     Icons.Filled.LightMode, stringResource(if (light) R.string.share_light_on else R.string.share_light_off),
                     if (light) Color(0xFFFBBF24) else Ts.text,
                 ) { onLight(!light) }
+            }
+            if (torch != null) {
+                RoundButton(
+                    if (torch) Icons.Filled.FlashlightOn else Icons.Filled.FlashlightOff,
+                    stringResource(if (torch) R.string.share_torch_on else R.string.share_torch_off),
+                    if (torch) Color(0xFFFBBF24) else Ts.text,
+                ) { onTorch(!torch) }
             }
         }
         Text(

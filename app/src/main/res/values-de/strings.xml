@@ -578,4 +578,7 @@
     <string name="capture_ai_noise">KI-Rauschunterdrückung (RNNoise)</string>
     <string name="capture_ai_noise_desc">Entfernt auch Tastaturklicks, Lüfter, Fernseher und anderen Lärm, den die Rauschunterdrückung des Telefons durchlässt, mit einem kleinen neuronalen Netz auf dem Telefon. Braucht etwas mehr Akku.</string>
     <string name="capture_ai_noise_license">Lizenz von RNNoise</string>
+    <string name="share_torch_on">Taschenlampe an (tippen: aus)</string>
+    <string name="share_torch_off">Taschenlampe: beleuchtet, was die Rückkamera filmt</string>
+    <string name="share_camera_lost">Die Kamera wurde beendet: Ein Anruf, eine andere App oder das Telefon hat sie übernommen.</string>
 </resources>

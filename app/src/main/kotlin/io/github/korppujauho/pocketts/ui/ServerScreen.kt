@@ -122,6 +122,8 @@ interface ServerActions {
     /** The warning on screen was closed. */
     fun dismissError() {}
     fun setRotateLock(on: Boolean) {}
+    /** The shared back camera's flashlight. */
+    fun setTorch(on: Boolean) {}
     fun setWatchMuted(muted: Boolean) {}
     fun setWatchVolume(volume: Float) {}
     /** The stream player as a small window over other apps. */
@@ -291,6 +293,7 @@ fun ServerScreen(
                     ShareBar(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
                         light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
+                        torch = if (state.stream.shareFlash && !frontCamera) state.stream.torch else null, onTorch = actions::setTorch,
                     )
                 }
                 if (state.stream.watching != 0 && egl != null && !pip) {

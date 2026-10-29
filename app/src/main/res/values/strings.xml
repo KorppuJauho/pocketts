@@ -620,4 +620,7 @@
     <string name="capture_ai_noise">AI noise removal (RNNoise)</string>
     <string name="capture_ai_noise_desc">Also removes keyboard clicks, a fan, a TV and other noise the phone\'s own removal lets through, with a small neural network on the phone. Uses a little more battery.</string>
     <string name="capture_ai_noise_license">RNNoise\'s license</string>
+    <string name="share_torch_on">Flashlight on (tap for off)</string>
+    <string name="share_torch_off">Flashlight: lights what the back camera films</string>
+    <string name="share_camera_lost">The camera stopped: a call, another app or the phone took it.</string>
 </resources>

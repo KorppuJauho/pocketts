@@ -578,4 +578,7 @@
     <string name="capture_ai_noise">Tekoälyn kohinanpoisto (RNNoise)</string>
     <string name="capture_ai_noise_desc">Poistaa myös näppäimistön naksutukset, tuulettimen, television ja muun melun, jonka puhelimen oma kohinanpoisto päästää läpi, puhelimessa toimivalla pienellä neuroverkolla. Kuluttaa hieman enemmän akkua.</string>
     <string name="capture_ai_noise_license">RNNoisen lisenssi</string>
+    <string name="share_torch_on">Taskulamppu päällä (napauta: pois)</string>
+    <string name="share_torch_off">Taskulamppu: valaisee sen, mitä takakamera kuvaa</string>
+    <string name="share_camera_lost">Kamera pysähtyi: puhelu, toinen sovellus tai puhelin otti sen käyttöönsä.</string>
 </resources>

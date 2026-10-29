@@ -151,6 +151,7 @@ object Session : TsClient.Listener {
     fun stopWatching() = engine?.stopWatching()
     fun stopShare() = engine?.stopShare()
     fun flipCamera() = engine?.flipCamera()
+    fun setTorch(on: Boolean) = engine?.setTorch(on)
     fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
     fun setWatchVolume(volume: Float) = engine?.setWatchVolume(volume)
 

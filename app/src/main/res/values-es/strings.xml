@@ -592,4 +592,7 @@
     <string name="capture_ai_noise">Eliminación de ruido con IA (RNNoise)</string>
     <string name="capture_ai_noise_desc">También elimina los clics del teclado, un ventilador, la televisión y otros ruidos que la eliminación del propio teléfono deja pasar, con una pequeña red neuronal en el teléfono. Usa un poco más de batería.</string>
     <string name="capture_ai_noise_license">Licencia de RNNoise</string>
+    <string name="share_torch_on">Linterna encendida (toca para apagar)</string>
+    <string name="share_torch_off">Linterna: ilumina lo que graba la cámara trasera</string>
+    <string name="share_camera_lost">La cámara se detuvo: la tomó una llamada, otra aplicación o el teléfono.</string>
 </resources>

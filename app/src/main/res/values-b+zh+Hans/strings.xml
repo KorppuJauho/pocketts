@@ -564,4 +564,7 @@
     <string name="capture_ai_noise">AI 降噪 (RNNoise)</string>
     <string name="capture_ai_noise_desc">用手机上的小型神经网络，同时去除手机自带降噪漏掉的键盘声、风扇声、电视声等噪音。会多耗一点电。</string>
     <string name="capture_ai_noise_license">RNNoise 许可证</string>
+    <string name="share_torch_on">手电筒已开启（轻触关闭）</string>
+    <string name="share_torch_off">手电筒：照亮后置摄像头拍摄的画面</string>
+    <string name="share_camera_lost">摄像头已停止：被来电、其他应用或手机占用。</string>
 </resources>

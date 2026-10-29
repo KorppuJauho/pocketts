@@ -10,7 +10,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.webrtc.Camera2Enumerator
 import org.webrtc.DataChannel
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -60,6 +59,8 @@ class StreamEngine(
         val sharePaused: Boolean = false, // our stream paused (as the TeamSpeak app pauses): nothing sent, viewers see it paused
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
+        val shareFlash: Boolean = false, // the shared back camera has a flashlight (with both cameras: the back one)
+        val torch: Boolean = false, // ... and it's on
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
         val lockedTurn: Int = 0, // the turn kept while locked (the phone's, from the screen's upright, when locked)
@@ -397,15 +398,15 @@ class StreamEngine(
     /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
-        val cams = Camera2Enumerator(context)
-        val device = cams.deviceNames.firstOrNull { cams.isFrontFacing(it) == front } ?: cams.deviceNames.firstOrNull() ?: run {
+        val cams = CameraInfo.all(context)
+        val cam = cams.firstOrNull { it.front == front } ?: cams.firstOrNull() ?: run {
             log("No camera")
             return@execute
         }
         bitrate = when { quality >= 1080 -> 4500; quality >= 720 -> 2500; else -> 1000 }
-        update { it.copy(shareFront = cams.isFrontFacing(device), shareBoth = false) }
+        update { it.copy(shareFront = cam.front, shareBoth = false, shareFlash = cam.hasFlash && !cam.front, torch = false) }
         turn.start(settings().cameraRotateLock)
-        startCapture(cams.createCapturer(device, null), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
+        startCapture(PhoneCamera(context, cam, ::cameraLost), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
             turn.observer(it) { state.shareFront }
         }
     }
@@ -418,9 +419,10 @@ class StreamEngine(
             return@execute
         }
         bitrate = when { quality >= 1080 -> 5000; quality >= 720 -> 3000; else -> 1200 }
-        update { it.copy(shareFront = false, shareBoth = true) }
+        val back = CameraInfo.of(context, ids.first)
+        update { it.copy(shareFront = false, shareBoth = true, shareFlash = back?.hasFlash == true, torch = false) }
         turn.start(settings().cameraRotateLock)
-        val cam = DualCamera(context, egl.eglBaseContext, ids) { front -> turn.extra(front) }
+        val cam = DualCamera(context, egl.eglBaseContext, ids, ::cameraLost) { front -> turn.extra(front) }
         dual = cam
         startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound)
     }
@@ -529,11 +531,29 @@ class StreamEngine(
             update { it.copy(shareFront = d.frontBig) }
             return@execute
         }
-        val cam = capturer as? org.webrtc.CameraVideoCapturer ?: return@execute
-        cam.switchCamera(object : org.webrtc.CameraVideoCapturer.CameraSwitchHandler {
-            override fun onCameraSwitchDone(front: Boolean) = exec.execute { update { it.copy(shareFront = front) } }
-            override fun onCameraSwitchError(e: String) = log("Camera switch failed: $e")
-        })
+        val cam = capturer as? PhoneCamera ?: return@execute
+        val next = CameraInfo.all(context).firstOrNull { it.front != cam.camera.front } ?: return@execute
+        cam.switchTo(next) { front -> exec.execute { update { it.copy(shareFront = front, shareFlash = next.hasFlash && !front) } } }
+    }
+
+    /** The flashlight of the shared back camera (with both cameras: the back one), on or off. */
+    fun setTorch(on: Boolean) = exec.execute {
+        when (val c = capturer) {
+            is PhoneCamera -> c.torch = on
+            is DualCamera -> c.torch = on
+            else -> return@execute
+        }
+        log("Flashlight ${if (on) "on" else "off"}")
+        update { it.copy(torch = on) }
+    }
+
+    // The shared camera stopped by itself (a call or another app took it, or an error): the share ends, and says why
+    private fun cameraLost(reason: String) = exec.execute {
+        if (state.sharing != Streams.Kind.CAMERA) return@execute
+        log("Camera lost: $reason")
+        shareId?.let { send(Streams.stop(it)) }
+        endShare()
+        update { it.copy(message = text(R.string.share_camera_lost)) }
     }
 
     fun stopShare() = exec.execute {
@@ -636,7 +656,7 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false) }
     }
 
     private fun releaseCapture() {
