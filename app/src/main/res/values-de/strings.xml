@@ -575,4 +575,7 @@
     <string name="whisper_channel_off">Nicht mehr in den Channel flüstern</string>
     <string name="whisper_list_title">Flüsterliste</string>
     <string name="whisper_list_subtitle">Solange du die Flüstertaste hältst, hören dich nur diese.</string>
+    <string name="capture_ai_noise">KI-Rauschunterdrückung (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Entfernt auch Tastaturklicks, Lüfter, Fernseher und anderen Lärm, den die Rauschunterdrückung des Telefons durchlässt, mit einem kleinen neuronalen Netz auf dem Telefon. Braucht etwas mehr Akku.</string>
+    <string name="capture_ai_noise_license">Lizenz von RNNoise</string>
 </resources>

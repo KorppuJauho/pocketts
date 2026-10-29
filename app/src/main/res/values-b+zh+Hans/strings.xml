@@ -561,4 +561,7 @@
     <string name="whisper_channel_off">停止对频道说悄悄话</string>
     <string name="whisper_list_title">悄悄话列表</string>
     <string name="whisper_list_subtitle">按住悄悄话按钮时，只有这些人能听到你。</string>
+    <string name="capture_ai_noise">AI 降噪 (RNNoise)</string>
+    <string name="capture_ai_noise_desc">用手机上的小型神经网络，同时去除手机自带降噪漏掉的键盘声、风扇声、电视声等噪音。会多耗一点电。</string>
+    <string name="capture_ai_noise_license">RNNoise 许可证</string>
 </resources>

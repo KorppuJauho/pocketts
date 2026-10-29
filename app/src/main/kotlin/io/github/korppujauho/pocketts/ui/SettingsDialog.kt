@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -533,6 +534,15 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
     }
     Group(stringResource(R.string.capture_processing)) {
         Check(stringResource(R.string.capture_noise), v.noiseSuppression) { onChange(v.copy(noiseSuppression = it)) }
+        Check(stringResource(R.string.capture_ai_noise), v.aiNoiseRemoval) { onChange(v.copy(aiNoiseRemoval = it)) }
+        Desc(stringResource(R.string.capture_ai_noise_desc))
+        // RNNoise's license (BSD: its notice goes with the app)
+        var license by remember { mutableStateOf(false) }
+        Text(
+            stringResource(R.string.capture_ai_noise_license), color = Ts.accent, fontSize = 12.5.sp,
+            modifier = Modifier.clickable { license = true }.padding(vertical = 2.dp),
+        )
+        if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
         Check(stringResource(R.string.capture_echo), v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
         Desc(stringResource(R.string.capture_echo_desc))
@@ -563,5 +573,21 @@ private fun LevelMeter(actions: SettingsActions, threshold: Float?) {
             val x = with(density) { (width * (threshold / 0.1f).coerceIn(0f, 1f)).toDp() }
             Box(Modifier.offset(x = x).width(2.dp).fillMaxSize().background(Ts.red))
         }
+    }
+}
+
+/** A library's license, from the app's own files (assets/licenses). */
+@Composable
+private fun LicenseDialog(asset: String, name: String, onDismiss: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val text = remember(asset) { runCatching { context.assets.open(asset).bufferedReader().use { it.readText() } }.getOrDefault("") }
+    TsDialog(
+        onDismiss = onDismiss, title = name,
+        buttons = { PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss) },
+    ) {
+        Text(
+            text, color = Ts.muted, fontSize = 11.sp, lineHeight = 14.sp,
+            modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
+        )
     }
 }

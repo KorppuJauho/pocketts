@@ -575,4 +575,7 @@
     <string name="whisper_channel_off">Lopeta kuiskaus kanavalle</string>
     <string name="whisper_list_title">Kuiskauslista</string>
     <string name="whisper_list_subtitle">Kun pidät kuiskausnappia pohjassa, vain nämä kuulevat sinut.</string>
+    <string name="capture_ai_noise">Tekoälyn kohinanpoisto (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Poistaa myös näppäimistön naksutukset, tuulettimen, television ja muun melun, jonka puhelimen oma kohinanpoisto päästää läpi, puhelimessa toimivalla pienellä neuroverkolla. Kuluttaa hieman enemmän akkua.</string>
+    <string name="capture_ai_noise_license">RNNoisen lisenssi</string>
 </resources>
