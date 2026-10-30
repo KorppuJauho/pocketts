@@ -55,13 +55,15 @@ object AppLog {
         }
         log("Started ${BuildConfig.VERSION_NAME} on ${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE}")
         if (debug != null) log("Settings: ${settings.forLog()}")
-        if (started || debug != null) lastStops(context)
+        // The debug log only says what happened while it was on; test builds' own log says all
+        if (started) lastStops(context, 0L) else if (debug != null) lastStops(context, debugSince(context))
     }
 
     /** The debug log turned on (starting with what matters for a bug report), or off (and deleted). */
     fun setDebugLog(context: Context, on: Boolean, settings: VoiceSettings) {
         if (on == (debug != null)) return
         if (on) {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putLong(SINCE, System.currentTimeMillis()).apply()
             debug = DebugLog(context.applicationContext)
             log("Debug log on: ${BuildConfig.VERSION_NAME} on ${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE}")
             log("Settings: ${settings.forLog()}")
@@ -85,14 +87,20 @@ object AppLog {
 
     // Why the app stopped the last times, as Android recorded it: a crash in native code (WebRTC's) or Android
     // stopping the app leaves no line of its own
-    private fun lastStops(context: Context) {
+    private const val PREFS = "debug-log"
+    private const val SINCE = "since" // when the debug log was turned on
+
+    private fun debugSince(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(SINCE, Long.MAX_VALUE)
+
+    // [since]: only stops after then
+    private fun lastStops(context: Context, since: Long) {
         if (Build.VERSION.SDK_INT < 30) return
         val stops = try {
             context.getSystemService(ActivityManager::class.java)?.getHistoricalProcessExitReasons(null, 0, 5)
         } catch (_: Exception) {
             null
         } ?: return
-        for (s in stops) {
+        for (s in stops.filter { it.timestamp >= since }) {
             val at = synchronized(time) { time.format(Date(s.timestamp)) }
             log("Stopped before at $at: reason ${s.reason}, ${s.description.orEmpty()} (status ${s.status}, importance ${s.importance}, ${s.pss / 1024} MB)")
             val trace = when (s.reason) {
