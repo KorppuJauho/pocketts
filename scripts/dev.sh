@@ -40,9 +40,11 @@ CPUS="${CPUS:-4}"   # keep builds from taking every core
 
 gradle() {
   # The build output goes to a Docker volume (fast), not next to the sources on the Windows drive.
+  # Robolectric's Android jars (about 200 MB, which the app's tests run on) are kept in a volume too: downloaded again
+  # on every run, Maven Central soon refuses them (HTTP 429, too many requests).
   # Host networking, so the tests reach a test server published on this machine.
   docker run --rm -t --network host --cpus "$CPUS" --memory 6g "${EXTRA[@]}" \
-    -v "$ROOT":/work -v pocketts-gradle:/gradle -v pocketts-out:/out \
+    -v "$ROOT":/work -v pocketts-gradle:/gradle -v pocketts-out:/out -v pocketts-m2:/root/.m2 \
     -e ANDROID_USER_HOME=/gradle/android-user \
     -e POCKETTS_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
     "$IMAGE" ./gradlew --no-daemon --console=plain "$@"

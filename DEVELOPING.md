@@ -14,7 +14,7 @@ Everything builds in Docker, so the only things needed are Docker and a Bash she
 WSL). There's no need to install Java or the Android SDK.
 
 ```bash
-ACCEPT_ANDROID_SDK_LICENSE=yes scripts/dev.sh image   # the build image: Java and the Android SDK (once)
+ACCEPT_ANDROID_SDK_LICENSE=yes scripts/dev.sh image   # the build image: Java, the Android SDK and NDK (once)
 scripts/dev.sh test                                   # tests
 scripts/dev.sh apk                                    # a test build in dist/
 scripts/dev.sh screenshots                            # pictures of the screens (example data) in docs/screenshots/
@@ -22,6 +22,10 @@ scripts/dev.sh gradle <task>                          # any other Gradle task
 ```
 
 The build image accepts the Android SDK license, which is why that variable has to be set.
+
+Builds keep Gradle's downloads, the build output and Robolectric's Android jars (which the app's tests run on, about
+200 MB) in Docker volumes: `pocketts-gradle`, `pocketts-out` and `pocketts-m2`. Later builds are then faster, and the
+tests don't download those jars every time (Maven Central starts refusing repeated downloads).
 
 `scripts/dev.sh screenshots` also makes the Google Play pictures (`docs/screenshots/play/`) and GitHub's social
 preview (`docs/screenshots/social-preview.png`, the picture shown when the repository is shared or found in search).
