@@ -112,8 +112,7 @@ interface ServerActions {
     fun watch(person: ServerModel.Client)
     fun stopWatching()
     /** The camera at [quality]: the picture's height, 480, 720 or 1080. */
-    /** The camera ([lens]: a back camera chosen by its id, else the main one). */
-    fun shareCamera(front: Boolean, quality: Int, sound: Boolean, lens: String? = null)
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean)
     /** Asks Android for the screen, then shares it. */
     fun shareScreen(sound: Boolean)
     fun stopShare()
@@ -571,12 +570,8 @@ fun ServerScreen(
         )
     }
     if (shareDialog) {
-        // The back lenses the phone offers apart (wide-angle, main, telephoto), when it offers more than one
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val lenses = remember { io.github.korppujauho.pocketts.CameraInfo.backLenses(context).map { it.first.id to it.second } }
         ShareDialog(
-            onCamera = { front, quality, sound, lens -> shareDialog = false; actions.shareCamera(front, quality, sound, lens) },
-            lenses = lenses,
+            onCamera = { front, quality, sound -> shareDialog = false; actions.shareCamera(front, quality, sound) },
             onBoth = { quality, sound -> shareDialog = false; actions.shareBothCameras(quality, sound) },
             sound = state.voice.cameraSound,
             canBoth = canBoth,

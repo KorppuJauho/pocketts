@@ -474,8 +474,7 @@ private fun FullScreenPlayer(
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
 fun ShareDialog(
-    onCamera: (front: Boolean, quality: Int, sound: Boolean, lens: String?) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
-    lenses: List<Pair<String, io.github.korppujauho.pocketts.Lens>> = emptyList(), // back cameras to choose from (id, kind)
+    onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
     onBoth: (quality: Int, sound: Boolean) -> Unit = { _, _ -> }, canBoth: Boolean = false, sound: Boolean = false,
     screenSound: Boolean = true,
     screenSoundBlocked: Boolean = false, // watching a stream: the phone's sound can't go with the screen now
@@ -484,7 +483,6 @@ fun ShareDialog(
     var withScreenSound by remember { mutableStateOf(screenSound) }
     var screen by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(0) } // front, back, both
-    var lens by remember { mutableStateOf(lenses.firstOrNull { it.second == io.github.korppujauho.pocketts.Lens.MAIN }?.first) }
     var quality by remember { mutableStateOf(720) }
     val qualities = listOf(480, 720, 1080)
     TsDialog(
@@ -497,7 +495,7 @@ fun ShareDialog(
                 when {
                     screen -> onScreen(withScreenSound && !screenSoundBlocked)
                     camera == 2 -> onBoth(quality, withSound)
-                    else -> onCamera(camera == 0, quality, withSound, if (camera == 1) lens else null)
+                    else -> onCamera(camera == 0, quality, withSound)
                 }
             }
         },
@@ -528,21 +526,6 @@ fun ShareDialog(
                     Text(stringResource(R.string.share_camera), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf(stringResource(R.string.camera_front), stringResource(R.string.camera_back)) + if (canBoth) listOf(stringResource(R.string.camera_both)) else emptyList(), camera) { camera = it }
                     if (camera == 2) Text(stringResource(R.string.share_both_desc), color = Ts.muted, fontSize = 13.sp)
-                    if (camera == 1 && lenses.size > 1) {
-                        Text(stringResource(R.string.share_lens), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        Segments(
-                            lenses.map { (_, kind) ->
-                                stringResource(
-                                    when (kind) {
-                                        io.github.korppujauho.pocketts.Lens.WIDE -> R.string.lens_wide
-                                        io.github.korppujauho.pocketts.Lens.MAIN -> R.string.lens_main
-                                        io.github.korppujauho.pocketts.Lens.TELE -> R.string.lens_tele
-                                    },
-                                )
-                            },
-                            lenses.indexOfFirst { it.first == lens }.coerceAtLeast(0),
-                        ) { lens = lenses[it].first }
-                    }
                     Text(stringResource(R.string.share_quality), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf("480p", "720p", "1080p"), qualities.indexOf(quality)) { quality = qualities[it] }
                     Text(
@@ -767,11 +750,22 @@ fun ShareBar(
             }
         }
         Text(
-            stringResource(R.string.stop), color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+            stringResource(R.string.stop), color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, softWrap = false,
             modifier = Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(Ts.redButton.copy(alpha = 0.15f))
                 .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(onClick = onStop)
                 .wrapContentHeight(Alignment.CenterVertically).padding(horizontal = 18.dp),
         )
+    }
+
+    // The buttons on the right, going onto a second line rather than squeezing when there are many (flip, lens, turn,
+    // light, Stop) on a narrow screen
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    @Composable
+    fun ButtonRow() {
+        androidx.compose.foundation.layout.FlowRow(
+            Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(8.dp), itemVerticalAlignment = Alignment.CenterVertically,
+        ) { Buttons() }
     }
 
     Column(
@@ -784,18 +778,14 @@ fun ShareBar(
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth()) {
                 Preview(Modifier.fillMaxWidth().height(minOf(maxWidth / aspect, maxHeight)))
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Status(Modifier.weight(1f))
-                Buttons()
-            }
+            Status(Modifier.fillMaxWidth())
+            ButtonRow()
         } else {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Preview(Modifier.size(width = 72.dp, height = minOf(72.dp / aspect, 128.dp)))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { Status(Modifier.padding(end = 4.dp)) }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
-                        Buttons()
-                    }
+                    ButtonRow()
                 }
             }
         }

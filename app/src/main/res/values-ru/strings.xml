@@ -609,10 +609,6 @@
     <string name="share_torch_on">Фонарик включён (нажмите, чтобы выключить)</string>
     <string name="share_torch_off">Фонарик: освещает то, что снимает задняя камера</string>
     <string name="share_camera_lost">Камера остановилась: её занял звонок, другое приложение или телефон.</string>
-    <string name="share_lens">Объектив</string>
-    <string name="lens_wide">Широкий</string>
-    <string name="lens_main">Основной</string>
-    <string name="lens_tele">Теле</string>
     <string name="share_preview_small">Уменьшить превью</string>
     <string name="share_lens_switch">Объектив %1$s: нажмите, чтобы переключить</string>
 </resources>

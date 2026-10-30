@@ -623,10 +623,6 @@
     <string name="share_torch_on">Flashlight on (tap for off)</string>
     <string name="share_torch_off">Flashlight: lights what the back camera films</string>
     <string name="share_camera_lost">The camera stopped: a call, another app or the phone took it.</string>
-    <string name="share_lens">Lens</string>
-    <string name="lens_wide">Wide</string>
-    <string name="lens_main">Main</string>
-    <string name="lens_tele">Tele</string>
     <string name="share_preview_small">Make the preview small</string>
     <string name="share_lens_switch">Lens %1$s: tap for the next lens</string>
 </resources>

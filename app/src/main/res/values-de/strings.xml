@@ -581,10 +581,6 @@
     <string name="share_torch_on">Taschenlampe an (tippen: aus)</string>
     <string name="share_torch_off">Taschenlampe: beleuchtet, was die Rückkamera filmt</string>
     <string name="share_camera_lost">Die Kamera wurde beendet: Ein Anruf, eine andere App oder das Telefon hat sie übernommen.</string>
-    <string name="share_lens">Objektiv</string>
-    <string name="lens_wide">Weitwinkel</string>
-    <string name="lens_main">Haupt</string>
-    <string name="lens_tele">Tele</string>
     <string name="share_preview_small">Vorschau verkleinern</string>
     <string name="share_lens_switch">Objektiv %1$s: tippen für das nächste Objektiv</string>
 </resources>
