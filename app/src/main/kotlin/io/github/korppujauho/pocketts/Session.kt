@@ -635,6 +635,7 @@ object Session : TsClient.Listener {
             is Chat.Key.Channel -> c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to key.id, "msg" to msg))
             is Chat.Key.Private -> c.post {
                 val person = model.clients.values.firstOrNull { it.uid == key.uid && it.id != model.ownClientId } ?: run {
+                    AppLog.log("Chat: a private message not sent (they left)")
                     _state.update { it.copy(error = chat.privateNames[key.uid]?.let { n -> app.getString(R.string.private_left, n) } ?: app.getString(R.string.private_left_unknown)) }
                     return@post
                 }
@@ -1197,6 +1198,12 @@ object Session : TsClient.Listener {
         val changed = model.apply(cmd)
         result.poke?.let { poked(it) }
         val message = result.message
+        // In the log, that something happened in the chat: never what was said, nor with whom
+        if (result.poke != null) AppLog.log("Chat: a poke arrived")
+        message?.let { (key, entry) ->
+            val kind = if (key is Chat.Key.Private) "private" else "channel"
+            AppLog.log(if (entry.outgoing) "Chat: a $kind message sent" else "Chat: a $kind message arrived")
+        }
         cues.forEach { sound(it) }
         if (result.poke != null) sound(Cue.POKE)
         if (message != null) sound(if (message.second.outgoing) Cue.MESSAGE_OUT else Cue.MESSAGE_IN)

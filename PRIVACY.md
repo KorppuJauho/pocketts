@@ -58,8 +58,8 @@ only while it's on, and only on your phone (at most about 1 MB, the oldest lines
 What could identify anyone is taken out before anything is written, not hidden: server addresses, host names and
 nicknames, people's and devices' names, channel and folder names, IP and email addresses, links and keys. Where the
 log needs to tell them apart, it uses running numbers ("server 1", "person 3") that mean nothing outside that one log.
-People's own words, such as kick reasons, are left out, and chat messages, passwords and your identity are never in
-it.
+People's own words, such as kick reasons, are left out, and passwords and your identity are never in it. Of the chat,
+it notes only that a message was sent or arrived, never what it said or with whom.
 
 The app never sends the log anywhere. Settings › Advanced can share it through Android's share menu, to wherever you
 choose (for example a bug report on GitHub), or delete it. Turning it off deletes it.
