@@ -578,6 +578,11 @@
     <string name="capture_ai_noise">KI-Rauschunterdrückung (RNNoise)</string>
     <string name="capture_ai_noise_desc">Entfernt auch Tastaturklicks, Lüfter, Fernseher und anderen Lärm, den die Rauschunterdrückung des Telefons durchlässt, mit einem kleinen neuronalen Netz auf dem Telefon. Braucht etwas mehr Akku.</string>
     <string name="capture_ai_noise_license">Lizenz von RNNoise</string>
+    <string name="share_torch_on">Taschenlampe an (tippen: aus)</string>
+    <string name="share_torch_off">Taschenlampe: beleuchtet, was die Rückkamera filmt</string>
+    <string name="share_camera_lost">Die Kamera wurde beendet: Ein Anruf, eine andere App oder das Telefon hat sie übernommen.</string>
+    <string name="share_preview_small">Vorschau verkleinern</string>
+    <string name="share_lens_switch">Objektiv %1$s: tippen für das nächste Objektiv</string>
     <string name="debug_log_title">Debug-Protokoll</string>
     <string name="debug_log">Debug-Protokoll führen</string>
     <string name="debug_log_desc">Für Fehlerberichte: was die App tut, Abstürze eingeschlossen, nur auf diesem Telefon gespeichert. Serveradressen, Namen und Nachrichten werden entfernt. Die App sendet es nie: Teile es selbst, zum Beispiel in einem Fehlerbericht auf GitHub. Ausschalten löscht es.</string>

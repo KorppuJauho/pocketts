@@ -449,6 +449,18 @@ private object SessionActions : ServerActions {
         MainActivity.current?.shareBothCameras(quality, sound)
     }
     override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
+    override fun setTorch(on: Boolean) {
+        Session.setTorch(on)
+    }
+    override fun setZoom(zoom: Float) {
+        Session.setZoom(zoom)
+    }
+    override fun nextLens() {
+        Session.nextLens()
+    }
+    override fun focusAt(x: Float, y: Float) {
+        Session.focusAt(x, y)
+    }
     override fun setWatchMuted(muted: Boolean) {
         Session.setWatchMuted(muted)
     }
