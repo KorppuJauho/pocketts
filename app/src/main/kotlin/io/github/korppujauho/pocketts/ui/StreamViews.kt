@@ -236,11 +236,14 @@ private const val PULL_TO_SWITCH = 56f // dp dragged on past the top that makes 
  * The handle under the picture sets its height (remembered): at first at most 40 % of the screen, so the channels and
  * the chat stay in view, and never taller than the picture needs. Pulled on past the top it shrinks to a small
  * picture over the app that can be moved ([MiniPlayer]).
+ *
+ * [talk]: the talk buttons (push-to-talk, whisper) for the full screen, which covers the app's own.
  */
 @Composable
 fun WatchCard(
     state: StreamEngine.State, title: String, egl: EglBase, onClose: () -> Unit,
     onMute: (Boolean) -> Unit = {}, onVolume: (Float) -> Unit = {}, onSmallWindow: (() -> Unit)? = null,
+    talk: (@Composable (Modifier) -> Unit)? = null,
 ) {
     var aspect by remember { mutableStateOf(16f / 9f) }
     var full by remember { mutableStateOf(false) }
@@ -252,7 +255,7 @@ fun WatchCard(
     var mini by remember { mutableStateOf(false) }
     if (mini) {
         MiniPlayer(state, video, egl, aspect, onOpen = { mini = false }, onClose = onClose)
-        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, talk) { full = false }
         return
     }
     Column(
@@ -334,7 +337,7 @@ fun WatchCard(
         }
         if (sound && state.watchAudio != null) SoundRow(state, onMute, onVolume)
     }
-    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, talk) { full = false }
 }
 
 /**
@@ -408,11 +411,14 @@ private fun SoundRow(state: StreamEngine.State, onMute: (Boolean) -> Unit, onVol
     }
 }
 
-/** The stream on the whole screen, the app turned the way the picture is; tap for the buttons. */
+/**
+ * The stream on the whole screen, the app turned the way the picture is; tap for the buttons. The talk buttons ([talk])
+ * stay in the bottom corner either way, so push-to-talk works while watching.
+ */
 @Composable
 private fun FullScreenPlayer(
     state: StreamEngine.State, video: VideoTrack, title: String, egl: EglBase, aspect: Float,
-    onMute: (Boolean) -> Unit, onExit: () -> Unit,
+    onMute: (Boolean) -> Unit, talk: (@Composable (Modifier) -> Unit)?, onExit: () -> Unit,
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     DisposableEffect(Unit) {
@@ -458,6 +464,7 @@ private fun FullScreenPlayer(
                     RoundButton(Icons.Filled.FullscreenExit, stringResource(R.string.stream_leave_full_screen), Ts.text, onExit)
                 }
             }
+            talk?.invoke(Modifier.align(Alignment.BottomEnd).padding(20.dp))
         }
     }
 }

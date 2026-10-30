@@ -6,6 +6,9 @@
   the microphone's sound before it's sent. It removes noise the phone's own noise removal lets through, such as
   keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by
   default, and takes about a tenth of one processor core.
+- **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
+  mode the round talk button now stays in its bottom corner (and the whisper button above it while there's a whisper
+  list), also when the stream's own buttons are hidden.
 
 ## 1.5.0 (2026-10-28)
 
