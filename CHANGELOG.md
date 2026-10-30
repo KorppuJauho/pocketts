@@ -7,8 +7,8 @@
   keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by
   default, and takes about a tenth of one processor core.
 - **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
-  mode the round talk button now stays in its bottom corner (and the whisper button above it while there's a whisper
-  list), also when the stream's own buttons are hidden.
+  mode the round talk button is in its bottom corner (and the whisper button above it while there's a whisper list),
+  with the stream's own buttons. The full screen also has the stream's volume slider, not only sound on and off.
 
 ## 1.5.0 (2026-10-28)
 

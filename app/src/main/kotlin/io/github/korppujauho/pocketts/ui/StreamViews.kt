@@ -49,6 +49,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
@@ -255,7 +256,7 @@ fun WatchCard(
     var mini by remember { mutableStateOf(false) }
     if (mini) {
         MiniPlayer(state, video, egl, aspect, onOpen = { mini = false }, onClose = onClose)
-        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, talk) { full = false }
+        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, onVolume, talk) { full = false }
         return
     }
     Column(
@@ -337,7 +338,7 @@ fun WatchCard(
         }
         if (sound && state.watchAudio != null) SoundRow(state, onMute, onVolume)
     }
-    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, talk) { full = false }
+    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, onVolume, talk) { full = false }
 }
 
 /**
@@ -412,13 +413,13 @@ private fun SoundRow(state: StreamEngine.State, onMute: (Boolean) -> Unit, onVol
 }
 
 /**
- * The stream on the whole screen, the app turned the way the picture is; tap for the buttons. The talk buttons ([talk])
- * stay in the bottom corner either way, so push-to-talk works while watching.
+ * The stream on the whole screen, the app turned the way the picture is; tap for the buttons: the sound (on, off and how
+ * loud), leaving the full screen, and the talk buttons ([talk]) in the bottom corner, so push-to-talk works while watching.
  */
 @Composable
 private fun FullScreenPlayer(
     state: StreamEngine.State, video: VideoTrack, title: String, egl: EglBase, aspect: Float,
-    onMute: (Boolean) -> Unit, talk: (@Composable (Modifier) -> Unit)?, onExit: () -> Unit,
+    onMute: (Boolean) -> Unit, onVolume: (Float) -> Unit, talk: (@Composable (Modifier) -> Unit)?, onExit: () -> Unit,
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     DisposableEffect(Unit) {
@@ -455,16 +456,11 @@ private fun FullScreenPlayer(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, modifier = Modifier.weight(1f))
-                    if (state.watchAudio != null) {
-                        RoundButton(
-                            if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-                            stringResource(if (state.watchMuted) R.string.stream_sound_on else R.string.stream_sound_off), if (state.watchMuted) Ts.red else Ts.text,
-                        ) { onMute(!state.watchMuted) }
-                    }
+                    if (state.watchAudio != null) Box(Modifier.width(200.dp)) { SoundRow(state, onMute, onVolume) }
                     RoundButton(Icons.Filled.FullscreenExit, stringResource(R.string.stream_leave_full_screen), Ts.text, onExit)
                 }
+                talk?.invoke(Modifier.align(Alignment.BottomEnd).padding(20.dp))
             }
-            talk?.invoke(Modifier.align(Alignment.BottomEnd).padding(20.dp))
         }
     }
 }
