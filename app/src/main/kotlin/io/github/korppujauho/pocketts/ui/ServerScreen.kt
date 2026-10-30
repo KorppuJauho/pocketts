@@ -302,7 +302,7 @@ fun ServerScreen(
                         talk = if (!ptt && state.whisperTo.isEmpty) null else ({ m ->
                             Column(m, verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (!state.whisperTo.isEmpty) WhisperButton(state.whisperHeld, actions::setWhisper)
-                                if (ptt) FloatingPtt(state.pttHeld, actions::setPtt)
+                                if (ptt) FloatingPtt(state.pttHeld, actions::setPtt, small = true)
                             }
                         }),
                     )

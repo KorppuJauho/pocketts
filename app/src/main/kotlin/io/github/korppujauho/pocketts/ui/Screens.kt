@@ -227,10 +227,10 @@ fun WhisperStrip(incoming: List<String>, list: List<String>, onList: () -> Unit,
     }
 }
 
-/** The floating push-to-talk button: round, at the bottom right, bigger while held. */
+/** The floating push-to-talk button: round, at the bottom right, bigger while held ([small]: over a full-screen stream). */
 @Composable
-fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-    val size = if (held) 66.dp else 60.dp
+fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = Modifier, small: Boolean = false) {
+    val size = (if (small) 48.dp else 60.dp) + if (held) 6.dp else 0.dp
     Box(
         modifier.size(size).shadow(10.dp, CircleShape).clip(CircleShape)
             .background(if (held) Color(0xEB0E7490) else Color(0xC71E1F22))
@@ -238,7 +238,7 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
         contentAlignment = Alignment.Center,
     ) {
         // The same icon as the push-to-talk button in the bar: the microphone there means muting
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(28.dp).upright())
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(if (small) 22.dp else 28.dp).upright())
     }
 }
 
