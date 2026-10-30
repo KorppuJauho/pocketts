@@ -597,4 +597,11 @@
     <string name="share_camera_lost">La caméra s’est arrêtée : un appel, une autre application ou le téléphone l’a prise.</string>
     <string name="share_preview_small">Réduire l’aperçu</string>
     <string name="share_lens_switch">Objectif %1$s : touchez pour l’objectif suivant</string>
+    <string name="debug_log_title">Journal de débogage</string>
+    <string name="debug_log">Tenir un journal de débogage</string>
+    <string name="debug_log_desc">Pour les rapports de bug : ce que fait l’application, plantages compris, gardé uniquement sur ce téléphone. Les adresses de serveur, les noms et les messages en sont retirés. L’application ne l’envoie jamais : partagez-le vous-même, par exemple dans un rapport de bug sur GitHub. Le désactiver le supprime.</string>
+    <string name="debug_log_share">Partager le journal</string>
+    <string name="debug_log_delete">Supprimer le journal</string>
+    <string name="debug_log_empty">Le journal de débogage est vide pour l’instant.</string>
+    <string name="debug_log_deleted">Journal de débogage supprimé.</string>
 </resources>

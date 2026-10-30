@@ -1,6 +1,7 @@
 package io.github.korppujauho.pocketts
 
 import android.content.Context
+import io.github.korppujauho.pocketts.proto.LogPrivacy
 import io.github.korppujauho.pocketts.proto.Chat
 import io.github.korppujauho.pocketts.proto.Command
 import io.github.korppujauho.pocketts.proto.ChannelEdits
@@ -339,7 +340,7 @@ object Session : TsClient.Listener {
                 return@execute
             }
             val target = ServerAddress.resolve(typed, AndroidDns, ServerAddress.MyTeamSpeakNicknames) { AppLog.log(it) }
-            AppLog.log("Connecting to ${target.host}:${target.port} (${target.how})")
+            AppLog.log("Connecting to ${LogPrivacy.server(target.host)}:${target.port} (${target.how})")
             model.clear()
             if (!keepChat) {
                 chat.clear()
@@ -426,7 +427,7 @@ object Session : TsClient.Listener {
             }
             // The quiet try's other refusals (a full channel, no permission) are shown as any other
             join.code.startsWith("quiet-") -> {
-                AppLog.log("Server error $id: ${cmd["msg"]}")
+                AppLog.log("Server error $id: ${LogPrivacy.text(cmd["msg"])}")
                 _state.update { it.copy(error = cmd["msg"]) }
             }
         }
@@ -565,6 +566,7 @@ object Session : TsClient.Listener {
         val old = _state.value.voice
         v.save(app)
         _state.update { it.copy(voice = v) }
+        if (v.debugLog != old.debugLog) AppLog.setDebugLog(app, v.debugLog, v)
         player?.voiceGain = v.voiceGain
         if (v.activation != VoiceSettings.Activation.PTT) setPtt(false)
         if (_state.value.phase == Phase.IDLE) return
@@ -637,6 +639,7 @@ object Session : TsClient.Listener {
             is Chat.Key.Channel -> c.sendCommand(Commands.build("sendtextmessage", "targetmode" to 2, "target" to key.id, "msg" to msg))
             is Chat.Key.Private -> c.post {
                 val person = model.clients.values.firstOrNull { it.uid == key.uid && it.id != model.ownClientId } ?: run {
+                    AppLog.log("Chat: a private message not sent (they left)")
                     _state.update { it.copy(error = chat.privateNames[key.uid]?.let { n -> app.getString(R.string.private_left, n) } ?: app.getString(R.string.private_left_unknown)) }
                     return@post
                 }
@@ -745,8 +748,10 @@ object Session : TsClient.Listener {
     private fun adminAnswered(asked: Pair<AdminAction, String>, cmd: Command) {
         val (action, who) = asked
         val id = cmd["id"] ?: return
-        if (id == "0") return AppLog.log("Admin: ${action.log} $who")
-        AppLog.log("Admin: couldn't ${action.log} $who, error $id: ${cmd["msg"]} (permission ${cmd["failed_permid"]})")
+        // Whom, as the log may say it: a person, or a channel
+        val whom = if (action.ordinal <= AdminAction.BAN.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
+        if (id == "0") return AppLog.log("Admin: ${action.log} $whom")
+        AppLog.log("Admin: couldn't ${action.log} $whom, error $id: ${LogPrivacy.text(cmd["msg"])} (permission ${cmd["failed_permid"]})")
         val message = when (id) {
             NO_PERMISSION -> app.getString(action.noPermission, who)
             WRONG_CHANNEL_PASSWORD -> app.getString(R.string.admin_move_needs_password, who)
@@ -948,7 +953,7 @@ object Session : TsClient.Listener {
                 try {
                     Result.success(f.list(cid, path, filePassword(cid)))
                 } catch (e: Exception) {
-                    AppLog.log("File list of $path in channel $cid failed: ${e.message}")
+                    AppLog.log("File list of ${LogPrivacy.folder(path)} in channel $cid failed: ${LogPrivacy.text(e.message)}")
                     Result.failure(IllegalStateException(fileProblem(e)))
                 },
             )
@@ -986,7 +991,7 @@ object Session : TsClient.Listener {
                 try { android.provider.DocumentsContract.deleteDocument(context.contentResolver, target) } catch (_: Exception) {}
                 app.getString(R.string.files_download_cancelled, name)
             } catch (e: Exception) {
-                AppLog.log("Saving a file failed: ${e.message}")
+                AppLog.log("$1: ${LogPrivacy.text(e.message)}")
                 try { android.provider.DocumentsContract.deleteDocument(context.contentResolver, target) } catch (_: Exception) {}
                 app.getString(R.string.files_download_failed, name, fileProblem(e))
             }
@@ -1032,7 +1037,7 @@ object Session : TsClient.Listener {
             } catch (e: FileTransfer.Cancelled) {
                 app.getString(R.string.files_upload_cancelled, name)
             } catch (e: Exception) {
-                AppLog.log("Sending a file failed: ${e.message}")
+                AppLog.log("$1: ${LogPrivacy.text(e.message)}")
                 app.getString(R.string.files_upload_failed, name, fileProblem(e, changed = true))
             }
             _state.update { it.copy(download = null, downloadResult = result) }
@@ -1048,7 +1053,7 @@ object Session : TsClient.Listener {
                     change(f, filePassword(cid))
                     null
                 } catch (e: Exception) {
-                    AppLog.log("$what in channel $cid failed: ${e.message}")
+                    AppLog.log("$1: ${LogPrivacy.text(e.message)}")
                     fileProblem(e, changed = true)
                 },
             )
@@ -1185,7 +1190,7 @@ object Session : TsClient.Listener {
                     }
                 }
                 if (cmd["id"] != "0" && cmd["return_code"]?.let { it.startsWith("ft-") || it.startsWith("quiet-") || it.startsWith("admin-") } != true) {
-                    AppLog.log("Server error ${cmd["id"]}: ${cmd["msg"]}")
+                    AppLog.log("Server error ${cmd["id"]}: ${LogPrivacy.text(cmd["msg"])}")
                     if (_state.value.phase == Phase.CONNECTED) _state.update { it.copy(error = cmd["msg"]) }
                 }
             }
@@ -1197,6 +1202,12 @@ object Session : TsClient.Listener {
         val changed = model.apply(cmd)
         result.poke?.let { poked(it) }
         val message = result.message
+        // In the log, that something happened in the chat: never what was said, nor with whom
+        if (result.poke != null) AppLog.log("Chat: a poke arrived")
+        message?.let { (key, entry) ->
+            val kind = if (key is Chat.Key.Private) "private" else "channel"
+            AppLog.log(if (entry.outgoing) "Chat: a $kind message sent" else "Chat: a $kind message arrived")
+        }
         cues.forEach { sound(it) }
         if (result.poke != null) sound(Cue.POKE)
         if (message != null) sound(if (message.second.outgoing) Cue.MESSAGE_OUT else Cue.MESSAGE_IN)
@@ -1224,7 +1235,8 @@ object Session : TsClient.Listener {
     }
 
     override fun onDisconnected(reason: String?) {
-        AppLog.log("Disconnected" + (reason?.let { ": $it" } ?: ""))
+        // Why, as the kind of end; the words can be someone's (a kick reason)
+        AppLog.log("Disconnected (${client?.end ?: "left"})" + (reason?.let { ": ${LogPrivacy.message(it)}" } ?: ""))
         val text = endText(client, reason)
         // The server still has our old connection, which it drops only after a while (the same identity may be on
         // once): tried again every few seconds until it lets go, for up to two minutes

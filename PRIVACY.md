@@ -50,6 +50,20 @@ Pictures you save go into your gallery (Pictures/PocketTS). Pictures you share g
 
 Removing the app removes all of this. Settings › Advanced can also let go of your identity.
 
+## The debug log (optional, off by default)
+
+For reporting a bug, you can turn on Settings › Advanced › Debug log. It records what the app does, crashes included,
+only while it's on, and only on your phone (at most about 1 MB, the oldest lines dropping off; not backed up).
+
+What could identify anyone is taken out before anything is written: server addresses, host names and nicknames,
+people's and devices' names, channel and folder names, IP and email addresses, links and keys. Where the
+log needs to tell them apart, it uses running numbers ("server 1", "person 3") that mean nothing outside that one log.
+People's own words, such as kick reasons, are left out, and passwords and your identity are never in it. Of the chat,
+it notes only that a message was sent or arrived, never what it said or with whom.
+
+The app never sends the log anywhere. Settings › Advanced can share it through Android's share menu, to wherever you
+choose (for example a bug report on GitHub), or delete it. Turning it off deletes it.
+
 ## Permissions
 
 - **Microphone:** your voice, and a camera stream's sound. Recording what other apps play during a screen share
@@ -70,4 +84,4 @@ Changes to this policy are made in this file, and its history shows every change
 project's [issues](https://github.com/KorppuJauho/pocketts/issues). For something private, use the private reporting
 described in [SECURITY.md](SECURITY.md).
 
-Last updated: 25 October 2026.
+Last updated: 30 October 2026.

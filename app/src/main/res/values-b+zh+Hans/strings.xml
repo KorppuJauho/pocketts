@@ -569,4 +569,11 @@
     <string name="share_camera_lost">摄像头已停止：被来电、其他应用或手机占用。</string>
     <string name="share_preview_small">缩小预览</string>
     <string name="share_lens_switch">镜头 %1$s：轻触切换到下一个镜头</string>
+    <string name="debug_log_title">调试日志</string>
+    <string name="debug_log">保留调试日志</string>
+    <string name="debug_log_desc">用于报告问题：记录应用的运行情况（包括崩溃），只保存在这部手机上。服务器地址、名字和消息都会被去除。应用从不发送它：请自行分享，例如在 GitHub 上提交问题报告时。关闭此项会删除日志。</string>
+    <string name="debug_log_share">分享日志</string>
+    <string name="debug_log_delete">删除日志</string>
+    <string name="debug_log_empty">调试日志目前为空。</string>
+    <string name="debug_log_deleted">调试日志已删除。</string>
 </resources>

@@ -968,7 +968,7 @@ class StreamEngine(
             "error" -> {
                 val code = g["return_code"].orEmpty()
                 if (g["id"] == "0" || !code.startsWith("stream-")) return
-                log("Refused: ${g["msg"]} ($code)")
+                log("Refused: ${io.github.korppujauho.pocketts.proto.LogPrivacy.text(g["msg"])} ($code)")
                 when {
                     code.startsWith("stream-setup") -> {
                         endShare()

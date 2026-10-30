@@ -597,4 +597,11 @@
     <string name="share_camera_lost">La cámara se detuvo: la tomó una llamada, otra aplicación o el teléfono.</string>
     <string name="share_preview_small">Hacer pequeña la vista previa</string>
     <string name="share_lens_switch">Objetivo %1$s: toca para el siguiente objetivo</string>
+    <string name="debug_log_title">Registro de depuración</string>
+    <string name="debug_log">Guardar un registro de depuración</string>
+    <string name="debug_log_desc">Para informes de errores: lo que hace la aplicación, incluidos los cierres inesperados, guardado solo en este teléfono. Se quitan las direcciones de servidor, los nombres y los mensajes. La aplicación nunca lo envía: compártelo tú, por ejemplo en un informe de error en GitHub. Desactivarlo lo borra.</string>
+    <string name="debug_log_share">Compartir registro</string>
+    <string name="debug_log_delete">Borrar registro</string>
+    <string name="debug_log_empty">El registro de depuración está vacío por ahora.</string>
+    <string name="debug_log_deleted">Registro de depuración borrado.</string>
 </resources>

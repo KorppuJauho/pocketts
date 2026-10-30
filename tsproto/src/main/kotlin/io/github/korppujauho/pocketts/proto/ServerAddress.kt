@@ -123,9 +123,9 @@ object ServerAddress {
                     val r = resolve(found, dns, null, log)
                     return r.copy(how = "nickname, then ${r.how}")
                 }
-                if (answer != null) log("Nickname $name: an answer that isn't an address")
+                if (answer != null) log("Nickname ${LogPrivacy.server(name)}: an answer that isn't an address")
             } catch (e: Exception) {
-                log("Nickname lookup for $name failed: ${e.message}")
+                log("Nickname lookup for ${LogPrivacy.server(name)} failed: ${LogPrivacy.text(e.message)}")
             }
         }
 
@@ -133,7 +133,7 @@ object ServerAddress {
         try {
             pick(dns.srv("_ts3._udp.$name"))?.let { return Resolved(it.target.trimEnd('.'), it.port, "DNS entry") }
         } catch (e: Exception) {
-            log("DNS lookup for $name failed: ${e.message}")
+            log("DNS lookup for ${LogPrivacy.server(name)} failed: ${LogPrivacy.text(e.message)}")
         }
 
         // 2. TeamSpeak's name service, for the name and the domains above it
@@ -143,7 +143,7 @@ object ServerAddress {
                 try {
                     tsdns(s.target, s.port, name)?.let { return it }
                 } catch (e: Exception) {
-                    log("TSDNS at ${s.target}:${s.port} failed: ${e.message}")
+                    log("TSDNS at ${LogPrivacy.server(s.target)}:${s.port} failed: ${LogPrivacy.text(e.message)}")
                 }
             }
         }

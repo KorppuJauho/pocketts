@@ -611,4 +611,11 @@
     <string name="share_camera_lost">Камера остановилась: её занял звонок, другое приложение или телефон.</string>
     <string name="share_preview_small">Уменьшить превью</string>
     <string name="share_lens_switch">Объектив %1$s: нажмите, чтобы переключить</string>
+    <string name="debug_log_title">Журнал отладки</string>
+    <string name="debug_log">Вести журнал отладки</string>
+    <string name="debug_log_desc">Для сообщений об ошибках: что делает приложение, включая сбои, хранится только на этом телефоне. Адреса серверов, имена и сообщения из него удаляются. Приложение никогда не отправляет его: поделитесь им сами, например в сообщении об ошибке на GitHub. Выключение удаляет журнал.</string>
+    <string name="debug_log_share">Поделиться журналом</string>
+    <string name="debug_log_delete">Удалить журнал</string>
+    <string name="debug_log_empty">Журнал отладки пока пуст.</string>
+    <string name="debug_log_deleted">Журнал отладки удалён.</string>
 </resources>

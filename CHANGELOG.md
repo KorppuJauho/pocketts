@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Debug log:** Settings › Advanced › Debug log keeps a log for bug reports on the phone, crashes included, with
+  server addresses, names, messages and keys taken out (running numbers such as "server 1" tell them apart). Of the
+  chat it notes only that a message was sent or arrived. The app never sends it: Share log hands it to
+  the app you choose, Delete log removes it, and turning it off deletes it. Off by default. The privacy policy says
+  what it holds, and a bug report template asks for it.
 - **AI noise removal:** Settings › Capture › AI noise removal (RNNoise) runs Xiph's RNNoise, a small neural network, on
   the microphone's sound before it's sent. It removes noise the phone's own noise removal lets through, such as
   keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by

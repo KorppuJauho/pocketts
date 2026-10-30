@@ -625,4 +625,11 @@
     <string name="share_camera_lost">The camera stopped: a call, another app or the phone took it.</string>
     <string name="share_preview_small">Make the preview small</string>
     <string name="share_lens_switch">Lens %1$s: tap for the next lens</string>
+    <string name="debug_log_title">Debug log</string>
+    <string name="debug_log">Keep a debug log</string>
+    <string name="debug_log_desc">For bug reports: what the app does, crashes included, kept on this phone only. Server addresses, names and messages are taken out. The app never sends it: share it yourself, for example in a bug report on GitHub. Turning this off deletes it.</string>
+    <string name="debug_log_share">Share log</string>
+    <string name="debug_log_delete">Delete log</string>
+    <string name="debug_log_empty">The debug log is empty for now.</string>
+    <string name="debug_log_deleted">Debug log deleted.</string>
 </resources>
