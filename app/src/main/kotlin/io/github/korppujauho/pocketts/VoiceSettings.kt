@@ -32,10 +32,19 @@ data class VoiceSettings(
     val uiSoundVolume: Float = 0.6f, // their volume, 0 - 1
     val adminTools: Boolean = false, // the person menu offers move, kick and ban (the server decides who may)
     val controlsAtBottom: Boolean = false, // the buttons and the Channels/Chat switch at the bottom of the screen (within thumb reach)
+    val debugLog: Boolean = false, // the debug log for bug reports (Settings › Advanced), kept on the phone
 ) {
     enum class Activation { VAD, PTT, CONTINUOUS }
 
     val voiceGain: Float get() = Math.pow(10.0, voiceVolumeDb / 20.0).toFloat()
+
+    /** The settings that matter for a bug report, for the debug log (nothing private: no addresses or passwords). */
+    fun forLog(): String = listOf(
+        "activation $activation", "echo cancellation $echoCancellation", "noise removal $noiseSuppression",
+        "AI noise removal $aiNoiseRemoval", "gain control $autoGainControl", "microphone ${(micVolume * 100).toInt()} %",
+        "voice $voiceVolumeDb dB", "floating push-to-talk $floatingPtt", "volume keys $volumeKeysPtt", "headset button $headsetPtt",
+        "mute on calls $muteOnCalls", "relay ${turnUrl.isNotEmpty()}", "relay only $relayOnly", "buttons at the bottom $controlsAtBottom",
+    ).joinToString(", ")
 
     companion object {
         private const val TURN_PASSWORD = "voice/turnPassword"
@@ -77,6 +86,7 @@ data class VoiceSettings(
                 uiSoundVolume = p.getFloat("uiSoundVolume", d.uiSoundVolume),
                 adminTools = p.getBoolean("adminTools", d.adminTools),
                 controlsAtBottom = p.getBoolean("controlsAtBottom", d.controlsAtBottom),
+                debugLog = p.getBoolean("debugLog", d.debugLog),
             )
         }
     }
@@ -111,6 +121,7 @@ data class VoiceSettings(
             .putFloat("uiSoundVolume", uiSoundVolume)
             .putBoolean("adminTools", adminTools)
             .putBoolean("controlsAtBottom", controlsAtBottom)
+            .putBoolean("debugLog", debugLog)
             .apply()
         secretPrefs(context).edit().putSecret("turnPassword", TURN_PASSWORD, turnPassword).apply()
     }

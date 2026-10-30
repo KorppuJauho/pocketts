@@ -484,6 +484,37 @@ private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group {
         Desc(stringResource(R.string.advanced_file_port))
     }
+    // For bug reports: kept on the phone, without names or addresses (see AppLog); the app never sends it
+    Group(stringResource(R.string.debug_log_title)) {
+        Check(stringResource(R.string.debug_log), v.debugLog) { onChange(v.copy(debugLog = it)) }
+        Desc(stringResource(R.string.debug_log_desc))
+        if (v.debugLog) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PillButton(stringResource(R.string.debug_log_share), modifier = Modifier.weight(1f)) {
+                    val uri = io.github.korppujauho.pocketts.AppLog.shareDebugLog(context)
+                    if (uri == null) {
+                        android.widget.Toast.makeText(context, R.string.debug_log_empty, android.widget.Toast.LENGTH_SHORT).show()
+                    } else {
+                        val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain")
+                            .putExtra(android.content.Intent.EXTRA_STREAM, uri).putExtra(android.content.Intent.EXTRA_SUBJECT, "PocketTS debug log")
+                            .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        context.startActivity(android.content.Intent.createChooser(send, null))
+                    }
+                }
+                PillButton(stringResource(R.string.debug_log_delete), PillKind.DANGER_TEXT, modifier = Modifier.weight(1f)) {
+                    io.github.korppujauho.pocketts.AppLog.clearDebugLog(context)
+                    android.widget.Toast.makeText(context, R.string.debug_log_deleted, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            // Test builds only: a crash on purpose, to see it in the debug log (the host name in it must come out)
+            if (io.github.korppujauho.pocketts.BuildConfig.DEBUG) {
+                PillButton("Crash the app (test build)", PillKind.DANGER_TEXT, modifier = Modifier.fillMaxWidth()) {
+                    throw IllegalStateException("A crash on purpose, from voice.example.org")
+                }
+            }
+        }
+    }
 }
 
 @Composable

@@ -606,4 +606,11 @@
     <string name="capture_ai_noise">ИИ-шумоподавление (RNNoise)</string>
     <string name="capture_ai_noise_desc">Убирает также щелчки клавиатуры, вентилятор, телевизор и другой шум, который пропускает шумоподавление телефона, с помощью небольшой нейросети на телефоне. Расходует немного больше заряда.</string>
     <string name="capture_ai_noise_license">Лицензия RNNoise</string>
+    <string name="debug_log_title">Журнал отладки</string>
+    <string name="debug_log">Вести журнал отладки</string>
+    <string name="debug_log_desc">Для сообщений об ошибках: что делает приложение, включая сбои, хранится только на этом телефоне. Адреса серверов, имена и сообщения из него удаляются. Приложение никогда не отправляет его: поделитесь им сами, например в сообщении об ошибке на GitHub. Выключение удаляет журнал.</string>
+    <string name="debug_log_share">Поделиться журналом</string>
+    <string name="debug_log_delete">Удалить журнал</string>
+    <string name="debug_log_empty">Журнал отладки пока пуст.</string>
+    <string name="debug_log_deleted">Журнал отладки удалён.</string>
 </resources>
