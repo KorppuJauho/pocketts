@@ -595,4 +595,9 @@
     <string name="share_torch_on">Linterna encendida (toca para apagar)</string>
     <string name="share_torch_off">Linterna: ilumina lo que graba la cámara trasera</string>
     <string name="share_camera_lost">La cámara se detuvo: la tomó una llamada, otra aplicación o el teléfono.</string>
+    <string name="share_lens">Objetivo</string>
+    <string name="lens_wide">Gran angular</string>
+    <string name="lens_main">Principal</string>
+    <string name="lens_tele">Tele</string>
+    <string name="share_preview_small">Hacer pequeña la vista previa</string>
 </resources>

@@ -595,4 +595,9 @@
     <string name="share_torch_on">Lampe torche allumée (touchez pour éteindre)</string>
     <string name="share_torch_off">Lampe torche : éclaire ce que filme la caméra arrière</string>
     <string name="share_camera_lost">La caméra s’est arrêtée : un appel, une autre application ou le téléphone l’a prise.</string>
+    <string name="share_lens">Objectif</string>
+    <string name="lens_wide">Grand-angle</string>
+    <string name="lens_main">Principal</string>
+    <string name="lens_tele">Télé</string>
+    <string name="share_preview_small">Réduire l’aperçu</string>
 </resources>

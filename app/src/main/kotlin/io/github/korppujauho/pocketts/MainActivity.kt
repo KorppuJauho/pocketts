@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /** The camera: asked for first if needed. */
-    fun shareCamera(front: Boolean, quality: Int, sound: Boolean) = withCamera { Session.shareCamera(front, quality, sound) }
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean, lens: String? = null) = withCamera { Session.shareCamera(front, quality, sound, lens) }
 
     fun shareBothCameras(quality: Int, sound: Boolean) = withCamera { Session.shareBothCameras(quality, sound) }
 
@@ -433,8 +433,8 @@ private object SessionActions : ServerActions {
     override fun stopWatching() {
         Session.stopWatching()
     }
-    override fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {
-        MainActivity.current?.shareCamera(front, quality, sound)
+    override fun shareCamera(front: Boolean, quality: Int, sound: Boolean, lens: String?) {
+        MainActivity.current?.shareCamera(front, quality, sound, lens)
     }
     override fun shareScreen(sound: Boolean) {
         MainActivity.current?.shareScreen(sound)
@@ -451,6 +451,12 @@ private object SessionActions : ServerActions {
     override fun setRotateLock(on: Boolean) = Session.setRotateLock(on)
     override fun setTorch(on: Boolean) {
         Session.setTorch(on)
+    }
+    override fun setZoom(zoom: Float) {
+        Session.setZoom(zoom)
+    }
+    override fun focusAt(x: Float, y: Float) {
+        Session.focusAt(x, y)
     }
     override fun setWatchMuted(muted: Boolean) {
         Session.setWatchMuted(muted)

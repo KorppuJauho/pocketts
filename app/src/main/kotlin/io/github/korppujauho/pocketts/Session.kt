@@ -152,6 +152,8 @@ object Session : TsClient.Listener {
     fun stopShare() = engine?.stopShare()
     fun flipCamera() = engine?.flipCamera()
     fun setTorch(on: Boolean) = engine?.setTorch(on)
+    fun setZoom(zoom: Float) = engine?.setZoom(zoom)
+    fun focusAt(x: Float, y: Float) = engine?.focusAt(x, y)
     fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
     fun setWatchVolume(volume: Float) = engine?.setWatchVolume(volume)
 
@@ -167,12 +169,12 @@ object Session : TsClient.Listener {
         engine?.setRotateLock(on)
     }
 
-    fun shareCamera(front: Boolean, quality: Int, sound: Boolean) {
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean, lens: String? = null) {
         val name = _state.value.client(_state.value.ownId)?.nickname ?: "Camera"
         if (_state.value.voice.cameraSound != sound) updateVoice(_state.value.voice.copy(cameraSound = sound))
         // The service says "camera" before the camera opens (Android's rule for using it in the background)
         ConnectionService.start(app, app.getString(R.string.notification_sharing_camera), camera = true)
-        streams().shareCamera(front, quality, name, sound && micPermitted())
+        streams().shareCamera(front, quality, name, sound && micPermitted(), lens)
     }
 
     fun shareBothCameras(quality: Int, sound: Boolean) {

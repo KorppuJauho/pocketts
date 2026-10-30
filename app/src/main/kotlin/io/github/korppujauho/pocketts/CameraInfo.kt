@@ -1,9 +1,11 @@
 package io.github.korppujauho.pocketts
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.os.Build
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat.FramerateRange
 import org.webrtc.Size
 
@@ -27,6 +29,28 @@ class CameraInfo(val id: String, c: CameraCharacteristics) {
         ?.contains(CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_ON) == true
     val continuousVideoFocus = c.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES)
         ?.contains(CameraCharacteristics.CONTROL_AF_MODE_CONTINUOUS_VIDEO) == true
+    /** Focus on a tapped spot: a lens that focuses, and regions for it. */
+    val tapFocus = c.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES)?.contains(CameraCharacteristics.CONTROL_AF_MODE_AUTO) == true &&
+        (c.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF) ?: 0) > 0
+    /** Exposure on a tapped spot (also for a fixed-focus front camera). */
+    val tapExposure = (c.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE) ?: 0) > 0
+
+    /** The sensor's area that pictures and regions are measured in. */
+    val activeArray: Rect = c.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: Rect(0, 0, 1, 1)
+
+    // Zoom: Android 11's zoom ratio (which can go under 1× on phones whose lenses work as one camera: the ultra-wide),
+    // else cropping the picture, up to its largest digital zoom
+    private val ratioRange = if (Build.VERSION.SDK_INT >= 30) c.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE) else null
+    val zoomRatio = ratioRange != null
+    val zoomMin: Float = ratioRange?.lower ?: 1f
+    val zoomMax: Float = ratioRange?.upper ?: (c.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 1f)
+
+    /** How wide it sees, across the sensor's long side, in degrees (0 when the phone doesn't say). */
+    val fieldOfView: Float = run {
+        val focal = c.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: 0f
+        val sensor = c.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)
+        if (focal > 0f && sensor != null) CameraView.fieldOfView(maxOf(sensor.width, sensor.height), focal) else 0f
+    }
 
     override fun toString() = "camera $id (${if (front) "front" else "back"}${if (hasFlash) ", flash" else ""})"
 
@@ -40,6 +64,12 @@ class CameraInfo(val id: String, c: CameraCharacteristics) {
                 AppLog.log("[Streams] The cameras can't be listed: $e")
                 emptyList()
             }
+        }
+
+        /** The back cameras to choose from (wide-angle, main, telephoto), when the phone offers more than one lens of its own. */
+        fun backLenses(context: Context): List<Pair<CameraInfo, Lens>> {
+            val backs = all(context).filter { !it.front }
+            return CameraView.lenses(backs.map { it.fieldOfView }).map { (i, kind) -> backs[i] to kind }
         }
 
         fun of(context: Context, id: String): CameraInfo? = context.getSystemService(CameraManager::class.java)?.let { of(it, id) }

@@ -61,6 +61,9 @@ class StreamEngine(
         val shareBoth: Boolean = false, // both cameras at once
         val shareFlash: Boolean = false, // the shared back camera has a flashlight (with both cameras: the back one)
         val torch: Boolean = false, // ... and it's on
+        val zoom: Float = 1f, // one camera shared: its zoom, and how far it goes (none: both the same)
+        val zoomMin: Float = 1f,
+        val zoomMax: Float = 1f,
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
         val lockedTurn: Int = 0, // the turn kept while locked (the phone's, from the screen's upright, when locked)
@@ -392,19 +395,21 @@ class StreamEngine(
         CameraTurn(context).also { t -> t.onTurn = { deg -> exec.execute { if (state.sharing == Streams.Kind.CAMERA || deg == 0) update { it.copy(phoneTurn = deg) } } } }
     }
     private var dual: DualCamera? = null
+    private var backCamera: String? = null // the back camera (lens) last shared, for flipping back to
     @Volatile private var phoneSound: ScreenSound? = null
     private val idlePace = SoundPace() // WebRTC's sound loop without a microphone and without the phone's sound
 
-    /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
-    fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
+    /** Starts sharing the camera: [front] or back ([lens]: a back camera chosen by its id), [quality] its picture's height. */
+    fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false, lens: String? = null) = exec.execute {
         if (state.sharing != null) return@execute
         val cams = CameraInfo.all(context)
-        val cam = cams.firstOrNull { it.front == front } ?: cams.firstOrNull() ?: run {
+        val cam = cams.firstOrNull { it.id == lens && !front } ?: cams.firstOrNull { it.front == front } ?: cams.firstOrNull() ?: run {
             log("No camera")
             return@execute
         }
         bitrate = when { quality >= 1080 -> 4500; quality >= 720 -> 2500; else -> 1000 }
-        update { it.copy(shareFront = cam.front, shareBoth = false, shareFlash = cam.hasFlash && !cam.front, torch = false) }
+        if (!cam.front) backCamera = cam.id
+        update { it.copy(shareFront = cam.front, shareBoth = false, shareFlash = cam.hasFlash && !cam.front, torch = false).zoomed(cam, 1f) }
         turn.start(settings().cameraRotateLock)
         startCapture(PhoneCamera(context, cam, ::cameraLost), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
             turn.observer(it) { state.shareFront }
@@ -532,8 +537,29 @@ class StreamEngine(
             return@execute
         }
         val cam = capturer as? PhoneCamera ?: return@execute
-        val next = CameraInfo.all(context).firstOrNull { it.front != cam.camera.front } ?: return@execute
-        cam.switchTo(next) { front -> exec.execute { update { it.copy(shareFront = front, shareFlash = next.hasFlash && !front) } } }
+        val cams = CameraInfo.all(context)
+        // From the front, back to the back lens that was chosen
+        val next = (if (cam.camera.front) cams.firstOrNull { it.id == backCamera && !it.front } else null)
+            ?: cams.firstOrNull { it.front != cam.camera.front } ?: return@execute
+        if (!next.front) backCamera = next.id
+        cam.switchTo(next) { front ->
+            exec.execute { update { it.copy(shareFront = front, shareFlash = next.hasFlash && !front).zoomed(next, cam.zoom) } }
+        }
+    }
+
+    // The zoom as shown, and how far the camera goes
+    private fun State.zoomed(cam: CameraInfo, zoom: Float) = copy(zoom = zoom, zoomMin = cam.zoomMin, zoomMax = cam.zoomMax)
+
+    /** Zooms the shared camera (one camera; not both at once). */
+    fun setZoom(zoom: Float) = exec.execute {
+        val cam = capturer as? PhoneCamera ?: return@execute
+        cam.zoom = zoom
+        if (state.zoom != cam.zoom) update { it.copy(zoom = cam.zoom) }
+    }
+
+    /** Focuses the shared camera (one camera) on a spot of its picture: 0 - 1 across it, as the camera gives it. */
+    fun focusAt(x: Float, y: Float) = exec.execute {
+        (capturer as? PhoneCamera)?.focusAt(x, y)
     }
 
     /** The flashlight of the shared back camera (with both cameras: the back one), on or off. */
@@ -656,7 +682,7 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false, zoom = 1f, zoomMin = 1f, zoomMax = 1f) }
     }
 
     private fun releaseCapture() {

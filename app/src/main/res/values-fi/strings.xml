@@ -581,4 +581,9 @@
     <string name="share_torch_on">Taskulamppu päällä (napauta: pois)</string>
     <string name="share_torch_off">Taskulamppu: valaisee sen, mitä takakamera kuvaa</string>
     <string name="share_camera_lost">Kamera pysähtyi: puhelu, toinen sovellus tai puhelin otti sen käyttöönsä.</string>
+    <string name="share_lens">Objektiivi</string>
+    <string name="lens_wide">Laaja</string>
+    <string name="lens_main">Pää</string>
+    <string name="lens_tele">Tele</string>
+    <string name="share_preview_small">Pienennä esikatselu</string>
 </resources>

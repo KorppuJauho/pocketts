@@ -51,6 +51,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
@@ -136,7 +138,11 @@ private class TextureVideoView(
 
 /** Our own share's picture: the whole of it, in its own shape, turned by [turn] more for what's shown here only. */
 @Composable
-private fun PreviewVideo(track: VideoTrack, egl: EglBase, modifier: Modifier, turn: Int, onSize: (Int, Int) -> Unit) {
+private fun PreviewVideo(
+    track: VideoTrack, egl: EglBase, modifier: Modifier, turn: Int,
+    shownTurn: java.util.concurrent.atomic.AtomicInteger? = null, // set to the whole turn each picture is drawn with
+    onSize: (Int, Int) -> Unit,
+) {
     var view by remember { mutableStateOf<TextureVideoView?>(null) }
     var shape by remember { mutableStateOf<Float?>(null) }
     val turnNow = androidx.compose.runtime.rememberUpdatedState(turn)
@@ -159,6 +165,7 @@ private fun PreviewVideo(track: VideoTrack, egl: EglBase, modifier: Modifier, tu
         val sink = v?.let {
             org.webrtc.VideoSink { f ->
                 val t = turnNow.value
+                shownTurn?.set((f.rotation + t) % 360)
                 if (t == 0) it.onFrame(f) else it.onFrame(org.webrtc.VideoFrame(f.buffer, (f.rotation + t) % 360, f.timestampNs))
             }
         }
@@ -467,7 +474,8 @@ private fun FullScreenPlayer(
 /** WebTS's "Share" window: what (camera or screen), which camera, how good. */
 @Composable
 fun ShareDialog(
-    onCamera: (front: Boolean, quality: Int, sound: Boolean) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
+    onCamera: (front: Boolean, quality: Int, sound: Boolean, lens: String?) -> Unit, onScreen: (sound: Boolean) -> Unit, onDismiss: () -> Unit,
+    lenses: List<Pair<String, io.github.korppujauho.pocketts.Lens>> = emptyList(), // back cameras to choose from (id, kind)
     onBoth: (quality: Int, sound: Boolean) -> Unit = { _, _ -> }, canBoth: Boolean = false, sound: Boolean = false,
     screenSound: Boolean = true,
     screenSoundBlocked: Boolean = false, // watching a stream: the phone's sound can't go with the screen now
@@ -476,6 +484,7 @@ fun ShareDialog(
     var withScreenSound by remember { mutableStateOf(screenSound) }
     var screen by remember { mutableStateOf(false) }
     var camera by remember { mutableStateOf(0) } // front, back, both
+    var lens by remember { mutableStateOf(lenses.firstOrNull { it.second == io.github.korppujauho.pocketts.Lens.MAIN }?.first) }
     var quality by remember { mutableStateOf(720) }
     val qualities = listOf(480, 720, 1080)
     TsDialog(
@@ -488,7 +497,7 @@ fun ShareDialog(
                 when {
                     screen -> onScreen(withScreenSound && !screenSoundBlocked)
                     camera == 2 -> onBoth(quality, withSound)
-                    else -> onCamera(camera == 0, quality, withSound)
+                    else -> onCamera(camera == 0, quality, withSound, if (camera == 1) lens else null)
                 }
             }
         },
@@ -519,6 +528,21 @@ fun ShareDialog(
                     Text(stringResource(R.string.share_camera), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf(stringResource(R.string.camera_front), stringResource(R.string.camera_back)) + if (canBoth) listOf(stringResource(R.string.camera_both)) else emptyList(), camera) { camera = it }
                     if (camera == 2) Text(stringResource(R.string.share_both_desc), color = Ts.muted, fontSize = 13.sp)
+                    if (camera == 1 && lenses.size > 1) {
+                        Text(stringResource(R.string.share_lens), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                        Segments(
+                            lenses.map { (_, kind) ->
+                                stringResource(
+                                    when (kind) {
+                                        io.github.korppujauho.pocketts.Lens.WIDE -> R.string.lens_wide
+                                        io.github.korppujauho.pocketts.Lens.MAIN -> R.string.lens_main
+                                        io.github.korppujauho.pocketts.Lens.TELE -> R.string.lens_tele
+                                    },
+                                )
+                            },
+                            lenses.indexOfFirst { it.first == lens }.coerceAtLeast(0),
+                        ) { lens = lenses[it].first }
+                    }
                     Text(stringResource(R.string.share_quality), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Segments(listOf("480p", "720p", "1080p"), qualities.indexOf(quality)) { quality = qualities[it] }
                     Text(
@@ -583,6 +607,8 @@ fun ShareBar(
     onLight: (Boolean) -> Unit = {},
     torch: Boolean? = null, // the back camera's flashlight, when it has one: on or off
     onTorch: (Boolean) -> Unit = {},
+    onZoom: ((Float) -> Unit)? = null, // pinching the big picture of one camera
+    onFocus: ((x: Float, y: Float) -> Unit)? = null, // tapping it: a spot, 0 - 1 across the camera's own picture
 ) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
@@ -594,17 +620,97 @@ fun ShareBar(
     val previewTurn = (360 - sent) % 360
     val track = state.localVideo
 
+    // The big picture of one camera: pinch to zoom, tap to focus, double tap back to 1×; a button makes it small again
+    // (tapping the small one makes it big)
+    val touch = camera && !state.shareBoth && onZoom != null && onFocus != null
+    val shownTurn = remember { java.util.concurrent.atomic.AtomicInteger(0) }
+    val shape = androidx.compose.runtime.rememberUpdatedState(aspect)
+    // The zoom while pinching, ahead of the camera's answer (taken from it again when the camera changes)
+    val pinch = remember { floatArrayOf(state.zoom) }
+    androidx.compose.runtime.LaunchedEffect(state.shareFront, state.zoomMin, state.zoomMax) { pinch[0] = state.zoom }
+    val range = androidx.compose.runtime.rememberUpdatedState(state.zoomMin..state.zoomMax)
+    var ring by remember { mutableStateOf<androidx.compose.ui.geometry.Offset?>(null) }
+    androidx.compose.runtime.LaunchedEffect(ring) {
+        if (ring != null) {
+            kotlinx.coroutines.delay(1000)
+            ring = null
+        }
+    }
+    // The zoom shown for a moment when it changes
+    var zoomShown by remember { mutableStateOf(false) }
+    val lastZoom = remember { floatArrayOf(state.zoom) }
+    androidx.compose.runtime.LaunchedEffect(state.zoom) {
+        if (state.zoom == lastZoom[0]) return@LaunchedEffect
+        lastZoom[0] = state.zoom
+        zoomShown = true
+        kotlinx.coroutines.delay(1200)
+        zoomShown = false
+    }
+
     @Composable
     fun Preview(modifier: Modifier) {
         if (track == null) return
+        val controls = big && touch
         Box(modifier.clip(RoundedCornerShape(8.dp)).background(Color.Black).border(1.dp, Color(0x26FFFFFF), RoundedCornerShape(8.dp))) {
             // Small and big alike, the whole picture in its own shape (the small box already has that shape)
-            PreviewVideo(track, egl, Modifier.fillMaxSize(), previewTurn) { w, h -> aspect = w.toFloat() / h }
+            PreviewVideo(track, egl, Modifier.fillMaxSize(), previewTurn, shownTurn) { w, h -> aspect = w.toFloat() / h }
             // Over the picture (a video surface doesn't take taps itself)
-            Box(Modifier.fillMaxSize().clickable { big = !big })
+            if (!controls) {
+                Box(Modifier.fillMaxSize().clickable { big = !big })
+            } else {
+                Box(
+                    Modifier.fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = { p ->
+                                    // Only on the picture (the big box can be wider), turned back to the camera's own
+                                    val spot = io.github.korppujauho.pocketts.CameraView.fitted(p.x, p.y, size.width.toFloat(), size.height.toFloat(), shape.value)
+                                    if (spot != null) {
+                                        ring = p
+                                        val (x, y) = io.github.korppujauho.pocketts.CameraView.unturn(spot.first, spot.second, shownTurn.get())
+                                        onFocus?.invoke(x, y)
+                                    }
+                                },
+                                onDoubleTap = {
+                                    pinch[0] = 1f
+                                    onZoom?.invoke(1f)
+                                },
+                            )
+                        }
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, _, z, _ ->
+                                if (z != 1f) {
+                                    pinch[0] = (pinch[0] * z).coerceIn(range.value.start, range.value.endInclusive)
+                                    onZoom?.invoke(pinch[0])
+                                }
+                            }
+                        },
+                )
+                ring?.let { p ->
+                    val side = 52.dp
+                    val half = with(androidx.compose.ui.platform.LocalDensity.current) { (side / 2).toPx() }
+                    Box(
+                        Modifier.offset { androidx.compose.ui.unit.IntOffset((p.x - half).toInt(), (p.y - half).toInt()) }
+                            .size(side).border(2.dp, Color.White, CircleShape),
+                    )
+                }
+                if (zoomShown) {
+                    Text(
+                        "%.1f×".format(state.zoom), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                        modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp).clip(RoundedCornerShape(10.dp))
+                            .background(Color(0x99000000)).padding(horizontal = 10.dp, vertical = 4.dp),
+                    )
+                }
+                Box(
+                    Modifier.align(Alignment.TopEnd).padding(6.dp).size(36.dp).clip(CircleShape).background(Color(0x99000000))
+                        .clickable { big = false },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Filled.FullscreenExit, contentDescription = stringResource(R.string.share_preview_small), tint = Color.White, modifier = Modifier.size(22.dp))
+                }
+            }
         }
     }
-
     @Composable
     fun Status(modifier: Modifier) {
         Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {

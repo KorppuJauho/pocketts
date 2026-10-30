@@ -112,7 +112,8 @@ interface ServerActions {
     fun watch(person: ServerModel.Client)
     fun stopWatching()
     /** The camera at [quality]: the picture's height, 480, 720 or 1080. */
-    fun shareCamera(front: Boolean, quality: Int, sound: Boolean)
+    /** The camera ([lens]: a back camera chosen by its id, else the main one). */
+    fun shareCamera(front: Boolean, quality: Int, sound: Boolean, lens: String? = null)
     /** Asks Android for the screen, then shares it. */
     fun shareScreen(sound: Boolean)
     fun stopShare()
@@ -124,6 +125,10 @@ interface ServerActions {
     fun setRotateLock(on: Boolean) {}
     /** The shared back camera's flashlight. */
     fun setTorch(on: Boolean) {}
+    /** The shared camera's zoom. */
+    fun setZoom(zoom: Float) {}
+    /** Focus on a spot of the shared camera's picture (0 - 1 across it, as the camera gives it). */
+    fun focusAt(x: Float, y: Float) {}
     fun setWatchMuted(muted: Boolean) {}
     fun setWatchVolume(volume: Float) {}
     /** The stream player as a small window over other apps. */
@@ -294,6 +299,7 @@ fun ServerScreen(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
                         light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
                         torch = if (state.stream.shareFlash && !frontCamera) state.stream.torch else null, onTorch = actions::setTorch,
+                        onZoom = actions::setZoom, onFocus = actions::focusAt,
                     )
                 }
                 if (state.stream.watching != 0 && egl != null && !pip) {
@@ -561,8 +567,12 @@ fun ServerScreen(
         )
     }
     if (shareDialog) {
+        // The back lenses the phone offers apart (wide-angle, main, telephoto), when it offers more than one
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val lenses = remember { io.github.korppujauho.pocketts.CameraInfo.backLenses(context).map { it.first.id to it.second } }
         ShareDialog(
-            onCamera = { front, quality, sound -> shareDialog = false; actions.shareCamera(front, quality, sound) },
+            onCamera = { front, quality, sound, lens -> shareDialog = false; actions.shareCamera(front, quality, sound, lens) },
+            lenses = lenses,
             onBoth = { quality, sound -> shareDialog = false; actions.shareBothCameras(quality, sound) },
             sound = state.voice.cameraSound,
             canBoth = canBoth,

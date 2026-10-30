@@ -3,13 +3,16 @@ package io.github.korppujauho.pocketts
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.params.MeteringRectangle
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
 import android.hardware.display.DisplayManager
+import android.os.Build
 import android.os.Handler
 import android.util.Range
 import android.view.Display
@@ -27,7 +30,7 @@ import org.webrtc.VideoFrame
 
 /**
  * A phone camera for a stream, with the app's own code rather than WebRTC's, so its settings can change while it
- * runs: the flashlight ([torch]). Its pictures go to WebRTC as WebRTC's own camera code gives them: the same size and
+ * runs: the flashlight ([torch]), the zoom ([zoom], each camera its own) and focusing on a tapped spot ([focusAt]). Its pictures go to WebRTC as WebRTC's own camera code gives them: the same size and
  * frame rate chosen the same way, the same stabilization and focus, the same turn and mirroring. So the preview,
  * [CameraTurn] and [DualCamera] see no difference.
  *
@@ -37,7 +40,7 @@ import org.webrtc.VideoFrame
  */
 class PhoneCamera(
     context: Context,
-    private var info: CameraInfo,
+    info: CameraInfo,
     private val onLost: (reason: String) -> Unit,
 ) : VideoCapturer {
     private val manager = context.applicationContext.getSystemService(CameraManager::class.java)
@@ -45,6 +48,9 @@ class PhoneCamera(
     private lateinit var helper: SurfaceTextureHelper
     private lateinit var observer: CapturerObserver
     private lateinit var handler: Handler
+    @Volatile private var info = info
+    private val zooms = java.util.concurrent.ConcurrentHashMap<String, Float>() // each camera's own zoom
+    @Volatile private var requestWaiting = false
 
     // On the camera thread only
     private var device: CameraDevice? = null
@@ -57,13 +63,56 @@ class PhoneCamera(
     private var width = 0
     private var height = 0
     private var fps = 30
+    private var focus: MeteringRectangle? = null // a tapped spot, for a few seconds
+    private var focusTurn = 0 // which tap it is: an older one's timeout doesn't undo a newer one
 
     /** The flashlight wanted on. It lights only on a camera that has one: off on the front camera, back on after flipping. */
     @Volatile var torch = false
         set(value) {
             field = value
-            if (::handler.isInitialized) handler.post { request() }
+            requestSoon()
         }
+
+    /** The camera's zoom now (each camera keeps its own), within what it allows (see [CameraInfo.zoomMin]). */
+    var zoom: Float
+        get() = zooms[info.id] ?: 1f
+        set(value) {
+            zooms[info.id] = value.coerceIn(info.zoomMin, info.zoomMax)
+            requestSoon()
+        }
+
+    // A pinch gives many zooms a second: one new request at a time, with the latest
+    private fun requestSoon() {
+        if (!::handler.isInitialized || requestWaiting) return
+        requestWaiting = true
+        handler.post {
+            requestWaiting = false
+            request()
+        }
+    }
+
+    /**
+     * Focuses and sets the exposure on a spot of the picture (0 - 1 across it, as the sensor lies) for a few seconds,
+     * then goes back to following the scene. A camera that can't focus (many front ones) only sets the exposure.
+     */
+    fun focusAt(x: Float, y: Float) {
+        handler.post {
+            val i = info
+            val f = format ?: return@post
+            if (!i.tapFocus && !i.tapExposure) return@post
+            val a = i.activeArray
+            val r = CameraView.region(x, y, a.width(), a.height(), zoom, f.width.toFloat() / f.height)
+            focus = MeteringRectangle(Rect(r[0], r[1], r[2], r[3]), MeteringRectangle.METERING_WEIGHT_MAX - 1)
+            val turn = ++focusTurn
+            request(trigger = true)
+            handler.postDelayed({
+                if (turn == focusTurn && focus != null) {
+                    focus = null
+                    request()
+                }
+            }, FOCUS_MS)
+        }
+    }
 
     /** Which camera it is now. */
     val camera: CameraInfo get() = info
@@ -157,7 +206,7 @@ class PhoneCamera(
     }
 
     // The one request the camera repeats, made again whenever a setting changes (the camera isn't restarted for it)
-    private fun request() {
+    private fun request(trigger: Boolean = false) {
         val s = session ?: return
         val camera = device ?: return
         val target = surface ?: return
@@ -176,11 +225,34 @@ class PhoneCamera(
                 r.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON)
                 r.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF)
             }
-            if (i.continuousVideoFocus) r.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO)
+            // Zoom: the camera's own (a sharp picture, not an enlarged one); regions are measured on the whole sensor
+            val z = zoom
+            if (i.zoomRatio && Build.VERSION.SDK_INT >= 30) {
+                r.set(CaptureRequest.CONTROL_ZOOM_RATIO, z)
+            } else if (z > 1f) {
+                val c = CameraView.crop(i.activeArray.width(), i.activeArray.height(), z)
+                r.set(CaptureRequest.SCALER_CROP_REGION, Rect(c[0], c[1], c[2], c[3]))
+            }
+            // Focus: on the tapped spot for a while, else following the scene
+            val spot = focus
+            if (spot != null && i.tapFocus) {
+                r.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
+                r.set(CaptureRequest.CONTROL_AF_REGIONS, arrayOf(spot))
+            } else if (i.continuousVideoFocus) {
+                r.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO)
+            }
+            if (spot != null && i.tapExposure) r.set(CaptureRequest.CONTROL_AE_REGIONS, arrayOf(spot))
             // The flashlight: lit for the whole recording, the exposure still automatic
             if (i.hasFlash) r.set(CaptureRequest.FLASH_MODE, if (torch) CaptureRequest.FLASH_MODE_TORCH else CaptureRequest.FLASH_MODE_OFF)
             r.addTarget(target)
             s.setRepeatingRequest(r.build(), null, handler)
+            if (trigger && spot != null && i.tapFocus) {
+                // A focus run on the spot: an earlier one stopped first
+                r.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL)
+                s.capture(r.build(), null, handler)
+                r.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START)
+                s.capture(r.build(), null, handler)
+            }
         } catch (e: Exception) {
             AppLog.log("[Streams] Camera request failed: $e")
         }
@@ -208,6 +280,8 @@ class PhoneCamera(
 
     private fun close() {
         generation++
+        focus = null
+        focusTurn++
         helper.stopListening()
         try { session?.close() } catch (_: Exception) {}
         session = null
@@ -251,4 +325,8 @@ class PhoneCamera(
     override fun dispose() {}
 
     override fun isScreencast() = false
+
+    private companion object {
+        const val FOCUS_MS = 5000L // how long a tapped spot holds
+    }
 }
