@@ -53,6 +53,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
@@ -245,11 +246,14 @@ private const val PULL_TO_SWITCH = 56f // dp dragged on past the top that makes 
  * The handle under the picture sets its height (remembered): at first at most 40 % of the screen, so the channels and
  * the chat stay in view, and never taller than the picture needs. Pulled on past the top it shrinks to a small
  * picture over the app that can be moved ([MiniPlayer]).
+ *
+ * [talk]: the talk buttons (push-to-talk, whisper) for the full screen, which covers the app's own.
  */
 @Composable
 fun WatchCard(
     state: StreamEngine.State, title: String, egl: EglBase, onClose: () -> Unit,
     onMute: (Boolean) -> Unit = {}, onVolume: (Float) -> Unit = {}, onSmallWindow: (() -> Unit)? = null,
+    talk: (@Composable (Modifier) -> Unit)? = null,
 ) {
     var aspect by remember { mutableStateOf(16f / 9f) }
     var full by remember { mutableStateOf(false) }
@@ -261,7 +265,7 @@ fun WatchCard(
     var mini by remember { mutableStateOf(false) }
     if (mini) {
         MiniPlayer(state, video, egl, aspect, onOpen = { mini = false }, onClose = onClose)
-        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+        if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, onVolume, talk) { full = false }
         return
     }
     Column(
@@ -337,13 +341,13 @@ fun WatchCard(
                     if (state.watchMuted) Ts.red else Ts.text,
                 ) { sound = !sound }
             }
-            if (onSmallWindow != null) RoundButton(Icons.Filled.PictureInPictureAlt, stringResource(R.string.stream_small_window), Ts.text, onSmallWindow)
+            if (onSmallWindow != null) RoundButton(Icons.Filled.PictureInPictureAlt, stringResource(R.string.stream_small_window), Ts.text, onClick = onSmallWindow)
             RoundButton(Icons.Filled.Fullscreen, stringResource(R.string.stream_full_screen), Ts.text) { full = true }
-            RoundButton(Icons.Filled.Close, stringResource(R.string.stream_stop_watching), Ts.text, onClose)
+            RoundButton(Icons.Filled.Close, stringResource(R.string.stream_stop_watching), Ts.text, onClick = onClose)
         }
         if (sound && state.watchAudio != null) SoundRow(state, onMute, onVolume)
     }
-    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute) { full = false }
+    if (full && video != null) FullScreenPlayer(state, video, title, egl, aspect, onMute, onVolume, talk) { full = false }
 }
 
 /**
@@ -401,27 +405,47 @@ private fun MiniPlayer(state: StreamEngine.State, video: VideoTrack?, egl: EglBa
     }
 }
 
-/** The stream's sound: on or off, and how loud. */
+/** The stream's sound: on or off, and how loud ([small]: the full screen's, see-through and smaller). */
 @Composable
-private fun SoundRow(state: StreamEngine.State, onMute: (Boolean) -> Unit, onVolume: (Float) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+private fun SoundRow(state: StreamEngine.State, onMute: (Boolean) -> Unit, onVolume: (Float) -> Unit, small: Boolean = false) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (small) 6.dp else 10.dp)) {
         RoundButton(
             if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
             stringResource(if (state.watchMuted) R.string.stream_sound_on else R.string.stream_sound_off), if (state.watchMuted) Ts.red else Ts.text,
+            size = if (small) 36.dp else 40.dp, background = if (small) FullScreenButton else Ts.button,
         ) { onMute(!state.watchMuted) }
-        androidx.compose.material3.Slider(
-            value = if (state.watchMuted) 0f else state.watchVolume, onValueChange = { onVolume(it); if (state.watchMuted) onMute(false) },
-            modifier = Modifier.weight(1f),
-            colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = Ts.accent, activeTrackColor = Ts.accent),
+        ThinSlider(
+            if (state.watchMuted) 0f else state.watchVolume, { onVolume(it); if (state.watchMuted) onMute(false) },
+            Modifier.weight(1f),
         )
     }
 }
 
-/** The stream on the whole screen, the app turned the way the picture is; tap for the buttons. */
+private val FullScreenButton = Color(0x59000000)
+
+/** A slim slider (0 - 1): a thin track and a small round handle that stays within it. */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun ThinSlider(value: Float, onChange: (Float) -> Unit, modifier: Modifier = Modifier) {
+    androidx.compose.material3.Slider(
+        value = value, onValueChange = onChange, modifier = modifier,
+        thumb = { Box(Modifier.size(14.dp).clip(CircleShape).background(Color.White)) },
+        track = { s ->
+            Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0x40FFFFFF))) {
+                Box(Modifier.fillMaxWidth(s.value.coerceIn(0f, 1f)).height(4.dp).background(Ts.accent))
+            }
+        },
+    )
+}
+
+/**
+ * The stream on the whole screen, the app turned the way the picture is; tap for the buttons: the sound (on, off and how
+ * loud), leaving the full screen, and the talk buttons ([talk]) in the bottom corner, so push-to-talk works while watching.
+ */
 @Composable
 private fun FullScreenPlayer(
     state: StreamEngine.State, video: VideoTrack, title: String, egl: EglBase, aspect: Float,
-    onMute: (Boolean) -> Unit, onExit: () -> Unit,
+    onMute: (Boolean) -> Unit, onVolume: (Float) -> Unit, talk: (@Composable (Modifier) -> Unit)?, onExit: () -> Unit,
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     DisposableEffect(Unit) {
@@ -452,20 +476,19 @@ private fun FullScreenPlayer(
         ) { controls = !controls }) {
             VideoView(video, egl, Modifier.fillMaxSize())
             if (controls) {
+                // Kept light over the picture: a fade at the top, small see-through buttons
                 Row(
-                    Modifier.fillMaxWidth().background(Color(0x66000000)).padding(horizontal = 16.dp, vertical = 10.dp),
+                    Modifier.fillMaxWidth()
+                        .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0x8C000000), Color.Transparent)))
+                        .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, modifier = Modifier.weight(1f))
-                    if (state.watchAudio != null) {
-                        RoundButton(
-                            if (state.watchMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-                            stringResource(if (state.watchMuted) R.string.stream_sound_on else R.string.stream_sound_off), if (state.watchMuted) Ts.red else Ts.text,
-                        ) { onMute(!state.watchMuted) }
-                    }
-                    RoundButton(Icons.Filled.FullscreenExit, stringResource(R.string.stream_leave_full_screen), Ts.text, onExit)
+                    Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                    if (state.watchAudio != null) Box(Modifier.width(150.dp)) { SoundRow(state, onMute, onVolume, small = true) }
+                    RoundButton(Icons.Filled.FullscreenExit, stringResource(R.string.stream_leave_full_screen), Ts.text, size = 36.dp, background = FullScreenButton, onClick = onExit)
                 }
+                talk?.invoke(Modifier.align(Alignment.BottomEnd).padding(16.dp))
             }
         }
     }
@@ -727,7 +750,7 @@ fun ShareBar(
     @Composable
     fun Buttons() {
         if (camera) {
-            RoundButton(Icons.Filled.FlipCameraAndroid, stringResource(if (state.shareBoth) R.string.share_swap_cameras else R.string.share_switch_camera), Ts.text, onFlip)
+            RoundButton(Icons.Filled.FlipCameraAndroid, stringResource(if (state.shareBoth) R.string.share_swap_cameras else R.string.share_switch_camera), Ts.text, onClick = onFlip)
             val lens = state.lens
             if (lens != null && onLens != null) LensButton(lens, stringResource(R.string.share_lens_switch, lens), onLens)
             RoundButton(
@@ -797,12 +820,15 @@ private val ShareGreen = Color(0xFF23A559)
 
 /** WebTS's round share button. */
 @Composable
-private fun RoundButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color, onClick: () -> Unit) {
+private fun RoundButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color,
+    size: androidx.compose.ui.unit.Dp = 40.dp, background: Color = Ts.button, onClick: () -> Unit,
+) {
     Box(
-        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick),
+        Modifier.size(size).clip(CircleShape).background(background).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(20.dp).upright())
+        Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(size / 2).upright())
     }
 }
 

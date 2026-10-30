@@ -310,6 +310,13 @@ fun ServerScreen(
                     WatchCard(
                         state.stream, who?.let { stringResource(R.string.stream_title, it) } ?: stringResource(R.string.stream_title_unknown), egl, actions::stopWatching, actions::setWatchMuted, actions::setWatchVolume,
                         actions::pictureInPicture,
+                        // In the full screen, which covers the controls bar and the floating button
+                        talk = if (!ptt && state.whisperTo.isEmpty) null else ({ m ->
+                            Column(m, verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (!state.whisperTo.isEmpty) WhisperButton(state.whisperHeld, actions::setWhisper)
+                                if (ptt) FloatingPtt(state.pttHeld, actions::setPtt, small = true)
+                            }
+                        }),
                     )
                 }
                 val unread = state.unread.any { k ->

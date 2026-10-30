@@ -17,6 +17,9 @@
     ("0.6×", "1×") and switches to the next one during the stream.
   - **Losing the camera** to a call or another app ends the share with a message instead of a frozen picture.
   - The preview shows the picture as viewers see it, also with the turn locked.
+- **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
+  mode the round talk button is in its bottom corner (and the whisper button above it while there's a whisper list),
+  with the stream's own buttons. The full screen also has the stream's volume slider, not only sound on and off.
 
 ## 1.5.0 (2026-10-28)
 
