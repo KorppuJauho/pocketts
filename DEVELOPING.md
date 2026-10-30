@@ -24,7 +24,7 @@ scripts/dev.sh gradle <task>                          # any other Gradle task
 The build image accepts the Android SDK license, which is why that variable has to be set.
 
 Builds keep Gradle's downloads, the build output and Robolectric's Android jars (which the app's tests run on, about
-150 MB) in Docker volumes: `pocketts-gradle`, `pocketts-out` and `pocketts-m2`. Later builds are then faster, and the
+200 MB) in Docker volumes: `pocketts-gradle`, `pocketts-out` and `pocketts-m2`. Later builds are then faster, and the
 tests don't download those jars every time (Maven Central starts refusing repeated downloads).
 
 `scripts/dev.sh screenshots` also makes the Google Play pictures (`docs/screenshots/play/`) and GitHub's social
