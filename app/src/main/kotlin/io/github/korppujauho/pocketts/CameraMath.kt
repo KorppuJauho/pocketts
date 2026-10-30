@@ -89,6 +89,22 @@ object CameraView {
     }
 
     /**
+     * A lens's zoom compared with the main one (0.6× for an ultra-wide, 3× for a telephoto), from how wide each sees
+     * ([fov] and [mainFov], in degrees).
+     */
+    fun zoomFactor(fov: Float, mainFov: Float): Float {
+        if (fov <= 0f || mainFov <= 0f) return 1f
+        fun half(deg: Float) = kotlin.math.tan(Math.toRadians(deg / 2.0))
+        return (half(mainFov) / half(fov)).toFloat()
+    }
+
+    /** A zoom as a lens button says it: one decimal, without it when whole ("0.6×", "1×", "3×"). */
+    fun zoomLabel(zoom: Float): String {
+        val tenths = Math.round(zoom * 10)
+        return if (tenths % 10 == 0) "${tenths / 10}×" else "${tenths / 10}.${tenths % 10}×"
+    }
+
+    /**
      * Which back cameras to offer, from how wide each sees ([fovs], the main one first, as Android lists it): the
      * widest of the clearly wider ones as the wide-angle, the narrowest of the clearly narrower ones as the telephoto.
      * Ones that see about the same (the same lens again, or all the lenses as one camera) are left out. Indexes into

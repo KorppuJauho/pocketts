@@ -614,4 +614,5 @@
     <string name="lens_main">Основной</string>
     <string name="lens_tele">Теле</string>
     <string name="share_preview_small">Уменьшить превью</string>
+    <string name="share_lens_switch">Объектив %1$s: нажмите, чтобы переключить</string>
 </resources>

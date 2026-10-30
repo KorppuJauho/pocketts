@@ -455,6 +455,9 @@ private object SessionActions : ServerActions {
     override fun setZoom(zoom: Float) {
         Session.setZoom(zoom)
     }
+    override fun nextLens() {
+        Session.nextLens()
+    }
     override fun focusAt(x: Float, y: Float) {
         Session.focusAt(x, y)
     }

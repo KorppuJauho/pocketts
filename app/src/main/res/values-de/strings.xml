@@ -586,4 +586,5 @@
     <string name="lens_main">Haupt</string>
     <string name="lens_tele">Tele</string>
     <string name="share_preview_small">Vorschau verkleinern</string>
+    <string name="share_lens_switch">Objektiv %1$s: tippen für das nächste Objektiv</string>
 </resources>

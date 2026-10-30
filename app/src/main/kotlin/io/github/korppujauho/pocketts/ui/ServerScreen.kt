@@ -127,6 +127,8 @@ interface ServerActions {
     fun setTorch(on: Boolean) {}
     /** The shared camera's zoom. */
     fun setZoom(zoom: Float) {}
+    /** The next back lens of the shared camera. */
+    fun nextLens() {}
     /** Focus on a spot of the shared camera's picture (0 - 1 across it, as the camera gives it). */
     fun focusAt(x: Float, y: Float) {}
     fun setWatchMuted(muted: Boolean) {}
@@ -301,7 +303,7 @@ fun ServerScreen(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
                         light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
                         torch = if (state.stream.shareFlash && !frontCamera) state.stream.torch else null, onTorch = actions::setTorch,
-                        onZoom = actions::setZoom, onFocus = actions::focusAt,
+                        onZoom = actions::setZoom, onFocus = actions::focusAt, onLens = actions::nextLens,
                     )
                 }
                 if (state.stream.watching != 0 && egl != null && !pip) {

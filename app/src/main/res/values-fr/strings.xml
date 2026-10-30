@@ -600,4 +600,5 @@
     <string name="lens_main">Principal</string>
     <string name="lens_tele">Télé</string>
     <string name="share_preview_small">Réduire l’aperçu</string>
+    <string name="share_lens_switch">Objectif %1$s : touchez pour l’objectif suivant</string>
 </resources>

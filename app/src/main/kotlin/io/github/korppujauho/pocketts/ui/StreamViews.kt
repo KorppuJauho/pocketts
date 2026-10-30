@@ -609,6 +609,7 @@ fun ShareBar(
     onTorch: (Boolean) -> Unit = {},
     onZoom: ((Float) -> Unit)? = null, // pinching the big picture of one camera
     onFocus: ((x: Float, y: Float) -> Unit)? = null, // tapping it: a spot, 0 - 1 across the camera's own picture
+    onLens: (() -> Unit)? = null, // the next back lens, on phones that offer them apart
 ) {
     val kind = state.sharing ?: return
     var big by remember { mutableStateOf(false) }
@@ -744,6 +745,8 @@ fun ShareBar(
     fun Buttons() {
         if (camera) {
             RoundButton(Icons.Filled.FlipCameraAndroid, stringResource(if (state.shareBoth) R.string.share_swap_cameras else R.string.share_switch_camera), Ts.text, onFlip)
+            val lens = state.lens
+            if (lens != null && onLens != null) LensButton(lens, stringResource(R.string.share_lens_switch, lens), onLens)
             RoundButton(
                 if (state.rotateLocked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
                 stringResource(if (state.rotateLocked) R.string.share_turn_locked else R.string.share_turn_follows),
@@ -810,6 +813,18 @@ private fun RoundButton(icon: androidx.compose.ui.graphics.vector.ImageVector, l
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(20.dp).upright())
+    }
+}
+
+/** The back lens as its zoom ("0.6×"), in a round button like the others: a tap moves to the next lens. */
+@Composable
+private fun LensButton(text: String, label: String, onClick: () -> Unit) {
+    Box(
+        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick)
+            .semantics { contentDescription = label },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1, modifier = Modifier.upright())
     }
 }
 

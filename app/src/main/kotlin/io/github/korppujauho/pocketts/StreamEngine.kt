@@ -64,6 +64,7 @@ class StreamEngine(
         val zoom: Float = 1f, // one camera shared: its zoom, and how far it goes (none: both the same)
         val zoomMin: Float = 1f,
         val zoomMax: Float = 1f,
+        val lens: String? = null, // the back lens as its zoom ("0.6×"), when the phone offers lenses to switch between
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
         val lockedTurn: Int = 0, // the turn kept while locked (the phone's, from the screen's upright, when locked)
@@ -396,12 +397,14 @@ class StreamEngine(
     }
     private var dual: DualCamera? = null
     private var backCamera: String? = null // the back camera (lens) last shared, for flipping back to
+    private var lenses: List<Pair<CameraInfo, Lens>> = emptyList() // the back lenses offered apart, for switching
     @Volatile private var phoneSound: ScreenSound? = null
     private val idlePace = SoundPace() // WebRTC's sound loop without a microphone and without the phone's sound
 
     /** Starts sharing the camera: [front] or back ([lens]: a back camera chosen by its id), [quality] its picture's height. */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false, lens: String? = null) = exec.execute {
         if (state.sharing != null) return@execute
+        lenses = CameraInfo.backLenses(context)
         val cams = CameraInfo.all(context)
         val cam = cams.firstOrNull { it.id == lens && !front } ?: cams.firstOrNull { it.front == front } ?: cams.firstOrNull() ?: run {
             log("No camera")
@@ -548,7 +551,26 @@ class StreamEngine(
     }
 
     // The zoom as shown, and how far the camera goes
-    private fun State.zoomed(cam: CameraInfo, zoom: Float) = copy(zoom = zoom, zoomMin = cam.zoomMin, zoomMax = cam.zoomMax)
+    private fun State.zoomed(cam: CameraInfo, zoom: Float) = copy(zoom = zoom, zoomMin = cam.zoomMin, zoomMax = cam.zoomMax, lens = lensLabel(cam))
+
+    // A back lens's zoom compared with the main lens, when there are lenses to switch between
+    private fun lensLabel(cam: CameraInfo): String? {
+        if (cam.front || lenses.size < 2 || lenses.none { it.first.id == cam.id }) return null
+        val main = lenses.firstOrNull { it.second == Lens.MAIN }?.first ?: return null
+        return CameraView.zoomLabel(CameraView.zoomFactor(cam.fieldOfView, main.fieldOfView))
+    }
+
+    /** The next back lens (wide, main, telephoto, then round again), on a phone that offers them apart. */
+    fun nextLens() = exec.execute {
+        val cam = capturer as? PhoneCamera ?: return@execute
+        if (cam.camera.front || lenses.size < 2) return@execute
+        val at = lenses.indexOfFirst { it.first.id == cam.camera.id }
+        val next = lenses[(at + 1) % lenses.size].first
+        backCamera = next.id
+        cam.switchTo(next) { front ->
+            exec.execute { update { it.copy(shareFront = front, shareFlash = next.hasFlash && !front).zoomed(next, cam.zoom) } }
+        }
+    }
 
     /** Zooms the shared camera (one camera; not both at once). */
     fun setZoom(zoom: Float) = exec.execute {
@@ -682,7 +704,7 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false, zoom = 1f, zoomMin = 1f, zoomMax = 1f) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false, zoom = 1f, zoomMin = 1f, zoomMax = 1f, lens = null) }
     }
 
     private fun releaseCapture() {

@@ -572,4 +572,5 @@
     <string name="lens_main">主摄</string>
     <string name="lens_tele">长焦</string>
     <string name="share_preview_small">缩小预览</string>
+    <string name="share_lens_switch">镜头 %1$s：轻触切换到下一个镜头</string>
 </resources>

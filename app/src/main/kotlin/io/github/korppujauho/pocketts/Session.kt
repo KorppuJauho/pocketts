@@ -153,6 +153,7 @@ object Session : TsClient.Listener {
     fun flipCamera() = engine?.flipCamera()
     fun setTorch(on: Boolean) = engine?.setTorch(on)
     fun setZoom(zoom: Float) = engine?.setZoom(zoom)
+    fun nextLens() = engine?.nextLens()
     fun focusAt(x: Float, y: Float) = engine?.focusAt(x, y)
     fun setWatchMuted(muted: Boolean) = engine?.setWatchMuted(muted)
     fun setWatchVolume(volume: Float) = engine?.setWatchVolume(volume)

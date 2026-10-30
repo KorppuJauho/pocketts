@@ -628,4 +628,5 @@
     <string name="lens_main">Main</string>
     <string name="lens_tele">Tele</string>
     <string name="share_preview_small">Make the preview small</string>
+    <string name="share_lens_switch">Lens %1$s: tap for the next lens</string>
 </resources>

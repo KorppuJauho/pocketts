@@ -75,6 +75,19 @@ class CameraMathTest {
         assertEquals(84f, CameraView.fieldOfView(6.4f, 3.55f), 0.5f)
     }
 
+    @Test
+    fun lensZoom() {
+        // This phone's ultra-wide (104°) against its main lens (73°): 0.6×
+        assertEquals("0.6×", CameraView.zoomLabel(CameraView.zoomFactor(104f, 73f)))
+        assertEquals("1×", CameraView.zoomLabel(CameraView.zoomFactor(73f, 73f)))
+        // A telephoto three times as long
+        assertEquals("3×", CameraView.zoomLabel(CameraView.zoomFactor(27.7f, 73f)))
+        assertEquals("0.5×", CameraView.zoomLabel(0.5f))
+        assertEquals("2.5×", CameraView.zoomLabel(2.47f))
+        // A phone that doesn't say
+        assertEquals(1f, CameraView.zoomFactor(0f, 73f), 0f)
+    }
+
     private fun assertPoint(expected: Pair<Float, Float>, actual: Pair<Float, Float>) {
         assertEquals(expected.first, actual.first, 0.001f)
         assertEquals(expected.second, actual.second, 0.001f)

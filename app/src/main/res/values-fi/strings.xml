@@ -586,4 +586,5 @@
     <string name="lens_main">Pää</string>
     <string name="lens_tele">Tele</string>
     <string name="share_preview_small">Pienennä esikatselu</string>
+    <string name="share_lens_switch">Objektiivi %1$s: napauta seuraavaan objektiiviin</string>
 </resources>
