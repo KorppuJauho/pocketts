@@ -244,7 +244,7 @@ private fun openLinkText(context: Context, text: String) {
         val found = try {
             Result.success(io.github.korppujauho.pocketts.proto.Invites.resolve(link))
         } catch (e: Exception) {
-            AppLog.log("Looking up the invite failed: ${e.message}")
+            AppLog.log("Looking up the invite failed: ${io.github.korppujauho.pocketts.proto.LogPrivacy.text(e.message)}")
             Result.failure(e)
         }
         main.post {

@@ -578,4 +578,11 @@
     <string name="capture_ai_noise">Tekoälyn kohinanpoisto (RNNoise)</string>
     <string name="capture_ai_noise_desc">Poistaa myös näppäimistön naksutukset, tuulettimen, television ja muun melun, jonka puhelimen oma kohinanpoisto päästää läpi, puhelimessa toimivalla pienellä neuroverkolla. Kuluttaa hieman enemmän akkua.</string>
     <string name="capture_ai_noise_license">RNNoisen lisenssi</string>
+    <string name="debug_log_title">Vianetsintäloki</string>
+    <string name="debug_log">Pidä vianetsintälokia</string>
+    <string name="debug_log_desc">Vikailmoituksia varten: mitä sovellus tekee, kaatumiset mukaan lukien, vain tässä puhelimessa. Palvelinosoitteet, nimet ja viestit poistetaan. Sovellus ei koskaan lähetä sitä: jaa se itse, esimerkiksi vikailmoitukseen GitHubissa. Pois kytkeminen poistaa sen.</string>
+    <string name="debug_log_share">Jaa loki</string>
+    <string name="debug_log_delete">Poista loki</string>
+    <string name="debug_log_empty">Vianetsintäloki on vielä tyhjä.</string>
+    <string name="debug_log_deleted">Vianetsintäloki poistettu.</string>
 </resources>

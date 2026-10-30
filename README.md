@@ -32,8 +32,9 @@ that off in Settings).
 
 **Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
 [issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Questions, ideas and tips are welcome in
-the [discussions](https://github.com/KorppuJauho/pocketts/discussions); bugs go to the issues. Security problems:
-please report them privately, see [SECURITY.md](SECURITY.md).
+the [discussions](https://github.com/KorppuJauho/pocketts/discussions); bugs go to the issues, where a debug log
+(Settings › Advanced › Debug log, with names and addresses taken out) helps with bugs that are hard to repeat.
+Security problems: please report them privately, see [SECURITY.md](SECURITY.md).
 
 ## Install
 

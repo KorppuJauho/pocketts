@@ -592,4 +592,11 @@
     <string name="capture_ai_noise">Eliminación de ruido con IA (RNNoise)</string>
     <string name="capture_ai_noise_desc">También elimina los clics del teclado, un ventilador, la televisión y otros ruidos que la eliminación del propio teléfono deja pasar, con una pequeña red neuronal en el teléfono. Usa un poco más de batería.</string>
     <string name="capture_ai_noise_license">Licencia de RNNoise</string>
+    <string name="debug_log_title">Registro de depuración</string>
+    <string name="debug_log">Guardar un registro de depuración</string>
+    <string name="debug_log_desc">Para informes de errores: lo que hace la aplicación, incluidos los cierres inesperados, guardado solo en este teléfono. Se quitan las direcciones de servidor, los nombres y los mensajes. La aplicación nunca lo envía: compártelo tú, por ejemplo en un informe de error en GitHub. Desactivarlo lo borra.</string>
+    <string name="debug_log_share">Compartir registro</string>
+    <string name="debug_log_delete">Borrar registro</string>
+    <string name="debug_log_empty">El registro de depuración está vacío por ahora.</string>
+    <string name="debug_log_deleted">Registro de depuración borrado.</string>
 </resources>

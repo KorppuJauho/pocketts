@@ -16,6 +16,7 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.key.Keyer
 import coil3.request.Options
 import coil3.svg.SvgDecoder
+import io.github.korppujauho.pocketts.proto.LogPrivacy
 import io.github.korppujauho.pocketts.proto.Pictures
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -102,7 +103,7 @@ object ServerFiles {
             }
             synchronized(missing) { missing[f.key] = System.currentTimeMillis() + 10 * 60_000 }
             // Once per file every 10 minutes (it's then left alone): which file, and why
-            AppLog.log("Server file ${f.paths.first()} (channel ${f.cid}) couldn't be shown: ${last?.message ?: "not found"}")
+            AppLog.log("Server file ${LogPrivacy.folder(f.paths.first())} (channel ${f.cid}) couldn't be shown: ${LogPrivacy.text(last?.message ?: "not found")}")
             throw last ?: IllegalStateException("not found")
         }
     }

@@ -54,7 +54,7 @@ class AudioRoute(context: Context) {
             val best = preference.firstNotNullOfOrNull { type -> available.firstOrNull { it.type == type } } ?: return
             if (am.communicationDevice?.id != best.id) {
                 am.setCommunicationDevice(best)
-                AppLog.log("Voice goes to ${best.productName} (type ${best.type})")
+                AppLog.log("Voice goes to ${io.github.korppujauho.pocketts.proto.LogPrivacy.person(best.productName)} (type ${best.type})")
             }
         } else {
             val headset = am.getDevices(AudioManager.GET_DEVICES_OUTPUTS).any {

@@ -592,4 +592,11 @@
     <string name="capture_ai_noise">Suppression du bruit par IA (RNNoise)</string>
     <string name="capture_ai_noise_desc">Supprime aussi les clics du clavier, un ventilateur, la télévision et les autres bruits que la suppression du téléphone laisse passer, grâce à un petit réseau de neurones sur le téléphone. Consomme un peu plus de batterie.</string>
     <string name="capture_ai_noise_license">Licence de RNNoise</string>
+    <string name="debug_log_title">Journal de débogage</string>
+    <string name="debug_log">Tenir un journal de débogage</string>
+    <string name="debug_log_desc">Pour les rapports de bug : ce que fait l’application, plantages compris, gardé uniquement sur ce téléphone. Les adresses de serveur, les noms et les messages en sont retirés. L’application ne l’envoie jamais : partagez-le vous-même, par exemple dans un rapport de bug sur GitHub. Le désactiver le supprime.</string>
+    <string name="debug_log_share">Partager le journal</string>
+    <string name="debug_log_delete">Supprimer le journal</string>
+    <string name="debug_log_empty">Le journal de débogage est vide pour l’instant.</string>
+    <string name="debug_log_deleted">Journal de débogage supprimé.</string>
 </resources>

@@ -273,7 +273,7 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
             socket = s
             Thread({ receiveLoop(s) }, "ts-receive").apply { isDaemon = true }.start()
         } catch (e: Exception) {
-            log("Can't reach ${options.host}:${options.port}: $e")
+            log("Can't reach ${LogPrivacy.server(options.host)}:${options.port}: ${LogPrivacy.text(e)}")
             state = State.DISCONNECTED
             if (e is java.net.UnknownHostException) {
                 end = End.NO_SUCH_HOST
@@ -314,7 +314,8 @@ class TsClient(private val listener: Listener, private val log: (String) -> Unit
     }
 
     private fun fail(reason: String, kind: End, detail: String = "", network: Boolean = true) {
-        log("Disconnected: $reason")
+        // A refusal's words can be someone's (a ban reason)
+        log("Disconnected ($kind): ${if (kind == End.REFUSED) LogPrivacy.message(reason) else LogPrivacy.text(reason)}")
         lostConnection = network
         end = kind
         endDetail = detail
