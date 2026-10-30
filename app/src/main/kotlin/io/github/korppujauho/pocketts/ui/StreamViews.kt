@@ -614,10 +614,10 @@ fun ShareBar(
     var big by remember { mutableStateOf(false) }
     var aspect by remember { mutableStateOf(9f / 16f) } // the picture's width / height, as shown
     val camera = kind == Streams.Kind.CAMERA
-    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera), turned back
-    // by the turn added for them
-    val sent = if (state.rotateLocked) state.lockedTurn else screenTurn
-    val previewTurn = (360 - sent) % 360
+    // The preview is what the viewers see, the front camera too (not mirrored like a selfie camera), turned back by
+    // how the phone is held: upright for you as it is for them. With the turn locked, turning the phone turns the
+    // preview too, as the viewers' picture turns.
+    val previewTurn = (360 - screenTurn) % 360
     val track = state.localVideo
 
     // The big picture of one camera: pinch to zoom, tap to focus, double tap back to 1×; a button makes it small again

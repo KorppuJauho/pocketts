@@ -211,6 +211,8 @@ fun ServerScreen(
     }
     // The ring light: sharing the front camera, the screen at full brightness with a white frame lights your face
     var ringLight by rememberSaveable { mutableStateOf(false) }
+    // Off when a share ends: a new one starts without it, as the flashlight does
+    LaunchedEffect(state.stream.sharing == null) { if (state.stream.sharing == null) ringLight = false }
     val frontCamera = state.stream.sharing == io.github.korppujauho.pocketts.proto.Streams.Kind.CAMERA && state.stream.shareFront && !state.stream.shareBoth
     val lightOn = ringLight && frontCamera
     val window = (androidx.compose.ui.platform.LocalContext.current as? android.app.Activity)?.window

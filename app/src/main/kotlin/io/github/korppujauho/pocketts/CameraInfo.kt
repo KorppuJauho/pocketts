@@ -52,6 +52,9 @@ class CameraInfo(val id: String, c: CameraCharacteristics) {
         if (focal > 0f && sensor != null) CameraView.fieldOfView(maxOf(sensor.width, sensor.height), focal) else 0f
     }
 
+    /** The lenses a combined camera is made of (Android 9+: its "physical" cameras), when it says. */
+    val lensIds: Set<String> = try { c.physicalCameraIds } catch (_: Exception) { emptySet() }
+
     override fun toString() = "camera $id (${if (front) "front" else "back"}${if (hasFlash) ", flash" else ""})"
 
     companion object {
@@ -69,7 +72,22 @@ class CameraInfo(val id: String, c: CameraCharacteristics) {
         /** The back cameras to choose from (wide-angle, main, telephoto), when the phone offers more than one lens of its own. */
         fun backLenses(context: Context): List<Pair<CameraInfo, Lens>> {
             val backs = all(context).filter { !it.front }
+            describe(context)
             return CameraView.lenses(backs.map { it.fieldOfView }).map { (i, kind) -> backs[i] to kind }
+        }
+
+        // Once a run, in the log: what the phone offers apps (which lenses can be had, and how far each zooms)
+        private var described = false
+
+        private fun describe(context: Context) {
+            if (described) return
+            described = true
+            val cm = context.getSystemService(CameraManager::class.java) ?: return
+            fun line(i: CameraInfo) = "${i.id} ${if (i.front) "front" else "back"} %.0f° zoom %.1f-%.1f".format(i.fieldOfView, i.zoomMin, i.zoomMax)
+            for (i in all(context)) {
+                val parts = i.lensIds.mapNotNull { of(cm, it) }.joinToString { "lens ${line(it)}" }
+                AppLog.log("[Streams] Camera ${line(i)}" + if (parts.isNotEmpty()) " (made of $parts)" else "")
+            }
         }
 
         fun of(context: Context, id: String): CameraInfo? = context.getSystemService(CameraManager::class.java)?.let { of(it, id) }
