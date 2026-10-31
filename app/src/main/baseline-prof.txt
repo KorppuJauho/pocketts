@@ -1,0 +1,11 @@
+# Baseline profile: PocketTS's own code (the app and the TeamSpeak connection, tsproto) is compiled ahead of time when
+# the app is installed, instead of being interpreted and compiled while it runs. That makes starting, the first time a
+# screen opens and a stream starting smoother. The libraries (Compose, WebRTC's Java part) bring profiles of their own.
+#
+# Written with wildcards rather than recorded on a device: for an app this size, compiling all its own code costs a few
+# megabytes after installing, and needs no test device to make. ProfileInstaller (which Compose brings) applies it to
+# installs from GitHub too; Google Play applies it when installing.
+#
+# H: hot (compiled), S: run at start, P: run after start; L...; a class, ->**(**) all its methods.
+HSPLio/github/korppujauho/pocketts/**;->**(**)**
+Lio/github/korppujauho/pocketts/**;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Smoother start:** PocketTS's own code is compiled ahead of time when the app is installed (a baseline profile),
+  so starting, opening screens the first time and starting a stream are smoother. The log notes how long a start took.
 - **Debug log:** Settings › Advanced › Debug log keeps a log for bug reports on the phone, crashes included, with
   server addresses, names, messages and keys taken out (running numbers such as "server 1" tell them apart). Of the
   chat it notes only that a message was sent or arrived. The app never sends it: Share log hands it to

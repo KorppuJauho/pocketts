@@ -178,6 +178,13 @@ class MainActivity : ComponentActivity() {
             if (!info.isInPictureInPictureMode && lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) Session.stopWatching()
         }
         setContent { PocketTsTheme { App() } }
+        // How long a start took, from the app's process starting to the first screen drawn (only a fresh start: the
+        // process's own): to see what the baseline profile and later changes do
+        if (savedInstanceState == null && !startLogged) {
+            startLogged = true
+            val began = android.os.Process.getStartUptimeMillis()
+            window.decorView.post { AppLog.log("Started in ${android.os.SystemClock.uptimeMillis() - began} ms") }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -210,6 +217,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         var current: MainActivity? = null
+        private var startLogged = false // the start time is logged once a process
     }
 }
 
