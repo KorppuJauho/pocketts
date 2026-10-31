@@ -147,6 +147,8 @@ fun ServerScreen(
     egl: org.webrtc.EglBase? = null,
     canBoth: Boolean = false, // the phone can use both cameras at once
     pip: Boolean = false, // the app is a small picture-in-picture window: the stream player is drawn there instead
+    // Who is talking (Session.voices): passed as it is and read only where it's shown, so talking doesn't redraw the screen
+    voices: androidx.compose.runtime.State<Session.Voices> = remember { mutableStateOf(Session.Voices()) },
 ) {
     var shareDialog by remember { mutableStateOf(false) }
     var serversMenu by remember { mutableStateOf(false) }
@@ -279,7 +281,7 @@ fun ServerScreen(
                             whisper = if (state.whisperTo.isEmpty) null else ({ WhisperButton(state.whisperHeld, actions::setWhisper) }),
                         )
                         WhisperStrip(
-                            incoming = state.whispering.filter { it != state.ownId }.mapNotNull { state.client(it)?.nickname },
+                            incoming = { voices.value.whispering.filter { it != state.ownId }.mapNotNull { state.client(it)?.nickname } },
                             list = state.whisperTo.people.mapNotNull { state.client(it)?.nickname } +
                                 state.whisperTo.channels.mapNotNull { id -> state.channel(id)?.let { it.displayName.ifEmpty { it.name } } },
                             onList = { whisperList = true }, onClear = actions::clearWhisper,
@@ -358,7 +360,7 @@ fun ServerScreen(
                             } else {
                                 ChannelTree(
                                     items,
-                                    TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch, whispering = state.whispering) { it.id !in state.cannotTalk },
+                                    TreeContext(state.ownId, state.ownChannel, voices, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
                                     onChannel = { ch ->
                                         if (ch.id == state.ownChannel) return@ChannelTree
                                         // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed

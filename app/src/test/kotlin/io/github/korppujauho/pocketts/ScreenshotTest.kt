@@ -70,29 +70,29 @@ class ScreenshotTest {
     }
 
     @Test
-    fun server() = shot("server") { ServerScreen(Example.state(), Example.noActions) }
+    fun server() = shot("server") { ServerScreen(Example.state(), Example.noActions, voices = Example.voices()) }
 
     @Test
-    fun chat() = shot("chat") { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+    fun chat() = shot("chat") { ServerScreen(Example.chatState(), Example.noActions, voices = Example.voices(), startView = View.CHAT) }
 
     /** Settings › UI › Buttons at the bottom, with push-to-talk's round button kept above them. */
     @Test
     fun buttonsAtBottom() = shot("buttons-at-bottom") {
         ServerScreen(
             Example.state().copy(voice = VoiceSettings(controlsAtBottom = true, activation = VoiceSettings.Activation.PTT), micAllowed = true),
-            Example.noActions,
+            Example.noActions, voices = Example.voices(),
         )
     }
 
     @Test
     fun chatButtonsAtBottom() = shot("chat-buttons-at-bottom") {
-        ServerScreen(Example.chatState().copy(voice = VoiceSettings(controlsAtBottom = true)), Example.noActions, startView = View.CHAT)
+        ServerScreen(Example.chatState().copy(voice = VoiceSettings(controlsAtBottom = true)), Example.noActions, voices = Example.voices(), startView = View.CHAT)
     }
 
     /** Settings › UI › Show admin functions, after holding a channel: edit mode. */
     @Test
     fun channelEditing() = shot("channel-editing") {
-        ServerScreen(Example.state().copy(voice = VoiceSettings(adminTools = true)), Example.noActions, startEditing = true)
+        ServerScreen(Example.state().copy(voice = VoiceSettings(adminTools = true)), Example.noActions, voices = Example.voices(), startEditing = true)
     }
 
     @Test
@@ -223,15 +223,15 @@ class ScreenshotTest {
 
     @Test
     fun poked() = shot("poke") {
-        ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions)
+        ServerScreen(Example.state().copy(pokes = listOf(Chat.Poke(1, Example.T0 + 300_000, 1, "Lee", "", "Come to Gaming!"))), Example.noActions, voices = Example.voices())
     }
 
     @Test
     fun pushToTalk() = shot("push-to-talk") {
         val s = Example.state()
         ServerScreen(
-            s.copy(voice = VoiceSettings(activation = VoiceSettings.Activation.PTT), micAllowed = true, pttHeld = true, talking = s.talking + 3),
-            Example.noActions,
+            s.copy(voice = VoiceSettings(activation = VoiceSettings.Activation.PTT), micAllowed = true, pttHeld = true),
+            Example.noActions, voices = Example.voices(setOf(1, 3, 4)),
         )
     }
 
@@ -242,9 +242,8 @@ class ScreenshotTest {
         ServerScreen(
             s.copy(
                 micAllowed = true, whisperTo = Session.WhisperList(people = listOf(5), channels = listOf(6)), whisperHeld = true,
-                talking = s.talking + 1 + 3, whispering = setOf(1, 3),
             ),
-            Example.noActions,
+            Example.noActions, voices = Example.voices(setOf(1, 3, 4), whispering = setOf(1, 3)),
         )
     }
 
@@ -341,7 +340,7 @@ class ScreenshotTest {
 
     @Test
     fun serverConnecting() = shot("server-connecting") {
-        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com", reconnecting = 2), Example.noActions)
+        ServerScreen(Session.UiState(phase = Session.Phase.CONNECTING, address = "ts.example.com", reconnecting = 2), Example.noActions, voices = Example.voices())
     }
 }
 
@@ -447,6 +446,10 @@ object Example {
         )
     }
 
+    /** Who is talking in the examples (only your own channel's talking can be seen). */
+    fun voices(talking: Set<Int> = setOf(1, 4), whispering: Set<Int> = emptySet()) =
+        androidx.compose.runtime.mutableStateOf(Session.Voices(talking, whispering))
+
     fun state(): Session.UiState {
         val m = model()
         return Session.UiState(
@@ -456,7 +459,6 @@ object Example {
             tree = m.tree(),
             ownId = 3,
             ownChannel = 1,
-            talking = setOf(1, 4), // only your own channel's talking can be seen
             cannotTalk = m.clients.values.filter { !m.canTalk(it) }.map { it.id }.toSet(),
             micAllowed = true,
             badges = m.clients.values.associate { it.id to m.badges(it) },

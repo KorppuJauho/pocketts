@@ -64,10 +64,10 @@ class PlayStoreTest {
     val compose = androidx.compose.ui.test.junit4.createComposeRule()
 
     @Test
-    fun channels() = shot("1-channels") { ServerScreen(Example.state(), Example.noActions) }
+    fun channels() = shot("1-channels") { ServerScreen(Example.state(), Example.noActions, voices = Example.voices()) }
 
     @Test
-    fun chat() = shot("2-chat") { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+    fun chat() = shot("2-chat") { ServerScreen(Example.chatState(), Example.noActions, voices = Example.voices(), startView = View.CHAT) }
 
     // The person menu opens in a window of its own over the channels: the whole screen is captured
     @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
@@ -76,7 +76,7 @@ class PlayStoreTest {
         compose.setContent {
             PocketTsTheme {
                 val s = Example.state()
-                ServerScreen(s, Example.noActions)
+                ServerScreen(s, Example.noActions, voices = Example.voices())
                 io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {})
             }
         }
@@ -163,9 +163,9 @@ class PlayStoreTest {
             }
             Box(Modifier.align(Alignment.CenterEnd).padding(end = 70.dp)) {
                 Box(Modifier.offset(x = (-230).dp, y = 40.dp)) {
-                    Phone(0.74f) { ServerScreen(Example.chatState(), Example.noActions, startView = View.CHAT) }
+                    Phone(0.74f) { ServerScreen(Example.chatState(), Example.noActions, voices = Example.voices(), startView = View.CHAT) }
                 }
-                Phone(0.80f) { ServerScreen(Example.state(), Example.noActions) }
+                Phone(0.80f) { ServerScreen(Example.state(), Example.noActions, voices = Example.voices()) }
             }
         }
     }
