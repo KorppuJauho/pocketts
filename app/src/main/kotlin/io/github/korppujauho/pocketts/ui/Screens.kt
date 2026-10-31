@@ -200,13 +200,15 @@ fun WhisperButton(held: Boolean, onHold: (Boolean) -> Unit) {
  * the cross clears it). Nothing when neither.
  */
 @Composable
-fun WhisperStrip(incoming: List<String>, list: List<String>, onList: () -> Unit, onClear: () -> Unit) {
-    if (incoming.isEmpty() && list.isEmpty()) return
+fun WhisperStrip(incoming: () -> List<String>, list: List<String>, onList: () -> Unit, onClear: () -> Unit) {
+    // [incoming] read here, so whispers coming and going redraw this strip only
+    val whisperers = incoming()
+    if (whisperers.isEmpty() && list.isEmpty()) return
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.whisper.copy(alpha = 0.1f))
             .border(1.dp, Ts.whisper.copy(alpha = 0.35f), RoundedCornerShape(12.dp)),
     ) {
-        for (name in incoming) {
+        for (name in whisperers) {
             Text(
                 stringResource(R.string.whispering_to_you, name), color = Ts.whisper, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),

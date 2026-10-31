@@ -277,6 +277,7 @@ private val favorites = kotlinx.coroutines.flow.MutableStateFlow<List<Favorite>>
 @Composable
 private fun App() {
     val state by Session.state.collectAsState()
+    val voices = Session.voices.collectAsState() // handed on as it is: only the talking indicators read it
     val favs by favorites.collectAsState()
     val ctx = LocalContext.current
     val settings = remember { Settings(ctx) }
@@ -298,7 +299,7 @@ private fun App() {
         androidx.compose.foundation.layout.Box {
             ServerScreen(
                 state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = egl,
-                canBoth = canBoth, pip = pip,
+                canBoth = canBoth, pip = pip, voices = voices,
             )
             if (pip) io.github.korppujauho.pocketts.ui.PipPlayer(state.stream, egl)
         }
