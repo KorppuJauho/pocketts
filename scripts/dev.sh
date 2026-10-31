@@ -8,6 +8,8 @@
 #   scripts/dev.sh screenshots        pictures of the screens (example data) -> docs/screenshots/
 #   scripts/dev.sh ts-server up|down  start/stop the TeamSpeak test server container (TS_CONTAINER)
 #   scripts/dev.sh it                 tests against that server (TS_TEST_SERVER)
+#   scripts/dev.sh load [n] [s]       a busy channel on that server: n test clients (12) talk and chat for s seconds
+#                                     (180), to see how the app holds up (its log's "Frames: late %" lines)
 #   scripts/dev.sh devserver up|down  the page phones install test builds from and send their log to (DEV_PORT)
 #   scripts/dev.sh viewer up|down     a "Stream viewer" on the test server that watches every stream, for testing
 #                                     sharing without a second device; the dev page shows what it sees (/viewer).
@@ -47,10 +49,20 @@ gradle() {
     -v "$ROOT":/work -v pocketts-gradle:/gradle -v pocketts-out:/out -v pocketts-m2:/root/.m2 \
     -e ANDROID_USER_HOME=/gradle/android-user \
     -e POCKETTS_BUILD_ROOT=/out -e TS_TEST_SERVER="${TS_TEST_SERVER_FOR_TESTS:-}" -e TS_TEST_FT_PORT="${TS_TEST_FT_PORT:-}" \
+    -e TS_LOAD_CLIENTS="${TS_LOAD_CLIENTS:-}" -e TS_LOAD_SECONDS="${TS_LOAD_SECONDS:-}" \
     "$IMAGE" ./gradlew --no-daemon --console=plain "$@"
 }
 
 need() { [ -n "${!1:-}" ] || { echo "Set $1 in dev.env"; exit 1; }; }
+
+# The test server's web query (path and parameters as $1), from the server's own network, where it listens. Its key
+# is in the server container's settings; it goes in by environment and is never printed.
+query() {
+  local key
+  key=$(docker inspect "$TS_CONTAINER" --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^TSSERVER_QUERY_ADMIN_API_KEY=//p')
+  K="$key" docker run --rm --network "container:$TS_CONTAINER" -e K "$IMAGE" \
+    bash -c 'curl -s -m 10 -H "x-api-key: $K" "http://127.0.0.1:10080/1/$1"' _ "$1"
+}
 
 case "${1:-}" in
   image)
@@ -87,6 +99,17 @@ case "${1:-}" in
   it)
     need TS_TEST_SERVER
     TS_TEST_SERVER_FOR_TESTS="$TS_TEST_SERVER" gradle :tsproto:test --tests '*ServerTest*' --rerun
+    ;;
+  load)
+    need TS_TEST_SERVER
+    need TS_CONTAINER
+    # The server's flood protection blocks an address after about three quick connections: its limit is raised for
+    # the run and put back afterwards (also if the run stops early)
+    before=$(query serverinfo | sed -n 's/.*"virtualserver_antiflood_points_needed_ip_block":"\([0-9]*\)".*/\1/p')
+    query "serveredit?virtualserver_antiflood_points_needed_ip_block=100000" > /dev/null
+    trap 'query "serveredit?virtualserver_antiflood_points_needed_ip_block=${before:-250}" > /dev/null' EXIT
+    TS_TEST_SERVER_FOR_TESTS="$TS_TEST_SERVER" TS_LOAD_CLIENTS="${2:-12}" TS_LOAD_SECONDS="${3:-180}" \
+      gradle :tsproto:test --tests '*LoadTest*' --rerun
     ;;
   devserver)
     case "${2:-}" in

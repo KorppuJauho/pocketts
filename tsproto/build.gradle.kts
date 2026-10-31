@@ -24,6 +24,8 @@ tasks.test {
     useJUnitPlatform()
     environment("TS_TEST_SERVER", System.getenv("TS_TEST_SERVER") ?: "")
     environment("TS_TEST_FT_PORT", System.getenv("TS_TEST_FT_PORT") ?: "")
+    environment("TS_LOAD_CLIENTS", System.getenv("TS_LOAD_CLIENTS") ?: "")
+    environment("TS_LOAD_SECONDS", System.getenv("TS_LOAD_SECONDS") ?: "")
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true
