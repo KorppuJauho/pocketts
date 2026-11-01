@@ -53,6 +53,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -97,14 +105,14 @@ fun AppHeader(right: @Composable () -> Unit = {}) {
 /** The settings gear in the header's corner. */
 @Composable
 fun SettingsGear(onClick: () -> Unit) {
-    HeaderButton(Icons.Filled.Settings, stringResource(R.string.settings), onClick)
+    HeaderButton(Icons.Filled.Settings, stringResource(R.string.settings), onClick = onClick)
 }
 
 /** A small icon button for the header. */
 @Composable
-fun HeaderButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun HeaderButton(icon: ImageVector, label: String, tint: Color = Ts.text, onClick: () -> Unit) {
     androidx.compose.material3.IconButton(onClick = onClick, modifier = Modifier.size(40.dp)) {
-        Icon(icon, contentDescription = label, tint = Ts.text, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(22.dp))
     }
 }
 
@@ -114,14 +122,17 @@ fun HeaderButton(icon: ImageVector, label: String, onClick: () -> Unit) {
  */
 @Composable
 fun WarningBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modifier, inset: androidx.compose.ui.unit.Dp = 15.dp) {
+    // Longer while a screen reader is on (as long as Android's own setting for that asks)
+    val accessibility = androidx.compose.ui.platform.LocalAccessibilityManager.current
     androidx.compose.runtime.LaunchedEffect(text) {
-        kotlinx.coroutines.delay(6000)
+        kotlinx.coroutines.delay(accessibility?.calculateRecommendedTimeoutMillis(6000, containsIcons = true, containsText = true, containsControls = true) ?: 6000)
         onDismiss()
     }
     val shape = RoundedCornerShape(10.dp)
     Row(
         modifier.fillMaxWidth().padding(horizontal = inset).shadow(8.dp, shape).clip(shape).background(Color(0xFF3A1D20))
-            .border(1.dp, Ts.red.copy(alpha = 0.6f), shape).padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 2.dp),
+            .border(1.dp, Ts.red.copy(alpha = 0.6f), shape).semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(Icons.Filled.Warning, contentDescription = null, tint = Color(0xFFF87171), modifier = Modifier.size(20.dp))
@@ -133,33 +144,40 @@ fun WarningBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modi
     }
 }
 
-/** WebTS's red "exit" style button. */
+/** A round control button; red when [off] (read out as off, or on with [onOff]). */
 @Composable
-fun ExitButton(text: String, onClick: () -> Unit) {
-    Text(
-        text, color = Ts.red, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-        modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(Ts.red.copy(alpha = 0.15f))
-            .border(1.dp, Ts.red.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-            .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 5.dp),
-    )
-}
-
-/** A round control button; red when [off]. */
-@Composable
-fun ControlButton(icon: ImageVector, label: String, off: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
+fun ControlButton(icon: ImageVector, label: String, off: Boolean = false, enabled: Boolean = true, onOff: Boolean = false, onClick: () -> Unit) {
     val bg = if (off) Ts.redButton else Ts.button
+    val state = if (off) stringResource(R.string.a11y_off) else if (onOff) stringResource(R.string.a11y_on) else null
     Box(
         Modifier.size(48.dp).clip(CircleShape).background(bg)
             .border(1.dp, if (off) Ts.redButton else Ts.buttonBorder, CircleShape)
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .then(if (state != null) Modifier.semantics { stateDescription = state } else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = label, tint = if (off) Color.White else Ts.text.copy(alpha = if (enabled) 1f else 0.4f), modifier = Modifier.upright())
     }
 }
 
-/** Calls [onHold] with true while pressed, false when let go (push-to-talk). */
-fun Modifier.holdToTalk(onHold: (Boolean) -> Unit): Modifier = pointerInput(Unit) {
+/**
+ * Calls [onHold] with true while pressed, false when let go (push-to-talk). A screen reader (TalkBack) can't hold a
+ * button down, so through it a tap starts and the next one stops.
+ */
+@Composable
+fun Modifier.holdToTalk(held: Boolean, label: String, whisper: Boolean = false, onHold: (Boolean) -> Unit): Modifier {
+    val action = stringResource(
+        if (whisper) (if (held) R.string.a11y_whisper_stop else R.string.a11y_whisper_start)
+        else (if (held) R.string.a11y_talk_stop else R.string.a11y_talk_start)
+    )
+    return semantics {
+        role = Role.Button
+        contentDescription = label
+        onClick(action) { onHold(!held); true }
+    }.pressToTalk(onHold)
+}
+
+private fun Modifier.pressToTalk(onHold: (Boolean) -> Unit): Modifier = pointerInput(Unit) {
     detectTapGestures(onPress = {
         onHold(true)
         try {
@@ -176,10 +194,10 @@ fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
     val color = if (held) Ts.talking else Ts.text
     Box(
         Modifier.size(48.dp).clip(CircleShape).background(if (held) Ts.talking.copy(alpha = 0.2f) else Ts.button)
-            .border(1.dp, if (held) Ts.talking else Ts.buttonBorder, CircleShape).holdToTalk(onHold),
+            .border(1.dp, if (held) Ts.talking else Ts.buttonBorder, CircleShape).holdToTalk(held, stringResource(R.string.hold_to_talk), onHold = onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = color, modifier = Modifier.upright())
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = null, tint = color, modifier = Modifier.upright())
     }
 }
 
@@ -188,10 +206,11 @@ fun PttButton(held: Boolean, onHold: (Boolean) -> Unit) {
 fun WhisperButton(held: Boolean, onHold: (Boolean) -> Unit) {
     Box(
         Modifier.size(48.dp).clip(CircleShape).background(if (held) Ts.whisper.copy(alpha = 0.25f) else Ts.button)
-            .border(1.dp, if (held) Ts.whisper else Ts.whisper.copy(alpha = 0.5f), CircleShape).holdToTalk(onHold),
+            .border(1.dp, if (held) Ts.whisper else Ts.whisper.copy(alpha = 0.5f), CircleShape)
+            .holdToTalk(held, stringResource(R.string.hold_to_whisper), whisper = true, onHold = onHold),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Filled.Hearing, contentDescription = stringResource(R.string.hold_to_whisper), tint = Ts.whisper, modifier = Modifier.upright())
+        Icon(Icons.Filled.Hearing, contentDescription = null, tint = Ts.whisper, modifier = Modifier.upright())
     }
 }
 
@@ -211,7 +230,8 @@ fun WhisperStrip(incoming: () -> List<String>, list: List<String>, onList: () ->
         for (name in whisperers) {
             Text(
                 stringResource(R.string.whispering_to_you, name), color = Ts.whisper, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }.padding(horizontal = 14.dp, vertical = 8.dp),
             )
         }
         if (list.isNotEmpty()) {
@@ -221,7 +241,7 @@ fun WhisperStrip(incoming: () -> List<String>, list: List<String>, onList: () ->
                     stringResource(R.string.whisper_list_line, list.joinToString(", ")), color = Ts.text, fontSize = 13.sp,
                     maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(horizontal = 10.dp, vertical = 10.dp),
                 )
-                Box(Modifier.size(40.dp).clickable(onClick = onClear), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(44.dp).clickable(role = Role.Button, onClick = onClear), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.whisper_clear), tint = Ts.muted, modifier = Modifier.size(18.dp))
                 }
             }
@@ -236,11 +256,11 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
     Box(
         modifier.size(size).shadow(10.dp, CircleShape).clip(CircleShape)
             .background(if (held) Color(0xEB0E7490) else Color(0xC71E1F22))
-            .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(onHold),
+            .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(held, stringResource(R.string.hold_to_talk), onHold = onHold),
         contentAlignment = Alignment.Center,
     ) {
         // The same icon as the push-to-talk button in the bar: the microphone there means muting
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = stringResource(R.string.hold_to_talk), tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(if (small) 22.dp else 28.dp).upright())
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = null, tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(if (small) 22.dp else 28.dp).upright())
     }
 }
 
@@ -258,15 +278,17 @@ fun ControlsBar(
             .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)).padding(12.dp),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
-        ControlButton(if (micOff) Icons.Filled.MicOff else Icons.Filled.Mic, stringResource(R.string.microphone), off = micOff, onClick = onMic)
+        ControlButton(if (micOff) Icons.Filled.MicOff else Icons.Filled.Mic, stringResource(R.string.microphone), off = micOff, onOff = true, onClick = onMic)
         ControlButton(
             if (soundOff) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-            stringResource(R.string.sound), off = soundOff, onClick = onSound,
+            stringResource(R.string.sound), off = soundOff, onOff = true, onClick = onSound,
         )
         if (onShare != null) {
+            val shareState = stringResource(if (sharing) R.string.a11y_on else R.string.a11y_off)
             Box(
                 Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Color(0xFF23A559) else Ts.button)
-                    .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(onClick = onShare),
+                    .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(role = Role.Button, onClick = onShare)
+                    .semantics { stateDescription = shareState },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
@@ -339,8 +361,8 @@ fun TsField(
 @Composable
 fun PrimaryButton(text: String, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
-        modifier.clip(RoundedCornerShape(8.dp)).background(if (enabled) Ts.accent else Ts.accent.copy(alpha = 0.4f))
-            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 18.dp, vertical = 12.dp),
+        modifier.clip(RoundedCornerShape(8.dp)).background(if (enabled) Ts.accentFill else Ts.accentFill.copy(alpha = 0.4f))
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 18.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = Color.White.copy(alpha = if (enabled) 1f else 0.6f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)

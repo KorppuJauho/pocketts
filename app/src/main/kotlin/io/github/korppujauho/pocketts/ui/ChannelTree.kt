@@ -50,6 +50,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -289,8 +291,11 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
     val self = c.id == ctx.ownId
     val voice = if (whispering) Ts.whisper else Ts.talking
     val bg = if (talking) voice.copy(alpha = 0.1f) else Ts.row
+    // Read out when the row is touched, not each time it changes (that would be all the time)
+    val voiceLabel = if (!talking) null else stringResource(if (whispering) R.string.a11y_whispering else R.string.a11y_talking)
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 1.dp).background(bg).clickable(onClick = onClick),
+        Modifier.fillMaxWidth().padding(vertical = 1.dp).background(bg).clickable(onClick = onClick)
+            .then(if (voiceLabel != null) Modifier.semantics { stateDescription = voiceLabel } else Modifier),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.width(2.dp).height(34.dp).background(if (talking) voice else Color.Transparent))

@@ -143,8 +143,8 @@ private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit
 @Composable
 private fun FavButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     androidx.compose.foundation.layout.Box(
-        Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)).background(Ts.card)
-            .border(1.dp, Ts.buttonBorder, RoundedCornerShape(8.dp)).clickable(onClick = onClick),
+        Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(Ts.card)
+            .border(1.dp, Ts.buttonBorder, RoundedCornerShape(8.dp)).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         androidx.compose.material3.Icon(icon, contentDescription = label, tint = Ts.muted, modifier = Modifier.size(18.dp))

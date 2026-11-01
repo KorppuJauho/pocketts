@@ -55,6 +55,10 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
@@ -148,9 +152,12 @@ fun ChatPanel(
 
 @Composable
 private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boolean, onClose: (() -> Unit)? = null, onClick: () -> Unit) {
+    val unreadLabel = stringResource(R.string.a11y_unread)
     Row(
         Modifier.clip(RoundedCornerShape(6.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
-            .clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 4.dp),
+            .selectable(selected = active, role = Role.Tab, onClick = onClick)
+            .semantics { if (unread) stateDescription = unreadLabel }
+            .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -159,7 +166,7 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
         if (unread) Box(Modifier.size(8.dp).clip(CircleShape).background(Ts.red))
         if (onClose != null) Icon(
             androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.muted,
-            modifier = Modifier.clip(CircleShape).clickable(onClick = onClose).padding(2.dp).size(16.dp),
+            modifier = Modifier.clip(CircleShape).clickable(role = Role.Button, onClick = onClose).padding(4.dp).size(16.dp),
         )
     }
 }
