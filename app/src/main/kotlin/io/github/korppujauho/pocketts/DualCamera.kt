@@ -7,8 +7,6 @@ import android.opengl.GLES20
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
-import org.webrtc.Camera2Enumerator
-import org.webrtc.CameraVideoCapturer
 import org.webrtc.CapturerObserver
 import org.webrtc.EglBase
 import org.webrtc.GlRectDrawer
@@ -22,12 +20,14 @@ import org.webrtc.VideoFrameDrawer
 /**
  * Both cameras at once: one camera's picture big, the other's small in the top right corner, drawn together into
  * the one picture a stream carries. [frontBig] swaps them. Only on phones that can run both cameras at the same
- * time ([pair]). Each picture is turned by [turn] (see [CameraTurn]) before it's drawn, so both stay upright.
+ * time ([pair]). Each picture is turned by [turn] (see [CameraTurn]) before it's drawn, so both stay upright. The back
+ * camera's flashlight is [torch]; a camera that stops by itself calls [onLost].
  */
 class DualCamera(
     private val context: Context,
     private val shared: EglBase.Context,
     private val ids: Pair<String, String>, // back, front
+    private val onLost: (reason: String) -> Unit,
     private val turn: (front: Boolean) -> Int,
 ) : VideoCapturer {
 
@@ -49,6 +49,13 @@ class DualCamera(
         }
     }
 
+    /** The back camera's flashlight, on or off. */
+    @Volatile var torch = false
+        set(value) {
+            field = value
+            cameras.firstOrNull { !it.first.camera.front }?.first?.torch = value
+        }
+
     @Volatile var frontBig = false
         set(value) {
             field = value
@@ -59,7 +66,7 @@ class DualCamera(
     private lateinit var observer: CapturerObserver
     private val thread = HandlerThread("dual-camera").apply { start() }
     private val handler = Handler(thread.looper)
-    private val cameras = ArrayList<Pair<CameraVideoCapturer, SurfaceTextureHelper>>()
+    private val cameras = java.util.concurrent.CopyOnWriteArrayList<Pair<PhoneCamera, SurfaceTextureHelper>>()
 
     // Used on our thread only
     private var running = false
@@ -88,10 +95,10 @@ class DualCamera(
             drawer = GlRectDrawer()
             running = true
         }
-        val cams = Camera2Enumerator(context)
         for ((id, front) in listOf(ids.first to false, ids.second to true)) {
+            val info = CameraInfo.of(context, id) ?: continue
             val helper = SurfaceTextureHelper.create(if (front) "front-camera" else "back-camera", shared)
-            val cam = cams.createCapturer(id, null)
+            val cam = PhoneCamera(context, info, onLost).also { if (!front) it.torch = torch }
             cam.initialize(helper, context.applicationContext, object : CapturerObserver {
                 override fun onCapturerStarted(ok: Boolean) {
                     if (!ok) AppLog.log("[Streams] The ${if (front) "front" else "back"} camera didn't start")

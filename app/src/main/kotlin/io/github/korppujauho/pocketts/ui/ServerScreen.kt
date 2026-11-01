@@ -126,6 +126,14 @@ interface ServerActions {
     /** The warning on screen was closed. */
     fun dismissError() {}
     fun setRotateLock(on: Boolean) {}
+    /** The shared back camera's flashlight. */
+    fun setTorch(on: Boolean) {}
+    /** The shared camera's zoom. */
+    fun setZoom(zoom: Float) {}
+    /** The next back lens of the shared camera. */
+    fun nextLens() {}
+    /** Focus on a spot of the shared camera's picture (0 - 1 across it, as the camera gives it). */
+    fun focusAt(x: Float, y: Float) {}
     fun setWatchMuted(muted: Boolean) {}
     fun setWatchVolume(volume: Float) {}
     /** The stream player as a small window over other apps. */
@@ -210,6 +218,8 @@ fun ServerScreen(
     }
     // The ring light: sharing the front camera, the screen at full brightness with a white frame lights your face
     var ringLight by rememberSaveable { mutableStateOf(false) }
+    // Off when a share ends: a new one starts without it, as the flashlight does
+    LaunchedEffect(state.stream.sharing == null) { if (state.stream.sharing == null) ringLight = false }
     val frontCamera = state.stream.sharing == io.github.korppujauho.pocketts.proto.Streams.Kind.CAMERA && state.stream.shareFront && !state.stream.shareBoth
     val lightOn = ringLight && frontCamera
     val window = (androidx.compose.ui.platform.LocalContext.current as? android.app.Activity)?.window
@@ -296,6 +306,8 @@ fun ServerScreen(
                     ShareBar(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
                         light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
+                        torch = if (state.stream.shareFlash && !frontCamera) state.stream.torch else null, onTorch = actions::setTorch,
+                        onZoom = actions::setZoom, onFocus = actions::focusAt, onLens = actions::nextLens,
                     )
                 }
                 if (state.stream.watching != 0 && egl != null && !pip) {
