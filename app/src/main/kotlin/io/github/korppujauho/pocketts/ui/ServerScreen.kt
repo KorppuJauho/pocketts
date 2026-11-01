@@ -39,6 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -155,6 +159,8 @@ fun ServerScreen(
     egl: org.webrtc.EglBase? = null,
     canBoth: Boolean = false, // the phone can use both cameras at once
     pip: Boolean = false, // the app is a small picture-in-picture window: the stream player is drawn there instead
+    // Who is talking (Session.voices): passed as it is and read only where it's shown, so talking doesn't redraw the screen
+    voices: androidx.compose.runtime.State<Session.Voices> = remember { mutableStateOf(Session.Voices()) },
 ) {
     var shareDialog by remember { mutableStateOf(false) }
     var serversMenu by remember { mutableStateOf(false) }
@@ -232,8 +238,7 @@ fun ServerScreen(
         }
         Column(Modifier.fillMaxSize()) {
             AppHeader {
-                ExitButton(stringResource(R.string.disconnect)) { actions.disconnect() }
-                androidx.compose.foundation.layout.Spacer(Modifier.size(14.dp)) // so the star isn't Disconnect by mistake
+                HeaderButton(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Logout, stringResource(R.string.disconnect), tint = Ts.red) { actions.disconnect() }
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
                     HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, stringResource(R.string.servers)) { serversMenu = true }
@@ -289,7 +294,7 @@ fun ServerScreen(
                             whisper = if (state.whisperTo.isEmpty) null else ({ WhisperButton(state.whisperHeld, actions::setWhisper) }),
                         )
                         WhisperStrip(
-                            incoming = state.whispering.filter { it != state.ownId }.mapNotNull { state.client(it)?.nickname },
+                            incoming = { voices.value.whispering.filter { it != state.ownId }.mapNotNull { state.client(it)?.nickname } },
                             list = state.whisperTo.people.mapNotNull { state.client(it)?.nickname } +
                                 state.whisperTo.channels.mapNotNull { id -> state.channel(id)?.let { it.displayName.ifEmpty { it.name } } },
                             onList = { whisperList = true }, onClear = actions::clearWhisper,
@@ -370,7 +375,7 @@ fun ServerScreen(
                             } else {
                                 ChannelTree(
                                     items,
-                                    TreeContext(state.ownId, state.ownChannel, state.talking, state.serverKey, state.badges, actions::watch, whispering = state.whispering) { it.id !in state.cannotTalk },
+                                    TreeContext(state.ownId, state.ownChannel, voices, state.serverKey, state.badges, actions::watch) { it.id !in state.cannotTalk },
                                     onChannel = { ch ->
                                         if (ch.id == state.ownChannel) return@ChannelTree
                                         // A spacer is a channel too (some servers' AFK channel), but easily tapped by mistake: only when allowed
@@ -601,9 +606,12 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
     ) {
         for ((v, label) in listOf(View.CHANNELS to stringResource(R.string.view_channels), View.CHAT to stringResource(R.string.chat))) {
             val active = v == view
+            val unreadLabel = if (v == View.CHAT && unread && !active) stringResource(R.string.a11y_unread) else null
             Row(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
-                    .clickable { onView(v) }.padding(vertical = 8.dp),
+                    .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onView(v) }
+                    .then(if (unreadLabel != null) Modifier.semantics { stateDescription = unreadLabel } else Modifier)
+                    .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {

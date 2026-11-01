@@ -48,7 +48,6 @@ object Session : TsClient.Listener {
         val tree: List<ServerModel.Node> = emptyList(),
         val ownId: Int = 0,
         val ownChannel: Int = 0,
-        val talking: Set<Int> = emptySet(),
         val cannotTalk: Set<Int> = emptySet(), // people without the talk power for their channel
         val inputMuted: Boolean = false,
         val outputMuted: Boolean = false,
@@ -65,7 +64,6 @@ object Session : TsClient.Listener {
         val pttHeld: Boolean = false,
         val whisperTo: WhisperList = WhisperList(),
         val whisperHeld: Boolean = false,
-        val whispering: Set<Int> = emptySet(), // people whispering to us (and we, while we whisper)
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
@@ -114,6 +112,16 @@ object Session : TsClient.Listener {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
+
+    /**
+     * Who is talking, and of them who is whispering (to us; and we, while we whisper). Kept apart from [UiState]: in a
+     * busy channel it changes several times a second, and only the talking indicators need it, so a change redraws
+     * those, not the whole screen.
+     */
+    data class Voices(val talking: Set<Int> = emptySet(), val whispering: Set<Int> = emptySet())
+
+    private val _voices = MutableStateFlow(Voices())
+    val voices: StateFlow<Voices> = _voices
 
     private lateinit var app: Context
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "session").apply { isDaemon = true } }
@@ -190,7 +198,7 @@ object Session : TsClient.Listener {
     // would hear us twice, a moment apart)
     private fun streamSoundPaused(): Boolean {
         val s = _state.value
-        return s.inputMuted || !s.micAllowed || s.ownId in s.talking
+        return s.inputMuted || !s.micAllowed || s.ownId in _voices.value.talking
     }
 
     /** Whether a screen share carries what the phone plays. */
@@ -322,6 +330,7 @@ object Session : TsClient.Listener {
         }
         val prev = _state.value
         if (!keepChat) synchronized(historyLock) { historyServer = null }
+        _voices.value = Voices()
         _state.value = UiState(
             phase = Phase.CONNECTING, address = address, inputMuted = prev.inputMuted, outputMuted = prev.outputMuted,
             volumes = Settings(app).volumes(), voice = VoiceSettings.load(app), micAllowed = micPermitted(),
@@ -1229,8 +1238,8 @@ object Session : TsClient.Listener {
     override fun onVoice(voice: TsClient.Voice) {
         player?.onVoice(voice)
         // Who's whispering to us (until they stop, or talk to the channel instead)
-        if (voice.data.isNotEmpty() && (voice.clientId in _state.value.whispering) != voice.whisper) {
-            _state.update { s -> s.copy(whispering = if (voice.whisper) s.whispering + voice.clientId else s.whispering - voice.clientId) }
+        if (voice.data.isNotEmpty() && (voice.clientId in _voices.value.whispering) != voice.whisper) {
+            _voices.update { v -> v.copy(whispering = if (voice.whisper) v.whispering + voice.clientId else v.whispering - voice.clientId) }
         }
     }
 
@@ -1261,10 +1270,11 @@ object Session : TsClient.Listener {
             _state.update {
                 it.copy(
                     phase = Phase.CONNECTING, reconnecting = retries, waitingForOld = oldStillThere,
-                    error = if (oldStillThere) null else text, talking = emptySet(), whispering = emptySet(),
+                    error = if (oldStillThere) null else text,
                 )
             }
             clearWhisper() // people come back with new ids
+            _voices.value = Voices()
             ConnectionService.start(app, app.getString(R.string.notification_reconnecting, _state.value.address))
             scheduleRetry(if (oldStillThere) 3L else minOf(30L, 2L * retries))
             return
@@ -1363,6 +1373,7 @@ object Session : TsClient.Listener {
         if (::app.isInitialized) CallWatcher.stop(app)
         endCall()
         val s = _state.value
+        _voices.value = Voices()
         _state.value = UiState(
             phase = Phase.IDLE, error = if (level > 0) null else reason, address = s.address, inputMuted = s.inputMuted,
             outputMuted = s.outputMuted, volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed, neededLevel = level,
@@ -1376,10 +1387,10 @@ object Session : TsClient.Listener {
 
     /** Someone started or stopped talking; [whisper]: we started whispering (others' whispers come from [onVoice]). */
     private fun setTalking(clientId: Int, talking: Boolean, whisper: Boolean = false) {
-        _state.update { s ->
-            s.copy(
-                talking = if (talking) s.talking + clientId else s.talking - clientId,
-                whispering = if (!talking) s.whispering - clientId else if (whisper) s.whispering + clientId else s.whispering,
+        _voices.update { v ->
+            Voices(
+                talking = if (talking) v.talking + clientId else v.talking - clientId,
+                whispering = if (!talking) v.whispering - clientId else if (whisper) v.whispering + clientId else v.whispering,
             )
         }
         if (clientId == _state.value.ownId) engine?.refreshSound()

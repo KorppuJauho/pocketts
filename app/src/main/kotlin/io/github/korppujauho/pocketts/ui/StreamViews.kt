@@ -56,6 +56,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.runtime.setValue
@@ -83,9 +84,9 @@ import io.github.korppujauho.pocketts.R
 @Composable
 fun WatchButton(onClick: () -> Unit) {
     Text(
-        stringResource(R.string.stream_watch), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
-        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Ts.green).clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+        stringResource(R.string.stream_watch), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(WatchGreen).clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
     )
 }
 
@@ -396,7 +397,7 @@ private fun MiniPlayer(state: StreamEngine.State, video: VideoTrack?, egl: EglBa
                 Text(state.watchStatus, color = Color.White, fontSize = 11.sp, modifier = Modifier.align(Alignment.Center).padding(6.dp))
             }
             Box(
-                Modifier.align(Alignment.TopEnd).padding(4.dp).size(26.dp).clip(CircleShape).background(Color(0x99000000)).clickable(onClick = onClose),
+                Modifier.align(Alignment.TopEnd).padding(4.dp).size(32.dp).clip(CircleShape).background(Color(0x99000000)).clickable(role = Role.Button, onClick = onClose),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Filled.Close, stringResource(R.string.stream_stop_watching), tint = Color.White, modifier = Modifier.size(16.dp))
@@ -473,6 +474,7 @@ private fun FullScreenPlayer(
         }
         Box(Modifier.fillMaxSize().background(Color.Black).clickable(
             interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null,
+            onClickLabel = stringResource(if (controls) R.string.a11y_hide_controls else R.string.a11y_show_controls),
         ) { controls = !controls }) {
             VideoView(video, egl, Modifier.fillMaxSize())
             if (controls) {
@@ -663,7 +665,7 @@ fun ShareBar(
             PreviewVideo(track, egl, Modifier.fillMaxSize(), previewTurn, shownTurn) { w, h -> aspect = w.toFloat() / h }
             // Over the picture (a video surface doesn't take taps itself)
             if (!controls) {
-                Box(Modifier.fillMaxSize().clickable { big = !big })
+                Box(Modifier.fillMaxSize().clickable(onClickLabel = stringResource(if (big) R.string.a11y_preview_smaller else R.string.a11y_preview_bigger)) { big = !big })
             } else {
                 Box(
                     Modifier.fillMaxSize()
@@ -710,7 +712,7 @@ fun ShareBar(
                 }
                 Box(
                     Modifier.align(Alignment.TopEnd).padding(6.dp).size(36.dp).clip(CircleShape).background(Color(0x99000000))
-                        .clickable { big = false },
+                        .clickable(role = Role.Button) { big = false },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(Icons.Filled.FullscreenExit, contentDescription = stringResource(R.string.share_preview_small), tint = Color.White, modifier = Modifier.size(22.dp))
@@ -775,7 +777,7 @@ fun ShareBar(
         Text(
             stringResource(R.string.stop), color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, softWrap = false,
             modifier = Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(Ts.redButton.copy(alpha = 0.15f))
-                .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(onClick = onStop)
+                .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(role = Role.Button, onClick = onStop)
                 .wrapContentHeight(Alignment.CenterVertically).padding(horizontal = 18.dp),
         )
     }
@@ -815,6 +817,7 @@ fun ShareBar(
     }
 }
 
+private val WatchGreen = Color(0xFF15803D) // dark enough for WATCH's white letters
 private val ShareText = Color(0xFF4ADE80)
 private val ShareGreen = Color(0xFF23A559)
 
@@ -825,7 +828,7 @@ private fun RoundButton(
     size: androidx.compose.ui.unit.Dp = 40.dp, background: Color = Ts.button, onClick: () -> Unit,
 ) {
     Box(
-        Modifier.size(size).clip(CircleShape).background(background).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick),
+        Modifier.size(size).clip(CircleShape).background(background).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(size / 2).upright())
@@ -836,7 +839,7 @@ private fun RoundButton(
 @Composable
 private fun LensButton(text: String, label: String, onClick: () -> Unit) {
     Box(
-        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(onClick = onClick)
+        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,
     ) {

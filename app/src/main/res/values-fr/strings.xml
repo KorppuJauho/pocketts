@@ -604,4 +604,21 @@
     <string name="debug_log_delete">Supprimer le journal</string>
     <string name="debug_log_empty">Le journal de débogage est vide pour l’instant.</string>
     <string name="debug_log_deleted">Journal de débogage supprimé.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Activé</string>
+    <string name="a11y_off">Désactivé</string>
+    <string name="a11y_talk_start">commencer à parler</string>
+    <string name="a11y_talk_stop">arrêter de parler</string>
+    <string name="a11y_whisper_start">commencer à chuchoter</string>
+    <string name="a11y_whisper_stop">arrêter de chuchoter</string>
+    <string name="a11y_talking">Parle</string>
+    <string name="a11y_whispering">Chuchote</string>
+    <string name="a11y_unread">Messages non lus</string>
+    <string name="a11y_move_up">Monter</string>
+    <string name="a11y_move_down">Descendre</string>
+    <string name="a11y_show_controls">afficher les boutons</string>
+    <string name="a11y_hide_controls">masquer les boutons</string>
+    <string name="a11y_preview_bigger">agrandir l\'aperçu</string>
+    <string name="a11y_preview_smaller">réduire l\'aperçu</string>
 </resources>

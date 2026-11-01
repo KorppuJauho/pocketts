@@ -57,6 +57,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
@@ -165,6 +168,10 @@ fun ChannelEditList(
             val ch = item.node.channel
             val moving = dragged == ch.id
             val tilt = if (items.indexOf(item) % 2 == 0) angle else -angle
+            val siblings = items.filter { it.node.channel.parent == ch.parent }
+            val at = siblings.indexOf(item)
+            val moveUp = stringResource(R.string.a11y_move_up)
+            val moveDown = stringResource(R.string.a11y_move_down)
             val shape = RoundedCornerShape(8.dp)
             Box(
                 Modifier.fillMaxWidth().padding(start = (item.depth * 15).dp).zIndex(if (moving) 1f else 0f)
@@ -201,6 +208,19 @@ fun ChannelEditList(
                             },
                             onDragCancel = { dragged = null; dragY = 0f },
                         )
+                    }
+                    // Without dragging (TalkBack, switches): up or down past the channel next to it
+                    .semantics {
+                        customActions = buildList {
+                            if (at > 0) add(CustomAccessibilityAction(moveUp) {
+                                onReorder(ch, if (at >= 2) siblings[at - 2].node.channel.id else 0)
+                                true
+                            })
+                            if (at < siblings.size - 1) add(CustomAccessibilityAction(moveDown) {
+                                onReorder(ch, siblings[at + 1].node.channel.id)
+                                true
+                            })
+                        }
                     },
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

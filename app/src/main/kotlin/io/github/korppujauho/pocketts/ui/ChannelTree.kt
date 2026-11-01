@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -49,6 +50,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -79,11 +82,11 @@ fun flattenTree(nodes: List<ServerModel.Node>, depth: Int = 0, out: MutableList<
 data class TreeContext(
     val ownId: Int,
     val ownChannel: Int,
-    val talking: Set<Int>,
+    // Who is talking: read only by each person's row, so a change redraws that row and not the tree
+    val voices: androidx.compose.runtime.State<io.github.korppujauho.pocketts.Session.Voices>,
     val server: String = "",
     val badges: Map<Int, List<Long>> = emptyMap(),
     val onWatch: ((ServerModel.Client) -> Unit)? = null,
-    val whispering: Set<Int> = emptySet(), // talking as a whisper: drawn in the whisper colour
     val canTalk: (ServerModel.Client) -> Boolean,
 )
 
@@ -282,17 +285,22 @@ private fun androidx.compose.foundation.layout.RowScope.SpacerTitle(s: ServerMod
 
 @Composable
 private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Unit) {
-    val talking = c.id in ctx.talking
+    // Only this row's part of who is talking: the row redraws when that changes, not when anyone else's does
+    val talking by remember(c.id, ctx.voices) { androidx.compose.runtime.derivedStateOf { c.id in ctx.voices.value.talking } }
+    val whispering by remember(c.id, ctx.voices) { androidx.compose.runtime.derivedStateOf { c.id in ctx.voices.value.whispering } }
     val self = c.id == ctx.ownId
-    val voice = if (c.id in ctx.whispering) Ts.whisper else Ts.talking
+    val voice = if (whispering) Ts.whisper else Ts.talking
     val bg = if (talking) voice.copy(alpha = 0.1f) else Ts.row
+    // Read out when the row is touched, not each time it changes (that would be all the time)
+    val voiceLabel = if (!talking) null else stringResource(if (whispering) R.string.a11y_whispering else R.string.a11y_talking)
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 1.dp).background(bg).clickable(onClick = onClick),
+        Modifier.fillMaxWidth().padding(vertical = 1.dp).background(bg).clickable(onClick = onClick)
+            .then(if (voiceLabel != null) Modifier.semantics { stateDescription = voiceLabel } else Modifier),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.width(2.dp).height(34.dp).background(if (talking) voice else Color.Transparent))
         Spacer(Modifier.width(25.dp))
-        PersonAvatar(c, ctx.server, 24, talking, ring = if (c.id in ctx.whispering) Ts.whisper else Ts.green)
+        PersonAvatar(c, ctx.server, 24, talking, ring = if (whispering) Ts.whisper else Ts.green)
         Spacer(Modifier.width(8.dp))
         Text(
             c.nickname,

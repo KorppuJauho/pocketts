@@ -178,6 +178,13 @@ class MainActivity : ComponentActivity() {
             if (!info.isInPictureInPictureMode && lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) Session.stopWatching()
         }
         setContent { PocketTsTheme { App() } }
+        // How long a start took, from the app's process starting to the first screen drawn (only a fresh start: the
+        // process's own): to see what the baseline profile and later changes do
+        if (savedInstanceState == null && !startLogged) {
+            startLogged = true
+            val began = android.os.Process.getStartUptimeMillis()
+            window.decorView.post { AppLog.log("Started in ${android.os.SystemClock.uptimeMillis() - began} ms") }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -210,6 +217,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         var current: MainActivity? = null
+        private var startLogged = false // the start time is logged once a process
     }
 }
 
@@ -269,6 +277,7 @@ private val favorites = kotlinx.coroutines.flow.MutableStateFlow<List<Favorite>>
 @Composable
 private fun App() {
     val state by Session.state.collectAsState()
+    val voices = Session.voices.collectAsState() // handed on as it is: only the talking indicators read it
     val favs by favorites.collectAsState()
     val ctx = LocalContext.current
     val settings = remember { Settings(ctx) }
@@ -290,7 +299,7 @@ private fun App() {
         androidx.compose.foundation.layout.Box {
             ServerScreen(
                 state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = egl,
-                canBoth = canBoth, pip = pip,
+                canBoth = canBoth, pip = pip, voices = voices,
             )
             if (pip) io.github.korppujauho.pocketts.ui.PipPlayer(state.stream, egl)
         }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Smoother start:** PocketTS's own code is compiled ahead of time when the app is installed (a baseline profile),
+  so starting, opening screens the first time and starting a stream are smoother. The log notes how long a start took.
+- **Smoother in busy channels:** someone starting or stopping talking now redraws only their row in the channel list,
+  not the whole screen (and not the chat at all), so a busy channel uses less of the phone.
 - **Debug log:** Settings › Advanced › Debug log keeps a log for bug reports on the phone, crashes included, with
   server addresses, names, messages and keys taken out (running numbers such as "server 1" tell them apart). Of the
   chat it notes only that a message was sent or arrived. The app never sends it: Share log hands it to
@@ -25,6 +29,13 @@
 - **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
   mode the round talk button is in its bottom corner (and the whisper button above it while there's a whisper list),
   with the stream's own buttons. The full screen also has the stream's volume slider, not only sound on and off.
+- **Easier to read and tap:** grey text is a little lighter, and the WATCH and main blue buttons a little darker, so
+  their text reads easily; WATCH and the small crosses are bigger to tap. Disconnect is an icon like the star and the
+  gear next to it.
+- **Screen readers (TalkBack):** the talk and whisper buttons work with a double tap (once to start, again to stop),
+  Microphone, Sound and Share say whether they're on or off, tabs say which is chosen and when there are unread
+  messages, warnings and "is whispering to you" are read out, a person's row says when they're talking, and in the
+  channel editor Move up and Move down change the order without dragging.
 
 ## 1.5.0 (2026-10-28)
 

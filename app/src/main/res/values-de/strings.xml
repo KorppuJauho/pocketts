@@ -590,4 +590,21 @@
     <string name="debug_log_delete">Protokoll löschen</string>
     <string name="debug_log_empty">Das Debug-Protokoll ist noch leer.</string>
     <string name="debug_log_deleted">Debug-Protokoll gelöscht.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Ein</string>
+    <string name="a11y_off">Aus</string>
+    <string name="a11y_talk_start">Sprechen starten</string>
+    <string name="a11y_talk_stop">Sprechen beenden</string>
+    <string name="a11y_whisper_start">Flüstern starten</string>
+    <string name="a11y_whisper_stop">Flüstern beenden</string>
+    <string name="a11y_talking">Spricht</string>
+    <string name="a11y_whispering">Flüstert</string>
+    <string name="a11y_unread">Ungelesene Nachrichten</string>
+    <string name="a11y_move_up">Nach oben</string>
+    <string name="a11y_move_down">Nach unten</string>
+    <string name="a11y_show_controls">Schaltflächen zeigen</string>
+    <string name="a11y_hide_controls">Schaltflächen ausblenden</string>
+    <string name="a11y_preview_bigger">Vorschau vergrößern</string>
+    <string name="a11y_preview_smaller">Vorschau verkleinern</string>
 </resources>

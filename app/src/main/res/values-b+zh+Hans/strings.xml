@@ -576,4 +576,21 @@
     <string name="debug_log_delete">删除日志</string>
     <string name="debug_log_empty">调试日志目前为空。</string>
     <string name="debug_log_deleted">调试日志已删除。</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">开</string>
+    <string name="a11y_off">关</string>
+    <string name="a11y_talk_start">开始说话</string>
+    <string name="a11y_talk_stop">停止说话</string>
+    <string name="a11y_whisper_start">开始说悄悄话</string>
+    <string name="a11y_whisper_stop">停止说悄悄话</string>
+    <string name="a11y_talking">正在说话</string>
+    <string name="a11y_whispering">正在说悄悄话</string>
+    <string name="a11y_unread">有未读消息</string>
+    <string name="a11y_move_up">上移</string>
+    <string name="a11y_move_down">下移</string>
+    <string name="a11y_show_controls">显示按钮</string>
+    <string name="a11y_hide_controls">隐藏按钮</string>
+    <string name="a11y_preview_bigger">放大预览</string>
+    <string name="a11y_preview_smaller">缩小预览</string>
 </resources>

@@ -590,4 +590,21 @@
     <string name="debug_log_delete">Poista loki</string>
     <string name="debug_log_empty">Vianetsintäloki on vielä tyhjä.</string>
     <string name="debug_log_deleted">Vianetsintäloki poistettu.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Päällä</string>
+    <string name="a11y_off">Pois</string>
+    <string name="a11y_talk_start">aloita puhuminen</string>
+    <string name="a11y_talk_stop">lopeta puhuminen</string>
+    <string name="a11y_whisper_start">aloita kuiskaus</string>
+    <string name="a11y_whisper_stop">lopeta kuiskaus</string>
+    <string name="a11y_talking">Puhuu</string>
+    <string name="a11y_whispering">Kuiskaa</string>
+    <string name="a11y_unread">Lukemattomia viestejä</string>
+    <string name="a11y_move_up">Siirrä ylös</string>
+    <string name="a11y_move_down">Siirrä alas</string>
+    <string name="a11y_show_controls">näytä painikkeet</string>
+    <string name="a11y_hide_controls">piilota painikkeet</string>
+    <string name="a11y_preview_bigger">suurenna esikatselu</string>
+    <string name="a11y_preview_smaller">pienennä esikatselu</string>
 </resources>
