@@ -613,4 +613,21 @@
     <string name="debug_log_delete">Удалить журнал</string>
     <string name="debug_log_empty">Журнал отладки пока пуст.</string>
     <string name="debug_log_deleted">Журнал отладки удалён.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Вкл.</string>
+    <string name="a11y_off">Выкл.</string>
+    <string name="a11y_talk_start">начать говорить</string>
+    <string name="a11y_talk_stop">перестать говорить</string>
+    <string name="a11y_whisper_start">начать шептать</string>
+    <string name="a11y_whisper_stop">перестать шептать</string>
+    <string name="a11y_talking">Говорит</string>
+    <string name="a11y_whispering">Шепчет</string>
+    <string name="a11y_unread">Непрочитанные сообщения</string>
+    <string name="a11y_move_up">Переместить вверх</string>
+    <string name="a11y_move_down">Переместить вниз</string>
+    <string name="a11y_show_controls">показать кнопки</string>
+    <string name="a11y_hide_controls">скрыть кнопки</string>
+    <string name="a11y_preview_bigger">увеличить превью</string>
+    <string name="a11y_preview_smaller">уменьшить превью</string>
 </resources>

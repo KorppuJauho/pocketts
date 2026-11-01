@@ -30,6 +30,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -74,7 +76,10 @@ fun TsDialog(
                     Spacer(Modifier.width(14.dp))
                 }
                 Column(Modifier.weight(1f)) {
-                    Text(title, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        title, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.semantics { heading() },
+                    )
                     if (!subtitle.isNullOrEmpty()) {
                         Text(subtitle, color = Ts.muted, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
@@ -113,7 +118,7 @@ enum class PillKind { PRIMARY, SECONDARY, DANGER, DANGER_TEXT }
 fun PillButton(text: String, kind: PillKind = PillKind.SECONDARY, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val shape = RoundedCornerShape(22.dp)
     val (bg, fg) = when (kind) {
-        PillKind.PRIMARY -> Ts.accent to Color.White
+        PillKind.PRIMARY -> Ts.accentFill to Color.White
         PillKind.SECONDARY -> Color(0x0FFFFFFF) to Ts.text
         PillKind.DANGER -> Ts.redButton to Color.White
         PillKind.DANGER_TEXT -> Color.Transparent to Color(0xFFF87171)
@@ -121,7 +126,7 @@ fun PillButton(text: String, kind: PillKind = PillKind.SECONDARY, enabled: Boole
     Box(
         modifier.height(44.dp).clip(shape).background(if (enabled) bg else bg.copy(alpha = bg.alpha * 0.4f))
             .then(if (kind == PillKind.SECONDARY) Modifier.border(1.dp, Pop.edge, shape) else Modifier)
-            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 20.dp),
+            .clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick).padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = if (enabled) fg else fg.copy(alpha = 0.5f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
@@ -145,7 +150,7 @@ fun ActionTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, 
     Column(
         modifier.height(76.dp).clip(RoundedCornerShape(18.dp)).background(if (selected) tint.copy(alpha = 0.16f) else Pop.field)
             .border(1.dp, if (selected) tint else Color(0x0AFFFFFF), RoundedCornerShape(18.dp))
-            .clickable(onClick = onClick),
+            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

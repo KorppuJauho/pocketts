@@ -599,4 +599,21 @@
     <string name="debug_log_delete">Borrar registro</string>
     <string name="debug_log_empty">El registro de depuración está vacío por ahora.</string>
     <string name="debug_log_deleted">Registro de depuración borrado.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Activado</string>
+    <string name="a11y_off">Desactivado</string>
+    <string name="a11y_talk_start">empezar a hablar</string>
+    <string name="a11y_talk_stop">dejar de hablar</string>
+    <string name="a11y_whisper_start">empezar a susurrar</string>
+    <string name="a11y_whisper_stop">dejar de susurrar</string>
+    <string name="a11y_talking">Hablando</string>
+    <string name="a11y_whispering">Susurrando</string>
+    <string name="a11y_unread">Mensajes sin leer</string>
+    <string name="a11y_move_up">Subir</string>
+    <string name="a11y_move_down">Bajar</string>
+    <string name="a11y_show_controls">mostrar los botones</string>
+    <string name="a11y_hide_controls">ocultar los botones</string>
+    <string name="a11y_preview_bigger">agrandar la vista previa</string>
+    <string name="a11y_preview_smaller">reducir la vista previa</string>
 </resources>

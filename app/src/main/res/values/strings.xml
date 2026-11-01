@@ -627,4 +627,21 @@
     <string name="debug_log_delete">Delete log</string>
     <string name="debug_log_empty">The debug log is empty for now.</string>
     <string name="debug_log_deleted">Debug log deleted.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">On</string>
+    <string name="a11y_off">Off</string>
+    <string name="a11y_talk_start">start talking</string>
+    <string name="a11y_talk_stop">stop talking</string>
+    <string name="a11y_whisper_start">start whispering</string>
+    <string name="a11y_whisper_stop">stop whispering</string>
+    <string name="a11y_talking">Talking</string>
+    <string name="a11y_whispering">Whispering</string>
+    <string name="a11y_unread">Unread messages</string>
+    <string name="a11y_move_up">Move up</string>
+    <string name="a11y_move_down">Move down</string>
+    <string name="a11y_show_controls">show the buttons</string>
+    <string name="a11y_hide_controls">hide the buttons</string>
+    <string name="a11y_preview_bigger">make the preview bigger</string>
+    <string name="a11y_preview_smaller">make the preview smaller</string>
 </resources>

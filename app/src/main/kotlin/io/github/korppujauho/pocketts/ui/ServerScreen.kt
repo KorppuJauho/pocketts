@@ -39,6 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -224,8 +228,7 @@ fun ServerScreen(
         }
         Column(Modifier.fillMaxSize()) {
             AppHeader {
-                ExitButton(stringResource(R.string.disconnect)) { actions.disconnect() }
-                androidx.compose.foundation.layout.Spacer(Modifier.size(14.dp)) // so the star isn't Disconnect by mistake
+                HeaderButton(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Logout, stringResource(R.string.disconnect), tint = Ts.red) { actions.disconnect() }
                 // WebTS's menu: the favourites (one tap switches), and adding the server you're on
                 androidx.compose.foundation.layout.Box {
                     HeaderButton(androidx.compose.material.icons.Icons.Filled.Star, stringResource(R.string.servers)) { serversMenu = true }
@@ -591,9 +594,12 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
     ) {
         for ((v, label) in listOf(View.CHANNELS to stringResource(R.string.view_channels), View.CHAT to stringResource(R.string.chat))) {
             val active = v == view
+            val unreadLabel = if (v == View.CHAT && unread && !active) stringResource(R.string.a11y_unread) else null
             Row(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
-                    .clickable { onView(v) }.padding(vertical = 8.dp),
+                    .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onView(v) }
+                    .then(if (unreadLabel != null) Modifier.semantics { stateDescription = unreadLabel } else Modifier)
+                    .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {

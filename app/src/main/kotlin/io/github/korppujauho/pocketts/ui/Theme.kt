@@ -24,15 +24,16 @@ object Ts {
     val title = Color(0xFFF2F3F5)
     val bright = Color(0xFFF8FAFC)
     val username = Color(0xFFCBD5E1)
-    val muted = Color(0xFF80848E)
-    val faint = Color(0xFF64748B)
+    // Lighter than WebTS's: small text needs at least 4.5 : 1 against the panels and popups to read easily
+    val muted = Color(0xFF9AA1AA)
+    val faint = Color(0xFF929CAE)
     val event = Color(0xFF949BA4)
     val spacer = Color(0xFFCBD5E1)
     val spacerRepeat = Color(0xFF94A3B8)
 
     val brand = Color(0xFF00A8FC)
     val accent = Color(0xFF3B82F6)
-    val accentHover = Color(0xFF2563EB)
+    val accentFill = Color(0xFF2563EB) // filled buttons: dark enough for their white text to read easily
     val talking = Color(0xFF38BDF8)
     val sender = Color(0xFF93C5FD)
     val red = Color(0xFFEF4444)
