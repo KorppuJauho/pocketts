@@ -353,15 +353,21 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
         actions = object : ConnectActions {
             override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {
                 // A teamspeak:// or tmspk.gg link pasted in: as when it's opened (an invite is looked up, then asked
-                // about). A ts3server:// one connects as before.
-                if (JoinLink.isLink(address) && !address.trim().startsWith("ts3server://", ignoreCase = true)) {
+                // about). A ts3server:// one connects straight away, with its channel and passwords; one with a
+                // privilege key is asked about first, as when it's opened.
+                val ts3 = address.trim().startsWith("ts3server://", ignoreCase = true)
+                val link = if (ts3) JoinLink.parse(address) else null
+                if (JoinLink.isLink(address) && (!ts3 || link == null || link.token.isNotEmpty())) {
                     settings.nickname = nickname
                     openLinkText(ctx, address)
                     return
                 }
-                settings.serverPassword = if (remember) password else ""
-                if (favorite) saveFavorites(ctx, favs + Favorite(address, password = if (remember) password else ""))
-                connect(ctx, address, nickname, password)
+                // Only the server is kept as the address: the link can hold passwords, which go where passwords do
+                val server = link?.address ?: address
+                val pw = password.ifEmpty { link?.password.orEmpty() }
+                settings.serverPassword = if (remember) pw else ""
+                if (favorite) saveFavorites(ctx, favs + Favorite(server, password = if (remember) pw else ""))
+                connect(ctx, server, nickname, pw, channel = link?.channel.orEmpty(), channelPassword = link?.channelPassword.orEmpty())
             }
             override fun connectFavorite(f: Favorite) = connectFavorite(ctx, f)
             override fun saveFavorite(old: Favorite?, new: Favorite) =
