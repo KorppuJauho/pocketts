@@ -10,7 +10,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import org.webrtc.Camera2Enumerator
 import org.webrtc.DataChannel
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -60,6 +59,12 @@ class StreamEngine(
         val sharePaused: Boolean = false, // our stream paused (as the TeamSpeak app pauses): nothing sent, viewers see it paused
         val shareFront: Boolean = true, // the front camera (with both: the front one is the big picture)
         val shareBoth: Boolean = false, // both cameras at once
+        val shareFlash: Boolean = false, // the shared back camera has a flashlight (with both cameras: the back one)
+        val torch: Boolean = false, // ... and it's on
+        val zoom: Float = 1f, // one camera shared: its zoom, and how far it goes (none: both the same)
+        val zoomMin: Float = 1f,
+        val zoomMax: Float = 1f,
+        val lens: String? = null, // the back lens as its zoom ("0.6×"), when the phone offers lenses to switch between
         val rotateLocked: Boolean = false, // the camera's turn is locked (else it follows how the phone is held)
         val phoneTurn: Int = 0, // while sharing the camera: how the phone is held, clockwise from upright
         val lockedTurn: Int = 0, // the turn kept while locked (the phone's, from the screen's upright, when locked)
@@ -391,21 +396,32 @@ class StreamEngine(
         CameraTurn(context).also { t -> t.onTurn = { deg -> exec.execute { if (state.sharing == Streams.Kind.CAMERA || deg == 0) update { it.copy(phoneTurn = deg) } } } }
     }
     private var dual: DualCamera? = null
+    private var backCamera: String? = null // the back camera (lens) last shared, for flipping back to
+    private var lenses: List<Pair<CameraInfo, Lens>> = emptyList() // the back lenses offered apart, for switching
+    private var torchWanted = false
+    private var backFlash: String? = null // a back camera with a flash, which a lens without one can borrow
+    private var torchApart: String? = null // ... while its flash is lit that way
+    private var borrowFails = false // the phone refused it: no light for such lenses this share
     @Volatile private var phoneSound: ScreenSound? = null
     private val idlePace = SoundPace() // WebRTC's sound loop without a microphone and without the phone's sound
 
-    /** Starts sharing the camera ([front] or back, [hd] 720p else 480p). */
+    /** Starts sharing the camera: [front] or back (its main lens; the share bar switches lenses), [quality] its picture's height. */
     fun shareCamera(front: Boolean, quality: Int, name: String, withSound: Boolean = false) = exec.execute {
         if (state.sharing != null) return@execute
-        val cams = Camera2Enumerator(context)
-        val device = cams.deviceNames.firstOrNull { cams.isFrontFacing(it) == front } ?: cams.deviceNames.firstOrNull() ?: run {
+        lenses = CameraInfo.backLenses(context)
+        val cams = CameraInfo.all(context)
+        val cam = cams.firstOrNull { it.front == front } ?: cams.firstOrNull() ?: run {
             log("No camera")
             return@execute
         }
         bitrate = when { quality >= 1080 -> 4500; quality >= 720 -> 2500; else -> 1000 }
-        update { it.copy(shareFront = cams.isFrontFacing(device), shareBoth = false) }
+        if (!cam.front) backCamera = cam.id
+        torchWanted = false
+        borrowFails = false
+        backFlash = cams.firstOrNull { !it.front && it.hasFlash }?.id
+        update { it.copy(shareFront = cam.front, shareBoth = false, shareFlash = lightable(cam), torch = false).zoomed(cam, 1f) }
         turn.start(settings().cameraRotateLock)
-        startCapture(cams.createCapturer(device, null), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
+        startCapture(PhoneCamera(context, cam, ::cameraLost), false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound) {
             turn.observer(it) { state.shareFront }
         }
     }
@@ -418,9 +434,10 @@ class StreamEngine(
             return@execute
         }
         bitrate = when { quality >= 1080 -> 5000; quality >= 720 -> 3000; else -> 1200 }
-        update { it.copy(shareFront = false, shareBoth = true) }
+        val back = CameraInfo.of(context, ids.first)
+        update { it.copy(shareFront = false, shareBoth = true, shareFlash = back?.hasFlash == true, torch = false) }
         turn.start(settings().cameraRotateLock)
-        val cam = DualCamera(context, egl.eglBaseContext, ids) { front -> turn.extra(front) }
+        val cam = DualCamera(context, egl.eglBaseContext, ids, ::cameraLost) { front -> turn.extra(front) }
         dual = cam
         startCapture(cam, false, widthFor(quality), quality, Streams.Kind.CAMERA, name, withSound)
     }
@@ -529,11 +546,105 @@ class StreamEngine(
             update { it.copy(shareFront = d.frontBig) }
             return@execute
         }
-        val cam = capturer as? org.webrtc.CameraVideoCapturer ?: return@execute
-        cam.switchCamera(object : org.webrtc.CameraVideoCapturer.CameraSwitchHandler {
-            override fun onCameraSwitchDone(front: Boolean) = exec.execute { update { it.copy(shareFront = front) } }
-            override fun onCameraSwitchError(e: String) = log("Camera switch failed: $e")
-        })
+        val cam = capturer as? PhoneCamera ?: return@execute
+        val cams = CameraInfo.all(context)
+        // From the front, back to the back lens that was chosen
+        val next = (if (cam.camera.front) cams.firstOrNull { it.id == backCamera && !it.front } else null)
+            ?: cams.firstOrNull { it.front != cam.camera.front } ?: return@execute
+        if (!next.front) backCamera = next.id
+        cam.switchTo(next) { front ->
+            exec.execute {
+                applyTorch(next)
+                update { it.copy(shareFront = front, shareFlash = lightable(next)).zoomed(next, cam.zoom) }
+            }
+        }
+    }
+
+    // The zoom as shown, and how far the camera goes
+    private fun State.zoomed(cam: CameraInfo, zoom: Float) = copy(zoom = zoom, zoomMin = cam.zoomMin, zoomMax = cam.zoomMax, lens = lensLabel(cam))
+
+    // A back lens's zoom compared with the main lens, when there are lenses to switch between
+    private fun lensLabel(cam: CameraInfo): String? {
+        if (cam.front || lenses.size < 2 || lenses.none { it.first.id == cam.id }) return null
+        val main = lenses.firstOrNull { it.second == Lens.MAIN }?.first ?: return null
+        return CameraView.zoomLabel(CameraView.zoomFactor(cam.fieldOfView, main.fieldOfView))
+    }
+
+    /** The next back lens (wide, main, telephoto, then round again), on a phone that offers them apart. */
+    fun nextLens() = exec.execute {
+        val cam = capturer as? PhoneCamera ?: return@execute
+        if (cam.camera.front || lenses.size < 2) return@execute
+        val at = lenses.indexOfFirst { it.first.id == cam.camera.id }
+        val next = lenses[(at + 1) % lenses.size].first
+        backCamera = next.id
+        cam.switchTo(next) { front ->
+            exec.execute {
+                applyTorch(next)
+                update { it.copy(shareFront = front, shareFlash = lightable(next)).zoomed(next, cam.zoom) }
+            }
+        }
+    }
+
+    /** Zooms the shared camera (one camera; not both at once). */
+    fun setZoom(zoom: Float) = exec.execute {
+        val cam = capturer as? PhoneCamera ?: return@execute
+        cam.zoom = zoom
+        if (state.zoom != cam.zoom) update { it.copy(zoom = cam.zoom) }
+    }
+
+    /** Focuses the shared camera (one camera) on a spot of its picture: 0 - 1 across it, as the camera gives it. */
+    fun focusAt(x: Float, y: Float) = exec.execute {
+        (capturer as? PhoneCamera)?.focusAt(x, y)
+    }
+
+    /** The flashlight of the shared back camera (with both cameras: the back one), on or off. */
+    fun setTorch(on: Boolean) = exec.execute {
+        torchWanted = on
+        when (val c = capturer) {
+            is PhoneCamera -> applyTorch(c.camera)
+            is DualCamera -> c.torch = on
+            else -> return@execute
+        }
+        log("Flashlight ${if (on) "on" else "off"}")
+        update { it.copy(torch = on) }
+    }
+
+    // A camera that can be lit: a back one with its own flash, or one that borrows another back camera's
+    private fun lightable(cam: CameraInfo) = !cam.front && (cam.hasFlash || (backFlash != null && !borrowFails))
+
+    // The flashlight as wanted, on the camera shared now: its own flash, else (a lens without one, such as an ultra-wide)
+    // the main camera's, lit through Android's flashlight as the phone's quick settings do. Some phones refuse that
+    // while another lens is in use; then the button goes away for this share.
+    private fun applyTorch(cam: CameraInfo) {
+        (capturer as? PhoneCamera)?.torch = torchWanted // lights only with its own flash
+        val borrow = if (torchWanted && !cam.front && !cam.hasFlash && !borrowFails) backFlash else null
+        torchApart?.let { id ->
+            if (id == borrow) return
+            try { cameraManager?.setTorchMode(id, false) } catch (_: Exception) {}
+            torchApart = null
+        }
+        if (borrow == null) return
+        try {
+            cameraManager?.setTorchMode(borrow, true)
+            torchApart = borrow
+            log("Flashlight lit through camera $borrow")
+        } catch (e: Exception) {
+            log("The flashlight can't be lit with this lens: $e")
+            borrowFails = true
+            torchWanted = false
+            update { it.copy(torch = false, shareFlash = false) }
+        }
+    }
+
+    private val cameraManager by lazy { context.getSystemService(android.hardware.camera2.CameraManager::class.java) }
+
+    // The shared camera stopped by itself (a call or another app took it, or an error): the share ends, and says why
+    private fun cameraLost(reason: String) = exec.execute {
+        if (state.sharing != Streams.Kind.CAMERA) return@execute
+        log("Camera lost: $reason")
+        shareId?.let { send(Streams.stop(it)) }
+        endShare()
+        update { it.copy(message = text(R.string.share_camera_lost)) }
     }
 
     fun stopShare() = exec.execute {
@@ -636,10 +747,15 @@ class StreamEngine(
         viewers.values.forEach { it.pc.dispose() }
         viewers.clear()
         releaseCapture()
-        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false) }
+        update { it.copy(sharing = null, shareLive = false, viewers = 0, localVideo = null, phoneTurn = 0, sharePaused = false, shareFlash = false, torch = false, zoom = 1f, zoomMin = 1f, zoomMax = 1f, lens = null) }
     }
 
     private fun releaseCapture() {
+        // A borrowed flash goes out with the share
+        torchApart?.let { id ->
+            try { cameraManager?.setTorchMode(id, false) } catch (_: Exception) {}
+            torchApart = null
+        }
         phoneSound?.stop()
         turn.stop()
         try { capturer?.stopCapture() } catch (_: Exception) {}

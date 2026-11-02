@@ -15,6 +15,17 @@
   the microphone's sound before it's sent. It removes noise the phone's own noise removal lets through, such as
   keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by
   default, and takes about a tenth of one processor core.
+- **Camera streams:** the camera has the app's own camera code now, which brings:
+  - **Flashlight:** a button in the share bar lights the back camera (also a lens without a flash of its own, such as
+    an ultra-wide, on phones that allow it); a new stream starts with it off, as with the ring light.
+  - **Zoom:** pinch the big preview; the zoom shows for a moment, a double tap returns to 1×, and each camera keeps its
+    own. On phones whose lenses work as one camera, zooming under 1× reaches the ultra-wide.
+  - **Tap to focus:** tap the big preview to focus and set the exposure on that spot, with a ring where it was
+    tapped; after a few seconds the camera follows the scene again. A button makes the big preview small.
+  - **Lenses:** on phones that offer their back lenses apart, a button in the share bar shows the lens as its zoom
+    ("0.6×", "1×") and switches to the next one during the stream.
+  - **Losing the camera** to a call or another app ends the share with a message instead of a frozen picture.
+  - The preview shows the picture as viewers see it, also with the turn locked.
 - **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
   mode the round talk button is in its bottom corner (and the whisper button above it while there's a whisper list),
   with the stream's own buttons. The full screen also has the stream's volume slider, not only sound on and off.
