@@ -1,8 +1,5 @@
 # PocketTS
 
-> **Made with AI assistance.** PocketTS is written with the help of an AI coding assistant. Every change is tested
-> by hand on a real phone before it goes in.
-
 A free, unofficial TeamSpeak client for Android, made for TeamSpeak 6 servers. Type a nickname and a server address
 to join.
 
@@ -11,13 +8,16 @@ to join.
 ## What it does
 
 - **Voice:** voice activation, push-to-talk (also a floating button over other apps), whispering to chosen people or
-  channels, echo and noise removal. Keeps working with the screen off, and goes quiet during phone calls.
+  channels, echo and noise removal, and AI noise removal (RNNoise) for keyboard clicks, fans and the like. Keeps
+  working with the screen off, and goes quiet during phone calls.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
   password. Hold a channel for its info.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
 - **Files:** a channel's files: download, upload, rename and delete them, and make folders (as the server allows).
-- **Streams:** watch others' screen and camera streams (at the size you choose, small over the app, or in a small
-  window over other apps), and share your own camera (with your microphone) or screen (with what the phone plays).
+- **Streams:** watch others' screen and camera streams (at the size you choose, small over the app, in a small window
+  over other apps, or on the full screen with push-to-talk and the stream's volume), and share your own camera (with
+  your microphone) or screen (with what the phone plays). The camera has a flashlight, zoom, tap to focus and a
+  button for the phone's other back lenses.
 - **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
   who may.
 - **Connecting** by address, server nickname, TeamSpeak link or invite; favourites; privilege keys from a server's
@@ -43,7 +43,8 @@ Download the APK from [Releases](https://github.com/KorppuJauho/pocketts/release
 
 ## Known limitations
 
-- **No myTeamSpeak features.** Pictures shared through myTeamSpeak by the TeamSpeak app can't be shown in PocketTS.
+- **No myTeamSpeak features.** PocketTS doesn't use myTeamSpeak, TeamSpeak's account service, so what goes through
+  it isn't available: 1:1 voice calls, group chats, and pictures shared through myTeamSpeak by the TeamSpeak app.
 - **Pictures go to the server's own files.** PocketTS can't upload pictures to TeamSpeak's picture service. The
   pictures you send are saved in the channel's files on the server (file transfer), so you need permission to upload
   files in that channel. TeamSpeak app users see them as usual.
@@ -66,4 +67,4 @@ downloads), give it a different name and icon so nobody mistakes it for PocketTS
 
 PocketTS isn't affiliated with or endorsed by TeamSpeak Systems GmbH. TeamSpeak is their trademark.
 
-PocketTS is free and stays free. If you'd like to say thanks, you can [buy me a coffee](https://buymeacoffee.com/jauho).
+If you'd like to say thanks, you can [buy me a coffee](https://buymeacoffee.com/jauho).

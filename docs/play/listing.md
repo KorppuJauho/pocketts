@@ -22,7 +22,7 @@ PocketTS is a voice chat app for TeamSpeak servers, made for phones. Connect to 
 VOICE
 • Voice activation, push-to-talk or always on
 • Whisper to chosen people or channels, wherever they are
-• Noise removal, echo cancellation and gain control
+• Noise removal, echo cancellation and gain control, and AI noise removal (RNNoise) for keyboard clicks, fans and the like
 • A volume for each person, and headset and volume-button push-to-talk
 • Keeps working with the screen off, and reconnects by itself when the network changes
 • Goes quiet during phone calls, and pauses a stream you share
@@ -34,8 +34,9 @@ CHANNELS AND CHAT
 • Hold a channel for its info, and browse its files: download, upload, rename and delete (as the server allows)
 
 STREAMS
-• Watch others' screen and camera streams at the size you like, small over the app, or in a small window over other apps
+• Watch others' screen and camera streams at the size you like, small over the app, in a small window over other apps, or on the full screen with push-to-talk and the stream's volume
 • Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
+• The camera's flashlight, zoom and tap to focus, and a button for the phone's other back lenses
 
 AND MORE
 • Connect by address, server nickname, TeamSpeak link or invite
