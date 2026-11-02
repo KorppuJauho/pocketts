@@ -1,20 +1,7 @@
 # Changelog
 
-## Unreleased
+## 1.6.0 (2026-11-02)
 
-- **Smoother start:** PocketTS's own code is compiled ahead of time when the app is installed (a baseline profile),
-  so starting, opening screens the first time and starting a stream are smoother. The log notes how long a start took.
-- **Smoother in busy channels:** someone starting or stopping talking now redraws only their row in the channel list,
-  not the whole screen (and not the chat at all), so a busy channel uses less of the phone.
-- **Debug log:** Settings › Advanced › Debug log keeps a log for bug reports on the phone, crashes included, with
-  server addresses, names, messages and keys taken out (running numbers such as "server 1" tell them apart). Of the
-  chat it notes only that a message was sent or arrived. The app never sends it: Share log hands it to
-  the app you choose, Delete log removes it, and turning it off deletes it. Off by default. The privacy policy says
-  what it holds, and a bug report template asks for it.
-- **AI noise removal:** Settings › Capture › AI noise removal (RNNoise) runs Xiph's RNNoise, a small neural network, on
-  the microphone's sound before it's sent. It removes noise the phone's own noise removal lets through, such as
-  keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by
-  default, and takes about a tenth of one processor core.
 - **Camera streams:** the camera has the app's own camera code now, which brings:
   - **Flashlight:** a button in the share bar lights the back camera (also a lens without a flash of its own, such as
     an ultra-wide, on phones that allow it); a new stream starts with it off, as with the ring light.
@@ -26,9 +13,18 @@
     ("0.6×", "1×") and switches to the next one during the stream.
   - **Losing the camera** to a call or another app ends the share with a message instead of a frozen picture.
   - The preview shows the picture as viewers see it, also with the turn locked.
+- **AI noise removal:** Settings › Capture › AI noise removal (RNNoise) runs Xiph's RNNoise, a small neural network, on
+  the microphone's sound before it's sent. It removes noise the phone's own noise removal lets through, such as
+  keyboard clicks, a fan or a TV; with both on, keyboard clicks next to the phone are almost silent. It's off by
+  default, and takes about a tenth of one processor core.
 - **Talking while watching full screen:** a stream on the full screen covered the push-to-talk button. In push-to-talk
   mode the round talk button is in its bottom corner (and the whisper button above it while there's a whisper list),
   with the stream's own buttons. The full screen also has the stream's volume slider, not only sound on and off.
+- **Debug log:** Settings › Advanced › Debug log keeps a log for bug reports on the phone, crashes included, with
+  server addresses, names, messages and keys taken out (running numbers such as "server 1" tell them apart). Of the
+  chat it notes only that a message was sent or arrived. The app never sends it: Share log hands it to
+  the app you choose, Delete log removes it, and turning it off deletes it. Off by default. The privacy policy says
+  what it holds, and a bug report template asks for it.
 - **Easier to read and tap:** grey text is a little lighter, and the WATCH and main blue buttons a little darker, so
   their text reads easily; WATCH and the small crosses are bigger to tap. Disconnect is an icon like the star and the
   gear next to it.
@@ -40,6 +36,10 @@
   Microphone, Sound and Share say whether they're on or off, tabs say which is chosen and when there are unread
   messages, warnings and "is whispering to you" are read out, a person's row says when they're talking, and in the
   channel editor Move up and Move down change the order without dragging.
+- **Smoother start:** PocketTS's own code is compiled ahead of time when the app is installed (a baseline profile),
+  so starting, opening screens the first time and starting a stream are smoother. The log notes how long a start took.
+- **Smoother in busy channels:** someone starting or stopping talking now redraws only their row in the channel list,
+  not the whole screen (and not the chat at all), so a busy channel uses less of the phone.
 
 ## 1.5.0 (2026-10-28)
 
