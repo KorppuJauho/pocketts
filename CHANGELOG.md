@@ -32,6 +32,10 @@
 - **Easier to read and tap:** grey text is a little lighter, and the WATCH and main blue buttons a little darker, so
   their text reads easily; WATCH and the small crosses are bigger to tap. Disconnect is an icon like the star and the
   gear next to it.
+- **Pasted ts3server:// links:** a `ts3server://` link pasted into the address field now joins its channel, with its
+  channel and server passwords (a privilege key in it is asked about first, as when the link is opened). Only the
+  server is kept as the address, so the link's passwords aren't saved with it. Connecting again after raising the
+  security level keeps a link's channel and privilege key too. Both found by chochrunius.
 - **Screen readers (TalkBack):** the talk and whisper buttons work with a double tap (once to start, again to stop),
   Microphone, Sound and Share say whether they're on or off, tabs say which is chosen and when there are unread
   messages, warnings and "is whispering to you" are read out, a person's row says when they're talking, and in the

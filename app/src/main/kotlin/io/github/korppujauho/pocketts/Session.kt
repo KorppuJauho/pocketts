@@ -309,7 +309,8 @@ object Session : TsClient.Listener {
         val t = levelTarget ?: return
         levelTarget = null
         _state.update { it.copy(neededLevel = 0) }
-        connect(app, t.address, t.nickname, t.password, t.filePort)
+        // With all of it: a link's channel, its password and privilege key (not used yet, as the server refused us first)
+        connect(app, t.address, t.nickname, t.password, t.filePort, t.channel, t.channelPassword, t.privilegeKey)
     }
 
     /** The security level wasn't raised (enough): the server's need is let be, and said why we're not connected. */

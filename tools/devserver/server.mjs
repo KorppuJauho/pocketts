@@ -104,7 +104,10 @@ createServer((req, res) => {
 img{max-width:48%;margin:1%;vertical-align:top}</style>
 <h2>Stream viewer</h2><p>Times are UTC. <a href="/clock">Clock</a> (show it while sharing your screen: the log then says
 the DELAY) &middot; <a href="/">Test builds</a></p>
-<div>${pictures.map((p) => `<a href="/viewer/pictures/${p}"><img src="/viewer/pictures/${p}" alt="${p}"></a>`).join("")}</div>
+<div>${pictures.map((p) => {
+  const link = `/viewer/pictures/${encodeURIComponent(p)}`;
+  return `<a href="${link}"><img src="${link}" alt="${escape(p)}"></a>`;
+}).join("")}</div>
 <pre>${escape(lines.join("\n"))}</pre>`);
   }
 
