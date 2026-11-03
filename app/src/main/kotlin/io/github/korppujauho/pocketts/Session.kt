@@ -276,10 +276,18 @@ object Session : TsClient.Listener {
     /** What the last connect asked for, to get a lost connection back. */
     private data class Target(
         val address: String, val nickname: String, val password: String, val filePort: Int? = null,
-        // From a TeamSpeak link: the channel to join first, and a privilege key the person agreed to use (once)
+        // From a TeamSpeak link or a favourite: the channel to join first, and a privilege key the person agreed to use
+        // (once). A favourite's channel also has its id from an earlier visit (0 when none yet), and hears where the
+        // channel turned out to be (its id and path), to remember it.
         val channel: String = "", val channelPassword: String = "", val privilegeKey: String = "",
+        val channelId: Int = 0, val onChannel: ((Int, String) -> Unit)? = null,
     )
     private var target: Target? = null
+    // The channel asked for when connecting, until we see where the server put us: it doesn't refuse a missing channel
+    // or a wrong password, it just puts us in its default channel. Looked at once the whole channel list is in: a TS6
+    // server tells where we are after the list's first part already.
+    private var channelAskedFor: Target? = null
+    private var channelListDone = false
     private var retries = 0
     private var oldWaits = 0 // tries refused because the server still had our old connection
     @Volatile private var wasConnected = false // only a connection that worked is tried again
@@ -290,13 +298,18 @@ object Session : TsClient.Listener {
     fun connect(
         context: Context, address: String, nickname: String, serverPassword: String, filePort: Int? = null,
         channel: String = "", channelPassword: String = "", privilegeKey: String = "",
+        channelId: Int = 0, onChannel: ((Int, String) -> Unit)? = null,
     ) {
         app = context.applicationContext
+        connectTo(Target(address, nickname, serverPassword, filePort, channel, channelPassword, privilegeKey, channelId, onChannel))
+    }
+
+    private fun connectTo(t: Target) {
         if (_state.value.phase != Phase.IDLE) return
         retries = 0
         oldWaits = 0
         wasConnected = false
-        target = Target(address, nickname, serverPassword, filePort, channel, channelPassword, privilegeKey)
+        target = t
         start(keepChat = false)
     }
 
@@ -310,7 +323,7 @@ object Session : TsClient.Listener {
         levelTarget = null
         _state.update { it.copy(neededLevel = 0) }
         // With all of it: a link's channel, its password and privilege key (not used yet, as the server refused us first)
-        connect(app, t.address, t.nickname, t.password, t.filePort, t.channel, t.channelPassword, t.privilegeKey)
+        connectTo(t)
     }
 
     /** The security level wasn't raised (enough): the server's need is let be, and said why we're not connected. */
@@ -856,6 +869,8 @@ object Session : TsClient.Listener {
         oldWaits = 0
         if (s.waitingForOld) _state.update { it.copy(waitingForOld = false) }
         wasConnected = true
+        channelAskedFor = target?.takeIf { it.channel.isNotEmpty() && s.reconnecting == 0 }
+        channelListDone = false
         if (s.reconnecting > 0) _state.update { it.copy(reconnecting = 0) }
         if (s.away) client?.sendCommand(Commands.build("clientupdate", "client_away" to true, "client_away_message" to s.awayMessage))
         if (s.inputMuted || s.outputMuted) {
@@ -1210,6 +1225,8 @@ object Session : TsClient.Listener {
         val cues = eventCues(cmd)
         val result = chat.handle(cmd, model) // before the model: a move's line needs where they were
         val changed = model.apply(cmd)
+        if (cmd.name == "channellistfinished") channelListDone = true
+        if (channelListDone) channelAskedFor?.let { asked -> model.ownClient?.let { me -> channelReached(asked, me.channel) } }
         result.poke?.let { poked(it) }
         val message = result.message
         // In the log, that something happened in the chat: never what was said, nor with whom
@@ -1234,6 +1251,34 @@ object Session : TsClient.Listener {
             if (cmd.name.startsWith("notifycliententerview") || cmd.name == "notifyclientleftview") updateGains()
             if (cmd.name == "notifyclientleftview" || cmd.name == "notifychanneldeleted") pruneWhisper()
         }
+    }
+
+    /**
+     * Where the server put us, against the channel asked for (its path, "Parent/Child", or "/id"). Somewhere else: the
+     * channel is looked for in the list, by the id from an earlier visit (it was renamed or moved) or by its path in
+     * other letter case, and joined; a wrong password there asks for it again. Not found: a warning.
+     */
+    private fun channelReached(asked: Target, cid: Int) {
+        channelAskedFor = null
+        val path = { id: Int -> generateSequence(model.channels[id]) { model.channels[it.parent] }.toList().reversed().joinToString("/") { it.name } }
+        val reached = asked.channel == path(cid) || asked.channel == "/$cid" || asked.channelId == cid
+        val found = if (reached) cid else asked.channelId.takeIf { it in model.channels }
+            ?: model.channels.keys.firstOrNull { path(it).equals(asked.channel, ignoreCase = true) }
+        if (found == null) {
+            AppLog.log("The channel asked for wasn't joined")
+            _state.update { it.copy(error = app.getString(R.string.channel_not_joined, asked.channel)) }
+            return
+        }
+        if (!reached) {
+            AppLog.log("The channel asked for was found under another name, joining it")
+            joinChannel(found, asked.channelPassword)
+        }
+        // Remembered as it is now, and reconnecting goes straight there
+        if (asked.onChannel != null && (found != asked.channelId || path(found) != asked.channel)) {
+            AppLog.log("The favourite's channel was remembered as it is now")
+            asked.onChannel.invoke(found, path(found))
+        }
+        target = target?.copy(channel = "/$found", channelId = found)
     }
 
     override fun onVoice(voice: TsClient.Voice) {

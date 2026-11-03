@@ -43,6 +43,10 @@
     <string name="favourite_file_port">Tiedonsiirron portti</string>
     <string name="favourite_file_port_hint">Palvelimen oma (yleensä 30033)</string>
     <string name="favourite_file_port_desc">Vain jos palvelimen kuvat ja profiilikuvat eivät lataudu: sen tiedonsiirto on toisessa portissa.</string>
+    <string name="favourite_channel">Kanava, jolle liitytään</string>
+    <string name="favourite_channel_hint">Palvelimen oletuskanava</string>
+    <string name="favourite_channel_desc">Kanavan nimi kirjoitettuna kuten palvelin sen näyttää. Toisen kanavan sisällä olevalle anna polku: Pelit/Aula.</string>
+    <string name="channel_not_joined">Kanavalle %1$s ei päästy: sellaista kanavaa ei ole tai sen salasana on väärä. Olet palvelimen oletuskanavalla.</string>
     <string name="update_title">PocketTS %1$s on julkaistu</string>
     <string name="update_text">Tätä (%1$s) uudempi versio on GitHubissa.</string>
     <string name="not_now">Ei nyt</string>

@@ -327,17 +327,27 @@ private fun App() {
 private fun connect(
     context: Context, address: String, nickname: String, password: String, filePort: Int? = null,
     channel: String = "", channelPassword: String = "", privilegeKey: String = "",
+    channelId: Int = 0, onChannel: ((Int, String) -> Unit)? = null,
 ) {
     Settings(context).let {
         it.nickname = nickname
         it.address = address
     }
     MainActivity.current?.ensureMic()
-    Session.connect(context, address, nickname, password, filePort, channel, channelPassword, privilegeKey)
+    Session.connect(context, address, nickname, password, filePort, channel, channelPassword, privilegeKey, channelId, onChannel)
 }
 
 private fun connectFavorite(context: Context, f: Favorite) =
-    connect(context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password, f.filePort)
+    connect(
+        context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password, f.filePort,
+        channel = f.channel, channelPassword = f.channelPassword, channelId = f.channelId,
+    ) { id, path ->
+        // Where its channel is now (learned on the first visit, or renamed since): remembered in the favourite
+        val ctx = context.applicationContext
+        saveFavorites(ctx, favorites.value.map {
+            if (Favorites.same(it.address, f.address) && it.channel == f.channel) it.copy(channel = path, channelId = id) else it
+        })
+    }
 
 private fun saveFavorites(context: Context, list: List<Favorite>) {
     Favorites.save(context, list)
