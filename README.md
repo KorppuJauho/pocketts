@@ -51,9 +51,8 @@ stay in the test for 14 days in a row, so every tester helps:
    same account and choose to become a tester.
 3. Install PocketTS from Google Play. It can take a few minutes after joining before Play finds it.
 
-Please stay in the test for at least 14 days; leaving it and coming back starts the 14 days again. The Play
-version gets its updates from Google Play. If you have the GitHub version, the Play version installs over it and
-keeps your settings. Feedback is welcome in the [issues](https://github.com/KorppuJauho/pocketts/issues).
+The Play version gets its updates from Google Play. If you have the GitHub version, the Play version installs over it
+and keeps your settings. Feedback is welcome in the [issues](https://github.com/KorppuJauho/pocketts/issues).
 
 ### GitHub
 
