@@ -162,7 +162,10 @@ fun CheckRow(text: String, checked: Boolean, enabled: Boolean = true, onChange: 
     }
 }
 
-/** WebTS's "Edit favourite": its name, address, the nickname used there, its password, connect automatically. */
+/**
+ * WebTS's "Edit favourite": its name, address, the nickname used there, its password, the channel to join (with its
+ * password), connect automatically.
+ */
 @Composable
 fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Unit)?, onDismiss: () -> Unit) {
     var name by remember { mutableStateOf(f.name) }
@@ -170,6 +173,8 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
     var nick by remember { mutableStateOf(f.nickname) }
     var pw by remember { mutableStateOf(f.password) }
     var auto by remember { mutableStateOf(f.auto) }
+    var channel by remember { mutableStateOf(f.channel) }
+    var channelPw by remember { mutableStateOf(f.channelPassword) }
     var filePort by remember { mutableStateOf(f.filePort?.toString().orEmpty()) }
     var advanced by remember { mutableStateOf(f.filePort != null) }
     TsDialog(
@@ -181,7 +186,15 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
             Spacer(Modifier.weight(1f))
             PillButton(stringResource(R.string.cancel), onClick = onDismiss)
             PillButton(stringResource(R.string.save), PillKind.PRIMARY, enabled = address.isNotBlank()) {
-                onSave(Favorite(address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 }))
+                // "Games / Lobby" isn't found: no spaces around the path's slashes
+                val ch = channel.split('/').joinToString("/") { it.trim() }
+                onSave(
+                    Favorite(
+                        address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 },
+                        ch, if (ch.isEmpty()) "" else channelPw,
+                        if (ch == f.channel) f.channelId else 0, // another channel typed: its id is learned again
+                    )
+                )
             }
         },
     ) {
@@ -190,6 +203,11 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 TsField(address, { address = it }, stringResource(R.string.server_address), keyboard = KeyboardType.Uri)
                 TsField(nick, { nick = it }, stringResource(R.string.favourite_nickname))
                 TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true)
+                TsField(channel, { channel = it }, stringResource(R.string.favourite_channel), placeholder = stringResource(R.string.favourite_channel_hint))
+                if (channel.isNotBlank()) {
+                    Text(stringResource(R.string.favourite_channel_desc), color = Ts.muted, fontSize = 12.sp)
+                    TsField(channelPw, { channelPw = it }, stringResource(R.string.channel_password), password = true)
+                }
                 CheckRow(stringResource(R.string.favourite_auto), auto) { auto = it }
                 // Advanced: folded away unless used
                 Row(

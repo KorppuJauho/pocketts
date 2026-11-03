@@ -6,7 +6,9 @@ import org.json.JSONObject
 
 /**
  * WebTS's favourites: a server's address, a name for the lists, the nickname used there, its password (kept only on
- * this phone), and whether to connect to it when the app opens (one at most).
+ * this phone), whether to connect to it when the app opens (one at most), and the channel to join there (its name, or
+ * its path for a subchannel; the server's default channel when empty) with that channel's password. The channel's id is
+ * learned when it's first joined, so it's found again after it's renamed or moved.
  */
 data class Favorite(
     val address: String,
@@ -15,6 +17,9 @@ data class Favorite(
     val password: String = "",
     val auto: Boolean = false,
     val filePort: Int? = null, // the server's file transfer port when it isn't the one the server tells (advanced)
+    val channel: String = "",
+    val channelPassword: String = "",
+    val channelId: Int = 0,
 ) {
     val label: String get() = name.ifBlank { address }
 }
@@ -24,22 +29,25 @@ object Favorites {
 
     private const val PASSWORD = "favorites/password" // one in the list, as an earlier version kept it
     private const val PASSWORDS = "favorites/passwords"
+    private const val CHANNEL_PASSWORDS = "favorites/channelPasswords"
 
     /**
-     * The passwords are kept apart from the list, encrypted with the other secrets (see [secretPrefs]): the list comes
+     * The passwords (the servers' and the channels') are kept apart from the list, encrypted with the other secrets (see [secretPrefs]): the list comes
      * along when the app's data is copied to a new phone, the passwords don't. Ones an earlier version kept in the list
      * are moved there now.
      */
     fun load(c: Context): List<Favorite> = try {
         val a = JSONArray(prefs(c).getString("list", "[]"))
         val inList = (0 until a.length()).any { a.getJSONObject(it).has("password") }
-        val passwords = if (inList) JSONArray() else passwords(c)
+        val passwords = if (inList) JSONArray() else passwords(c, "favorites", PASSWORDS)
+        val channelPasswords = passwords(c, "favoriteChannels", CHANNEL_PASSWORDS)
         val list = (0 until a.length()).map { i ->
             val o = a.getJSONObject(i)
             Favorite(
                 o.optString("address"), o.optString("name"), o.optString("nickname"),
                 if (inList) password(o.optString("password")) else passwords.optString(i), o.optBoolean("auto"),
-                o.optInt("filePort", 0).takeIf { it in 1..65535 },
+                o.optInt("filePort", 0).takeIf { it in 1..65535 }, o.optString("channel"), channelPasswords.optString(i),
+                o.optInt("channelId", 0),
             )
         }.filter { it.address.isNotBlank() }
         if (inList) save(c, list)
@@ -48,9 +56,9 @@ object Favorites {
         emptyList()
     }
 
-    /** The passwords, in the list's order. */
-    private fun passwords(c: Context): JSONArray = try {
-        JSONArray(secretPrefs(c).getSecret("favorites", PASSWORDS) ?: "[]")
+    /** The passwords saved under [name], in the list's order. */
+    private fun passwords(c: Context, name: String, label: String): JSONArray = try {
+        JSONArray(secretPrefs(c).getSecret(name, label) ?: "[]")
     } catch (e: SecretBox.Unreadable) {
         AppLog.log("The favourites' passwords can't be read: ${e.message}")
         JSONArray()
@@ -70,12 +78,18 @@ object Favorites {
         list.forEachIndexed { i, f ->
             a.put(
                 JSONObject().put("address", f.address.trim()).put("name", f.name.trim()).put("nickname", f.nickname.trim())
-                    .put("auto", i == autoAt).apply { f.filePort?.let { put("filePort", it) } }
+                    .put("auto", i == autoAt).apply {
+                        f.filePort?.let { put("filePort", it) }
+                        if (f.channel.isNotBlank()) put("channel", f.channel.trim())
+                        if (f.channel.isNotBlank() && f.channelId > 0) put("channelId", f.channelId)
+                    }
             )
         }
         val secrets = secretPrefs(c).edit()
         if (list.all { it.password.isEmpty() }) secrets.remove("favorites")
         else secrets.putSecret("favorites", PASSWORDS, JSONArray(list.map { it.password }).toString())
+        if (list.all { it.channelPassword.isEmpty() }) secrets.remove("favoriteChannels")
+        else secrets.putSecret("favoriteChannels", CHANNEL_PASSWORDS, JSONArray(list.map { it.channelPassword }).toString())
         secrets.commit()
         prefs(c).edit().putString("list", a.toString()).apply()
     }

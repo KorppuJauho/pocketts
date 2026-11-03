@@ -116,6 +116,28 @@ class SavedSecretsTest {
     }
 
     @Test
+    fun favouriteChannelPasswordIsSealedApart() {
+        Favorites.save(
+            context,
+            listOf(Favorite("a.example.com"), Favorite("ts.example.com", channel = "Games/Lobby", channelPassword = "ch pw", channelId = 40)),
+        )
+        assertEquals(listOf(0, 40), Favorites.load(context).map { it.channelId })
+        assertTrue(SecretBox.isSealed(prefs("secrets").getString("favoriteChannels", null)!!))
+        assertFalse(prefs("favorites").getString("list", null)!!.contains("ch pw"))
+        assertEquals(listOf("", "Games/Lobby"), Favorites.load(context).map { it.channel })
+        assertEquals(listOf("", "ch pw"), Favorites.load(context).map { it.channelPassword })
+
+        // On a new phone the channel comes along, its password doesn't
+        prefs("secrets").edit().clear().commit()
+        Secrets.box = SecretBox(SoftwareKey())
+        assertEquals(Favorite("ts.example.com", channel = "Games/Lobby", channelId = 40), Favorites.load(context)[1])
+
+        // No channel passwords left: nothing kept for them
+        Favorites.save(context, Favorites.load(context))
+        assertFalse(prefs("secrets").contains("favoriteChannels"))
+    }
+
+    @Test
     fun onANewPhoneTheRestComesAlong() {
         Settings(context).nickname = "Jamie"
         Settings(context).serverPassword = "server pw"

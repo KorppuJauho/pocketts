@@ -43,6 +43,10 @@
     <string name="favourite_file_port">Порт передачи файлов</string>
     <string name="favourite_file_port_hint">Порт сервера (обычно 30033)</string>
     <string name="favourite_file_port_desc">Только если картинки и аватары сервера не загружаются: его передача файлов работает на другом порту.</string>
+    <string name="favourite_channel">Канал для входа</string>
+    <string name="favourite_channel_hint">Канал сервера по умолчанию</string>
+    <string name="favourite_channel_desc">Название канала так, как его показывает сервер. Для вложенного канала укажите путь: Игры/Лобби.</string>
+    <string name="channel_not_joined">Не удалось войти в %1$s: такого канала нет или его пароль неверен. Вы в канале сервера по умолчанию.</string>
     <string name="update_title">Вышел PocketTS %1$s</string>
     <string name="update_text">На GitHub есть версия новее этой (%1$s).</string>
     <string name="not_now">Не сейчас</string>

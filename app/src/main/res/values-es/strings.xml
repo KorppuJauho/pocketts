@@ -43,6 +43,10 @@
     <string name="favourite_file_port">Puerto de transferencia de archivos</string>
     <string name="favourite_file_port_hint">El del servidor (normalmente 30033)</string>
     <string name="favourite_file_port_desc">Solo si las imágenes y los avatares del servidor no cargan: su transferencia de archivos está en otro puerto.</string>
+    <string name="favourite_channel">Canal al que entrar</string>
+    <string name="favourite_channel_hint">El canal predeterminado del servidor</string>
+    <string name="favourite_channel_desc">El nombre del canal, escrito como lo muestra el servidor. Para un canal dentro de otro, escribe la ruta: Juegos/Lobby.</string>
+    <string name="channel_not_joined">No se pudo entrar en %1$s: ese canal no existe o su contraseña es incorrecta. Estás en el canal predeterminado del servidor.</string>
     <string name="update_title">Ya está disponible PocketTS %1$s</string>
     <string name="update_text">Hay una versión más nueva que esta (%1$s) en GitHub.</string>
     <string name="not_now">Ahora no</string>

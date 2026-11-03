@@ -48,6 +48,10 @@
     <string name="favourite_file_port">File transfer port</string>
     <string name="favourite_file_port_hint">The server\'s own (usually 30033)</string>
     <string name="favourite_file_port_desc">Only if the server\'s pictures and avatars don\'t load: its file transfer is on another port.</string>
+    <string name="favourite_channel">Channel to join</string>
+    <string name="favourite_channel_hint">The server\'s default channel</string>
+    <string name="favourite_channel_desc">The channel\'s name, written as the server shows it. For a channel inside another one, give its path: Games/Lobby.</string>
+    <string name="channel_not_joined">Couldn\'t join %1$s: there\'s no such channel, or its password is wrong. You\'re in the server\'s default channel.</string>
     <string name="update_title">PocketTS %1$s is out</string>
     <string name="update_text">A newer version than this one (%1$s) is on GitHub.</string>
     <string name="not_now">Not now</string>

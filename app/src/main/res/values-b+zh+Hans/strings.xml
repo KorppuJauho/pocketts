@@ -43,6 +43,10 @@
     <string name="favourite_file_port">文件传输端口</string>
     <string name="favourite_file_port_hint">服务器自己的端口（通常为 30033）</string>
     <string name="favourite_file_port_desc">仅当服务器的图片和头像无法加载时：它的文件传输使用了其他端口。</string>
+    <string name="favourite_channel">要加入的频道</string>
+    <string name="favourite_channel_hint">服务器的默认频道</string>
+    <string name="favourite_channel_desc">频道名称，需与服务器显示的完全一致。子频道请填写路径：游戏/大厅。</string>
+    <string name="channel_not_joined">无法加入 %1$s：没有这个频道，或其密码错误。你现在在服务器的默认频道。</string>
     <string name="update_title">PocketTS %1$s 已发布</string>
     <string name="update_text">GitHub 上有比当前版本（%1$s）更新的版本。</string>
     <string name="not_now">以后再说</string>

@@ -43,6 +43,10 @@
     <string name="favourite_file_port">Port de transfert de fichiers</string>
     <string name="favourite_file_port_hint">Celui du serveur (en général 30033)</string>
     <string name="favourite_file_port_desc">Seulement si les images et les avatars du serveur ne se chargent pas : son transfert de fichiers est sur un autre port.</string>
+    <string name="favourite_channel">Canal à rejoindre</string>
+    <string name="favourite_channel_hint">Le canal par défaut du serveur</string>
+    <string name="favourite_channel_desc">Le nom du canal, écrit comme le serveur l\'affiche. Pour un canal dans un autre, indiquez le chemin : Jeux/Accueil.</string>
+    <string name="channel_not_joined">Impossible de rejoindre %1$s : ce canal n\'existe pas, ou son mot de passe est faux. Vous êtes dans le canal par défaut du serveur.</string>
     <string name="update_title">PocketTS %1$s est disponible</string>
     <string name="update_text">Une version plus récente que celle-ci (%1$s) est sur GitHub.</string>
     <string name="not_now">Pas maintenant</string>
