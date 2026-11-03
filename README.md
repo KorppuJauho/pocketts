@@ -49,7 +49,8 @@ stay in the test for 14 days in a row, so every tester helps:
    group's owner sees who has joined.
 2. Open the [test page on Google Play](https://play.google.com/apps/testing/io.github.korppujauho.pocketts) with the
    same account and choose to become a tester.
-3. Install PocketTS from Google Play. It can take a few minutes after joining before Play finds it.
+3. Install PocketTS from Google Play. After joining, it can take from a few minutes up to a few hours before Play
+   finds it.
 
 The Play version gets its updates from Google Play. If you have the GitHub version, the Play version installs over it
 and keeps your settings. Feedback is welcome in the [issues](https://github.com/KorppuJauho/pocketts/issues).
