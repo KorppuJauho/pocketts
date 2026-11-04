@@ -12,6 +12,11 @@ People who have helped make PocketTS. Thank you!
   in [their fork](https://github.com/chochrunius/pocketts/commit/9ca66a224c3d6e283689d826f660c40533d61b4e). Their fork
   also had the idea of a channel to join on each server, which became the favourites' channel.
 
+## Translations
+
+- **[chochrunius](https://github.com/chochrunius)**: the Czech translation, first made in
+  [their fork](https://github.com/chochrunius/pocketts/commit/b0958cce78).
+
 ## Testers
 
 Everyone in the Google Play closed test, and everyone who reports problems and ideas in the

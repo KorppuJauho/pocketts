@@ -45,7 +45,7 @@ AND MORE
 • Mute, sound and disconnect buttons in the notification
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
 • Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)
-• In English, Finnish, German, Spanish, French, Simplified Chinese and Russian
+• In English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech
 
 PRIVATE BY DESIGN
 No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname or an invite, TeamSpeak's nickname or invite service).
