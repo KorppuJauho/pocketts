@@ -13,6 +13,11 @@ People who have helped make PocketTS. Thank you!
   also had the idea of a channel to join on each server, which became the favourites' channel, and showed the connect
   screen's error at the top ([commit](https://github.com/chochrunius/pocketts/commit/48e3359ed6)).
 
+## Translations
+
+- **[chochrunius](https://github.com/chochrunius)**: the Czech translation, first made in
+  [their fork](https://github.com/chochrunius/pocketts/commit/b0958cce78).
+
 ## Testers
 
 Everyone in the Google Play closed test, and everyone who reports problems and ideas in the

@@ -1,6 +1,6 @@
 # Translations
 
-PocketTS speaks English, Finnish, German, Spanish, French, Simplified Chinese and Russian. It follows the phone's
+PocketTS speaks English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech. It follows the phone's
 language, or the one chosen in PocketTS's Settings › UI › Language. On Android 13 and later, that choice is the same
 as the phone's own per-app setting: Settings › Apps › PocketTS › Language.
 
@@ -13,8 +13,10 @@ as the phone's own per-app setting: Settings › Apps › PocketTS › Language.
 | French | `values-fr/strings.xml` | not yet |
 | Simplified Chinese | `values-b+zh+Hans/strings.xml` | not yet |
 | Russian | `values-ru/strings.xml` | not yet |
+| Czech | `values-cs/strings.xml` | not yet |
 
-The translations were written with AI help, like the rest of PocketTS. If you speak one of these languages and
+The translations were written with AI help, like the rest of PocketTS. The Czech one was first made by
+[chochrunius](https://github.com/chochrunius) in their fork. If you speak one of these languages and
 something reads oddly, please open an [issue](https://github.com/KorppuJauho/pocketts/issues) or a pull request that
 changes the file. Small fixes are welcome.
 
@@ -38,13 +40,14 @@ made by their contributors and published under the MIT license:
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-PocketTS's sentences are its own; only the terms were taken over.
+PocketTS's sentences are its own; only the terms were taken over. The Czech file's terms haven't been compared with
+them yet.
 
 ## For translators
 
 - Keep the placeholders: `%1$s` is a name or text, `%1$d` a number. Their order in the sentence can change.
 - Plurals (`<plurals>`) have one form per number category of the language (Finnish: one, other; Russian: one, few,
-  many, other; Chinese: other only).
+  many, other; Czech: one, few, many, other, where many is only for fractions; Chinese: other only).
 - In Android's files, an apostrophe is written `\'` and a double quote `\"`. French uses the typographic `’`, which
   needs no escaping.
 - "PocketTS", "TeamSpeak", "GitHub", "Opus Voice" and "Opus Music" stay as they are.
