@@ -82,6 +82,8 @@ fun ConnectScreen(
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
         AppHeader { if (settingsActions != null) SettingsGear { settings = true } }
+        // Above the scrolling part: in view whether the connect came from a favourite or the form
+        error?.let { WarningBanner(it, onDismissError, Modifier.padding(top = 15.dp)) }
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -105,7 +107,6 @@ fun ConnectScreen(
                     CheckRow(stringResource(R.string.remember_password), remember) { remember = it }
                     // Always there; ticked (and fixed) for a server that already is a favourite
                     CheckRow(stringResource(if (known) R.string.favourites_in else R.string.favourites_save), favorite || known, enabled = !known) { favorite = it }
-                    error?.let { WarningBanner(it, onDismissError, inset = 0.dp) }
                     UpdateCard()
                     PrimaryButton(
                         stringResource(R.string.connect), enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
