@@ -7,6 +7,9 @@ import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -464,12 +467,44 @@ private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     }
 }
 
-/** The app's language: the phone's, or one of the translations by its own name. */
+/**
+ * The app's language: the phone's, or one of the translations by its own name. One row showing the chosen one; a tap
+ * opens the list (it scrolls when there are many).
+ */
 @Composable
 private fun Language(tag: String, onChange: (String) -> Unit) {
+    val choices = listOf("" to stringResource(R.string.ui_language_phone)) + io.github.korppujauho.pocketts.AppLanguage.choices
+    val chosen = choices.firstOrNull { it.first == tag }?.second ?: choices.first().second
+    var open by remember { mutableStateOf(false) }
     Group(stringResource(R.string.ui_language)) {
-        Radio(stringResource(R.string.ui_language_phone), tag.isEmpty()) { onChange("") }
-        for ((t, name) in io.github.korppujauho.pocketts.AppLanguage.choices) Radio(name, tag == t) { onChange(t) }
+        Box {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
+                    .border(1.dp, Color(0x14FFFFFF), RoundedCornerShape(12.dp))
+                    .clickable(role = androidx.compose.ui.semantics.Role.DropdownList) { open = true }
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(chosen, color = Ts.bright, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted,
+                )
+            }
+            androidx.compose.material3.DropdownMenu(open, onDismissRequest = { open = false }, containerColor = Ts.card) {
+                for ((t, name) in choices) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(name, color = if (t == tag) Ts.bright else Ts.text, fontWeight = if (t == tag) FontWeight.SemiBold else null) },
+                        trailingIcon = if (t == tag) {
+                            { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Rounded.Check, contentDescription = null, tint = Ts.accent) }
+                        } else null,
+                        onClick = {
+                            open = false
+                            onChange(t)
+                        },
+                    )
+                }
+            }
+        }
     }
 }
 
