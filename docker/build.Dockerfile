@@ -8,7 +8,7 @@ ARG PLATFORM=android-37.0
 ARG BUILD_TOOLS=37.0.0
 # Native code (RNNoise, the AI noise removal) is built with these
 ARG NDK=29.0.14206865
-ARG CMAKE=3.31.6
+ARG CMAKE=3.31.5
 
 ENV ANDROID_HOME=/opt/android-sdk
 ENV PATH=$PATH:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools
