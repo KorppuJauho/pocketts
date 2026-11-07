@@ -242,9 +242,9 @@
     <string name="capture_vad_delay">停用前的延迟</string>
     <string name="capture_processing">信号处理</string>
     <string name="capture_noise">消除背景噪音</string>
-    <string name="capture_echo">回声消除</string>
+    <string name="capture_echo">回声消除（通话模式）</string>
     <string name="capture_agc">自动增益控制</string>
-    <string name="capture_echo_desc">回声消除会像通话一样播放语音（扬声器或你的耳麦）。使用耳机时关闭它可获得最佳音质。</string>
+    <string name="capture_echo_desc">语音像通话一样播放：通过你的耳麦，否则通过手机扬声器。没有麦克风的蓝牙音箱不会被使用，蓝牙耳机也会切换为通话音质，其他应用同样如此。关闭它可获得最佳音质并使用蓝牙音箱；此时请使用耳机或按键说话，以免麦克风收录音箱的声音。</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">显示管理功能</string>

@@ -251,9 +251,9 @@
     <string name="capture_vad_delay">Задержка перед отключением</string>
     <string name="capture_processing">Обработка сигнала</string>
     <string name="capture_noise">Убирать фоновый шум</string>
-    <string name="capture_echo">Подавление эха</string>
+    <string name="capture_echo">Подавление эха (режим звонка)</string>
     <string name="capture_agc">Автоматическая регулировка усиления</string>
-    <string name="capture_echo_desc">С подавлением эха голоса звучат как в телефонном звонке (динамик или гарнитура). Выключите его для лучшего звука в наушниках.</string>
+    <string name="capture_echo_desc">Голоса звучат как в телефонном звонке: через гарнитуру, а без неё — через динамик телефона. Bluetooth-колонка без микрофона не используется, а Bluetooth-наушники переходят на звук звонка, в том числе для других приложений. Выключите его для лучшего звука и для Bluetooth-колонок, и используйте наушники или «Нажми и говори», чтобы микрофон не улавливал колонку.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Показывать функции администратора</string>

@@ -248,9 +248,9 @@
     <string name="capture_vad_delay">Retardo antes de desactivar</string>
     <string name="capture_processing">Procesamiento de señal</string>
     <string name="capture_noise">Eliminar el ruido de fondo</string>
-    <string name="capture_echo">Cancelación de eco</string>
+    <string name="capture_echo">Cancelación de eco (modo llamada)</string>
     <string name="capture_agc">Control automático de ganancia</string>
-    <string name="capture_echo_desc">La cancelación de eco reproduce las voces como en una llamada (altavoz o tus auriculares con micrófono). Desactívala para el mejor sonido con auriculares.</string>
+    <string name="capture_echo_desc">Las voces suenan como en una llamada: por tus auriculares con micrófono o, si no, por el altavoz del teléfono. Un altavoz Bluetooth sin micrófono no se usa, y los auriculares Bluetooth pasan a su sonido de llamada, también para otras apps. Desactívala para el mejor sonido y para altavoces Bluetooth, y usa auriculares o Pulsar para hablar para que el micrófono no capte el altavoz.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Mostrar funciones de administración</string>
