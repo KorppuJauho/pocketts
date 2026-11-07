@@ -248,9 +248,9 @@
     <string name="capture_vad_delay">Délai avant désactivation</string>
     <string name="capture_processing">Traitement du signal</string>
     <string name="capture_noise">Supprimer les bruits de fond</string>
-    <string name="capture_echo">Annulation de l’écho</string>
+    <string name="capture_echo">Annulation de l’écho (mode appel)</string>
     <string name="capture_agc">Contrôle automatique du gain</string>
-    <string name="capture_echo_desc">L’annulation de l’écho joue les voix comme un appel (haut-parleur ou votre casque). Désactivez-la pour le meilleur son au casque.</string>
+    <string name="capture_echo_desc">Les voix sont jouées comme un appel : dans votre casque, sinon par le haut-parleur du téléphone. Une enceinte Bluetooth sans micro n’est pas utilisée, et un casque Bluetooth passe à son son d’appel, aussi pour les autres apps. Désactivez-la pour le meilleur son et pour les enceintes Bluetooth, et utilisez un casque ou Appuyer pour parler pour que le micro ne capte pas l’enceinte.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Afficher les fonctions d’administration</string>

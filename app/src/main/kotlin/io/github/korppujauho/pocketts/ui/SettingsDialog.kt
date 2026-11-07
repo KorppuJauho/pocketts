@@ -611,8 +611,8 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
         )
         if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
         Check(stringResource(R.string.capture_echo), v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
-        Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
         Desc(stringResource(R.string.capture_echo_desc))
+        Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }
 
