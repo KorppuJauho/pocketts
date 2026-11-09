@@ -37,7 +37,6 @@
 
     <!-- Connect screen -->
     <string name="favourites">Favourites</string>
-    <string name="connect_title">Connect to a server</string>
     <string name="favourites_in">In favourites</string>
     <string name="favourites_save">Save to favourites</string>
     <string name="favourite_edit">Edit favourite</string>
@@ -48,6 +47,15 @@
     <string name="favourite_file_port">File transfer port</string>
     <string name="favourite_file_port_hint">The server\'s own (usually 30033)</string>
     <string name="favourite_file_port_desc">Only if the server\'s pictures and avatars don\'t load: its file transfer is on another port.</string>
+    <string name="community_tab">Community</string>
+    <string name="community_desc">Public servers run by TeamSpeak. Tap one to join. PocketTS is an unofficial app.</string>
+    <string name="community_desc_no_nick">Public servers run by TeamSpeak. Type a nickname above to join one. PocketTS is an unofficial app.</string>
+    <string name="community_worldwide">Worldwide</string>
+    <string name="community_eu_east">Europe East</string>
+    <string name="community_emea">Europe, Middle East and Africa</string>
+    <string name="community_apac">Asia–Pacific</string>
+    <string name="community_latam">Latin America</string>
+    <string name="community_na">North America</string>
     <string name="favourite_channel">Channel to join</string>
     <string name="favourite_channel_hint">The server\'s default channel</string>
     <string name="favourite_channel_desc">The channel\'s name, written as the server shows it. For a channel inside another one, give its path: Games/Lobby.</string>

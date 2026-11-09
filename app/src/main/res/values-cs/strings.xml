@@ -32,7 +32,6 @@
 
     <!-- Connect screen -->
     <string name="favourites">Oblíbené</string>
-    <string name="connect_title">Připojení k serveru</string>
     <string name="favourites_in">V oblíbených</string>
     <string name="favourites_save">Uložit do oblíbených</string>
     <string name="favourite_edit">Upravit oblíbený server</string>
@@ -43,6 +42,15 @@
     <string name="favourite_file_port">Port pro přenos souborů</string>
     <string name="favourite_file_port_hint">Port serveru (obvykle 30033)</string>
     <string name="favourite_file_port_desc">Pouze pokud se nenačítají obrázky a avatary serveru: přenos souborů na serveru používá jiný port.</string>
+    <string name="community_tab">Komunita</string>
+    <string name="community_desc">Veřejné servery provozované společností TeamSpeak. Klepnutím se připojíte. PocketTS je neoficiální aplikace.</string>
+    <string name="community_desc_no_nick">Veřejné servery provozované společností TeamSpeak. Pro připojení zadejte výše přezdívku. PocketTS je neoficiální aplikace.</string>
+    <string name="community_worldwide">Celý svět</string>
+    <string name="community_eu_east">Východní Evropa</string>
+    <string name="community_emea">Evropa, Blízký východ a Afrika</string>
+    <string name="community_apac">Asie a Tichomoří</string>
+    <string name="community_latam">Latinská Amerika</string>
+    <string name="community_na">Severní Amerika</string>
     <string name="favourite_channel">Kanál, do kterého se připojit</string>
     <string name="favourite_channel_hint">Výchozí kanál serveru</string>
     <string name="favourite_channel_desc">Název kanálu tak, jak ho zobrazuje server. U kanálu uvnitř jiného zadejte cestu: Hry/Lobby.</string>

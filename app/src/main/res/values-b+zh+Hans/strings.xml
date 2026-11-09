@@ -32,7 +32,6 @@
 
     <!-- Connect screen -->
     <string name="favourites">收藏</string>
-    <string name="connect_title">连接到服务器</string>
     <string name="favourites_in">已收藏</string>
     <string name="favourites_save">保存到收藏</string>
     <string name="favourite_edit">编辑收藏</string>
@@ -43,6 +42,15 @@
     <string name="favourite_file_port">文件传输端口</string>
     <string name="favourite_file_port_hint">服务器自己的端口（通常为 30033）</string>
     <string name="favourite_file_port_desc">仅当服务器的图片和头像无法加载时：它的文件传输使用了其他端口。</string>
+    <string name="community_tab">社区</string>
+    <string name="community_desc">由 TeamSpeak 运营的公共服务器。点按即可加入。PocketTS 是非官方应用。</string>
+    <string name="community_desc_no_nick">由 TeamSpeak 运营的公共服务器。请先在上方输入昵称再加入。PocketTS 是非官方应用。</string>
+    <string name="community_worldwide">全球</string>
+    <string name="community_eu_east">东欧</string>
+    <string name="community_emea">欧洲、中东和非洲</string>
+    <string name="community_apac">亚太</string>
+    <string name="community_latam">拉丁美洲</string>
+    <string name="community_na">北美</string>
     <string name="favourite_channel">要加入的频道</string>
     <string name="favourite_channel_hint">服务器的默认频道</string>
     <string name="favourite_channel_desc">频道名称，需与服务器显示的完全一致。子频道请填写路径：游戏/大厅。</string>

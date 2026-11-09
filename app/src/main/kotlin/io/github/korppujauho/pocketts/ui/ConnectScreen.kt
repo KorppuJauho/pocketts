@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -46,6 +47,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.selection.selectable
+import kotlinx.coroutines.launch
 import io.github.korppujauho.pocketts.Favorite
 import io.github.korppujauho.pocketts.R
 
@@ -97,20 +101,34 @@ fun ConnectScreen(
                     }
                 }
             }
-            Panel(Modifier.fillMaxWidth(), header = {
-                Text(stringResource(R.string.connect_title), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-            }) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    TsField(nick, { nick = it }, stringResource(R.string.nickname))
-                    TsField(addr, { addr = it }, stringResource(R.string.server_address), placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
-                    TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true, imeAction = ImeAction.Go)
-                    CheckRow(stringResource(R.string.remember_password), remember) { remember = it }
-                    // Always there; ticked (and fixed) for a server that already is a favourite
-                    CheckRow(stringResource(if (known) R.string.favourites_in else R.string.favourites_save), favorite || known, enabled = !known) { favorite = it }
-                    UpdateCard()
-                    PrimaryButton(
-                        stringResource(R.string.connect), enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
-                    ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
+            // Connecting by address, and TeamSpeak's community servers: two pages of one panel, its switch on top, and
+            // a swipe goes between them too
+            val pages = androidx.compose.foundation.pager.rememberPagerState { 2 }
+            val scope = androidx.compose.runtime.rememberCoroutineScope()
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
+                    .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
+            ) {
+                PageSwitch(pages.currentPage) { scope.launch { pages.animateScrollToPage(it) } }
+                Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+                androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // The same nickname on both pages
+                        TsField(nick, { nick = it }, stringResource(R.string.nickname))
+                        if (page == 0) {
+                            TsField(addr, { addr = it }, stringResource(R.string.server_address), placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
+                            TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true, imeAction = ImeAction.Go)
+                            CheckRow(stringResource(R.string.remember_password), remember) { remember = it }
+                            // Always there; ticked (and fixed) for a server that already is a favourite
+                            CheckRow(stringResource(if (known) R.string.favourites_in else R.string.favourites_save), favorite || known, enabled = !known) { favorite = it }
+                            UpdateCard()
+                            PrimaryButton(
+                                stringResource(R.string.connect), enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
+                            ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
+                        } else {
+                            CommunityServers(nick.trim()) { actions.connect(it, nick.trim(), "", false, false) }
+                        }
+                    }
                 }
             }
         }
@@ -122,6 +140,49 @@ fun ConnectScreen(
     editing?.let { f ->
         FavoriteDialog(f, onSave = { actions.saveFavorite(f, it); editing = null }, onDelete = { actions.removeFavorite(f); editing = null }) {
             editing = null
+        }
+    }
+}
+
+/** The panel's top bar: its two pages, Connect and the community servers, as the server screen's Channels/Chat switch. */
+@Composable
+private fun PageSwitch(page: Int, onPage: (Int) -> Unit) {
+    Row(Modifier.fillMaxWidth().background(Ts.card).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        for ((i, label) in listOf(stringResource(R.string.connect), stringResource(R.string.community_tab)).withIndex()) {
+            val active = i == page
+            Box(
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                    .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onPage(i) }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
+/** TeamSpeak's community servers (see [io.github.korppujauho.pocketts.CommunityServers]): one tap joins, with [nick]. */
+@Composable
+private fun CommunityServers(nick: String, onJoin: (String) -> Unit) {
+    Text(
+        stringResource(if (nick.isBlank()) R.string.community_desc_no_nick else R.string.community_desc),
+        color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp, modifier = Modifier.padding(horizontal = 2.dp),
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        for (s in io.github.korppujauho.pocketts.CommunityServers.list) {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Ts.card)
+                    .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                    .clickable(enabled = nick.isNotBlank()) { onJoin(s.address) }.padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(s.name), color = if (nick.isNotBlank()) Ts.text else Ts.muted, fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+                )
+                Text(s.address, color = Ts.muted, fontSize = 12.sp, maxLines = 1, modifier = Modifier.padding(start = 8.dp))
+            }
         }
     }
 }
