@@ -32,7 +32,6 @@
 
     <!-- Connect screen -->
     <string name="favourites">Favoriten</string>
-    <string name="connect_title">Mit einem Server verbinden</string>
     <string name="favourites_in">In den Favoriten</string>
     <string name="favourites_save">In Favoriten speichern</string>
     <string name="favourite_edit">Favorit bearbeiten</string>
@@ -43,6 +42,15 @@
     <string name="favourite_file_port">Port für Dateiübertragung</string>
     <string name="favourite_file_port_hint">Der des Servers (meist 30033)</string>
     <string name="favourite_file_port_desc">Nur wenn die Bilder und Avatare des Servers nicht laden: Seine Dateiübertragung läuft über einen anderen Port.</string>
+    <string name="community_tab">Community</string>
+    <string name="community_desc">Öffentliche Server, betrieben von TeamSpeak. Tippe auf einen, um beizutreten. PocketTS ist eine inoffizielle App.</string>
+    <string name="community_desc_no_nick">Öffentliche Server, betrieben von TeamSpeak. Gib oben einen Nickname ein, um beizutreten. PocketTS ist eine inoffizielle App.</string>
+    <string name="community_worldwide">Weltweit</string>
+    <string name="community_eu_east">Osteuropa</string>
+    <string name="community_emea">Europa, Naher Osten und Afrika</string>
+    <string name="community_apac">Asien-Pazifik</string>
+    <string name="community_latam">Lateinamerika</string>
+    <string name="community_na">Nordamerika</string>
     <string name="favourite_channel">Kanal beim Verbinden</string>
     <string name="favourite_channel_hint">Der Standardkanal des Servers</string>
     <string name="favourite_channel_desc">Der Name des Kanals, so geschrieben, wie der Server ihn zeigt. Für einen Kanal in einem anderen den Pfad angeben: Spiele/Lobby.</string>

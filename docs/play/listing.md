@@ -40,6 +40,7 @@ STREAMS
 
 AND MORE
 • Connect by address, server nickname, TeamSpeak link or invite
+• TeamSpeak's own public community servers, one tap away
 • Use a privilege key from a server's admin
 • Favourite servers, and switching between them
 • Mute, sound and disconnect buttons in the notification
@@ -53,7 +54,7 @@ No account, no ads, no analytics. Your identity and passwords are encrypted on y
 OPEN SOURCE
 PocketTS is free software (GPL-3.0). The source code, the changelog and the issue tracker are on GitHub: https://github.com/KorppuJauho/pocketts
 
-PocketTS is an independent app. It isn't made by, endorsed by or affiliated with TeamSpeak Systems GmbH. TeamSpeak is a trademark of its owner. You need a TeamSpeak server to connect to.
+PocketTS is an independent app. It isn't made by, endorsed by or affiliated with TeamSpeak Systems GmbH. TeamSpeak is a trademark of its owner. Connect to any TeamSpeak server, or try one of TeamSpeak's public community servers.
 ```
 
 ## Graphics

@@ -32,7 +32,6 @@
 
     <!-- Connect screen -->
     <string name="favourites">Suosikit</string>
-    <string name="connect_title">Yhdistä palvelimeen</string>
     <string name="favourites_in">Suosikeissa</string>
     <string name="favourites_save">Tallenna suosikkeihin</string>
     <string name="favourite_edit">Muokkaa suosikkia</string>
@@ -43,6 +42,15 @@
     <string name="favourite_file_port">Tiedonsiirron portti</string>
     <string name="favourite_file_port_hint">Palvelimen oma (yleensä 30033)</string>
     <string name="favourite_file_port_desc">Vain jos palvelimen kuvat ja profiilikuvat eivät lataudu: sen tiedonsiirto on toisessa portissa.</string>
+    <string name="community_tab">Yhteisö</string>
+    <string name="community_desc">TeamSpeakin ylläpitämiä julkisia palvelimia. Liity napauttamalla. PocketTS on epävirallinen sovellus.</string>
+    <string name="community_desc_no_nick">TeamSpeakin ylläpitämiä julkisia palvelimia. Kirjoita nimimerkki yllä, niin voit liittyä. PocketTS on epävirallinen sovellus.</string>
+    <string name="community_worldwide">Maailmanlaajuinen</string>
+    <string name="community_eu_east">Itä-Eurooppa</string>
+    <string name="community_emea">Eurooppa, Lähi-itä ja Afrikka</string>
+    <string name="community_apac">Aasia ja Tyynenmeren alue</string>
+    <string name="community_latam">Latinalainen Amerikka</string>
+    <string name="community_na">Pohjois-Amerikka</string>
     <string name="favourite_channel">Kanava, jolle liitytään</string>
     <string name="favourite_channel_hint">Palvelimen oletuskanava</string>
     <string name="favourite_channel_desc">Kanavan nimi kirjoitettuna kuten palvelin sen näyttää. Toisen kanavan sisällä olevalle anna polku: Pelit/Aula.</string>
