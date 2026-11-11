@@ -23,6 +23,7 @@ VOICE
 • Voice activation, push-to-talk or always on
 • Whisper to chosen people or channels, wherever they are
 • Noise removal, echo cancellation and gain control, and AI noise removal (RNNoise) for keyboard clicks, fans and the like
+• Voices through the loudspeaker or the earpiece, as you choose, or connected headphones
 • A volume for each person, and headset and volume-button push-to-talk
 • Keeps working with the screen off, and reconnects by itself when the network changes
 • Goes quiet during phone calls, and pauses a stream you share
@@ -42,7 +43,7 @@ AND MORE
 • Connect by address, server nickname, TeamSpeak link or invite
 • TeamSpeak's own public community servers, one tap away
 • Use a privilege key from a server's admin
-• Favourite servers, and switching between them
+• Favourite servers in folders you name and arrange, and switching between them
 • Mute, sound and disconnect buttons in the notification
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
 • Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)

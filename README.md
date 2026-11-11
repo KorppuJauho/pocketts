@@ -8,8 +8,9 @@ to join.
 ## What it does
 
 - **Voice:** voice activation, push-to-talk (also a floating button over other apps), whispering to chosen people or
-  channels, echo and noise removal, and AI noise removal (RNNoise) for keyboard clicks, fans and the like. Keeps
-  working with the screen off, and goes quiet during phone calls.
+  channels, echo and noise removal, and AI noise removal (RNNoise) for keyboard clicks, fans and the like. Voices
+  play through the loudspeaker or the earpiece, as you choose, or connected headphones. Keeps working with the
+  screen off, and goes quiet during phone calls.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
   password. Hold a channel for its info.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
@@ -20,9 +21,9 @@ to join.
   button for the phone's other back lenses.
 - **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
   who may.
-- **Connecting** by address, server nickname, TeamSpeak link or invite; favourites; TeamSpeak's own public community
-  servers, one tap away; privilege keys from a server's admin; reconnecting by itself when the network changes; and
-  mute, sound and disconnect buttons in the notification.
+- **Connecting** by address, server nickname, TeamSpeak link or invite; favourites, in folders you name and arrange
+  by dragging; TeamSpeak's own public community servers, one tap away; privilege keys from a server's admin;
+  reconnecting by itself when the network changes; and mute, sound and disconnect buttons in the notification.
 - **Settings** and sounds for events.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).

@@ -64,7 +64,7 @@ class ScreenshotTest {
             "Jamie", "ts.example.com", "", listOf(
                 Favorite("ts.example.com", "Friends", auto = true),
                 Favorite("voice.example.org:9988"),
-                Favorite("192.0.2.10:9987", "Test server"),
+                Favorite("192.0.2.10:9987", "Test server", folder = "Work"),
             ), null, Example.noConnect, settingsActions = Example.noSettings,
         )
     }
@@ -331,6 +331,11 @@ class ScreenshotTest {
     @Test
     fun settings() = shot("settings-capture") {
         SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
+    fun settingsPlayback() = shot("settings-playback") {
+        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 1, modifier = Modifier.fillMaxSize())
     }
 
     @Test
