@@ -43,7 +43,7 @@ AND MORE
 • Connect by address, server nickname, TeamSpeak link or invite
 • TeamSpeak's own public community servers, one tap away
 • Use a privilege key from a server's admin
-• Favourite servers, and switching between them
+• Favourite servers in folders you name and arrange, and switching between them
 • Mute, sound and disconnect buttons in the notification
 • Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
 • Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)
