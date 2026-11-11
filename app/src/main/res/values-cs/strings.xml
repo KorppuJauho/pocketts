@@ -51,8 +51,8 @@
     <string name="connect_show">Rozbalit panel připojení</string>
     <string name="connect_hide">Sbalit panel připojení</string>
     <string name="community_tab">Komunita</string>
-    <string name="community_desc">Veřejné servery provozované společností TeamSpeak. Klepnutím se připojíte. PocketTS je neoficiální aplikace.</string>
-    <string name="community_desc_no_nick">Veřejné servery provozované společností TeamSpeak. Pro připojení zadejte výše přezdívku. PocketTS je neoficiální aplikace.</string>
+    <string name="community_desc">Veřejné servery provozované společností TeamSpeak. Klepnutím se připojíte.</string>
+    <string name="community_desc_no_nick">Veřejné servery provozované společností TeamSpeak. Pro připojení zadejte výše přezdívku.</string>
     <string name="community_worldwide">Celý svět</string>
     <string name="community_eu_east">Východní Evropa</string>
     <string name="community_emea">Evropa, Blízký východ a Afrika</string>

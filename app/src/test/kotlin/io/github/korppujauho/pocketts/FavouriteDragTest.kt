@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import io.github.korppujauho.pocketts.ui.ConnectActions
@@ -32,14 +33,14 @@ class FavouriteDragTest {
     )
 
     private class Seen : ConnectActions {
-        val moves = mutableListOf<Pair<String, Int>>()
+        val moves = mutableListOf<Triple<String, String, Int>>()
         val connects = mutableListOf<String>()
         override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {}
         override fun connectFavorite(f: Favorite) { connects += f.address }
         override fun saveFavorite(old: Favorite?, new: Favorite) {}
         override fun removeFavorite(f: Favorite) {}
         override fun toggleAuto(f: Favorite) {}
-        override fun moveFavorite(f: Favorite, to: Int) { moves += f.address to to }
+        override fun moveFavorite(f: Favorite, folder: String, to: Int) { moves += Triple(f.address, folder, to) }
     }
 
     private fun screen(seen: Seen) = rule.setContent {
@@ -56,9 +57,26 @@ class FavouriteDragTest {
             moveBy(Offset(0f, 170f)) // a row down
         }
         rule.waitForIdle() // the row is lifted and the others have made room
-        rule.onNodeWithText("Friends' server").performTouchInput { up() }
+        rule.onAllNodesWithText("Friends' server")[0].performTouchInput { up() } // the row itself: its floating copy has the name too
         rule.waitForIdle()
-        assertEquals(listOf("ts.example.com" to 1), seen.moves)
+        assertEquals(listOf(Triple("ts.example.com", "", 1)), seen.moves)
+        assertEquals(emptyList<String>(), seen.connects)
+    }
+
+    @Test
+    fun draggedOverAnotherFolderItMovesThere() {
+        val seen = Seen()
+        screen(seen)
+        rule.onNodeWithText("Third").performTouchInput {
+            down(center)
+            advanceEventTime(800)
+            moveBy(Offset(0f, 330f)) // past its folder's end, onto the next folder
+        }
+        rule.waitForIdle()
+        rule.onAllNodesWithText("Third")[0].performTouchInput { up() }
+        rule.waitForIdle()
+        assertEquals(1, seen.moves.size)
+        assertEquals("third.example.org" to "Gaming", seen.moves[0].first to seen.moves[0].second)
         assertEquals(emptyList<String>(), seen.connects)
     }
 
@@ -68,7 +86,7 @@ class FavouriteDragTest {
         screen(seen)
         rule.onNodeWithText("Third").performTouchInput { longClick() }
         rule.waitForIdle()
-        assertEquals(emptyList<Pair<String, Int>>(), seen.moves)
+        assertEquals(emptyList<Triple<String, String, Int>>(), seen.moves)
         assertEquals(emptyList<String>(), seen.connects)
     }
 

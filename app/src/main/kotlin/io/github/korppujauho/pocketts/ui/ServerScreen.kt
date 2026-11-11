@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -247,26 +250,43 @@ fun ServerScreen(
                         shape = RoundedCornerShape(16.dp), containerColor = Pop.top, shadowElevation = 12.dp,
                         border = androidx.compose.foundation.BorderStroke(1.dp, Pop.edge),
                     ) {
-                        // By folder, as on the connect screen; a single folder needs no name
-                        val folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites)
-                        for ((folder, inFolder) in folders) {
-                            if (folders.size > 1) Text(
-                                folderName(folder), color = Ts.muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 2.dp),
-                            )
-                            for (f in inFolder) {
-                                val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(f.label, color = Ts.text) },
-                                    leadingIcon = {
-                                        androidx.compose.material3.Icon(
-                                            if (here) androidx.compose.material.icons.Icons.Filled.CheckCircle else androidx.compose.material.icons.Icons.Filled.Star,
-                                            contentDescription = if (here) stringResource(R.string.connected) else null, tint = if (here) Ts.green else Ts.muted,
-                                        )
-                                    },
-                                    enabled = !here,
-                                    onClick = { serversMenu = false; actions.switchTo(f) },
+                        // By folder, in the connect screen's look: each folder a panel under its name, each favourite a
+                        // row in it (the one we're on is marked, and isn't to be tapped)
+                        for ((folder, inFolder) in io.github.korppujauho.pocketts.Favorites.byFolder(favorites)) {
+                            Column(
+                                Modifier.padding(horizontal = 10.dp, vertical = 5.dp).width(264.dp).clip(RoundedCornerShape(10.dp))
+                                    .background(Ts.panel).border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)),
+                            ) {
+                                Text(
+                                    folderName(folder), color = Ts.title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 12.dp, vertical = 8.dp),
                                 )
+                                Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+                                Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    for (f in inFolder) {
+                                        val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
+                                        Row(
+                                            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Ts.card)
+                                                .border(1.dp, if (here) Ts.green.copy(alpha = 0.6f) else Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                                                .clickable(enabled = !here, role = androidx.compose.ui.semantics.Role.Button) {
+                                                    serversMenu = false
+                                                    actions.switchTo(f)
+                                                }
+                                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Text(
+                                                f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+                                            )
+                                            if (here) androidx.compose.material3.Icon(
+                                                androidx.compose.material.icons.Icons.Filled.CheckCircle,
+                                                contentDescription = stringResource(R.string.connected), tint = Ts.green, modifier = Modifier.size(18.dp),
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                         if (favorites.none { io.github.korppujauho.pocketts.Favorites.same(it.address, state.address) }) {

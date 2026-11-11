@@ -51,8 +51,8 @@
     <string name="connect_show">Abrir el panel de conexión</string>
     <string name="connect_hide">Plegar el panel de conexión</string>
     <string name="community_tab">Comunidad</string>
-    <string name="community_desc">Servidores públicos gestionados por TeamSpeak. Toca uno para entrar. PocketTS es una app no oficial.</string>
-    <string name="community_desc_no_nick">Servidores públicos gestionados por TeamSpeak. Escribe un apodo arriba para entrar en uno. PocketTS es una app no oficial.</string>
+    <string name="community_desc">Servidores públicos gestionados por TeamSpeak. Toca uno para entrar.</string>
+    <string name="community_desc_no_nick">Servidores públicos gestionados por TeamSpeak. Escribe un apodo arriba para entrar en uno.</string>
     <string name="community_worldwide">Mundial</string>
     <string name="community_eu_east">Europa del Este</string>
     <string name="community_emea">Europa, Oriente Medio y África</string>

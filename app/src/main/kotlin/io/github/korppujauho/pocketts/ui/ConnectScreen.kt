@@ -10,7 +10,12 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
@@ -73,8 +78,8 @@ interface ConnectActions {
     fun removeFavorite(f: Favorite)
     fun toggleAuto(f: Favorite)
     fun renameFolder(folder: String, name: String) {}
-    /** A favourite dragged to place [to] in its folder; a folder moved one place up or down. */
-    fun moveFavorite(f: Favorite, to: Int) {}
+    /** A favourite dragged to place [to] among [folder]'s others (its own folder or another); a folder moved one place up or down. */
+    fun moveFavorite(f: Favorite, folder: String, to: Int) {}
     fun moveFolder(folder: String, up: Boolean) {}
     /** Remembered: the folders folded shut, and whether the Connect and Community panel is folded to its bar. */
     fun setFolded(folders: Set<String>) {}
@@ -125,19 +130,14 @@ fun ConnectScreen(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
-            for ((folder, inFolder) in folders) {
-                val open = folder !in shut
-                FolderPanel(
-                    folderName(folder), open,
-                    onToggle = {
-                        shut = if (open) shut + folder else shut - folder
-                        actions.setFolded(shut)
-                    },
-                    onRename = { renaming = folder },
-                ) {
-                    FavoriteRows(inFolder, actions, onEdit = { editing = it })
-                }
-            }
+            if (folders.isNotEmpty()) FavouriteFolders(
+                folders, shut, actions,
+                onToggle = { folder ->
+                    shut = if (folder in shut) shut - folder else shut + folder
+                    actions.setFolded(shut)
+                },
+                onRename = { renaming = it }, onEdit = { editing = it },
+            )
             // Connecting by address, and TeamSpeak's community servers: two pages of one panel, its switch on top, and
             // a swipe goes between them too
             val pages = androidx.compose.foundation.pager.rememberPagerState { 2 }
@@ -228,11 +228,15 @@ internal fun folderName(folder: String) = folder.ifEmpty { stringResource(R.stri
 /** A folder of favourites: its name, and a tap on it folds it shut or open (holding it opens its edit window). */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-private fun FolderPanel(name: String, open: Boolean, onToggle: () -> Unit, onRename: () -> Unit, content: @Composable () -> Unit) {
+private fun FolderPanel(
+    name: String, open: Boolean, onToggle: () -> Unit, onRename: () -> Unit,
+    modifier: Modifier = Modifier, marked: Boolean = false, // where a dragged favourite would be dropped, when folded shut
+    rows: Modifier = Modifier, content: @Composable () -> Unit,
+) {
     val rename = stringResource(R.string.folder_edit)
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
-            .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
+        modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
+            .border(1.dp, if (marked) Ts.accent else Ts.hairline, RoundedCornerShape(12.dp)),
     ) {
         Row(
             Modifier.fillMaxWidth().background(Ts.card)
@@ -258,7 +262,7 @@ private fun FolderPanel(name: String, open: Boolean, onToggle: () -> Unit, onRen
         }
         if (open) {
             Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
+            Column(rows.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
         }
     }
 }
@@ -346,62 +350,154 @@ private fun CommunityServers(nick: String, onJoin: (String) -> Unit) {
 }
 
 /**
- * A folder's favourites: a tap connects, and a row held is dragged up or down to another place among them (the others
- * make room; let go, it stays there).
+ * The favourites in their folders. A tap on a row connects; a row held is dragged to another place, in its folder or
+ * in another one. Dragged, it floats over everything else and stays within the folders; the rows where it would land
+ * make room, and the folder it leaves and the one it enters shrink and grow by a row. Let go over a folder that's folded
+ * shut, it goes last there.
  */
 @Composable
-private fun FavoriteRows(list: List<Favorite>, actions: ConnectActions, onEdit: (Favorite) -> Unit) {
+private fun FavouriteFolders(
+    folders: List<Pair<String, List<Favorite>>>, shut: Set<String>, actions: ConnectActions,
+    onToggle: (String) -> Unit, onRename: (String) -> Unit, onEdit: (Favorite) -> Unit,
+) {
     val gap = with(androidx.compose.ui.platform.LocalDensity.current) { 8.dp.toPx() }
+    val inset = with(androidx.compose.ui.platform.LocalDensity.current) { 12.dp.toPx() } // a folder's edge to its rows
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-    var rowHeight by remember { mutableStateOf(0) }
+    // Where things are laid out, asked while dragging (in this area's own measure)
+    var area by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val rowPlaces = remember { mutableMapOf<Favorite, LayoutCoordinates>() }
+    val folderPlaces = remember { mutableMapOf<String, LayoutCoordinates>() }
+    fun place(of: LayoutCoordinates?): Rect? {
+        val a = area?.takeIf { it.isAttached } ?: return null
+        return of?.takeIf { it.isAttached }?.let { a.localBoundingBoxOf(it, clipBounds = false) }
+    }
+
     var dragged by remember { mutableStateOf<Favorite?>(null) }
+    var startTop by remember { mutableStateOf(0f) } // the row's top when it was picked up
     var dragY by remember { mutableStateOf(0f) }
-    val slot = rowHeight + gap
-    val from = list.indexOf(dragged)
-    // Where it would land: its own place moved by whole rows
-    val to = if (from < 0 || slot <= 0f) from else (from + Math.round(dragY / slot)).coerceIn(0, list.lastIndex)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        list.forEachIndexed { i, f ->
-            val mine = f == dragged
-            // The rows between where it was and where it would land step aside
-            val aside by androidx.compose.animation.core.animateFloatAsState(
-                when {
-                    from < 0 || mine -> 0f
-                    i in (from + 1)..to -> -slot
-                    i in to until from -> slot
-                    else -> 0f
-                },
-                label = "aside",
-            )
-            androidx.compose.runtime.key(f) {
-                FavoriteRow(
-                    f, lifted = mine,
-                    modifier = Modifier.onSizeChanged { rowHeight = it.height }
-                        .zIndex(if (mine) 1f else 0f).graphicsLayer { translationY = if (mine) dragY else aside },
-                    onConnect = { actions.connectFavorite(f) }, onEdit = { onEdit(f) },
-                    onUp = if (i > 0) ({ actions.moveFavorite(f, i - 1) }) else null,
-                    onDown = if (i < list.lastIndex) ({ actions.moveFavorite(f, i + 1) }) else null,
-                    onDragStart = {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                        dragged = f
-                        dragY = 0f
+    // Counted up when something moves in the layout during a drag (a folder growing, the ones under it going down):
+    // where the row would land is worked out again then, not only when the finger moves
+    var shifts by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val shifted = { if (dragged != null) shifts++ }
+
+    val d = dragged
+    if (d != null) shifts // read, so a shift redraws this
+    val own = d?.let { place(rowPlaces[it]) }
+    val height = own?.height ?: 0f
+    val slot = height + gap
+    val home = d?.let { f -> folders.firstOrNull { f in it.second } } // the folder it's dragged from
+    val from = home?.second?.indexOf(d) ?: -1
+    // The floating row's top: with the finger, but never past the first folder's top or the last one's bottom
+    val bounds = folders.mapNotNull { place(folderPlaces[it.first]) }
+    val top = if (own == null || bounds.isEmpty()) 0f
+    else (startTop + dragY).coerceIn(bounds.minOf { it.top }, maxOf(bounds.minOf { it.top }, bounds.maxOf { it.bottom } - height - inset))
+    val centre = top + height / 2
+    // Where it would land: the folder its middle is over (or nearest to), and its place among that folder's others
+    val target: Pair<String, Int>? = if (d == null || own == null || home == null) null else {
+        val folder = folders.minByOrNull { (name, _) ->
+            place(folderPlaces[name])?.let { r -> if (centre < r.top) r.top - centre else if (centre > r.bottom) centre - r.bottom else 0f } ?: Float.MAX_VALUE
+        }?.first ?: home.first
+        val list = folders.first { it.first == folder }.second
+        val index = if (folder in shut) list.count { it != d } else list.withIndex().count { (i, o) ->
+            // It takes the place its middle is nearest to. A row's middle is as it rests while this one is away: those
+            // after it in its own folder have closed the gap
+            o != d && (place(rowPlaces[o])?.center?.y ?: Float.MAX_VALUE) - (if (folder == home.first && i > from) slot else 0f) < centre - slot / 2
+        }
+        folder to index
+    }
+
+    Box(Modifier.fillMaxWidth().onGloballyPositioned { area = it }) {
+        Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
+            for ((folder, list) in folders) {
+                val open = folder !in shut
+                // The folder it leaves is a row shorter while it's over another, the one it enters a row taller
+                val taller by androidx.compose.animation.core.animateFloatAsState(
+                    when {
+                        d == null || target == null || home == null || target.first == home.first -> 0f
+                        folder == home.first -> -slot
+                        folder == target.first && open -> slot
+                        else -> 0f
                     },
-                    onDrag = { dragY += it },
-                    onDragEnd = { moved ->
-                        if (moved && to >= 0 && to != from) actions.moveFavorite(f, to)
-                        dragged = null
-                        dragY = 0f
-                    },
+                    animationSpec = if (d == null) androidx.compose.animation.core.snap() else androidx.compose.animation.core.spring(),
+                    label = "taller",
                 )
+                androidx.compose.runtime.key(folder) {
+                    FolderPanel(
+                        folderName(folder), open, onToggle = { onToggle(folder) }, onRename = { onRename(folder) },
+                        modifier = Modifier.onGloballyPositioned { folderPlaces[folder] = it; shifted() },
+                        marked = !open && d != null && target?.first == folder && home?.first != folder,
+                        rows = Modifier.layout { measurable, constraints ->
+                            val placed = measurable.measure(constraints)
+                            layout(placed.width, (placed.height + Math.round(taller)).coerceAtLeast(0)) { placed.place(0, 0) }
+                        },
+                    ) {
+                        list.forEachIndexed { i, f ->
+                            val mine = f == d
+                            val among = if (home?.first == folder && from in 0 until i) i - 1 else i // its place without the dragged one
+                            // Those after the gap it left close it; those from where it would land on make room
+                            val aside by androidx.compose.animation.core.animateFloatAsState(
+                                when {
+                                    d == null || mine || target == null || home == null -> 0f
+                                    else -> (if (folder == home.first && i > from) -slot else 0f) +
+                                        (if (folder == target.first && among >= target.second) slot else 0f)
+                                },
+                                animationSpec = if (d == null) androidx.compose.animation.core.snap() else androidx.compose.animation.core.spring(),
+                                label = "aside",
+                            )
+                            androidx.compose.runtime.key(f) {
+                                // Its place is asked of this box, which stays put: the row inside is what steps aside
+                                Box(Modifier.onGloballyPositioned { rowPlaces[f] = it; shifted() }) {
+                                    FavoriteRow(
+                                        f.label, lifted = false,
+                                        // Picked up, the row in the list is only its gap: the one that floats is drawn below
+                                        modifier = Modifier.graphicsLayer { translationY = aside; alpha = if (mine) 0f else 1f },
+                                        onConnect = { actions.connectFavorite(f) }, onEdit = { onEdit(f) },
+                                        onUp = if (i > 0) ({ actions.moveFavorite(f, folder, i - 1) }) else null,
+                                        onDown = if (i < list.lastIndex) ({ actions.moveFavorite(f, folder, i + 1) }) else null,
+                                        onDragStart = {
+                                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                            startTop = place(rowPlaces[f])?.top ?: 0f
+                                            dragY = 0f
+                                            dragged = f
+                                        },
+                                        onDrag = { dragY += it },
+                                        onDragEnd = { moved ->
+                                            val to = target
+                                            if (moved && to != null && (to.first != folder || to.second != i)) actions.moveFavorite(f, to.first, to.second)
+                                            dragged = null
+                                            dragY = 0f
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+        // The one being dragged, over everything else
+        if (d != null && own != null) {
+            FavoriteRow(
+                d.label, lifted = true,
+                modifier = Modifier.zIndex(1f)
+                    .offset { androidx.compose.ui.unit.IntOffset(Math.round(own.left), Math.round(top)) }
+                    .width(with(androidx.compose.ui.platform.LocalDensity.current) { own.width.toDp() }),
+            )
+        }
+    }
+    // Favourites and folders that are gone aren't kept track of
+    androidx.compose.runtime.SideEffect {
+        rowPlaces.keys.retainAll(folders.flatMap { it.second }.toSet())
+        folderPlaces.keys.retainAll(folders.map { it.first }.toSet())
     }
 }
 
+/** A favourite's row; without what to do (the row that floats while dragged) it's only the picture of one. */
 @Composable
 private fun FavoriteRow(
-    f: Favorite, lifted: Boolean, modifier: Modifier, onConnect: () -> Unit, onEdit: () -> Unit, onUp: (() -> Unit)?, onDown: (() -> Unit)?,
-    onDragStart: () -> Unit, onDrag: (Float) -> Unit, onDragEnd: (moved: Boolean) -> Unit,
+    label: String, lifted: Boolean, modifier: Modifier, onConnect: () -> Unit = {}, onEdit: () -> Unit = {},
+    onUp: (() -> Unit)? = null, onDown: (() -> Unit)? = null,
+    onDragStart: () -> Unit = {}, onDrag: (Float) -> Unit = {}, onDragEnd: (moved: Boolean) -> Unit = {},
 ) {
     val connect = stringResource(R.string.connect)
     val up = stringResource(R.string.a11y_move_up)
@@ -434,7 +530,7 @@ private fun FavoriteRow(
                 }
                 .padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
-            Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         // Removing is in its edit window (Delete), where it isn't tapped by mistake
         FavButton(androidx.compose.material.icons.Icons.Rounded.Edit, stringResource(R.string.edit), onEdit)

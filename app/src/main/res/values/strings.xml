@@ -56,8 +56,8 @@
     <string name="connect_show">Open the connect panel</string>
     <string name="connect_hide">Fold the connect panel</string>
     <string name="community_tab">Community</string>
-    <string name="community_desc">Public servers run by TeamSpeak. Tap one to join. PocketTS is an unofficial app.</string>
-    <string name="community_desc_no_nick">Public servers run by TeamSpeak. Type a nickname above to join one. PocketTS is an unofficial app.</string>
+    <string name="community_desc">Public servers run by TeamSpeak. Tap one to join.</string>
+    <string name="community_desc_no_nick">Public servers run by TeamSpeak. Type a nickname above to join one.</string>
     <string name="community_worldwide">Worldwide</string>
     <string name="community_eu_east">Europe East</string>
     <string name="community_emea">Europe, Middle East and Africa</string>

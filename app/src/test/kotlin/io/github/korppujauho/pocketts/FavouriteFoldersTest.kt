@@ -70,12 +70,28 @@ class FavouriteFoldersTest {
     fun aFavouriteIsDraggedWithinItsFolder() {
         val d = Favorite("d.example.com")
         // a, c and d are in the first folder, b (Friends) between them in the list
-        assertEquals(listOf(c, b, d, a), Favorites.moved(listOf(a, b, c, d), a, 2))
-        assertEquals(listOf(d, b, a, c), Favorites.moved(listOf(a, b, c, d), d, 0))
-        assertEquals(listOf(a, b, c, d), Favorites.moved(listOf(a, b, c, d), c, 1)) // where it was
-        assertEquals(listOf(c, b, d, a), Favorites.moved(listOf(a, b, c, d), a, 9)) // past the end: last
-        // The folders are as they were
-        assertEquals(listOf("", "Friends"), Favorites.byFolder(Favorites.moved(listOf(a, b, c, d), a, 2)).map { it.first })
+        val list = listOf(a, b, c, d)
+        assertEquals(listOf("" to listOf(c, d, a), "Friends" to listOf(b)), Favorites.byFolder(Favorites.moved(list, a, "", 2)))
+        assertEquals(listOf("" to listOf(d, a, c), "Friends" to listOf(b)), Favorites.byFolder(Favorites.moved(list, d, "", 0)))
+        assertEquals(listOf("" to listOf(a, c, d), "Friends" to listOf(b)), Favorites.byFolder(Favorites.moved(list, c, "", 1))) // where it was
+        assertEquals(listOf("" to listOf(c, d, a), "Friends" to listOf(b)), Favorites.byFolder(Favorites.moved(list, a, "", 9))) // past the end: last
+    }
+
+    @Test
+    fun aFavouriteIsDraggedIntoAnotherFolder() {
+        val w = Favorite("w.example.com", folder = "Work")
+        val list = listOf(a, b, c, w)
+        // Into Friends, before the one there
+        assertEquals(
+            listOf("" to listOf(c), "Friends" to listOf(a.copy(folder = "Friends"), b), "Work" to listOf(w)),
+            Favorites.byFolder(Favorites.moved(list, a, "Friends", 0)),
+        )
+        // The first folder keeps its place though its first favourite left
+        assertEquals(listOf("", "Friends", "Work"), Favorites.byFolder(Favorites.moved(list, a, "Work", 1)).map { it.first })
+        // A folder's last favourite dragged out: the folder is gone
+        assertEquals(listOf("" to listOf(a, c, b.copy(folder = "")), "Work" to listOf(w)), Favorites.byFolder(Favorites.moved(list, b, "", 2)))
+        // A folder that isn't there: nothing moves
+        assertEquals(list, Favorites.moved(list, a, "Nowhere", 0))
     }
 
     @Test

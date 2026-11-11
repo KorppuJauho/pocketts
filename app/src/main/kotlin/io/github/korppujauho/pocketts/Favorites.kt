@@ -113,13 +113,19 @@ object Favorites {
         return list.map { if (it.folder == folder) it.copy(folder = to) else it }
     }
 
-    /** A favourite dragged to place [to] among its folder's favourites (the other folders stay where they are). */
-    fun moved(list: List<Favorite>, f: Favorite, to: Int): List<Favorite> {
-        val inFolder = list.filter { it.folder == f.folder }
-        val from = inFolder.indexOf(f)
-        if (from < 0 || to.coerceIn(0, inFolder.lastIndex) == from) return list
-        val order = inFolder.toMutableList().apply { add(to.coerceIn(0, inFolder.lastIndex), removeAt(from)) }.iterator()
-        return list.map { if (it.folder == f.folder) order.next() else it }
+    /**
+     * A favourite dragged to place [to] among [folder]'s other favourites: in its own folder, or into another one (a
+     * folder its last favourite left is gone). The folders keep their order.
+     */
+    fun moved(list: List<Favorite>, f: Favorite, folder: String, to: Int): List<Favorite> {
+        val at = list.indexOf(f)
+        if (at < 0) return list
+        // By folder, so a folder's place doesn't depend on which of its favourites is left
+        val folders = byFolder(list).map { it.first to it.second.toMutableList() }
+        folders.first { it.first == f.folder }.second.remove(f)
+        val into = folders.firstOrNull { it.first == folder }?.second ?: return list
+        into.add(to.coerceIn(0, into.size), f.copy(folder = folder))
+        return folders.flatMap { it.second }
     }
 
     /** A folder moved one place up or down among the folders. */

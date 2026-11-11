@@ -51,8 +51,8 @@
     <string name="connect_show">Avaa yhdistämispaneeli</string>
     <string name="connect_hide">Sulje yhdistämispaneeli</string>
     <string name="community_tab">Yhteisö</string>
-    <string name="community_desc">TeamSpeakin ylläpitämiä julkisia palvelimia. Liity napauttamalla. PocketTS on epävirallinen sovellus.</string>
-    <string name="community_desc_no_nick">TeamSpeakin ylläpitämiä julkisia palvelimia. Kirjoita nimimerkki yllä, niin voit liittyä. PocketTS on epävirallinen sovellus.</string>
+    <string name="community_desc">TeamSpeakin ylläpitämiä julkisia palvelimia. Liity napauttamalla.</string>
+    <string name="community_desc_no_nick">TeamSpeakin ylläpitämiä julkisia palvelimia. Kirjoita nimimerkki yllä, niin voit liittyä.</string>
     <string name="community_worldwide">Maailmanlaajuinen</string>
     <string name="community_eu_east">Itä-Eurooppa</string>
     <string name="community_emea">Eurooppa, Lähi-itä ja Afrikka</string>

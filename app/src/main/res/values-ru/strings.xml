@@ -51,8 +51,8 @@
     <string name="connect_show">Развернуть панель подключения</string>
     <string name="connect_hide">Свернуть панель подключения</string>
     <string name="community_tab">Сообщество</string>
-    <string name="community_desc">Публичные серверы под управлением TeamSpeak. Нажмите на сервер, чтобы войти. PocketTS — неофициальное приложение.</string>
-    <string name="community_desc_no_nick">Публичные серверы под управлением TeamSpeak. Введите никнейм выше, чтобы войти. PocketTS — неофициальное приложение.</string>
+    <string name="community_desc">Публичные серверы под управлением TeamSpeak. Нажмите на сервер, чтобы войти.</string>
+    <string name="community_desc_no_nick">Публичные серверы под управлением TeamSpeak. Введите никнейм выше, чтобы войти.</string>
     <string name="community_worldwide">Весь мир</string>
     <string name="community_eu_east">Восточная Европа</string>
     <string name="community_emea">Европа, Ближний Восток и Африка</string>

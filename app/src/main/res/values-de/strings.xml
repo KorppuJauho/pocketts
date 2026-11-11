@@ -51,8 +51,8 @@
     <string name="connect_show">Verbindungsbereich ausklappen</string>
     <string name="connect_hide">Verbindungsbereich einklappen</string>
     <string name="community_tab">Community</string>
-    <string name="community_desc">Öffentliche Server, betrieben von TeamSpeak. Tippe auf einen, um beizutreten. PocketTS ist eine inoffizielle App.</string>
-    <string name="community_desc_no_nick">Öffentliche Server, betrieben von TeamSpeak. Gib oben einen Nickname ein, um beizutreten. PocketTS ist eine inoffizielle App.</string>
+    <string name="community_desc">Öffentliche Server, betrieben von TeamSpeak. Tippe auf einen, um beizutreten.</string>
+    <string name="community_desc_no_nick">Öffentliche Server, betrieben von TeamSpeak. Gib oben einen Nickname ein, um beizutreten.</string>
     <string name="community_worldwide">Weltweit</string>
     <string name="community_eu_east">Osteuropa</string>
     <string name="community_emea">Europa, Naher Osten und Afrika</string>

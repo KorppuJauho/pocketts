@@ -51,8 +51,8 @@
     <string name="connect_show">展开连接面板</string>
     <string name="connect_hide">收起连接面板</string>
     <string name="community_tab">社区</string>
-    <string name="community_desc">由 TeamSpeak 运营的公共服务器。点按即可加入。PocketTS 是非官方应用。</string>
-    <string name="community_desc_no_nick">由 TeamSpeak 运营的公共服务器。请先在上方输入昵称再加入。PocketTS 是非官方应用。</string>
+    <string name="community_desc">由 TeamSpeak 运营的公共服务器。点按即可加入。</string>
+    <string name="community_desc_no_nick">由 TeamSpeak 运营的公共服务器。请先在上方输入昵称再加入。</string>
     <string name="community_worldwide">全球</string>
     <string name="community_eu_east">东欧</string>
     <string name="community_emea">欧洲、中东和非洲</string>
