@@ -614,6 +614,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Ein</string>
     <string name="a11y_off">Aus</string>
+    <string name="a11y_about">Info zu %1$s</string>
     <string name="a11y_talk_start">Sprechen starten</string>
     <string name="a11y_talk_stop">Sprechen beenden</string>
     <string name="a11y_whisper_start">Flüstern starten</string>

@@ -679,6 +679,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Zapnuto</string>
     <string name="a11y_off">Vypnuto</string>
+    <string name="a11y_about">O nastavení %1$s</string>
     <string name="a11y_talk_start">začít mluvit</string>
     <string name="a11y_talk_stop">přestat mluvit</string>
     <string name="a11y_whisper_start">začít šeptat</string>

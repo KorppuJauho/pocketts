@@ -656,6 +656,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">On</string>
     <string name="a11y_off">Off</string>
+    <string name="a11y_about">About %1$s</string>
     <string name="a11y_talk_start">start talking</string>
     <string name="a11y_talk_stop">stop talking</string>
     <string name="a11y_whisper_start">start whispering</string>

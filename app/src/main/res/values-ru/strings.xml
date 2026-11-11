@@ -642,6 +642,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Вкл.</string>
     <string name="a11y_off">Выкл.</string>
+    <string name="a11y_about">О настройке «%1$s»</string>
     <string name="a11y_talk_start">начать говорить</string>
     <string name="a11y_talk_stop">перестать говорить</string>
     <string name="a11y_whisper_start">начать шептать</string>

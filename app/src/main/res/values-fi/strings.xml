@@ -614,6 +614,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Päällä</string>
     <string name="a11y_off">Pois</string>
+    <string name="a11y_about">Tietoja: %1$s</string>
     <string name="a11y_talk_start">aloita puhuminen</string>
     <string name="a11y_talk_stop">lopeta puhuminen</string>
     <string name="a11y_whisper_start">aloita kuiskaus</string>

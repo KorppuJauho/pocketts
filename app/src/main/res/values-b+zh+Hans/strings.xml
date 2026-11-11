@@ -600,6 +600,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">开</string>
     <string name="a11y_off">关</string>
+    <string name="a11y_about">关于“%1$s”</string>
     <string name="a11y_talk_start">开始说话</string>
     <string name="a11y_talk_stop">停止说话</string>
     <string name="a11y_whisper_start">开始说悄悄话</string>

@@ -628,6 +628,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Activé</string>
     <string name="a11y_off">Désactivé</string>
+    <string name="a11y_about">À propos de %1$s</string>
     <string name="a11y_talk_start">commencer à parler</string>
     <string name="a11y_talk_stop">arrêter de parler</string>
     <string name="a11y_whisper_start">commencer à chuchoter</string>
