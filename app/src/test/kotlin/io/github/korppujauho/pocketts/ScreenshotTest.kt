@@ -334,6 +334,11 @@ class ScreenshotTest {
     }
 
     @Test
+    fun settingsPlayback() = shot("settings-playback") {
+        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 1, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
     fun settingsUi() = shot("settings-ui") {
         SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 3, modifier = Modifier.fillMaxSize())
     }
