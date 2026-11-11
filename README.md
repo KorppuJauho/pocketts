@@ -20,9 +20,9 @@ to join.
   button for the phone's other back lenses.
 - **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
   who may.
-- **Connecting** by address, server nickname, TeamSpeak link or invite; favourites; TeamSpeak's own public community
-  servers, one tap away; privilege keys from a server's admin; reconnecting by itself when the network changes; and
-  mute, sound and disconnect buttons in the notification.
+- **Connecting** by address, server nickname, TeamSpeak link or invite; favourites, in folders you name and arrange
+  by dragging; TeamSpeak's own public community servers, one tap away; privilege keys from a server's admin;
+  reconnecting by itself when the network changes; and mute, sound and disconnect buttons in the notification.
 - **Settings** and sounds for events.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).

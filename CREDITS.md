@@ -12,6 +12,9 @@ People who have helped make PocketTS. Thank you!
   in [their fork](https://github.com/chochrunius/pocketts/commit/9ca66a224c3d6e283689d826f660c40533d61b4e). Their fork
   also had the idea of a channel to join on each server, which became the favourites' channel, and showed the connect
   screen's error at the top ([commit](https://github.com/chochrunius/pocketts/commit/48e3359ed6)).
+- **[imaliaz](https://github.com/imaliaz)**: the ideas for the favourites: folders that fold shut, arranging by
+  dragging, removing only from the edit window, and a connect panel that can be put away
+  ([#128](https://github.com/KorppuJauho/pocketts/issues/128)).
 
 ## Translations
 
