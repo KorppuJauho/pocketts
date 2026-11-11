@@ -260,9 +260,8 @@
     <string name="playback_output_speaker">Loudspeaker</string>
     <string name="playback_output_earpiece">Earpiece</string>
     <string name="playback_output_earpiece_desc">As in a phone call: hold the phone to your ear. The screen turns off there.</string>
-    <string name="playback_headset">Use a connected headset</string>
-    <string name="playback_headset_desc">Headphones or a headset play the voices while connected. Off: the phone itself always plays them.</string>
-    <string name="playback_output_media">With echo cancellation off, voices play like media: through the loudspeaker, or your headphones or Bluetooth speaker.</string>
+    <string name="playback_headset">Use connected headphones</string>
+    <string name="playback_headset_desc">Headphones, a headset or a Bluetooth speaker play the voices while connected. Off: the phone itself always plays them.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Microphone volume</string>
@@ -281,6 +280,7 @@
     <string name="capture_echo">Echo cancellation (phone call mode)</string>
     <string name="capture_agc">Automatic gain control</string>
     <string name="capture_echo_desc">Voices play like a phone call: through your headset, or else the phone\'s loudspeaker. A Bluetooth speaker without a microphone isn\'t used, and Bluetooth headphones switch to their call sound, for other apps too. Turn it off for the best sound and for Bluetooth speakers, and use headphones or push-to-talk so the microphone doesn\'t pick up the speaker.</string>
+    <string name="capture_echo_earpiece">On while voices play through the earpiece (Playback): the earpiece only works as a phone call, which has echo cancellation.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Show admin functions</string>

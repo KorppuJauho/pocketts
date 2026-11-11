@@ -248,9 +248,8 @@
     <string name="playback_output_speaker">Динамик</string>
     <string name="playback_output_earpiece">Разговорный динамик</string>
     <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
-    <string name="playback_headset">Использовать подключённую гарнитуру</string>
-    <string name="playback_headset_desc">Подключённые наушники или гарнитура воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
-    <string name="playback_output_media">Без подавления эха голоса звучат как медиа: через динамик, наушники или Bluetooth-колонку.</string>
+    <string name="playback_headset">Использовать подключённые наушники</string>
+    <string name="playback_headset_desc">Подключённые наушники, гарнитура или Bluetooth-колонка воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Громкость микрофона</string>
@@ -269,6 +268,7 @@
     <string name="capture_echo">Подавление эха (режим звонка)</string>
     <string name="capture_agc">Автоматическая регулировка усиления</string>
     <string name="capture_echo_desc">Голоса звучат как в телефонном звонке: через гарнитуру, а без неё — через динамик телефона. Bluetooth-колонка без микрофона не используется, а Bluetooth-наушники переходят на звук звонка, в том числе для других приложений. Выключите его для лучшего звука и для Bluetooth-колонок, и используйте наушники или «Нажми и говори», чтобы микрофон не улавливал колонку.</string>
+    <string name="capture_echo_earpiece">Включено, пока голоса звучат через разговорный динамик (Воспроизведение): он работает только в режиме звонка, а в нём есть подавление эха.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Показывать функции администратора</string>

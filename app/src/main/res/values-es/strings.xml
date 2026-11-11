@@ -246,8 +246,7 @@
     <string name="playback_output_earpiece">Auricular</string>
     <string name="playback_output_earpiece_desc">Como en una llamada: acerca el teléfono al oído. La pantalla se apaga ahí.</string>
     <string name="playback_headset">Usar los auriculares conectados</string>
-    <string name="playback_headset_desc">Unos auriculares conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
-    <string name="playback_output_media">Con la cancelación de eco desactivada, las voces suenan como multimedia: por el altavoz, tus auriculares o un altavoz Bluetooth.</string>
+    <string name="playback_headset_desc">Unos auriculares o un altavoz Bluetooth conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volumen del micrófono</string>
@@ -266,6 +265,7 @@
     <string name="capture_echo">Cancelación de eco (modo llamada)</string>
     <string name="capture_agc">Control automático de ganancia</string>
     <string name="capture_echo_desc">Las voces suenan como en una llamada: por tus auriculares con micrófono o, si no, por el altavoz del teléfono. Un altavoz Bluetooth sin micrófono no se usa, y los auriculares Bluetooth pasan a su sonido de llamada, también para otras apps. Desactívala para el mejor sonido y para altavoces Bluetooth, y usa auriculares o Pulsar para hablar para que el micrófono no capte el altavoz.</string>
+    <string name="capture_echo_earpiece">Activada mientras las voces suenan por el auricular (Reproducción): el auricular solo funciona en modo llamada, que tiene cancelación de eco.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Mostrar funciones de administración</string>

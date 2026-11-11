@@ -217,12 +217,18 @@ private fun Group(label: String? = null, badge: String? = null, content: @Compos
 fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
-internal fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+internal fun Check(text: String, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(enabled = enabled) { onChange(!checked) }.padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
-            Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
+            Checkbox(
+                checked, onChange, enabled = enabled,
+                colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted, disabledCheckedColor = Ts.accent.copy(alpha = 0.5f)),
+            )
         }
-        Text(text, color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
+        Text(text, color = if (enabled) Ts.text else Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
@@ -577,19 +583,15 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
 
 @Composable
 private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
-    // Where voices come out: a choice only as call audio (echo cancellation); as media Android decides
+    // Where voices come out: the choice the rest follows (the earpiece brings call audio, and echo cancellation, along)
     Group(stringResource(R.string.playback_output)) {
-        if (v.echoCancellation) {
-            Segmented(
-                listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
-                if (v.earpiece) 1 else 0,
-            ) { onChange(v.copy(earpiece = it == 1)) }
-            if (v.earpiece) Desc(stringResource(R.string.playback_output_earpiece_desc))
-            Check(stringResource(R.string.playback_headset), v.useHeadset) { onChange(v.copy(useHeadset = it)) }
-            Desc(stringResource(R.string.playback_headset_desc))
-        } else {
-            Desc(stringResource(R.string.playback_output_media))
-        }
+        Segmented(
+            listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
+            if (v.earpiece) 1 else 0,
+        ) { onChange(v.copy(earpiece = it == 1)) }
+        if (v.earpiece) Desc(stringResource(R.string.playback_output_earpiece_desc))
+        Check(stringResource(R.string.playback_headset), v.useHeadset) { onChange(v.copy(useHeadset = it)) }
+        Desc(stringResource(R.string.playback_headset_desc))
     }
     Group(stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB") {
         TsSlider(v.voiceVolumeDb.toFloat(), -20f..12f, 31) { onChange(v.copy(voiceVolumeDb = it.roundToInt())) }
@@ -608,7 +610,7 @@ private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (Voic
             SecondaryButton(stringResource(R.string.playback_play_sound)) { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
         }
     }
-    Desc(stringResource(if (v.echoCancellation) R.string.playback_call_volume else R.string.playback_media_volume))
+    Desc(stringResource(if (v.callAudio) R.string.playback_call_volume else R.string.playback_media_volume))
 }
 
 @Composable
@@ -646,8 +648,9 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
             modifier = Modifier.clickable { license = true }.padding(vertical = 2.dp),
         )
         if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
-        Check(stringResource(R.string.capture_echo), v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
-        Desc(stringResource(R.string.capture_echo_desc))
+        // With the earpiece (Playback) it's on and can't be turned off: the earpiece only plays as call audio
+        Check(stringResource(R.string.capture_echo), v.callAudio, enabled = !v.earpiece) { onChange(v.copy(echoCancellation = it)) }
+        Desc(stringResource(if (v.earpiece) R.string.capture_echo_earpiece else R.string.capture_echo_desc))
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }

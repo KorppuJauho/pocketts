@@ -261,9 +261,8 @@
     <string name="playback_output_speaker">Reproduktor</string>
     <string name="playback_output_earpiece">Sluchátko telefonu</string>
     <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
-    <string name="playback_headset">Používat připojenou náhlavní soupravu</string>
-    <string name="playback_headset_desc">Připojená sluchátka nebo náhlavní souprava přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
-    <string name="playback_output_media">Při vypnutém potlačení ozvěny se hlasy přehrávají jako média: přes reproduktor, sluchátka nebo Bluetooth reproduktor.</string>
+    <string name="playback_headset">Používat připojená sluchátka</string>
+    <string name="playback_headset_desc">Připojená sluchátka, náhlavní souprava nebo Bluetooth reproduktor přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Hlasitost mikrofonu</string>
@@ -282,6 +281,7 @@
     <string name="capture_echo">Potlačení ozvěny (režim hovoru)</string>
     <string name="capture_agc">Automatické řízení zesílení</string>
     <string name="capture_echo_desc">Hlasy se přehrávají jako při telefonním hovoru: přes náhlavní soupravu, jinak přes reproduktor telefonu. Bluetooth reproduktor bez mikrofonu se nepoužije a Bluetooth sluchátka přepnou na zvuk hovoru, i pro ostatní aplikace. Pro nejlepší zvuk a pro Bluetooth reproduktory funkci vypněte a používejte sluchátka nebo mluvení po stisku, aby mikrofon nesnímal reproduktor.</string>
+    <string name="capture_echo_earpiece">Zapnuto, dokud se hlasy přehrávají přes sluchátko telefonu (Přehrávání): to funguje jen v režimu hovoru, který má potlačení ozvěny.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Zobrazovat funkce správce</string>

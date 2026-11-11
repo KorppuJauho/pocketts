@@ -12,8 +12,8 @@ data class VoiceSettings(
     val noiseSuppression: Boolean = true,
     val aiNoiseRemoval: Boolean = false, // RNNoise, on the phone: removes noise the phone's own removal lets through
     val echoCancellation: Boolean = true,
-    val earpiece: Boolean = false, // with echo cancellation: voices from the earpiece, as a phone call, not the loudspeaker
-    val useHeadset: Boolean = true, // with echo cancellation: a connected headset plays the voices (off: the phone itself)
+    val earpiece: Boolean = false, // voices from the earpiece, as a phone call, not the loudspeaker (the top choice: see callAudio)
+    val useHeadset: Boolean = true, // connected headphones play the voices (off: always the phone itself)
     val autoGainControl: Boolean = false,
     val floatingPtt: Boolean = true, // the round push-to-talk button
     val volumeKeysPtt: Boolean = false, // volume buttons talk while held (app on screen)
@@ -40,9 +40,15 @@ data class VoiceSettings(
 
     val voiceGain: Float get() = Math.pow(10.0, voiceVolumeDb / 20.0).toFloat()
 
+    /**
+     * Voices play, and the microphone records, as the phone's call audio rather than as media: for echo cancellation,
+     * and always with the earpiece, which only call audio reaches. Where voices play is the choice the rest follows.
+     */
+    val callAudio: Boolean get() = echoCancellation || earpiece
+
     /** The settings that matter for a bug report, for the debug log (nothing private: no addresses or passwords). */
     fun forLog(): String = listOf(
-        "activation $activation", "echo cancellation $echoCancellation", "earpiece $earpiece", "headset $useHeadset",
+        "activation $activation", "echo cancellation $echoCancellation", "call audio $callAudio", "earpiece $earpiece", "headphones $useHeadset",
         "noise removal $noiseSuppression",
         "AI noise removal $aiNoiseRemoval", "gain control $autoGainControl", "microphone ${(micVolume * 100).toInt()} %",
         "voice $voiceVolumeDb dB", "floating push-to-talk $floatingPtt", "volume keys $volumeKeysPtt", "headset button $headsetPtt",

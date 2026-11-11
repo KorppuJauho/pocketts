@@ -10,9 +10,9 @@ import android.os.Looper
 import android.os.PowerManager
 
 /**
- * Where voice goes with echo cancellation on: the phone's call audio (which the echo canceller needs), through a
+ * Where voice goes as the phone's call audio (for echo cancellation, and always with the earpiece): through a
  * headset when one is connected and [useHeadset] is on, else the loudspeaker, or the earpiece when [earpiece] is chosen.
- * With echo cancellation off, voice plays like media and none of this is used.
+ * As media (the loudspeaker without echo cancellation), Android sends the voice itself and none of this is used.
  */
 class AudioRoute(context: Context) {
     private val am = context.getSystemService(AudioManager::class.java)

@@ -242,9 +242,8 @@
     <string name="playback_output_speaker">Lautsprecher</string>
     <string name="playback_output_earpiece">Hörer</string>
     <string name="playback_output_earpiece_desc">Wie bei einem Anruf: Halte das Telefon ans Ohr. Der Bildschirm schaltet sich dort aus.</string>
-    <string name="playback_headset">Verbundenes Headset verwenden</string>
-    <string name="playback_headset_desc">Kopfhörer oder ein Headset geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
-    <string name="playback_output_media">Ohne Echounterdrückung klingen Stimmen wie Medien: über den Lautsprecher, deine Kopfhörer oder einen Bluetooth-Lautsprecher.</string>
+    <string name="playback_headset">Verbundene Kopfhörer verwenden</string>
+    <string name="playback_headset_desc">Kopfhörer, ein Headset oder ein Bluetooth-Lautsprecher geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonlautstärke</string>
@@ -263,6 +262,7 @@
     <string name="capture_echo">Echounterdrückung (Anrufmodus)</string>
     <string name="capture_agc">Automatische Verstärkungsregelung</string>
     <string name="capture_echo_desc">Stimmen klingen wie in einem Anruf: über dein Headset, sonst über den Lautsprecher des Telefons. Ein Bluetooth-Lautsprecher ohne Mikrofon wird nicht genutzt, und Bluetooth-Kopfhörer wechseln zum Anrufklang, auch für andere Apps. Schalte sie für den besten Klang und für Bluetooth-Lautsprecher aus, und nutze Kopfhörer oder Push-to-Talk, damit das Mikrofon den Lautsprecher nicht aufnimmt.</string>
+    <string name="capture_echo_earpiece">An, solange Stimmen aus dem Hörer kommen (Wiedergabe): Der Hörer funktioniert nur im Anrufmodus, der Echounterdrückung hat.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Admin-Funktionen anzeigen</string>
