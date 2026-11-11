@@ -45,7 +45,7 @@
     <string name="favourite_folder">Složka</string>
     <string name="favourite_folder_new">Nová složka…</string>
     <string name="folder_name">Název složky</string>
-    <string name="folder_rename">Přejmenovat složku</string>
+    <string name="folder_edit">Upravit složku</string>
     <string name="folder_fold">sbalit složku</string>
     <string name="folder_unfold">rozbalit složku</string>
     <string name="connect_show">Rozbalit panel připojení</string>

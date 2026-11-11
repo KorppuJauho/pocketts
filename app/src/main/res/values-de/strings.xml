@@ -45,7 +45,7 @@
     <string name="favourite_folder">Ordner</string>
     <string name="favourite_folder_new">Neuer Ordner…</string>
     <string name="folder_name">Ordnername</string>
-    <string name="folder_rename">Ordner umbenennen</string>
+    <string name="folder_edit">Ordner bearbeiten</string>
     <string name="folder_fold">Ordner einklappen</string>
     <string name="folder_unfold">Ordner ausklappen</string>
     <string name="connect_show">Verbindungsbereich ausklappen</string>

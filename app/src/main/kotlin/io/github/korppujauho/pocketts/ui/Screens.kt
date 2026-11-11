@@ -339,9 +339,11 @@ fun TsField(
     keyboard: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     singleLine: Boolean = true,
+    readOnly: Boolean = false, // shows a choice made elsewhere (a list the caller opens), in the fields' look
+    trailing: (@Composable () -> Unit)? = null,
 ) {
     OutlinedTextField(
-        value = value, onValueChange = onChange, singleLine = singleLine,
+        value = value, onValueChange = onChange, singleLine = singleLine, readOnly = readOnly, trailingIcon = trailing,
         label = { Text(label) },
         placeholder = placeholder?.let { { Text(it, color = Ts.faint) } },
         visualTransformation = if (password) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,

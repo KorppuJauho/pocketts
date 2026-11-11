@@ -45,7 +45,7 @@
     <string name="favourite_folder">Dossier</string>
     <string name="favourite_folder_new">Nouveau dossier…</string>
     <string name="folder_name">Nom du dossier</string>
-    <string name="folder_rename">Renommer le dossier</string>
+    <string name="folder_edit">Modifier le dossier</string>
     <string name="folder_fold">replier le dossier</string>
     <string name="folder_unfold">ouvrir le dossier</string>
     <string name="connect_show">Ouvrir le panneau de connexion</string>

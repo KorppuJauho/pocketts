@@ -45,7 +45,7 @@
     <string name="favourite_folder">Carpeta</string>
     <string name="favourite_folder_new">Nueva carpeta…</string>
     <string name="folder_name">Nombre de la carpeta</string>
-    <string name="folder_rename">Cambiar el nombre de la carpeta</string>
+    <string name="folder_edit">Editar carpeta</string>
     <string name="folder_fold">plegar la carpeta</string>
     <string name="folder_unfold">abrir la carpeta</string>
     <string name="connect_show">Abrir el panel de conexión</string>

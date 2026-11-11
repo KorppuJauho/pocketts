@@ -386,6 +386,8 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
             override fun removeFavorite(f: Favorite) = saveFavorites(ctx, favs - f)
             override fun toggleAuto(f: Favorite) = saveFavorites(ctx, favs.map { it.copy(auto = if (it == f) !f.auto else false) })
             override fun renameFolder(folder: String, name: String) = saveFavorites(ctx, Favorites.renamed(favs, folder, name))
+            override fun moveFavorite(f: Favorite, to: Int) = saveFavorites(ctx, Favorites.moved(favs, f, to))
+            override fun moveFolder(folder: String, up: Boolean) = saveFavorites(ctx, Favorites.folderMoved(favs, folder, up))
             override fun setFolded(folders: Set<String>) = Favorites.setFolded(ctx, folders)
             override fun setConnectHidden(hidden: Boolean) {
                 settings.connectHidden = hidden

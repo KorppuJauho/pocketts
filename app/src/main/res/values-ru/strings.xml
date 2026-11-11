@@ -45,7 +45,7 @@
     <string name="favourite_folder">Папка</string>
     <string name="favourite_folder_new">Новая папка…</string>
     <string name="folder_name">Название папки</string>
-    <string name="folder_rename">Переименовать папку</string>
+    <string name="folder_edit">Изменить папку</string>
     <string name="folder_fold">свернуть папку</string>
     <string name="folder_unfold">развернуть папку</string>
     <string name="connect_show">Развернуть панель подключения</string>

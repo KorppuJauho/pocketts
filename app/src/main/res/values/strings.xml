@@ -50,7 +50,7 @@
     <string name="favourite_folder">Folder</string>
     <string name="favourite_folder_new">New folder…</string>
     <string name="folder_name">Folder name</string>
-    <string name="folder_rename">Rename folder</string>
+    <string name="folder_edit">Edit folder</string>
     <string name="folder_fold">fold the folder</string>
     <string name="folder_unfold">open the folder</string>
     <string name="connect_show">Open the connect panel</string>

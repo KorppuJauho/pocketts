@@ -113,6 +113,25 @@ object Favorites {
         return list.map { if (it.folder == folder) it.copy(folder = to) else it }
     }
 
+    /** A favourite dragged to place [to] among its folder's favourites (the other folders stay where they are). */
+    fun moved(list: List<Favorite>, f: Favorite, to: Int): List<Favorite> {
+        val inFolder = list.filter { it.folder == f.folder }
+        val from = inFolder.indexOf(f)
+        if (from < 0 || to.coerceIn(0, inFolder.lastIndex) == from) return list
+        val order = inFolder.toMutableList().apply { add(to.coerceIn(0, inFolder.lastIndex), removeAt(from)) }.iterator()
+        return list.map { if (it.folder == f.folder) order.next() else it }
+    }
+
+    /** A folder moved one place up or down among the folders. */
+    fun folderMoved(list: List<Favorite>, folder: String, up: Boolean): List<Favorite> {
+        val folders = byFolder(list).toMutableList()
+        val from = folders.indexOfFirst { it.first == folder }
+        val to = if (up) from - 1 else from + 1
+        if (from < 0 || to !in folders.indices) return list
+        folders.add(to, folders.removeAt(from))
+        return folders.flatMap { it.second }
+    }
+
     /** The folders folded shut on the connect screen. */
     fun folded(c: Context): Set<String> = prefs(c).getStringSet("folded", emptySet()).orEmpty().toSet()
 

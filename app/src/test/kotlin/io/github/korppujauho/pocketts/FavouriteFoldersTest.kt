@@ -67,6 +67,31 @@ class FavouriteFoldersTest {
     }
 
     @Test
+    fun aFavouriteIsDraggedWithinItsFolder() {
+        val d = Favorite("d.example.com")
+        // a, c and d are in the first folder, b (Friends) between them in the list
+        assertEquals(listOf(c, b, d, a), Favorites.moved(listOf(a, b, c, d), a, 2))
+        assertEquals(listOf(d, b, a, c), Favorites.moved(listOf(a, b, c, d), d, 0))
+        assertEquals(listOf(a, b, c, d), Favorites.moved(listOf(a, b, c, d), c, 1)) // where it was
+        assertEquals(listOf(c, b, d, a), Favorites.moved(listOf(a, b, c, d), a, 9)) // past the end: last
+        // The folders are as they were
+        assertEquals(listOf("", "Friends"), Favorites.byFolder(Favorites.moved(listOf(a, b, c, d), a, 2)).map { it.first })
+    }
+
+    @Test
+    fun aFolderIsMovedUpOrDown() {
+        val w = Favorite("w.example.com", folder = "Work")
+        val list = listOf(a, b, c, w)
+        assertEquals(listOf("Friends", "", "Work"), Favorites.byFolder(Favorites.folderMoved(list, "Friends", up = true)).map { it.first })
+        assertEquals(listOf("", "Work", "Friends"), Favorites.byFolder(Favorites.folderMoved(list, "Friends", up = false)).map { it.first })
+        // The first one up, the last one down: as it was
+        assertEquals(list, Favorites.folderMoved(list, "", up = true))
+        assertEquals(list, Favorites.folderMoved(list, "Work", up = false))
+        // Its favourites keep their order
+        assertEquals(listOf(b, a, c, w), Favorites.folderMoved(list, "Friends", up = true))
+    }
+
+    @Test
     fun foldedFoldersAreRemembered() {
         assertEquals(emptySet<String>(), Favorites.folded(context))
         Favorites.setFolded(context, setOf("", "Friends"))

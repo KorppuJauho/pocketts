@@ -6,7 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +73,9 @@ interface ConnectActions {
     fun removeFavorite(f: Favorite)
     fun toggleAuto(f: Favorite)
     fun renameFolder(folder: String, name: String) {}
+    /** A favourite dragged to place [to] in its folder; a folder moved one place up or down. */
+    fun moveFavorite(f: Favorite, to: Int) {}
+    fun moveFolder(folder: String, up: Boolean) {}
     /** Remembered: the folders folded shut, and whether the Connect and Community panel is folded to its bar. */
     fun setFolded(folders: Set<String>) {}
     fun setConnectHidden(hidden: Boolean) {}
@@ -124,7 +135,7 @@ fun ConnectScreen(
                     },
                     onRename = { renaming = folder },
                 ) {
-                    for (f in inFolder) FavoriteRow(f, actions, onEdit = { editing = f })
+                    FavoriteRows(inFolder, actions, onEdit = { editing = it })
                 }
             }
             // Connecting by address, and TeamSpeak's community servers: two pages of one panel, its switch on top, and
@@ -191,8 +202,11 @@ fun ConnectScreen(
     }
     renaming?.let { folder ->
         val first = stringResource(R.string.favourites)
+        val at = folders.indexOfFirst { it.first == folder }
         FolderDialog(
             folderName(folder),
+            onUp = if (at > 0) ({ actions.moveFolder(folder, true) }) else null,
+            onDown = if (at in 0 until folders.lastIndex) ({ actions.moveFolder(folder, false) }) else null,
             onSave = { typed ->
                 val name = if (typed == first) "" else typed // the first folder's own name is that folder
                 // Folded shut, it stays so under its new name
@@ -211,11 +225,11 @@ fun ConnectScreen(
 @Composable
 internal fun folderName(folder: String) = folder.ifEmpty { stringResource(R.string.favourites) }
 
-/** A folder of favourites: its name, and a tap on it folds it shut or open (holding it renames it). */
+/** A folder of favourites: its name, and a tap on it folds it shut or open (holding it opens its edit window). */
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun FolderPanel(name: String, open: Boolean, onToggle: () -> Unit, onRename: () -> Unit, content: @Composable () -> Unit) {
-    val rename = stringResource(R.string.folder_rename)
+    val rename = stringResource(R.string.folder_edit)
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
             .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
@@ -249,12 +263,15 @@ private fun FolderPanel(name: String, open: Boolean, onToggle: () -> Unit, onRen
     }
 }
 
-/** A folder's new name. */
+/**
+ * A folder's edit window: its name, and its place among the folders ([onUp] and [onDown] move it at once; null at the
+ * top and at the bottom).
+ */
 @Composable
-private fun FolderDialog(name: String, onSave: (String) -> Unit, onDismiss: () -> Unit) {
+private fun FolderDialog(name: String, onUp: (() -> Unit)?, onDown: (() -> Unit)?, onSave: (String) -> Unit, onDismiss: () -> Unit) {
     var text by remember { mutableStateOf(name) }
     TsDialog(
-        onDismiss = onDismiss, title = stringResource(R.string.folder_rename),
+        onDismiss = onDismiss, title = stringResource(R.string.folder_edit),
         icon = androidx.compose.material.icons.Icons.Rounded.Edit, tint = Ts.accent,
         buttons = {
             Spacer(Modifier.weight(1f))
@@ -263,6 +280,10 @@ private fun FolderDialog(name: String, onSave: (String) -> Unit, onDismiss: () -
         },
     ) {
         TsField(text, { text = it.take(40) }, stringResource(R.string.folder_name))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            PillButton(stringResource(R.string.a11y_move_up), enabled = onUp != null, modifier = Modifier.weight(1f)) { onUp?.invoke() }
+            PillButton(stringResource(R.string.a11y_move_down), enabled = onDown != null, modifier = Modifier.weight(1f)) { onDown?.invoke() }
+        }
     }
 }
 
@@ -324,13 +345,94 @@ private fun CommunityServers(nick: String, onJoin: (String) -> Unit) {
     }
 }
 
+/**
+ * A folder's favourites: a tap connects, and a row held is dragged up or down to another place among them (the others
+ * make room; let go, it stays there).
+ */
 @Composable
-private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+private fun FavoriteRows(list: List<Favorite>, actions: ConnectActions, onEdit: (Favorite) -> Unit) {
+    val gap = with(androidx.compose.ui.platform.LocalDensity.current) { 8.dp.toPx() }
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    var rowHeight by remember { mutableStateOf(0) }
+    var dragged by remember { mutableStateOf<Favorite?>(null) }
+    var dragY by remember { mutableStateOf(0f) }
+    val slot = rowHeight + gap
+    val from = list.indexOf(dragged)
+    // Where it would land: its own place moved by whole rows
+    val to = if (from < 0 || slot <= 0f) from else (from + Math.round(dragY / slot)).coerceIn(0, list.lastIndex)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        list.forEachIndexed { i, f ->
+            val mine = f == dragged
+            // The rows between where it was and where it would land step aside
+            val aside by androidx.compose.animation.core.animateFloatAsState(
+                when {
+                    from < 0 || mine -> 0f
+                    i in (from + 1)..to -> -slot
+                    i in to until from -> slot
+                    else -> 0f
+                },
+                label = "aside",
+            )
+            androidx.compose.runtime.key(f) {
+                FavoriteRow(
+                    f, lifted = mine,
+                    modifier = Modifier.onSizeChanged { rowHeight = it.height }
+                        .zIndex(if (mine) 1f else 0f).graphicsLayer { translationY = if (mine) dragY else aside },
+                    onConnect = { actions.connectFavorite(f) }, onEdit = { onEdit(f) },
+                    onUp = if (i > 0) ({ actions.moveFavorite(f, i - 1) }) else null,
+                    onDown = if (i < list.lastIndex) ({ actions.moveFavorite(f, i + 1) }) else null,
+                    onDragStart = {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        dragged = f
+                        dragY = 0f
+                    },
+                    onDrag = { dragY += it },
+                    onDragEnd = { moved ->
+                        if (moved && to >= 0 && to != from) actions.moveFavorite(f, to)
+                        dragged = null
+                        dragY = 0f
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FavoriteRow(
+    f: Favorite, lifted: Boolean, modifier: Modifier, onConnect: () -> Unit, onEdit: () -> Unit, onUp: (() -> Unit)?, onDown: (() -> Unit)?,
+    onDragStart: () -> Unit, onDrag: (Float) -> Unit, onDragEnd: (moved: Boolean) -> Unit,
+) {
+    val connect = stringResource(R.string.connect)
+    val up = stringResource(R.string.a11y_move_up)
+    val down = stringResource(R.string.a11y_move_down)
+    // The latest ones, for the gestures that outlive a redraw
+    val start by androidx.compose.runtime.rememberUpdatedState(onDragStart)
+    val drag by androidx.compose.runtime.rememberUpdatedState(onDrag)
+    val end by androidx.compose.runtime.rememberUpdatedState(onDragEnd)
+    val tap by androidx.compose.runtime.rememberUpdatedState(onConnect)
+    Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Column(
             Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(Ts.card)
-                .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
-                .clickable { actions.connectFavorite(f) }.padding(horizontal = 14.dp, vertical = 10.dp),
+                .border(1.dp, if (lifted) Ts.accent else Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                .semantics {
+                    role = androidx.compose.ui.semantics.Role.Button
+                    onClick(connect) { tap(); true }
+                    customActions = listOfNotNull(
+                        onUp?.let { androidx.compose.ui.semantics.CustomAccessibilityAction(up) { it(); true } },
+                        onDown?.let { androidx.compose.ui.semantics.CustomAccessibilityAction(down) { it(); true } },
+                    )
+                }
+                // A tap connects; held, it isn't a tap any more (the drag below takes it, and letting go connects nothing)
+                .pointerInput(Unit) { detectTapGestures(onLongPress = {}, onTap = { tap() }) }
+                .pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { start() },
+                        onDrag = { change, amount -> change.consume(); drag(amount.y) },
+                        onDragEnd = { end(true) }, onDragCancel = { end(false) },
+                    )
+                }
+                .padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
             Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -444,22 +546,15 @@ private fun FolderChoice(folders: List<String>, folder: String, newFolder: Strin
     var open by remember { mutableStateOf(false) }
     val label = stringResource(R.string.favourite_folder)
     Box {
-        Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
-                .border(1.dp, Color(0x14FFFFFF), RoundedCornerShape(12.dp))
-                .clickable(role = androidx.compose.ui.semantics.Role.DropdownList) { open = true }
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(label, color = Ts.muted, fontSize = 12.sp)
-                Text(
-                    if (newFolder != null) stringResource(R.string.favourite_folder_new) else folderName(folder),
-                    color = Ts.bright, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                )
-            }
-            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted)
-        }
+        // In the other fields' look; the whole of it opens the list
+        TsField(
+            if (newFolder != null) stringResource(R.string.favourite_folder_new) else folderName(folder), {}, label, readOnly = true,
+            trailing = { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted) },
+        )
+        Box(
+            Modifier.matchParentSize().clip(RoundedCornerShape(12.dp))
+                .clickable(role = androidx.compose.ui.semantics.Role.DropdownList) { open = true },
+        )
         androidx.compose.material3.DropdownMenu(open, onDismissRequest = { open = false }, containerColor = Ts.card) {
             for (name in folders) {
                 androidx.compose.material3.DropdownMenuItem(

@@ -45,7 +45,7 @@
     <string name="favourite_folder">文件夹</string>
     <string name="favourite_folder_new">新建文件夹…</string>
     <string name="folder_name">文件夹名称</string>
-    <string name="folder_rename">重命名文件夹</string>
+    <string name="folder_edit">编辑文件夹</string>
     <string name="folder_fold">收起文件夹</string>
     <string name="folder_unfold">展开文件夹</string>
     <string name="connect_show">展开连接面板</string>

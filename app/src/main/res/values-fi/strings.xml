@@ -45,7 +45,7 @@
     <string name="favourite_folder">Kansio</string>
     <string name="favourite_folder_new">Uusi kansio…</string>
     <string name="folder_name">Kansion nimi</string>
-    <string name="folder_rename">Nimeä kansio uudelleen</string>
+    <string name="folder_edit">Muokkaa kansiota</string>
     <string name="folder_fold">sulje kansio</string>
     <string name="folder_unfold">avaa kansio</string>
     <string name="connect_show">Avaa yhdistämispaneeli</string>
