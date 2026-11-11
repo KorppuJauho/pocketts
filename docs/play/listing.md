@@ -16,46 +16,26 @@ Voice chat for TeamSpeak servers: talk, chat, send pictures and share streams.
 
 ## Full description (4000 characters)
 
+Kept short: a line for each area, not every feature (the screenshots and GitHub show the rest).
+
 ```
-PocketTS is a voice chat app for TeamSpeak servers, made for phones. Connect to a server, join a channel and talk, with your voice going on with the screen off.
+PocketTS is a voice chat app for TeamSpeak servers, made for phones. Connect to a server, join a channel and talk, also with the screen off.
 
-VOICE
-• Voice activation, push-to-talk or always on
-• Whisper to chosen people or channels, wherever they are
-• Noise removal, echo cancellation and gain control, and AI noise removal (RNNoise) for keyboard clicks, fans and the like
-• Voices through the loudspeaker or the earpiece, as you choose, or connected headphones
-• A volume for each person, and headset and volume-button push-to-talk
-• Keeps working with the screen off, and reconnects by itself when the network changes
-• Goes quiet during phone calls, and pauses a stream you share
-
-CHANNELS AND CHAT
-• The server's channels and the people in them, with their banners and icons
-• Channel and private chats, pokes, and pictures (a few at once, saved or shared from the viewer)
-• Chat history kept on your phone for 90 days
-• Hold a channel for its info, and browse its files: download, upload, rename and delete (as the server allows)
-
-STREAMS
-• Watch others' screen and camera streams at the size you like, small over the app, in a small window over other apps, or on the full screen with push-to-talk and the stream's volume
-• Share your camera (front or back, with your microphone) or your screen (with what your phone plays)
-• The camera's flashlight, zoom and tap to focus, and a button for the phone's other back lenses
-
-AND MORE
-• Connect by address, server nickname, TeamSpeak link or invite
-• TeamSpeak's own public community servers, one tap away
-• Use a privilege key from a server's admin
-• Favourite servers in folders you name and arrange, and switching between them
-• Mute, sound and disconnect buttons in the notification
-• Your TeamSpeak identity: import it from a TeamSpeak app, export it, and raise its security level
-• Admin tools for server admins: move, kick and ban people, and add, edit, reorder and delete channels (optional)
-• In English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech
+• Voice: voice activation or push-to-talk, whispering, noise removal and echo cancellation, through the loudspeaker, the earpiece or headphones
+• Chat: channel and private chats, pictures and pokes
+• Streams: watch others' screens and cameras, and share your own
+• Channels: who is where, a channel's info and its files
+• Favourite servers in folders, and TeamSpeak's public community servers one tap away
+• Tools for server admins, and your TeamSpeak identity from another TeamSpeak app
+• In eight languages
 
 PRIVATE BY DESIGN
 No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname or an invite, TeamSpeak's nickname or invite service).
 
 OPEN SOURCE
-PocketTS is free software (GPL-3.0). The source code, the changelog and the issue tracker are on GitHub: https://github.com/KorppuJauho/pocketts
+PocketTS is free software (GPL-3.0). The source code is on GitHub: https://github.com/KorppuJauho/pocketts
 
-PocketTS is an independent app. It isn't made by, endorsed by or affiliated with TeamSpeak Systems GmbH. TeamSpeak is a trademark of its owner. Connect to any TeamSpeak server, or try one of TeamSpeak's public community servers.
+PocketTS is an independent app. It isn't made by, endorsed by or affiliated with TeamSpeak Systems GmbH. TeamSpeak is a trademark of its owner.
 ```
 
 ## Graphics
