@@ -22,8 +22,9 @@ to join.
 - **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
   who may.
 - **Connecting** by address, server nickname, TeamSpeak link or invite; favourites, in folders you name and arrange
-  by dragging; TeamSpeak's own public community servers, one tap away; privilege keys from a server's admin;
-  reconnecting by itself when the network changes; and mute, sound and disconnect buttons in the notification.
+  by dragging, each with a channel to join if you like; TeamSpeak's own public community servers, one tap away;
+  privilege keys from a server's admin; reconnecting by itself when the network changes; and mute, sound and
+  disconnect buttons in the notification.
 - **Settings** and sounds for events.
 - **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).

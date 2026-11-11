@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.7.0 (2026-11-11)
+
+- **Loudspeaker or earpiece:** Settings › Playback has "Voices play through", with Loudspeaker and Earpiece, followed
+  at once while connected, and "Use connected headphones". With the earpiece the screen turns off at the ear, as in a
+  phone call. The earpiece only plays as the phone's call audio, so echo cancellation is on with it.
+- **Voices from the earpiece by mistake:** on some phones voices came from the earpiece with echo cancellation on,
+  though the loudspeaker was meant. The loudspeaker is now asked for again once sound is running. A phone that still
+  plays call audio from its earpiece plays voices as media instead, which is always the loudspeaker, with echo
+  cancellation off and a notice saying so. Found by JohnyCore.
+- **Favourites in folders:** favourites are shown in folders that fold shut. Edit favourite has a Folder choice (with
+  "New folder…"), and a folder's header held opens Edit folder for its name and its place among the folders. A
+  favourite held is dragged to another place, also into another folder. A favourite is removed in its edit window
+  (the cross on its row is gone), and the Connect and Community panel folds shut to its bar. The favourites list on a
+  server shows the folders too. Suggested by imaliaz.
+- **A channel for each favourite:** Edit favourite has "Channel to join" (a name, or a path such as Games/Lobby) and
+  that channel's password, kept encrypted. A channel that's renamed or moved later is found again. When the channel
+  isn't there or its password is wrong, a warning says so: a TeamSpeak 6 server puts you in its default channel
+  without a word. Links with a channel get the same warning. The idea is from chochrunius's fork.
+- **TeamSpeak's community servers:** the connect panel has a Community page (a tap on its name, or a swipe) with
+  TeamSpeak's six public community servers, one tap away.
+- **Czech:** PocketTS in Czech, from chochrunius's translation. Settings › UI › Language is one row that opens the list
+  of languages, instead of a button for each.
+- **Tidier settings:** most explanations are behind an ⓘ next to their setting. Echo cancellation is named "Echo
+  cancellation (phone call mode)", and its text says what that means for Bluetooth speakers and headphones.
+- **Dialogs don't jump:** a dialog no longer moves on every character typed into a field the keyboard covers.
+- **Connect screen:** its error shows under the header, in view also when connecting from a favourite (from
+  chochrunius's fork), and a nickname saved in Settings shows in the form at once.
+
 ## 1.6.0 (2026-11-02)
 
 - **Camera streams:** the camera has the app's own camera code now, which brings:
