@@ -238,6 +238,12 @@
     <string name="playback_play_sound">Toista ääni</string>
     <string name="playback_call_volume">Kun kaiunpoisto on päällä, äänet seuraavat puhelun äänenvoimakkuutta: paina äänenvoimakkuuspainiketta yhdistettynä.</string>
     <string name="playback_media_volume">Äänet seuraavat median äänenvoimakkuutta.</string>
+    <string name="playback_output">Äänet kuuluvat</string>
+    <string name="playback_output_speaker">Kaiuttimesta</string>
+    <string name="playback_output_earpiece">Kuulokkeesta</string>
+    <string name="playback_output_earpiece_desc">Kuten puhelussa: pidä puhelinta korvalla. Näyttö sammuu siksi aikaa.</string>
+    <string name="playback_headset">Käytä yhdistettyjä kuulokkeita</string>
+    <string name="playback_headset_desc">Yhdistetyt kuulokkeet, kuulokemikrofoni tai Bluetooth-kaiutin toistavat äänet. Pois päältä: äänet kuuluvat aina puhelimesta.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonin äänenvoimakkuus</string>
@@ -256,6 +262,8 @@
     <string name="capture_echo">Kaiunpoisto (puhelutila)</string>
     <string name="capture_agc">Automaattinen vahvistuksen säätö</string>
     <string name="capture_echo_desc">Äänet toistetaan kuin puhelussa: kuulokemikrofonista tai muuten puhelimen kaiuttimesta. Bluetooth-kaiutinta, jossa ei ole mikrofonia, ei käytetä, ja Bluetooth-kuulokkeet vaihtavat puheluääneen myös muissa sovelluksissa. Kytke se pois parhaan äänen ja Bluetooth-kaiuttimen takia, ja käytä kuulokkeita tai Paina puhuaksesi -tilaa, ettei mikrofoni poimi kaiuttimen ääntä.</string>
+    <string name="capture_echo_earpiece">Päällä, kun äänet kuuluvat kuulokkeesta (Toisto): puhelimen kuuloke toimii vain puhelutilassa, jossa on kaiunpoisto.</string>
+    <string name="echo_refused">Tämä puhelin ei voi toistaa kaiunpoistettuja ääniä kaiuttimesta, joten kaiunpoisto on pois päältä. Paina puhuaksesi -tila tai kuulokkeet estävät kaiun.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Näytä ylläpitotoiminnot</string>

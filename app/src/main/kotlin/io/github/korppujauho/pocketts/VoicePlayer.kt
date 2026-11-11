@@ -88,6 +88,9 @@ class VoicePlayer(
         return seq
     }
 
+    /** The device to play from, when not Android's own choice (the phone's loudspeaker though headphones are connected). */
+    @Volatile var device: android.media.AudioDeviceInfo? = null
+
     private fun mixLoop() {
         val bufferBytes = maxOf(
             AudioTrack.getMinBufferSize(RATE, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT),
@@ -115,9 +118,16 @@ class VoicePlayer(
         val out = ShortArray(FRAME * 2)
         var idleSince = System.currentTimeMillis()
         var playing = false
+        var playsFrom: android.media.AudioDeviceInfo? = null
 
         try {
             while (running) {
+                device.let {
+                    if (it !== playsFrom) {
+                        track.setPreferredDevice(it)
+                        playsFrom = it
+                    }
+                }
                 val active = synchronized(lock) {
                     if (talkers.isEmpty() && System.currentTimeMillis() - idleSince > IDLE_PAUSE_MS) {
                         if (playing) { track.pause(); track.flush(); playing = false }

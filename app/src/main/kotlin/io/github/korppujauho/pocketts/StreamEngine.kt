@@ -100,7 +100,7 @@ class StreamEngine(
             PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context.applicationContext).createInitializationOptions())
             initialized = true
         }
-        val echo = settings().echoCancellation
+        val echo = settings().callAudio
         val audio = JavaAudioDeviceModule.builder(context.applicationContext)
             .setAudioSource(if (echo) android.media.MediaRecorder.AudioSource.VOICE_COMMUNICATION else android.media.MediaRecorder.AudioSource.MIC)
             .setUseHardwareAcousticEchoCanceler(echo)
@@ -142,7 +142,7 @@ class StreamEngine(
     private fun factoryForSound(phone: Boolean): Boolean {
         wantRecordless = phone
         val f = made ?: return true
-        if (madeEcho == settings().echoCancellation && madeRecordless == phone) return true
+        if (madeEcho == settings().callAudio && madeRecordless == phone) return true
         if (state.watching != 0 || viewers.isNotEmpty()) {
             if (madeRecordless == phone) return true // only the echo setting differs: it waits
             if (phone) return false
@@ -513,7 +513,7 @@ class StreamEngine(
                 fun option(key: String, on: Boolean) = org.webrtc.MediaConstraints.KeyValuePair(key, "$on")
                 val constraints = org.webrtc.MediaConstraints().apply {
                     // The phone's sound as it is: no echo cancelling, levelling or filtering meant for a voice
-                    mandatory.add(option("googEchoCancellation", phone == null && settings().echoCancellation))
+                    mandatory.add(option("googEchoCancellation", phone == null && settings().callAudio))
                     mandatory.add(option("googNoiseSuppression", false))
                     mandatory.add(option("googAutoGainControl", phone == null))
                     if (phone != null) mandatory.add(option("googHighpassFilter", false))

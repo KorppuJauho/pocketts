@@ -81,7 +81,7 @@ class MicSender(
     private fun record() {
         restart = false
         val s = settings()
-        val source = if (s.echoCancellation) MediaRecorder.AudioSource.VOICE_COMMUNICATION else MediaRecorder.AudioSource.MIC
+        val source = if (s.callAudio) MediaRecorder.AudioSource.VOICE_COMMUNICATION else MediaRecorder.AudioSource.MIC
         val min = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         val rec = AudioRecord(source, RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, maxOf(min, FRAME * 2 * 4))
         if (rec.state != AudioRecord.STATE_INITIALIZED) {
@@ -89,7 +89,7 @@ class MicSender(
             throw IllegalStateException("the microphone couldn't be opened")
         }
         val effects = listOfNotNull(
-            if (AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(rec.audioSessionId)?.apply { enabled = s.echoCancellation } else null,
+            if (AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(rec.audioSessionId)?.apply { enabled = s.callAudio } else null,
             if (NoiseSuppressor.isAvailable()) NoiseSuppressor.create(rec.audioSessionId)?.apply { enabled = s.noiseSuppression } else null,
             if (AutomaticGainControl.isAvailable()) AutomaticGainControl.create(rec.audioSessionId)?.apply { enabled = s.autoGainControl } else null,
         )
@@ -102,7 +102,7 @@ class MicSender(
         var lastSpeech = 0L
         var sending = false
         var sentWhisper = false // what [sending] is: a whisper or talking
-        AppLog.log("Microphone on (echo ${s.echoCancellation}, noise ${s.noiseSuppression}, gain ${s.autoGainControl})")
+        AppLog.log("Microphone on (echo ${s.callAudio}, noise ${s.noiseSuppression}, gain ${s.autoGainControl})")
         try {
             rec.startRecording()
             while (running && !restart && !(muted && !testing)) {

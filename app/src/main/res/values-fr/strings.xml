@@ -241,6 +241,12 @@
     <string name="playback_play_sound">Jouer un son</string>
     <string name="playback_call_volume">Avec l’annulation d’écho, les voix suivent le volume d’appel : appuyez sur un bouton de volume pendant la connexion.</string>
     <string name="playback_media_volume">Les voix suivent le volume multimédia.</string>
+    <string name="playback_output">Les voix sortent par</string>
+    <string name="playback_output_speaker">Haut-parleur</string>
+    <string name="playback_output_earpiece">Écouteur</string>
+    <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
+    <string name="playback_headset">Utiliser le casque connecté</string>
+    <string name="playback_headset_desc">Un casque, des écouteurs ou une enceinte Bluetooth connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volume du micro</string>
@@ -259,6 +265,8 @@
     <string name="capture_echo">Annulation de l’écho (mode appel)</string>
     <string name="capture_agc">Contrôle automatique du gain</string>
     <string name="capture_echo_desc">Les voix sont jouées comme un appel : dans votre casque, sinon par le haut-parleur du téléphone. Une enceinte Bluetooth sans micro n’est pas utilisée, et un casque Bluetooth passe à son son d’appel, aussi pour les autres apps. Désactivez-la pour le meilleur son et pour les enceintes Bluetooth, et utilisez un casque ou Appuyer pour parler pour que le micro ne capte pas l’enceinte.</string>
+    <string name="capture_echo_earpiece">Activée tant que les voix sortent par l’écouteur (Lecture) : l’écouteur ne fonctionne qu’en mode appel, qui a l’annulation de l’écho.</string>
+    <string name="echo_refused">Ce téléphone ne peut pas jouer les voix avec annulation de l’écho par son haut-parleur : l’annulation de l’écho est donc désactivée. Appuyer pour parler ou un casque évitent l’écho.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Afficher les fonctions d’administration</string>

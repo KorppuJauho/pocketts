@@ -217,12 +217,18 @@ private fun Group(label: String? = null, badge: String? = null, content: @Compos
 fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
-internal fun Check(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+internal fun Check(text: String, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(enabled = enabled) { onChange(!checked) }.padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
-            Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
+            Checkbox(
+                checked, onChange, enabled = enabled,
+                colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted, disabledCheckedColor = Ts.accent.copy(alpha = 0.5f)),
+            )
         }
-        Text(text, color = Ts.text, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
+        Text(text, color = if (enabled) Ts.text else Ts.muted, fontSize = 14.sp, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
@@ -553,8 +559,40 @@ private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     }
 }
 
+/** A two-way choice in one row, as the server screen's Channels/Chat switch. */
+@Composable
+internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Ts.card)
+            .border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)).padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        options.forEachIndexed { i, label ->
+            val active = i == selected
+            Box(
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                    .selectable(selected = active, role = androidx.compose.ui.semantics.Role.RadioButton) { onSelect(i) }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
 @Composable
 private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+    // Where voices come out: the choice the rest follows (the earpiece brings call audio, and echo cancellation, along)
+    Group(stringResource(R.string.playback_output)) {
+        Segmented(
+            listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
+            if (v.earpiece) 1 else 0,
+        ) { onChange(v.copy(earpiece = it == 1)) }
+        if (v.earpiece) Desc(stringResource(R.string.playback_output_earpiece_desc))
+        Check(stringResource(R.string.playback_headset), v.useHeadset) { onChange(v.copy(useHeadset = it)) }
+        Desc(stringResource(R.string.playback_headset_desc))
+    }
     Group(stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB") {
         TsSlider(v.voiceVolumeDb.toFloat(), -20f..12f, 31) { onChange(v.copy(voiceVolumeDb = it.roundToInt())) }
         RangeEnds(stringResource(R.string.quiet), stringResource(R.string.loud))
@@ -572,7 +610,7 @@ private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (Voic
             SecondaryButton(stringResource(R.string.playback_play_sound)) { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
         }
     }
-    Desc(stringResource(if (v.echoCancellation) R.string.playback_call_volume else R.string.playback_media_volume))
+    Desc(stringResource(if (v.callAudio) R.string.playback_call_volume else R.string.playback_media_volume))
 }
 
 @Composable
@@ -610,8 +648,18 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
             modifier = Modifier.clickable { license = true }.padding(vertical = 2.dp),
         )
         if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
-        Check(stringResource(R.string.capture_echo), v.echoCancellation) { onChange(v.copy(echoCancellation = it)) }
-        Desc(stringResource(R.string.capture_echo_desc))
+        // With the earpiece (Playback) it's on and can't be turned off: the earpiece only plays as call audio. On a
+        // phone whose loudspeaker doesn't play call audio it's off with the loudspeaker, and can't be turned on.
+        Check(stringResource(R.string.capture_echo), v.callAudio, enabled = !v.earpiece && !v.speakerRefused) { onChange(v.copy(echoCancellation = it)) }
+        Desc(
+            stringResource(
+                when {
+                    v.earpiece -> R.string.capture_echo_earpiece
+                    v.speakerRefused -> R.string.echo_refused
+                    else -> R.string.capture_echo_desc
+                }
+            )
+        )
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }

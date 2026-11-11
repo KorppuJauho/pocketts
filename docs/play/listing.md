@@ -23,6 +23,7 @@ VOICE
 • Voice activation, push-to-talk or always on
 • Whisper to chosen people or channels, wherever they are
 • Noise removal, echo cancellation and gain control, and AI noise removal (RNNoise) for keyboard clicks, fans and the like
+• Voices through the loudspeaker or the earpiece, as you choose, or connected headphones
 • A volume for each person, and headset and volume-button push-to-talk
 • Keeps working with the screen off, and reconnects by itself when the network changes
 • Goes quiet during phone calls, and pauses a stream you share

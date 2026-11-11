@@ -585,7 +585,23 @@ object Session : TsClient.Listener {
         sender?.testing = on
     }
 
-    fun updateVoice(v: VoiceSettings) {
+    /**
+     * This phone plays call audio from its earpiece though the loudspeaker was asked for: the loudspeaker is what was
+     * chosen, so voices play as media from now on (that's always the loudspeaker), without echo cancellation, and it's
+     * said why. Remembered, so the next connection doesn't start in the earpiece.
+     */
+    private fun speakerRefused() {
+        val v = _state.value.voice
+        if (v.earpiece || !v.callAudio || !::app.isInitialized) return
+        val now = v.copy(speakerRefusedAt = BuildConfig.VERSION_CODE)
+        now.save(app)
+        _state.update { it.copy(voice = now, error = app.getString(R.string.echo_refused)) }
+        if (_state.value.phase != Phase.IDLE) worker.execute { stopAudio(); startAudio() }
+    }
+
+    fun updateVoice(new: VoiceSettings) {
+        // The earpiece chosen: the loudspeaker gets its try again when it's chosen next
+        val v = if (new.earpiece && new.speakerRefusedAt != 0) new.copy(speakerRefusedAt = 0) else new
         val old = _state.value.voice
         v.save(app)
         _state.update { it.copy(voice = v) }
@@ -593,23 +609,39 @@ object Session : TsClient.Listener {
         player?.voiceGain = v.voiceGain
         if (v.activation != VoiceSettings.Activation.PTT) setPtt(false)
         if (_state.value.phase == Phase.IDLE) return
-        if (v.echoCancellation != old.echoCancellation) {
+        if (v.callAudio != old.callAudio) {
             // Call audio or media: playback and the microphone start again
             worker.execute { stopAudio(); startAudio() }
-        } else if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) {
-            sender?.reconfigure()
+        } else {
+            if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) sender?.reconfigure()
+            // The loudspeaker or the earpiece, headphones or not: followed while connected
+            if (v.earpiece != old.earpiece || v.useHeadset != old.useHeadset) {
+                route?.set(v.earpiece, v.useHeadset)
+                player?.device = phoneSpeaker(v)
+            }
         }
     }
 
+    /**
+     * As media, Android plays voices from connected headphones by itself: with those not to be used, the voices are
+     * told to the phone's own loudspeaker (null: Android's choice, or call audio, which [AudioRoute] sends).
+     */
+    private fun phoneSpeaker(v: VoiceSettings): android.media.AudioDeviceInfo? =
+        if (v.callAudio || v.useHeadset) null
+        else app.getSystemService(android.media.AudioManager::class.java).getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
+            .firstOrNull { it.type == android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
+
     private fun startAudio() {
         val v = _state.value.voice
-        if (v.echoCancellation) route = AudioRoute(app).also { it.start() }
-        player = VoicePlayer(v.echoCancellation, ::setTalking).also {
+        if (v.callAudio) route = AudioRoute(app, ::speakerRefused).also { it.start(v.earpiece, v.useHeadset) }
+        player = VoicePlayer(v.callAudio, ::setTalking).also {
+            it.device = phoneSpeaker(v)
             it.muted = _state.value.outputMuted
             it.voiceGain = v.voiceGain
         }
         updateGains()
         if (micPermitted()) startSender()
+        route?.audioStarted()
     }
 
     private fun startSender() {
@@ -628,6 +660,7 @@ object Session : TsClient.Listener {
             it.muted = _state.value.inputMuted
             it.whisperHeld = _state.value.whisperHeld
         }
+        route?.audioStarted() // also when the microphone is allowed only later
     }
 
     private fun stopAudio() {
