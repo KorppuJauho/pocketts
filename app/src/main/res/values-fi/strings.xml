@@ -263,6 +263,7 @@
     <string name="capture_agc">Automaattinen vahvistuksen säätö</string>
     <string name="capture_echo_desc">Äänet toistetaan kuin puhelussa: kuulokemikrofonista tai muuten puhelimen kaiuttimesta. Bluetooth-kaiutinta, jossa ei ole mikrofonia, ei käytetä, ja Bluetooth-kuulokkeet vaihtavat puheluääneen myös muissa sovelluksissa. Kytke se pois parhaan äänen ja Bluetooth-kaiuttimen takia, ja käytä kuulokkeita tai Paina puhuaksesi -tilaa, ettei mikrofoni poimi kaiuttimen ääntä.</string>
     <string name="capture_echo_earpiece">Päällä, kun äänet kuuluvat kuulokkeesta (Toisto): puhelimen kuuloke toimii vain puhelutilassa, jossa on kaiunpoisto.</string>
+    <string name="echo_refused">Tämä puhelin ei voi toistaa kaiunpoistettuja ääniä kaiuttimesta, joten kaiunpoisto on pois päältä. Paina puhuaksesi -tila tai kuulokkeet estävät kaiun.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Näytä ylläpitotoiminnot</string>

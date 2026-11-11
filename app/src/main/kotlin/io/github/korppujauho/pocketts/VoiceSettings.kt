@@ -14,6 +14,9 @@ data class VoiceSettings(
     val echoCancellation: Boolean = true,
     val earpiece: Boolean = false, // voices from the earpiece, as a phone call, not the loudspeaker (the top choice: see callAudio)
     val useHeadset: Boolean = true, // connected headphones play the voices (off: always the phone itself)
+    // This phone played call audio from its earpiece though the loudspeaker was asked: found by the app version of this
+    // number (0: not found). A later version tries again, and so does choosing the earpiece and the loudspeaker again.
+    val speakerRefusedAt: Int = 0,
     val autoGainControl: Boolean = false,
     val floatingPtt: Boolean = true, // the round push-to-talk button
     val volumeKeysPtt: Boolean = false, // volume buttons talk while held (app on screen)
@@ -44,11 +47,14 @@ data class VoiceSettings(
      * Voices play, and the microphone records, as the phone's call audio rather than as media: for echo cancellation,
      * and always with the earpiece, which only call audio reaches. Where voices play is the choice the rest follows.
      */
-    val callAudio: Boolean get() = echoCancellation || earpiece
+    val callAudio: Boolean get() = earpiece || (echoCancellation && !speakerRefused)
+
+    /** Call audio can't play from this phone's loudspeaker (see [speakerRefusedAt]): the loudspeaker then plays as media. */
+    val speakerRefused: Boolean get() = speakerRefusedAt != 0 && speakerRefusedAt == BuildConfig.VERSION_CODE
 
     /** The settings that matter for a bug report, for the debug log (nothing private: no addresses or passwords). */
     fun forLog(): String = listOf(
-        "activation $activation", "echo cancellation $echoCancellation", "call audio $callAudio", "earpiece $earpiece", "headphones $useHeadset",
+        "activation $activation", "echo cancellation $echoCancellation", "call audio $callAudio", "earpiece $earpiece", "headphones $useHeadset", "loudspeaker refused $speakerRefused",
         "noise removal $noiseSuppression",
         "AI noise removal $aiNoiseRemoval", "gain control $autoGainControl", "microphone ${(micVolume * 100).toInt()} %",
         "voice $voiceVolumeDb dB", "floating push-to-talk $floatingPtt", "volume keys $volumeKeysPtt", "headset button $headsetPtt",
@@ -72,6 +78,7 @@ data class VoiceSettings(
                 echoCancellation = p.getBoolean("echoCancellation", d.echoCancellation),
                 earpiece = p.getBoolean("earpiece", d.earpiece),
                 useHeadset = p.getBoolean("useHeadset", d.useHeadset),
+                speakerRefusedAt = p.getInt("speakerRefusedAt", d.speakerRefusedAt),
                 autoGainControl = p.getBoolean("autoGainControl", d.autoGainControl),
                 floatingPtt = p.getBoolean("floatingPtt", d.floatingPtt),
                 volumeKeysPtt = p.getBoolean("volumeKeysPtt", d.volumeKeysPtt),
@@ -114,6 +121,7 @@ data class VoiceSettings(
             .putBoolean("echoCancellation", echoCancellation)
             .putBoolean("earpiece", earpiece)
             .putBoolean("useHeadset", useHeadset)
+            .putInt("speakerRefusedAt", speakerRefusedAt)
             .putBoolean("autoGainControl", autoGainControl)
             .putBoolean("floatingPtt", floatingPtt)
             .putBoolean("volumeKeysPtt", volumeKeysPtt)

@@ -263,6 +263,7 @@
     <string name="capture_agc">Automatische Verstärkungsregelung</string>
     <string name="capture_echo_desc">Stimmen klingen wie in einem Anruf: über dein Headset, sonst über den Lautsprecher des Telefons. Ein Bluetooth-Lautsprecher ohne Mikrofon wird nicht genutzt, und Bluetooth-Kopfhörer wechseln zum Anrufklang, auch für andere Apps. Schalte sie für den besten Klang und für Bluetooth-Lautsprecher aus, und nutze Kopfhörer oder Push-to-Talk, damit das Mikrofon den Lautsprecher nicht aufnimmt.</string>
     <string name="capture_echo_earpiece">An, solange Stimmen aus dem Hörer kommen (Wiedergabe): Der Hörer funktioniert nur im Anrufmodus, der Echounterdrückung hat.</string>
+    <string name="echo_refused">Dieses Telefon kann Stimmen mit Echounterdrückung nicht über den Lautsprecher wiedergeben, daher ist die Echounterdrückung aus. Push-to-Talk oder Kopfhörer vermeiden Echo.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Admin-Funktionen anzeigen</string>

@@ -14,7 +14,11 @@ import android.os.PowerManager
  * headset when one is connected and [useHeadset] is on, else the loudspeaker, or the earpiece when [earpiece] is chosen.
  * As media (the loudspeaker without echo cancellation), Android sends the voice itself and none of this is used.
  */
-class AudioRoute(context: Context) {
+class AudioRoute(
+    context: Context,
+    /** The loudspeaker was asked for and Android plays from the earpiece all the same (on some phones it does). */
+    private val onSpeakerRefused: () -> Unit = {},
+) {
     private val am = context.getSystemService(AudioManager::class.java)
     private val main = Handler(Looper.getMainLooper())
     private var on = false
@@ -63,7 +67,10 @@ class AudioRoute(context: Context) {
     fun set(earpiece: Boolean, useHeadset: Boolean) {
         this.earpiece = earpiece
         this.useHeadset = useHeadset
-        if (on) choose()
+        if (!on) return
+        choose()
+        main.removeCallbacks(verdict)
+        main.postDelayed(verdict, 3000)
     }
 
     /**
@@ -75,15 +82,33 @@ class AudioRoute(context: Context) {
         choose()
         main.removeCallbacks(again)
         main.postDelayed(again, 1000)
+        main.removeCallbacks(verdict)
+        main.postDelayed(verdict, 3000)
     }
 
     private val again = Runnable { if (on) choose() }
+
+    // Asked, asked again, and given time: where does the voice go when it should be the loudspeaker?
+    private val verdict = Runnable {
+        if (!on || earpiece) return@Runnable
+        val refused = if (Build.VERSION.SDK_INT >= 31) {
+            wanted()?.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER && am.communicationDevice?.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE
+        } else {
+            @Suppress("DEPRECATION")
+            oldSpeaker && !am.isSpeakerphoneOn
+        }
+        if (refused) {
+            AppLog.log("The loudspeaker was asked for, but this phone plays call audio from its earpiece")
+            onSpeakerRefused()
+        }
+    }
 
     @Suppress("DEPRECATION")
     fun stop() {
         if (!on) return
         on = false
         main.removeCallbacks(again)
+        main.removeCallbacks(verdict)
         am.unregisterAudioDeviceCallback(devices)
         if (Build.VERSION.SDK_INT >= 31) {
             am.removeOnCommunicationDeviceChangedListener(changed as AudioManager.OnCommunicationDeviceChangedListener)
@@ -135,12 +160,14 @@ class AudioRoute(context: Context) {
             }
             @Suppress("DEPRECATION")
             am.isSpeakerphoneOn = !earpiece && !(headset && useHeadset)
+            oldSpeaker = !earpiece && !(headset && useHeadset)
             oldEarpiece = earpiece && !headset
         }
         screenAtEar()
     }
 
     private var oldEarpiece = false // before Android 12: the earpiece plays, as far as can be told
+    private var oldSpeaker = false // before Android 12: the loudspeaker was asked for
 
     /** The screen goes off at the ear only while the earpiece plays. */
     private fun screenAtEar() {

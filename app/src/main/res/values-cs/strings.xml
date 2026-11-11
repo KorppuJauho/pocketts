@@ -282,6 +282,7 @@
     <string name="capture_agc">Automatické řízení zesílení</string>
     <string name="capture_echo_desc">Hlasy se přehrávají jako při telefonním hovoru: přes náhlavní soupravu, jinak přes reproduktor telefonu. Bluetooth reproduktor bez mikrofonu se nepoužije a Bluetooth sluchátka přepnou na zvuk hovoru, i pro ostatní aplikace. Pro nejlepší zvuk a pro Bluetooth reproduktory funkci vypněte a používejte sluchátka nebo mluvení po stisku, aby mikrofon nesnímal reproduktor.</string>
     <string name="capture_echo_earpiece">Zapnuto, dokud se hlasy přehrávají přes sluchátko telefonu (Přehrávání): to funguje jen v režimu hovoru, který má potlačení ozvěny.</string>
+    <string name="echo_refused">Tento telefon neumí přehrávat hlasy s potlačením ozvěny přes reproduktor, proto je potlačení ozvěny vypnuté. Ozvěně zabrání mluvení po stisku nebo sluchátka.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Zobrazovat funkce správce</string>

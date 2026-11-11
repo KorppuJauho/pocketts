@@ -585,7 +585,23 @@ object Session : TsClient.Listener {
         sender?.testing = on
     }
 
-    fun updateVoice(v: VoiceSettings) {
+    /**
+     * This phone plays call audio from its earpiece though the loudspeaker was asked for: the loudspeaker is what was
+     * chosen, so voices play as media from now on (that's always the loudspeaker), without echo cancellation, and it's
+     * said why. Remembered, so the next connection doesn't start in the earpiece.
+     */
+    private fun speakerRefused() {
+        val v = _state.value.voice
+        if (v.earpiece || !v.callAudio || !::app.isInitialized) return
+        val now = v.copy(speakerRefusedAt = BuildConfig.VERSION_CODE)
+        now.save(app)
+        _state.update { it.copy(voice = now, error = app.getString(R.string.echo_refused)) }
+        if (_state.value.phase != Phase.IDLE) worker.execute { stopAudio(); startAudio() }
+    }
+
+    fun updateVoice(new: VoiceSettings) {
+        // The earpiece chosen: the loudspeaker gets its try again when it's chosen next
+        val v = if (new.earpiece && new.speakerRefusedAt != 0) new.copy(speakerRefusedAt = 0) else new
         val old = _state.value.voice
         v.save(app)
         _state.update { it.copy(voice = v) }
@@ -617,7 +633,7 @@ object Session : TsClient.Listener {
 
     private fun startAudio() {
         val v = _state.value.voice
-        if (v.callAudio) route = AudioRoute(app).also { it.start(v.earpiece, v.useHeadset) }
+        if (v.callAudio) route = AudioRoute(app, ::speakerRefused).also { it.start(v.earpiece, v.useHeadset) }
         player = VoicePlayer(v.callAudio, ::setTalking).also {
             it.device = phoneSpeaker(v)
             it.muted = _state.value.outputMuted

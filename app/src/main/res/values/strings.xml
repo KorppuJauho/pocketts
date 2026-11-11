@@ -281,6 +281,7 @@
     <string name="capture_agc">Automatic gain control</string>
     <string name="capture_echo_desc">Voices play like a phone call: through your headset, or else the phone\'s loudspeaker. A Bluetooth speaker without a microphone isn\'t used, and Bluetooth headphones switch to their call sound, for other apps too. Turn it off for the best sound and for Bluetooth speakers, and use headphones or push-to-talk so the microphone doesn\'t pick up the speaker.</string>
     <string name="capture_echo_earpiece">On while voices play through the earpiece (Playback): the earpiece only works as a phone call, which has echo cancellation.</string>
+    <string name="echo_refused">This phone can\'t play echo-cancelled voices through its loudspeaker, so echo cancellation is off. Push-to-talk or headphones avoid echo.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Show admin functions</string>

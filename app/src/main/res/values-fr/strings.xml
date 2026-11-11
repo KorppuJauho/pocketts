@@ -266,6 +266,7 @@
     <string name="capture_agc">Contrôle automatique du gain</string>
     <string name="capture_echo_desc">Les voix sont jouées comme un appel : dans votre casque, sinon par le haut-parleur du téléphone. Une enceinte Bluetooth sans micro n’est pas utilisée, et un casque Bluetooth passe à son son d’appel, aussi pour les autres apps. Désactivez-la pour le meilleur son et pour les enceintes Bluetooth, et utilisez un casque ou Appuyer pour parler pour que le micro ne capte pas l’enceinte.</string>
     <string name="capture_echo_earpiece">Activée tant que les voix sortent par l’écouteur (Lecture) : l’écouteur ne fonctionne qu’en mode appel, qui a l’annulation de l’écho.</string>
+    <string name="echo_refused">Ce téléphone ne peut pas jouer les voix avec annulation de l’écho par son haut-parleur : l’annulation de l’écho est donc désactivée. Appuyer pour parler ou un casque évitent l’écho.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Afficher les fonctions d’administration</string>

@@ -648,9 +648,18 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
             modifier = Modifier.clickable { license = true }.padding(vertical = 2.dp),
         )
         if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
-        // With the earpiece (Playback) it's on and can't be turned off: the earpiece only plays as call audio
-        Check(stringResource(R.string.capture_echo), v.callAudio, enabled = !v.earpiece) { onChange(v.copy(echoCancellation = it)) }
-        Desc(stringResource(if (v.earpiece) R.string.capture_echo_earpiece else R.string.capture_echo_desc))
+        // With the earpiece (Playback) it's on and can't be turned off: the earpiece only plays as call audio. On a
+        // phone whose loudspeaker doesn't play call audio it's off with the loudspeaker, and can't be turned on.
+        Check(stringResource(R.string.capture_echo), v.callAudio, enabled = !v.earpiece && !v.speakerRefused) { onChange(v.copy(echoCancellation = it)) }
+        Desc(
+            stringResource(
+                when {
+                    v.earpiece -> R.string.capture_echo_earpiece
+                    v.speakerRefused -> R.string.echo_refused
+                    else -> R.string.capture_echo_desc
+                }
+            )
+        )
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }

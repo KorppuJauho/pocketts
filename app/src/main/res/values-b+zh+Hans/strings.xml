@@ -260,6 +260,7 @@
     <string name="capture_agc">自动增益控制</string>
     <string name="capture_echo_desc">语音像通话一样播放：通过你的耳麦，否则通过手机扬声器。没有麦克风的蓝牙音箱不会被使用，蓝牙耳机也会切换为通话音质，其他应用同样如此。关闭它可获得最佳音质并使用蓝牙音箱；此时请使用耳机或按键说话，以免麦克风收录音箱的声音。</string>
     <string name="capture_echo_earpiece">语音通过听筒播放（播放）时保持开启：听筒只能在通话模式下使用，通话模式带有回声消除。</string>
+    <string name="echo_refused">这部手机无法通过扬声器播放带回声消除的语音，因此回声消除已关闭。使用按键说话或耳机可避免回声。</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">显示管理功能</string>
