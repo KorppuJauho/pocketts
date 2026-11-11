@@ -10,7 +10,15 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -63,11 +71,22 @@ fun TsDialog(
     buttons: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    // The window takes the whole screen and the keyboard's room is left free here, not by Android resizing a centred
+    // window: that one jumped on every character typed into a field the keyboard covered (the field asks to be
+    // scrolled into view, and the window moved with it). With the keyboard up the card sits at the top, so a change in
+    // the keyboard's height doesn't move it either.
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         val shape = RoundedCornerShape(24.dp)
+        val keyboard = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+        Box(
+            // A tap beside the card closes it, as it did when the window was only the card
+            Modifier.fillMaxSize().pointerInput(onDismiss) { detectTapGestures { onDismiss() } }.windowInsetsPadding(WindowInsets.safeDrawing),
+            contentAlignment = if (keyboard) Alignment.TopCenter else Alignment.Center,
+        ) {
         Column(
             Modifier.padding(horizontal = 18.dp, vertical = 24.dp).widthIn(max = 480.dp).fillMaxWidth()
                 .shadow(24.dp, shape).clip(shape).background(Pop.background).border(1.dp, Pop.edge, shape)
+                .pointerInput(Unit) { detectTapGestures {} } // a tap on the card itself isn't one beside it
                 .padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 18.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -96,6 +115,7 @@ fun TsDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 content = buttons,
             )
+        }
         }
     }
 }
