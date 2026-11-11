@@ -247,19 +247,27 @@ fun ServerScreen(
                         shape = RoundedCornerShape(16.dp), containerColor = Pop.top, shadowElevation = 12.dp,
                         border = androidx.compose.foundation.BorderStroke(1.dp, Pop.edge),
                     ) {
-                        for (f in favorites) {
-                            val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
-                            androidx.compose.material3.DropdownMenuItem(
-                                text = { Text(f.label, color = Ts.text) },
-                                leadingIcon = {
-                                    androidx.compose.material3.Icon(
-                                        if (here) androidx.compose.material.icons.Icons.Filled.CheckCircle else androidx.compose.material.icons.Icons.Filled.Star,
-                                        contentDescription = if (here) stringResource(R.string.connected) else null, tint = if (here) Ts.green else Ts.muted,
-                                    )
-                                },
-                                enabled = !here,
-                                onClick = { serversMenu = false; actions.switchTo(f) },
+                        // By folder, as on the connect screen; a single folder needs no name
+                        val folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites)
+                        for ((folder, inFolder) in folders) {
+                            if (folders.size > 1) Text(
+                                folderName(folder), color = Ts.muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 2.dp),
                             )
+                            for (f in inFolder) {
+                                val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
+                                androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text(f.label, color = Ts.text) },
+                                    leadingIcon = {
+                                        androidx.compose.material3.Icon(
+                                            if (here) androidx.compose.material.icons.Icons.Filled.CheckCircle else androidx.compose.material.icons.Icons.Filled.Star,
+                                            contentDescription = if (here) stringResource(R.string.connected) else null, tint = if (here) Ts.green else Ts.muted,
+                                        )
+                                    },
+                                    enabled = !here,
+                                    onClick = { serversMenu = false; actions.switchTo(f) },
+                                )
+                            }
                         }
                         if (favorites.none { io.github.korppujauho.pocketts.Favorites.same(it.address, state.address) }) {
                             androidx.compose.material3.DropdownMenuItem(
@@ -269,7 +277,9 @@ fun ServerScreen(
                                 },
                                 onClick = {
                                     serversMenu = false
-                                    addingFavorite = io.github.korppujauho.pocketts.Favorite(state.address, state.serverName, nickname)
+                                    addingFavorite = io.github.korppujauho.pocketts.Favorite(
+                                        state.address, state.serverName, nickname, folder = favorites.firstOrNull()?.folder.orEmpty(),
+                                    )
                                 },
                             )
                         }                    }
@@ -507,7 +517,10 @@ fun ServerScreen(
         BanDialog(p, onBan = { seconds, reason -> actions.ban(p, seconds, reason); banTarget = null }, onDismiss = { banTarget = null })
     }
     addingFavorite?.let { f ->
-        FavoriteDialog(f, onSave = { actions.addFavorite(it); addingFavorite = null }, onDelete = null) { addingFavorite = null }
+        FavoriteDialog(
+            f, onSave = { actions.addFavorite(it); addingFavorite = null }, onDelete = null,
+            folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites).map { it.first }.ifEmpty { listOf("") },
+        ) { addingFavorite = null }
     }
     pokeTarget?.let { p ->
         PokeDialog(p, onSend = { actions.poke(p, it); pokeTarget = null }, onDismiss = { pokeTarget = null })

@@ -42,6 +42,14 @@
     <string name="favourite_file_port">Port pro přenos souborů</string>
     <string name="favourite_file_port_hint">Port serveru (obvykle 30033)</string>
     <string name="favourite_file_port_desc">Pouze pokud se nenačítají obrázky a avatary serveru: přenos souborů na serveru používá jiný port.</string>
+    <string name="favourite_folder">Složka</string>
+    <string name="favourite_folder_new">Nová složka…</string>
+    <string name="folder_name">Název složky</string>
+    <string name="folder_rename">Přejmenovat složku</string>
+    <string name="folder_fold">sbalit složku</string>
+    <string name="folder_unfold">rozbalit složku</string>
+    <string name="connect_show">Připojit se k serveru</string>
+    <string name="connect_hide">Skrýt</string>
     <string name="community_tab">Komunita</string>
     <string name="community_desc">Veřejné servery provozované společností TeamSpeak. Klepnutím se připojíte. PocketTS je neoficiální aplikace.</string>
     <string name="community_desc_no_nick">Veřejné servery provozované společností TeamSpeak. Pro připojení zadejte výše přezdívku. PocketTS je neoficiální aplikace.</string>

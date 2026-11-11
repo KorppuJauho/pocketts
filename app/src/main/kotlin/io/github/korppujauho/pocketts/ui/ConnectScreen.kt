@@ -5,6 +5,11 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,9 +65,17 @@ interface ConnectActions {
     fun saveFavorite(old: Favorite?, new: Favorite)
     fun removeFavorite(f: Favorite)
     fun toggleAuto(f: Favorite)
+    fun renameFolder(folder: String, name: String) {}
+    /** Remembered: the folders folded shut, and whether the Connect and Community panel is hidden. */
+    fun setFolded(folders: Set<String>) {}
+    fun setConnectHidden(hidden: Boolean) {}
 }
 
-/** WebTS's connect window: the favourites (one tap connects), then an address to type. */
+/**
+ * WebTS's connect window: the favourites in their folders (one tap connects), then an address to type or TeamSpeak's
+ * community servers. That last panel can be hidden ([connectHidden]) by those who only use their favourites; a + in the
+ * header brings it back.
+ */
 @Composable
 fun ConnectScreen(
     nickname: String,
@@ -74,6 +87,8 @@ fun ConnectScreen(
     voice: io.github.korppujauho.pocketts.VoiceSettings = io.github.korppujauho.pocketts.VoiceSettings(),
     settingsActions: SettingsActions? = null,
     onDismissError: () -> Unit = {},
+    folded: Set<String> = emptySet(),
+    connectHidden: Boolean = false,
 ) {
     var settings by remember { mutableStateOf(false) }
     var nick by remember { mutableStateOf(nickname) }
@@ -82,34 +97,56 @@ fun ConnectScreen(
     var remember by remember { mutableStateOf(password.isNotEmpty()) }
     var favorite by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<Favorite?>(null) }
+    var renaming by remember { mutableStateOf<String?>(null) }
+    var shut by remember { mutableStateOf(folded) }
+    var hidden by remember { mutableStateOf(connectHidden) }
     val known = favorites.any { io.github.korppujauho.pocketts.Favorites.same(it.address, addr) }
+    val folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites)
+    // With no favourites there's nothing else on the screen: the panel stays
+    val panelHidden = hidden && favorites.isNotEmpty()
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-        AppHeader { if (settingsActions != null) SettingsGear { settings = true } }
+        AppHeader {
+            if (panelHidden) HeaderButton(androidx.compose.material.icons.Icons.Rounded.Add, stringResource(R.string.connect_show)) {
+                hidden = false
+                actions.setConnectHidden(false)
+            }
+            if (settingsActions != null) SettingsGear { settings = true }
+        }
         // Above the scrolling part: in view whether the connect came from a favourite or the form
         error?.let { WarningBanner(it, onDismissError, Modifier.padding(top = 15.dp)) }
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
-            if (favorites.isNotEmpty()) {
-                Panel(Modifier.fillMaxWidth(), header = {
-                    Text(stringResource(R.string.favourites), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                }) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        for (f in favorites) FavoriteRow(f, actions, onEdit = { editing = f })
-                    }
+            for ((folder, inFolder) in folders) {
+                val open = folder !in shut
+                FolderPanel(
+                    folderName(folder), open,
+                    onToggle = {
+                        shut = if (open) shut + folder else shut - folder
+                        actions.setFolded(shut)
+                    },
+                    onRename = { renaming = folder },
+                ) {
+                    for (f in inFolder) FavoriteRow(f, actions, onEdit = { editing = f })
                 }
             }
             // Connecting by address, and TeamSpeak's community servers: two pages of one panel, its switch on top, and
             // a swipe goes between them too
             val pages = androidx.compose.foundation.pager.rememberPagerState { 2 }
             val scope = androidx.compose.runtime.rememberCoroutineScope()
-            Column(
+            if (!panelHidden) Column(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
                     .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
             ) {
-                PageSwitch(pages.currentPage) { scope.launch { pages.animateScrollToPage(it) } }
+                PageSwitch(
+                    pages.currentPage, onPage = { scope.launch { pages.animateScrollToPage(it) } },
+                    onHide = if (favorites.isEmpty()) null else ({
+                        hidden = true
+                        actions.setConnectHidden(true)
+                    }),
+                )
                 Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
                 androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -135,19 +172,110 @@ fun ConnectScreen(
     }
 
     if (settings && settingsActions != null) {
-        SettingsDialog(voice, nick, settingsActions, onDismiss = { settings = false })
+        // A nickname saved in the settings shows in the form at once
+        val saving = remember(settingsActions) {
+            object : SettingsActions by settingsActions {
+                override fun save(voice: io.github.korppujauho.pocketts.VoiceSettings, nickname: String) {
+                    settingsActions.save(voice, nickname)
+                    if (nickname.isNotEmpty()) nick = nickname
+                }
+            }
+        }
+        SettingsDialog(voice, nick, saving, onDismiss = { settings = false })
     }
     editing?.let { f ->
-        FavoriteDialog(f, onSave = { actions.saveFavorite(f, it); editing = null }, onDelete = { actions.removeFavorite(f); editing = null }) {
-            editing = null
+        FavoriteDialog(
+            f, onSave = { actions.saveFavorite(f, it); editing = null }, onDelete = { actions.removeFavorite(f); editing = null },
+            folders = folders.map { it.first },
+        ) { editing = null }
+    }
+    renaming?.let { folder ->
+        val first = stringResource(R.string.favourites)
+        FolderDialog(
+            folderName(folder),
+            onSave = { typed ->
+                val name = if (typed == first) "" else typed // the first folder's own name is that folder
+                // Folded shut, it stays so under its new name
+                if (folder in shut) {
+                    shut = shut - folder + name
+                    actions.setFolded(shut)
+                }
+                actions.renameFolder(folder, name)
+                renaming = null
+            },
+        ) { renaming = null }
+    }
+}
+
+/** A folder's name as shown: the first one is "Favourites" until it's renamed. */
+@Composable
+internal fun folderName(folder: String) = folder.ifEmpty { stringResource(R.string.favourites) }
+
+/** A folder of favourites: its name, and a tap on it folds it shut or open (holding it renames it). */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun FolderPanel(name: String, open: Boolean, onToggle: () -> Unit, onRename: () -> Unit, content: @Composable () -> Unit) {
+    val rename = stringResource(R.string.folder_rename)
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
+            .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().background(Ts.card)
+                .combinedClickable(
+                    onClickLabel = stringResource(if (open) R.string.folder_fold else R.string.folder_unfold),
+                    onLongClickLabel = rename, onLongClick = onRename, onClick = onToggle,
+                )
+                .semantics {
+                    heading()
+                    customActions = listOf(androidx.compose.ui.semantics.CustomAccessibilityAction(rename) { onRename(); true })
+                }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                name, color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            androidx.compose.material3.Icon(
+                if (open) androidx.compose.material.icons.Icons.Rounded.ExpandLess else androidx.compose.material.icons.Icons.Rounded.ExpandMore,
+                contentDescription = null, tint = Ts.muted,
+            )
+        }
+        if (open) {
+            Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
         }
     }
 }
 
-/** The panel's top bar: its two pages, Connect and the community servers, as the server screen's Channels/Chat switch. */
+/** A folder's new name. */
 @Composable
-private fun PageSwitch(page: Int, onPage: (Int) -> Unit) {
-    Row(Modifier.fillMaxWidth().background(Ts.card).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+private fun FolderDialog(name: String, onSave: (String) -> Unit, onDismiss: () -> Unit) {
+    var text by remember { mutableStateOf(name) }
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.folder_rename),
+        icon = androidx.compose.material.icons.Icons.Rounded.Edit, tint = Ts.accent,
+        buttons = {
+            Spacer(Modifier.weight(1f))
+            PillButton(stringResource(R.string.cancel), onClick = onDismiss)
+            PillButton(stringResource(R.string.save), PillKind.PRIMARY, enabled = text.isNotBlank()) { onSave(text.trim()) }
+        },
+    ) {
+        TsField(text, { text = it.take(40) }, stringResource(R.string.folder_name))
+    }
+}
+
+/**
+ * The panel's top bar: its two pages, Connect and the community servers, as the server screen's Channels/Chat switch,
+ * and at its end the button that hides the panel ([onHide]; none when it can't be hidden).
+ */
+@Composable
+private fun PageSwitch(page: Int, onPage: (Int) -> Unit, onHide: (() -> Unit)?) {
+    Row(
+        Modifier.fillMaxWidth().background(Ts.card).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         for ((i, label) in listOf(stringResource(R.string.connect), stringResource(R.string.community_tab)).withIndex()) {
             val active = i == page
             Box(
@@ -158,6 +286,14 @@ private fun PageSwitch(page: Int, onPage: (Int) -> Unit) {
             ) {
                 Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             }
+        }
+        if (onHide != null) Box(
+            Modifier.size(40.dp).clip(RoundedCornerShape(7.dp)).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onHide),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.material3.Icon(
+                androidx.compose.material.icons.Icons.Rounded.ExpandLess, contentDescription = stringResource(R.string.connect_hide), tint = Ts.muted,
+            )
         }
     }
 }
@@ -197,8 +333,8 @@ private fun FavoriteRow(f: Favorite, actions: ConnectActions, onEdit: () -> Unit
         ) {
             Text(f.label, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
+        // Removing is in its edit window (Delete), where it isn't tapped by mistake
         FavButton(androidx.compose.material.icons.Icons.Rounded.Edit, stringResource(R.string.edit), onEdit)
-        FavButton(androidx.compose.material.icons.Icons.Rounded.Close, stringResource(R.string.remove)) { actions.removeFavorite(f) }
     }
 }
 
@@ -226,10 +362,15 @@ fun CheckRow(text: String, checked: Boolean, enabled: Boolean = true, onChange: 
 
 /**
  * WebTS's "Edit favourite": its name, address, the nickname used there, its password, the channel to join (with its
- * password), connect automatically.
+ * password), connect automatically, and the folder it's in: one of [folders], or a new one by its name.
  */
 @Composable
-fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Unit)?, onDismiss: () -> Unit) {
+fun FavoriteDialog(
+    f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Unit)?, folders: List<String> = listOf(f.folder), onDismiss: () -> Unit,
+) {
+    var folder by remember { mutableStateOf(f.folder) }
+    var newFolder by remember { mutableStateOf<String?>(null) } // a new folder's name being typed, when that was chosen
+    val firstFolder = stringResource(R.string.favourites)
     var name by remember { mutableStateOf(f.name) }
     var address by remember { mutableStateOf(f.address) }
     var nick by remember { mutableStateOf(f.nickname) }
@@ -255,6 +396,8 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                         address.trim(), name.trim(), nick.trim(), pw, auto, filePort.toIntOrNull()?.takeIf { it in 1..65535 },
                         ch, if (ch.isEmpty()) "" else channelPw,
                         if (ch == f.channel) f.channelId else 0, // another channel typed: its id is learned again
+                        // A new folder left without a name: where it was; the first folder's own name is that folder
+                        newFolder?.trim()?.ifEmpty { null }?.let { if (it == firstFolder) "" else it } ?: folder,
                     )
                 )
             }
@@ -270,6 +413,7 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                     Text(stringResource(R.string.favourite_channel_desc), color = Ts.muted, fontSize = 12.sp)
                     TsField(channelPw, { channelPw = it }, stringResource(R.string.channel_password), password = true)
                 }
+                FolderChoice(folders, folder, newFolder, onFolder = { folder = it; newFolder = null }, onNew = { newFolder = it })
                 CheckRow(stringResource(R.string.favourite_auto), auto) { auto = it }
                 // Advanced: folded away unless used
                 Row(
@@ -291,6 +435,44 @@ fun FavoriteDialog(f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Uni
                 }
             }
     }
+}
+
+/** The favourite's folder: a row showing it, which opens the list of folders and "New folder…" (then its name is typed). */
+@Composable
+private fun FolderChoice(folders: List<String>, folder: String, newFolder: String?, onFolder: (String) -> Unit, onNew: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    val label = stringResource(R.string.favourite_folder)
+    Box {
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
+                .border(1.dp, Color(0x14FFFFFF), RoundedCornerShape(12.dp))
+                .clickable(role = androidx.compose.ui.semantics.Role.DropdownList) { open = true }
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(label, color = Ts.muted, fontSize = 12.sp)
+                Text(
+                    if (newFolder != null) stringResource(R.string.favourite_folder_new) else folderName(folder),
+                    color = Ts.bright, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+            }
+            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted)
+        }
+        androidx.compose.material3.DropdownMenu(open, onDismissRequest = { open = false }, containerColor = Ts.card) {
+            for (name in folders) {
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(folderName(name), color = Ts.text) },
+                    onClick = { open = false; onFolder(name) },
+                )
+            }
+            androidx.compose.material3.DropdownMenuItem(
+                text = { Text(stringResource(R.string.favourite_folder_new), color = Ts.accent) },
+                onClick = { open = false; onNew("") },
+            )
+        }
+    }
+    if (newFolder != null) TsField(newFolder, { onNew(it.take(40)) }, stringResource(R.string.folder_name))
 }
 
 /** A newer PocketTS on GitHub: Download opens its release page, Not now hides it until a later one. */

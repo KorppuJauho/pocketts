@@ -42,6 +42,14 @@
     <string name="favourite_file_port">Port de transfert de fichiers</string>
     <string name="favourite_file_port_hint">Celui du serveur (en général 30033)</string>
     <string name="favourite_file_port_desc">Seulement si les images et les avatars du serveur ne se chargent pas : son transfert de fichiers est sur un autre port.</string>
+    <string name="favourite_folder">Dossier</string>
+    <string name="favourite_folder_new">Nouveau dossier…</string>
+    <string name="folder_name">Nom du dossier</string>
+    <string name="folder_rename">Renommer le dossier</string>
+    <string name="folder_fold">replier le dossier</string>
+    <string name="folder_unfold">ouvrir le dossier</string>
+    <string name="connect_show">Se connecter à un serveur</string>
+    <string name="connect_hide">Masquer</string>
     <string name="community_tab">Communauté</string>
     <string name="community_desc">Serveurs publics gérés par TeamSpeak. Touchez-en un pour le rejoindre. PocketTS est une app non officielle.</string>
     <string name="community_desc_no_nick">Serveurs publics gérés par TeamSpeak. Saisissez un pseudo ci-dessus pour en rejoindre un. PocketTS est une app non officielle.</string>

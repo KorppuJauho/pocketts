@@ -376,16 +376,23 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
                 val server = link?.address ?: address
                 val pw = password.ifEmpty { link?.password.orEmpty() }
                 settings.serverPassword = if (remember) pw else ""
-                if (favorite) saveFavorites(ctx, favs + Favorite(server, password = if (remember) pw else ""))
+                // A new favourite goes into the first folder
+                if (favorite) saveFavorites(ctx, favs + Favorite(server, password = if (remember) pw else "", folder = favs.firstOrNull()?.folder.orEmpty()))
                 connect(ctx, server, nickname, pw, channel = link?.channel.orEmpty(), channelPassword = link?.channelPassword.orEmpty())
             }
             override fun connectFavorite(f: Favorite) = connectFavorite(ctx, f)
             override fun saveFavorite(old: Favorite?, new: Favorite) =
-                saveFavorites(ctx, favs.map { if (it == old) new else if (new.auto) it.copy(auto = false) else it })
+                saveFavorites(ctx, if (old == null) favs + new else Favorites.edited(favs, old, new))
             override fun removeFavorite(f: Favorite) = saveFavorites(ctx, favs - f)
             override fun toggleAuto(f: Favorite) = saveFavorites(ctx, favs.map { it.copy(auto = if (it == f) !f.auto else false) })
+            override fun renameFolder(folder: String, name: String) = saveFavorites(ctx, Favorites.renamed(favs, folder, name))
+            override fun setFolded(folders: Set<String>) = Favorites.setFolded(ctx, folders)
+            override fun setConnectHidden(hidden: Boolean) {
+                settings.connectHidden = hidden
+            }
         },
         voice = state.voice, settingsActions = AppSettingsActions(ctx), onDismissError = Session::clearError,
+        folded = remember { Favorites.folded(ctx) }, connectHidden = remember { settings.connectHidden },
     )
 }
 

@@ -8,7 +8,8 @@ import org.json.JSONObject
  * WebTS's favourites: a server's address, a name for the lists, the nickname used there, its password (kept only on
  * this phone), whether to connect to it when the app opens (one at most), and the channel to join there (its name, or
  * its path for a subchannel; the server's default channel when empty) with that channel's password. The channel's id is
- * learned when it's first joined, so it's found again after it's renamed or moved.
+ * learned when it's first joined, so it's found again after it's renamed or moved. The folder it's shown in is just its
+ * name ("" is the first one, shown as "Favourites" until renamed): a folder is there while a favourite names it.
  */
 data class Favorite(
     val address: String,
@@ -20,6 +21,7 @@ data class Favorite(
     val channel: String = "",
     val channelPassword: String = "",
     val channelId: Int = 0,
+    val folder: String = "",
 ) {
     val label: String get() = name.ifBlank { address }
 }
@@ -47,7 +49,7 @@ object Favorites {
                 o.optString("address"), o.optString("name"), o.optString("nickname"),
                 if (inList) password(o.optString("password")) else passwords.optString(i), o.optBoolean("auto"),
                 o.optInt("filePort", 0).takeIf { it in 1..65535 }, o.optString("channel"), channelPasswords.optString(i),
-                o.optInt("channelId", 0),
+                o.optInt("channelId", 0), o.optString("folder"),
             )
         }.filter { it.address.isNotBlank() }
         if (inList) save(c, list)
@@ -82,6 +84,7 @@ object Favorites {
                         f.filePort?.let { put("filePort", it) }
                         if (f.channel.isNotBlank()) put("channel", f.channel.trim())
                         if (f.channel.isNotBlank() && f.channelId > 0) put("channelId", f.channelId)
+                        if (f.folder.isNotBlank()) put("folder", f.folder.trim())
                     }
             )
         }
@@ -93,6 +96,27 @@ object Favorites {
         secrets.commit()
         prefs(c).edit().putString("list", a.toString()).apply()
     }
+
+    /** The favourites by folder: the folders in the order their first favourite comes, each one's favourites in theirs. */
+    fun byFolder(list: List<Favorite>): List<Pair<String, List<Favorite>>> = list.groupBy { it.folder }.toList()
+
+    /** A favourite edited: in its place, or last when it went to another folder (a new folder then comes last). */
+    fun edited(list: List<Favorite>, old: Favorite, new: Favorite): List<Favorite> {
+        // At most one connects automatically
+        val others = if (new.auto) list.map { if (it == old) it else it.copy(auto = false) } else list
+        return if (new.folder == old.folder) others.map { if (it == old) new else it } else others.filter { it != old } + new
+    }
+
+    /** A folder renamed; a name another folder has joins the two (the favourites keep their order). */
+    fun renamed(list: List<Favorite>, folder: String, name: String): List<Favorite> {
+        val to = name.trim()
+        return list.map { if (it.folder == folder) it.copy(folder = to) else it }
+    }
+
+    /** The folders folded shut on the connect screen. */
+    fun folded(c: Context): Set<String> = prefs(c).getStringSet("folded", emptySet()).orEmpty().toSet()
+
+    fun setFolded(c: Context, folders: Set<String>) = prefs(c).edit().putStringSet("folded", folders).apply()
 
     /** The same server, however it was typed ("Example.com:9987" is "example.com"). */
     fun same(a: String, b: String): Boolean = normal(a) == normal(b)
