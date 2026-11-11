@@ -208,9 +208,14 @@ fun SettingsContent(
     }
 }
 
-/** A group of settings under its [label]; what it's about ([info]) is behind an ⓘ at the label's end. */
+/**
+ * A group of settings under its [label]. What it's about is behind an ⓘ at the label's end ([info]), or always in view
+ * under the label ([note]) where a tab has room for it.
+ */
 @Composable
-private fun Group(label: String? = null, badge: String? = null, info: String? = null, content: @Composable ColumnScope.() -> Unit) {
+private fun Group(
+    label: String? = null, badge: String? = null, info: String? = null, note: String? = null, content: @Composable ColumnScope.() -> Unit,
+) {
     var about by rememberSaveable(label) { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (label != null) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -222,6 +227,7 @@ private fun Group(label: String? = null, badge: String? = null, info: String? = 
             }
         }
         if (info != null && about) Desc(info)
+        if (note != null) Desc(note)
         content()
     }
 }
@@ -249,7 +255,9 @@ private fun InfoButton(setting: String, open: Boolean, onToggle: () -> Unit) {
 fun Desc(text: String) = Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
 
 @Composable
-internal fun Check(text: String, checked: Boolean, enabled: Boolean = true, info: String? = null, onChange: (Boolean) -> Unit) {
+internal fun Check(
+    text: String, checked: Boolean, enabled: Boolean = true, info: String? = null, note: String? = null, onChange: (Boolean) -> Unit,
+) {
     var about by rememberSaveable(text) { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Row(
@@ -268,6 +276,7 @@ internal fun Check(text: String, checked: Boolean, enabled: Boolean = true, info
         if (info != null) InfoButton(text, about) { about = !about }
     }
     if (info != null && about) Desc(info)
+    if (note != null) Desc(note) // always in view
 }
 
 @Composable
@@ -338,7 +347,7 @@ private fun Identity(actions: SettingsActions) {
     val saveFile = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: saved }
-    Group(stringResource(R.string.identity_title), info = stringResource(R.string.identity_desc)) {
+    Group(stringResource(R.string.identity_title), note = stringResource(R.string.identity_desc)) {
         problem?.let { Desc(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SecondaryButton(stringResource(R.string.identity_wipe)) { wiping = true }
@@ -413,7 +422,7 @@ private fun Identity(actions: SettingsActions) {
 @Composable
 private fun ChannelPasswordsGroup(actions: SettingsActions) {
     var forgotten by remember { mutableStateOf(false) }
-    Group(stringResource(R.string.passwords_title), info = stringResource(R.string.passwords_desc)) {
+    Group(stringResource(R.string.passwords_title), note = stringResource(R.string.passwords_desc)) {
         SecondaryButton(stringResource(R.string.passwords_forget)) {
             actions.forgetChannelPasswords()
             forgotten = true
@@ -429,7 +438,7 @@ private fun ChatHistory(actions: SettingsActions) {
     val rules = io.github.korppujauho.pocketts.proto.ChatHistory
     Group(
         stringResource(R.string.history_title),
-        info = stringResource(
+        note = stringResource(
             R.string.history_desc,
             androidx.compose.ui.res.pluralStringResource(R.plurals.history_days, rules.DAYS, rules.DAYS),
             androidx.compose.ui.res.pluralStringResource(R.plurals.history_lines, rules.LINES, rules.LINES),
@@ -490,10 +499,10 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
 @Composable
 private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group {
-        Check(stringResource(R.string.ui_admin), v.adminTools, info = stringResource(R.string.ui_admin_desc)) { onChange(v.copy(adminTools = it)) }
+        Check(stringResource(R.string.ui_admin), v.adminTools, note = stringResource(R.string.ui_admin_desc)) { onChange(v.copy(adminTools = it)) }
     }
     Group {
-        Check(stringResource(R.string.ui_controls_bottom), v.controlsAtBottom, info = stringResource(R.string.ui_controls_bottom_desc)) { onChange(v.copy(controlsAtBottom = it)) }
+        Check(stringResource(R.string.ui_controls_bottom), v.controlsAtBottom, note = stringResource(R.string.ui_controls_bottom_desc)) { onChange(v.copy(controlsAtBottom = it)) }
     }
 }
 
@@ -606,7 +615,10 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
 @Composable
 private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
     // Where voices come out: the choice the rest follows (the earpiece brings call audio, and echo cancellation, along)
-    Group(stringResource(R.string.playback_output), info = stringResource(R.string.playback_output_earpiece_desc)) {
+    Group(
+        stringResource(R.string.playback_output),
+        info = stringResource(if (v.earpiece) R.string.playback_output_earpiece_desc else R.string.playback_output_speaker_desc),
+    ) {
         Segmented(
             listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
             if (v.earpiece) 1 else 0,
@@ -639,13 +651,15 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
     Group(stringResource(R.string.capture_mic_volume), "${(v.micVolume * 100).roundToInt()}%") {
         TsSlider(v.micVolume, 0f..3f, 29) { onChange(v.copy(micVolume = (it * 10).roundToInt() / 10f)) }
     }
-    Group(stringResource(R.string.capture_activation), info = stringResource(R.string.capture_ptt_desc).takeIf { v.activation == Activation.PTT }) {
+    Group(stringResource(R.string.capture_activation)) {
         Radio(stringResource(R.string.capture_vad), v.activation == Activation.VAD) { onChange(v.copy(activation = Activation.VAD)) }
         Radio(stringResource(R.string.capture_ptt), v.activation == Activation.PTT) { onChange(v.copy(activation = Activation.PTT)) }
         Radio(stringResource(R.string.capture_continuous), v.activation == Activation.CONTINUOUS) { onChange(v.copy(activation = Activation.CONTINUOUS)) }
     }
-    Group(stringResource(R.string.capture_level), info = stringResource(R.string.capture_level_desc)) {
+    if (v.activation == Activation.PTT) Desc(stringResource(R.string.capture_ptt_desc))
+    Group(stringResource(R.string.capture_level)) {
         LevelMeter(actions, if (v.activation == Activation.VAD) v.vadThreshold else null)
+        Desc(stringResource(R.string.capture_level_desc))
     }
     if (v.activation == Activation.VAD) {
         Group(stringResource(R.string.capture_vad_level), "%.1f%%".format(v.vadThreshold * 100), info = stringResource(R.string.capture_vad_level_desc)) {

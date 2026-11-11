@@ -259,6 +259,7 @@
     <string name="playback_output">Voices play through</string>
     <string name="playback_output_speaker">Loudspeaker</string>
     <string name="playback_output_earpiece">Earpiece</string>
+    <string name="playback_output_speaker_desc">Voices come from the phone\'s loudspeaker, so you don\'t need to hold the phone.</string>
     <string name="playback_output_earpiece_desc">As in a phone call: hold the phone to your ear. The screen turns off there.</string>
     <string name="playback_headset">Use connected headphones</string>
     <string name="playback_headset_desc">Headphones, a headset or a Bluetooth speaker play the voices while connected. Off: the phone itself always plays them.</string>

@@ -260,6 +260,7 @@
     <string name="playback_output">Hlasy se přehrávají přes</string>
     <string name="playback_output_speaker">Reproduktor</string>
     <string name="playback_output_earpiece">Sluchátko telefonu</string>
+    <string name="playback_output_speaker_desc">Hlasy se přehrávají z reproduktoru telefonu, takže ho nemusíte držet.</string>
     <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
     <string name="playback_headset">Používat připojená sluchátka</string>
     <string name="playback_headset_desc">Připojená sluchátka, náhlavní souprava nebo Bluetooth reproduktor přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>

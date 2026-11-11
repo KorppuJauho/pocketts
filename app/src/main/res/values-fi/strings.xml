@@ -241,6 +241,7 @@
     <string name="playback_output">Äänet kuuluvat</string>
     <string name="playback_output_speaker">Kaiuttimesta</string>
     <string name="playback_output_earpiece">Kuulokkeesta</string>
+    <string name="playback_output_speaker_desc">Äänet kuuluvat puhelimen kaiuttimesta, joten puhelinta ei tarvitse pitää korvalla.</string>
     <string name="playback_output_earpiece_desc">Kuten puhelussa: pidä puhelinta korvalla. Näyttö sammuu siksi aikaa.</string>
     <string name="playback_headset">Käytä yhdistettyjä kuulokkeita</string>
     <string name="playback_headset_desc">Yhdistetyt kuulokkeet, kuulokemikrofoni tai Bluetooth-kaiutin toistavat äänet. Pois päältä: äänet kuuluvat aina puhelimesta.</string>
