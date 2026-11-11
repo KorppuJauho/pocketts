@@ -249,6 +249,7 @@
     <string name="playback_output">Stimmen kommen aus</string>
     <string name="playback_output_speaker">Lautsprecher</string>
     <string name="playback_output_earpiece">Hörer</string>
+    <string name="playback_output_speaker_desc">Stimmen kommen aus dem Lautsprecher des Telefons, du musst es also nicht halten.</string>
     <string name="playback_output_earpiece_desc">Wie bei einem Anruf: Halte das Telefon ans Ohr. Der Bildschirm schaltet sich dort aus.</string>
     <string name="playback_headset">Verbundene Kopfhörer verwenden</string>
     <string name="playback_headset_desc">Kopfhörer, ein Headset oder ein Bluetooth-Lautsprecher geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
@@ -622,6 +623,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Ein</string>
     <string name="a11y_off">Aus</string>
+    <string name="a11y_about">Info zu %1$s</string>
     <string name="a11y_talk_start">Sprechen starten</string>
     <string name="a11y_talk_stop">Sprechen beenden</string>
     <string name="a11y_whisper_start">Flüstern starten</string>

@@ -268,6 +268,7 @@
     <string name="playback_output">Hlasy se přehrávají přes</string>
     <string name="playback_output_speaker">Reproduktor</string>
     <string name="playback_output_earpiece">Sluchátko telefonu</string>
+    <string name="playback_output_speaker_desc">Hlasy se přehrávají z reproduktoru telefonu, takže ho nemusíte držet.</string>
     <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
     <string name="playback_headset">Používat připojená sluchátka</string>
     <string name="playback_headset_desc">Připojená sluchátka, náhlavní souprava nebo Bluetooth reproduktor přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
@@ -687,6 +688,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Zapnuto</string>
     <string name="a11y_off">Vypnuto</string>
+    <string name="a11y_about">O nastavení %1$s</string>
     <string name="a11y_talk_start">začít mluvit</string>
     <string name="a11y_talk_stop">přestat mluvit</string>
     <string name="a11y_whisper_start">začít šeptat</string>

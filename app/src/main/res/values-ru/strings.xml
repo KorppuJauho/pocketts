@@ -255,6 +255,7 @@
     <string name="playback_output">Голоса звучат через</string>
     <string name="playback_output_speaker">Динамик</string>
     <string name="playback_output_earpiece">Разговорный динамик</string>
+    <string name="playback_output_speaker_desc">Голоса звучат из динамика телефона, держать его у уха не нужно.</string>
     <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
     <string name="playback_headset">Использовать подключённые наушники</string>
     <string name="playback_headset_desc">Подключённые наушники, гарнитура или Bluetooth-колонка воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
@@ -650,6 +651,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Вкл.</string>
     <string name="a11y_off">Выкл.</string>
+    <string name="a11y_about">О настройке «%1$s»</string>
     <string name="a11y_talk_start">начать говорить</string>
     <string name="a11y_talk_stop">перестать говорить</string>
     <string name="a11y_whisper_start">начать шептать</string>

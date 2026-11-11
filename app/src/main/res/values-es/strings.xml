@@ -252,6 +252,7 @@
     <string name="playback_output">Las voces suenan por</string>
     <string name="playback_output_speaker">Altavoz</string>
     <string name="playback_output_earpiece">Auricular</string>
+    <string name="playback_output_speaker_desc">Las voces suenan por el altavoz del teléfono, así que no hace falta sostenerlo.</string>
     <string name="playback_output_earpiece_desc">Como en una llamada: acerca el teléfono al oído. La pantalla se apaga ahí.</string>
     <string name="playback_headset">Usar los auriculares conectados</string>
     <string name="playback_headset_desc">Unos auriculares o un altavoz Bluetooth conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
@@ -636,6 +637,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Activado</string>
     <string name="a11y_off">Desactivado</string>
+    <string name="a11y_about">Acerca de %1$s</string>
     <string name="a11y_talk_start">empezar a hablar</string>
     <string name="a11y_talk_stop">dejar de hablar</string>
     <string name="a11y_whisper_start">empezar a susurrar</string>

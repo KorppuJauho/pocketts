@@ -252,6 +252,7 @@
     <string name="playback_output">Les voix sortent par</string>
     <string name="playback_output_speaker">Haut-parleur</string>
     <string name="playback_output_earpiece">Écouteur</string>
+    <string name="playback_output_speaker_desc">Les voix sortent par le haut-parleur du téléphone : inutile de le tenir.</string>
     <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
     <string name="playback_headset">Utiliser le casque connecté</string>
     <string name="playback_headset_desc">Un casque, des écouteurs ou une enceinte Bluetooth connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
@@ -636,6 +637,7 @@
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Activé</string>
     <string name="a11y_off">Désactivé</string>
+    <string name="a11y_about">À propos de %1$s</string>
     <string name="a11y_talk_start">commencer à parler</string>
     <string name="a11y_talk_stop">arrêter de parler</string>
     <string name="a11y_whisper_start">commencer à chuchoter</string>
