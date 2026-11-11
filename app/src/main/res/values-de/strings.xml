@@ -48,8 +48,8 @@
     <string name="folder_rename">Ordner umbenennen</string>
     <string name="folder_fold">Ordner einklappen</string>
     <string name="folder_unfold">Ordner ausklappen</string>
-    <string name="connect_show">Mit einem Server verbinden</string>
-    <string name="connect_hide">Ausblenden</string>
+    <string name="connect_show">Verbindungsbereich ausklappen</string>
+    <string name="connect_hide">Verbindungsbereich einklappen</string>
     <string name="community_tab">Community</string>
     <string name="community_desc">Öffentliche Server, betrieben von TeamSpeak. Tippe auf einen, um beizutreten. PocketTS ist eine inoffizielle App.</string>
     <string name="community_desc_no_nick">Öffentliche Server, betrieben von TeamSpeak. Gib oben einen Nickname ein, um beizutreten. PocketTS ist eine inoffizielle App.</string>

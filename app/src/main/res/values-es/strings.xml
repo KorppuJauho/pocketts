@@ -48,8 +48,8 @@
     <string name="folder_rename">Cambiar el nombre de la carpeta</string>
     <string name="folder_fold">plegar la carpeta</string>
     <string name="folder_unfold">abrir la carpeta</string>
-    <string name="connect_show">Conectar a un servidor</string>
-    <string name="connect_hide">Ocultar</string>
+    <string name="connect_show">Abrir el panel de conexión</string>
+    <string name="connect_hide">Plegar el panel de conexión</string>
     <string name="community_tab">Comunidad</string>
     <string name="community_desc">Servidores públicos gestionados por TeamSpeak. Toca uno para entrar. PocketTS es una app no oficial.</string>
     <string name="community_desc_no_nick">Servidores públicos gestionados por TeamSpeak. Escribe un apodo arriba para entrar en uno. PocketTS es una app no oficial.</string>

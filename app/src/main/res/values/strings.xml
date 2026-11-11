@@ -53,8 +53,8 @@
     <string name="folder_rename">Rename folder</string>
     <string name="folder_fold">fold the folder</string>
     <string name="folder_unfold">open the folder</string>
-    <string name="connect_show">Connect to a server</string>
-    <string name="connect_hide">Hide</string>
+    <string name="connect_show">Open the connect panel</string>
+    <string name="connect_hide">Fold the connect panel</string>
     <string name="community_tab">Community</string>
     <string name="community_desc">Public servers run by TeamSpeak. Tap one to join. PocketTS is an unofficial app.</string>
     <string name="community_desc_no_nick">Public servers run by TeamSpeak. Type a nickname above to join one. PocketTS is an unofficial app.</string>

@@ -12,7 +12,7 @@ class Settings(private val context: Context) {
         get() = prefs.getString("nickname", "").orEmpty()
         set(v) = prefs.edit().putString("nickname", v).apply()
 
-    /** The connect screen's Connect and Community panel is hidden (a + in the header brings it back). */
+    /** The connect screen's Connect and Community panel is folded shut to its bar. */
     var connectHidden: Boolean
         get() = prefs.getBoolean("connectHidden", false)
         set(v) = prefs.edit().putBoolean("connectHidden", v).apply()

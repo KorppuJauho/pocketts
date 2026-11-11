@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -66,15 +65,15 @@ interface ConnectActions {
     fun removeFavorite(f: Favorite)
     fun toggleAuto(f: Favorite)
     fun renameFolder(folder: String, name: String) {}
-    /** Remembered: the folders folded shut, and whether the Connect and Community panel is hidden. */
+    /** Remembered: the folders folded shut, and whether the Connect and Community panel is folded to its bar. */
     fun setFolded(folders: Set<String>) {}
     fun setConnectHidden(hidden: Boolean) {}
 }
 
 /**
  * WebTS's connect window: the favourites in their folders (one tap connects), then an address to type or TeamSpeak's
- * community servers. That last panel can be hidden ([connectHidden]) by those who only use their favourites; a + in the
- * header brings it back.
+ * community servers. That last panel folds shut to its bar ([connectHidden]), as the folders do, for those who only use
+ * their favourites.
  */
 @Composable
 fun ConnectScreen(
@@ -102,17 +101,13 @@ fun ConnectScreen(
     var hidden by remember { mutableStateOf(connectHidden) }
     val known = favorites.any { io.github.korppujauho.pocketts.Favorites.same(it.address, addr) }
     val folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites)
-    // With no favourites there's nothing else on the screen: the panel stays
-    val panelHidden = hidden && favorites.isNotEmpty()
+    val fold = { to: Boolean ->
+        hidden = to
+        actions.setConnectHidden(to)
+    }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
-        AppHeader {
-            if (panelHidden) HeaderButton(androidx.compose.material.icons.Icons.Rounded.Add, stringResource(R.string.connect_show)) {
-                hidden = false
-                actions.setConnectHidden(false)
-            }
-            if (settingsActions != null) SettingsGear { settings = true }
-        }
+        AppHeader { if (settingsActions != null) SettingsGear { settings = true } }
         // Above the scrolling part: in view whether the connect came from a favourite or the form
         error?.let { WarningBanner(it, onDismissError, Modifier.padding(top = 15.dp)) }
         Column(
@@ -136,19 +131,24 @@ fun ConnectScreen(
             // a swipe goes between them too
             val pages = androidx.compose.foundation.pager.rememberPagerState { 2 }
             val scope = androidx.compose.runtime.rememberCoroutineScope()
-            if (!panelHidden) Column(
+            // A newer version is said in the form: folded shut, here instead
+            if (hidden) UpdateCard()
+            Column(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
                     .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
             ) {
                 PageSwitch(
-                    pages.currentPage, onPage = { scope.launch { pages.animateScrollToPage(it) } },
-                    onHide = if (favorites.isEmpty()) null else ({
-                        hidden = true
-                        actions.setConnectHidden(true)
-                    }),
+                    pages.currentPage, open = !hidden,
+                    // A page's name opens the panel on it
+                    onPage = {
+                        val shutNow = hidden
+                        if (shutNow) fold(false)
+                        scope.launch { if (shutNow) pages.scrollToPage(it) else pages.animateScrollToPage(it) }
+                    },
+                    onFold = { fold(!hidden) },
                 )
-                Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
-                androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
+                if (!hidden) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+                if (!hidden) androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // The same nickname on both pages
                         TsField(nick, { nick = it }, stringResource(R.string.nickname))
@@ -268,16 +268,16 @@ private fun FolderDialog(name: String, onSave: (String) -> Unit, onDismiss: () -
 
 /**
  * The panel's top bar: its two pages, Connect and the community servers, as the server screen's Channels/Chat switch,
- * and at its end the button that hides the panel ([onHide]; none when it can't be hidden).
+ * and at its end the arrow that folds the panel shut to this bar, or [open] again, as a folder's does.
  */
 @Composable
-private fun PageSwitch(page: Int, onPage: (Int) -> Unit, onHide: (() -> Unit)?) {
+private fun PageSwitch(page: Int, open: Boolean, onPage: (Int) -> Unit, onFold: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().background(Ts.card).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         for ((i, label) in listOf(stringResource(R.string.connect), stringResource(R.string.community_tab)).withIndex()) {
-            val active = i == page
+            val active = open && i == page // folded shut, neither page is the one shown
             Box(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onPage(i) }
@@ -287,12 +287,13 @@ private fun PageSwitch(page: Int, onPage: (Int) -> Unit, onHide: (() -> Unit)?) 
                 Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             }
         }
-        if (onHide != null) Box(
-            Modifier.size(40.dp).clip(RoundedCornerShape(7.dp)).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onHide),
+        Box(
+            Modifier.size(40.dp).clip(RoundedCornerShape(7.dp)).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onFold),
             contentAlignment = Alignment.Center,
         ) {
             androidx.compose.material3.Icon(
-                androidx.compose.material.icons.Icons.Rounded.ExpandLess, contentDescription = stringResource(R.string.connect_hide), tint = Ts.muted,
+                if (open) androidx.compose.material.icons.Icons.Rounded.ExpandLess else androidx.compose.material.icons.Icons.Rounded.ExpandMore,
+                contentDescription = stringResource(if (open) R.string.connect_hide else R.string.connect_show), tint = Ts.muted,
             )
         }
     }

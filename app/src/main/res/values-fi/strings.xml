@@ -48,8 +48,8 @@
     <string name="folder_rename">Nimeä kansio uudelleen</string>
     <string name="folder_fold">sulje kansio</string>
     <string name="folder_unfold">avaa kansio</string>
-    <string name="connect_show">Yhdistä palvelimeen</string>
-    <string name="connect_hide">Piilota</string>
+    <string name="connect_show">Avaa yhdistämispaneeli</string>
+    <string name="connect_hide">Sulje yhdistämispaneeli</string>
     <string name="community_tab">Yhteisö</string>
     <string name="community_desc">TeamSpeakin ylläpitämiä julkisia palvelimia. Liity napauttamalla. PocketTS on epävirallinen sovellus.</string>
     <string name="community_desc_no_nick">TeamSpeakin ylläpitämiä julkisia palvelimia. Kirjoita nimimerkki yllä, niin voit liittyä. PocketTS on epävirallinen sovellus.</string>
