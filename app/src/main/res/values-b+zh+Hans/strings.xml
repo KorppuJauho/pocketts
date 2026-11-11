@@ -235,6 +235,13 @@
     <string name="playback_play_sound">播放提示音</string>
     <string name="playback_call_volume">开启回声消除时，语音跟随通话音量：连接后按音量键即可调节。</string>
     <string name="playback_media_volume">语音跟随媒体音量。</string>
+    <string name="playback_output">语音播放设备</string>
+    <string name="playback_output_speaker">扬声器</string>
+    <string name="playback_output_earpiece">听筒</string>
+    <string name="playback_output_earpiece_desc">像打电话一样：把手机贴近耳朵，屏幕会自动熄灭。</string>
+    <string name="playback_headset">使用已连接的耳机</string>
+    <string name="playback_headset_desc">连接耳机或耳麦时由它们播放语音。关闭后始终由手机本身播放。</string>
+    <string name="playback_output_media">关闭回声消除时，语音像媒体一样播放：通过扬声器、耳机或蓝牙音箱。</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">麦克风音量</string>

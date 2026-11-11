@@ -244,6 +244,13 @@
     <string name="playback_play_sound">Воспроизвести звук</string>
     <string name="playback_call_volume">С подавлением эха голоса следуют громкости звонка: нажмите кнопку громкости во время подключения.</string>
     <string name="playback_media_volume">Голоса следуют громкости медиа.</string>
+    <string name="playback_output">Голоса звучат через</string>
+    <string name="playback_output_speaker">Динамик</string>
+    <string name="playback_output_earpiece">Разговорный динамик</string>
+    <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
+    <string name="playback_headset">Использовать подключённую гарнитуру</string>
+    <string name="playback_headset_desc">Подключённые наушники или гарнитура воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
+    <string name="playback_output_media">Без подавления эха голоса звучат как медиа: через динамик, наушники или Bluetooth-колонку.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Громкость микрофона</string>

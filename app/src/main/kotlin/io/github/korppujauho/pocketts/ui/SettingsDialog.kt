@@ -553,8 +553,44 @@ private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     }
 }
 
+/** A two-way choice in one row, as the server screen's Channels/Chat switch. */
+@Composable
+internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Ts.card)
+            .border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)).padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        options.forEachIndexed { i, label ->
+            val active = i == selected
+            Box(
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                    .selectable(selected = active, role = androidx.compose.ui.semantics.Role.RadioButton) { onSelect(i) }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
 @Composable
 private fun Playback(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+    // Where voices come out: a choice only as call audio (echo cancellation); as media Android decides
+    Group(stringResource(R.string.playback_output)) {
+        if (v.echoCancellation) {
+            Segmented(
+                listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
+                if (v.earpiece) 1 else 0,
+            ) { onChange(v.copy(earpiece = it == 1)) }
+            if (v.earpiece) Desc(stringResource(R.string.playback_output_earpiece_desc))
+            Check(stringResource(R.string.playback_headset), v.useHeadset) { onChange(v.copy(useHeadset = it)) }
+            Desc(stringResource(R.string.playback_headset_desc))
+        } else {
+            Desc(stringResource(R.string.playback_output_media))
+        }
+    }
     Group(stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB") {
         TsSlider(v.voiceVolumeDb.toFloat(), -20f..12f, 31) { onChange(v.copy(voiceVolumeDb = it.roundToInt())) }
         RangeEnds(stringResource(R.string.quiet), stringResource(R.string.loud))

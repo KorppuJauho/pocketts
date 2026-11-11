@@ -241,6 +241,13 @@
     <string name="playback_play_sound">Jouer un son</string>
     <string name="playback_call_volume">Avec l’annulation d’écho, les voix suivent le volume d’appel : appuyez sur un bouton de volume pendant la connexion.</string>
     <string name="playback_media_volume">Les voix suivent le volume multimédia.</string>
+    <string name="playback_output">Les voix sortent par</string>
+    <string name="playback_output_speaker">Haut-parleur</string>
+    <string name="playback_output_earpiece">Écouteur</string>
+    <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
+    <string name="playback_headset">Utiliser le casque connecté</string>
+    <string name="playback_headset_desc">Un casque ou des écouteurs connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
+    <string name="playback_output_media">Sans annulation de l’écho, les voix sont jouées comme un média : par le haut-parleur, votre casque ou une enceinte Bluetooth.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volume du micro</string>

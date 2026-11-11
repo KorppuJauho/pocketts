@@ -257,6 +257,13 @@
     <string name="playback_play_sound">Přehrát zvuk</string>
     <string name="playback_call_volume">Při zapnutém potlačení ozvěny se hlasitost hlasů řídí hlasitostí hovoru: během připojení stiskněte tlačítko hlasitosti.</string>
     <string name="playback_media_volume">Hlasitost hlasů se řídí hlasitostí médií.</string>
+    <string name="playback_output">Hlasy se přehrávají přes</string>
+    <string name="playback_output_speaker">Reproduktor</string>
+    <string name="playback_output_earpiece">Sluchátko telefonu</string>
+    <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
+    <string name="playback_headset">Používat připojenou náhlavní soupravu</string>
+    <string name="playback_headset_desc">Připojená sluchátka nebo náhlavní souprava přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
+    <string name="playback_output_media">Při vypnutém potlačení ozvěny se hlasy přehrávají jako média: přes reproduktor, sluchátka nebo Bluetooth reproduktor.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Hlasitost mikrofonu</string>

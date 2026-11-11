@@ -241,6 +241,13 @@
     <string name="playback_play_sound">Reproducir un sonido</string>
     <string name="playback_call_volume">Con la cancelación de eco activada, las voces siguen el volumen de llamada: pulsa un botón de volumen mientras estás conectado.</string>
     <string name="playback_media_volume">Las voces siguen el volumen multimedia.</string>
+    <string name="playback_output">Las voces suenan por</string>
+    <string name="playback_output_speaker">Altavoz</string>
+    <string name="playback_output_earpiece">Auricular</string>
+    <string name="playback_output_earpiece_desc">Como en una llamada: acerca el teléfono al oído. La pantalla se apaga ahí.</string>
+    <string name="playback_headset">Usar los auriculares conectados</string>
+    <string name="playback_headset_desc">Unos auriculares conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
+    <string name="playback_output_media">Con la cancelación de eco desactivada, las voces suenan como multimedia: por el altavoz, tus auriculares o un altavoz Bluetooth.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volumen del micrófono</string>

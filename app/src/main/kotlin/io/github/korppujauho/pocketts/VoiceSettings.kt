@@ -12,6 +12,8 @@ data class VoiceSettings(
     val noiseSuppression: Boolean = true,
     val aiNoiseRemoval: Boolean = false, // RNNoise, on the phone: removes noise the phone's own removal lets through
     val echoCancellation: Boolean = true,
+    val earpiece: Boolean = false, // with echo cancellation: voices from the earpiece, as a phone call, not the loudspeaker
+    val useHeadset: Boolean = true, // with echo cancellation: a connected headset plays the voices (off: the phone itself)
     val autoGainControl: Boolean = false,
     val floatingPtt: Boolean = true, // the round push-to-talk button
     val volumeKeysPtt: Boolean = false, // volume buttons talk while held (app on screen)
@@ -40,7 +42,8 @@ data class VoiceSettings(
 
     /** The settings that matter for a bug report, for the debug log (nothing private: no addresses or passwords). */
     fun forLog(): String = listOf(
-        "activation $activation", "echo cancellation $echoCancellation", "noise removal $noiseSuppression",
+        "activation $activation", "echo cancellation $echoCancellation", "earpiece $earpiece", "headset $useHeadset",
+        "noise removal $noiseSuppression",
         "AI noise removal $aiNoiseRemoval", "gain control $autoGainControl", "microphone ${(micVolume * 100).toInt()} %",
         "voice $voiceVolumeDb dB", "floating push-to-talk $floatingPtt", "volume keys $volumeKeysPtt", "headset button $headsetPtt",
         "mute on calls $muteOnCalls", "relay ${turnUrl.isNotEmpty()}", "relay only $relayOnly", "buttons at the bottom $controlsAtBottom",
@@ -61,6 +64,8 @@ data class VoiceSettings(
                 noiseSuppression = p.getBoolean("noiseSuppression", d.noiseSuppression),
                 aiNoiseRemoval = p.getBoolean("aiNoiseRemoval", d.aiNoiseRemoval),
                 echoCancellation = p.getBoolean("echoCancellation", d.echoCancellation),
+                earpiece = p.getBoolean("earpiece", d.earpiece),
+                useHeadset = p.getBoolean("useHeadset", d.useHeadset),
                 autoGainControl = p.getBoolean("autoGainControl", d.autoGainControl),
                 floatingPtt = p.getBoolean("floatingPtt", d.floatingPtt),
                 volumeKeysPtt = p.getBoolean("volumeKeysPtt", d.volumeKeysPtt),
@@ -101,6 +106,8 @@ data class VoiceSettings(
             .putBoolean("noiseSuppression", noiseSuppression)
             .putBoolean("aiNoiseRemoval", aiNoiseRemoval)
             .putBoolean("echoCancellation", echoCancellation)
+            .putBoolean("earpiece", earpiece)
+            .putBoolean("useHeadset", useHeadset)
             .putBoolean("autoGainControl", autoGainControl)
             .putBoolean("floatingPtt", floatingPtt)
             .putBoolean("volumeKeysPtt", volumeKeysPtt)

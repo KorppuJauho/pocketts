@@ -238,6 +238,13 @@
     <string name="playback_play_sound">Ton abspielen</string>
     <string name="playback_call_volume">Mit Echounterdrückung folgen die Stimmen der Anruflautstärke: Drück eine Lautstärketaste, während du verbunden bist.</string>
     <string name="playback_media_volume">Die Stimmen folgen der Medienlautstärke.</string>
+    <string name="playback_output">Stimmen kommen aus</string>
+    <string name="playback_output_speaker">Lautsprecher</string>
+    <string name="playback_output_earpiece">Hörer</string>
+    <string name="playback_output_earpiece_desc">Wie bei einem Anruf: Halte das Telefon ans Ohr. Der Bildschirm schaltet sich dort aus.</string>
+    <string name="playback_headset">Verbundenes Headset verwenden</string>
+    <string name="playback_headset_desc">Kopfhörer oder ein Headset geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
+    <string name="playback_output_media">Ohne Echounterdrückung klingen Stimmen wie Medien: über den Lautsprecher, deine Kopfhörer oder einen Bluetooth-Lautsprecher.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonlautstärke</string>

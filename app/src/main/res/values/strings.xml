@@ -256,6 +256,13 @@
     <string name="playback_play_sound">Play a sound</string>
     <string name="playback_call_volume">With echo cancellation on, voices follow the call volume: press a volume button while connected.</string>
     <string name="playback_media_volume">Voices follow the media volume.</string>
+    <string name="playback_output">Voices play through</string>
+    <string name="playback_output_speaker">Loudspeaker</string>
+    <string name="playback_output_earpiece">Earpiece</string>
+    <string name="playback_output_earpiece_desc">As in a phone call: hold the phone to your ear. The screen turns off there.</string>
+    <string name="playback_headset">Use a connected headset</string>
+    <string name="playback_headset_desc">Headphones or a headset play the voices while connected. Off: the phone itself always plays them.</string>
+    <string name="playback_output_media">With echo cancellation off, voices play like media: through the loudspeaker, or your headphones or Bluetooth speaker.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Microphone volume</string>

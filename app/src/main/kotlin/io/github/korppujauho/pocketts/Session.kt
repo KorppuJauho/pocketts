@@ -599,17 +599,20 @@ object Session : TsClient.Listener {
         } else if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) {
             sender?.reconfigure()
         }
+        // The loudspeaker or the earpiece, a headset or not: followed while connected
+        if (v.earpiece != old.earpiece || v.useHeadset != old.useHeadset) route?.set(v.earpiece, v.useHeadset)
     }
 
     private fun startAudio() {
         val v = _state.value.voice
-        if (v.echoCancellation) route = AudioRoute(app).also { it.start() }
+        if (v.echoCancellation) route = AudioRoute(app).also { it.start(v.earpiece, v.useHeadset) }
         player = VoicePlayer(v.echoCancellation, ::setTalking).also {
             it.muted = _state.value.outputMuted
             it.voiceGain = v.voiceGain
         }
         updateGains()
         if (micPermitted()) startSender()
+        route?.audioStarted()
     }
 
     private fun startSender() {
@@ -628,6 +631,7 @@ object Session : TsClient.Listener {
             it.muted = _state.value.inputMuted
             it.whisperHeld = _state.value.whisperHeld
         }
+        route?.audioStarted() // also when the microphone is allowed only later
     }
 
     private fun stopAudio() {

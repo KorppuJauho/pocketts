@@ -238,6 +238,13 @@
     <string name="playback_play_sound">Toista ääni</string>
     <string name="playback_call_volume">Kun kaiunpoisto on päällä, äänet seuraavat puhelun äänenvoimakkuutta: paina äänenvoimakkuuspainiketta yhdistettynä.</string>
     <string name="playback_media_volume">Äänet seuraavat median äänenvoimakkuutta.</string>
+    <string name="playback_output">Äänet kuuluvat</string>
+    <string name="playback_output_speaker">Kaiuttimesta</string>
+    <string name="playback_output_earpiece">Kuulokkeesta</string>
+    <string name="playback_output_earpiece_desc">Kuten puhelussa: pidä puhelinta korvalla. Näyttö sammuu siksi aikaa.</string>
+    <string name="playback_headset">Käytä yhdistettyjä kuulokkeita</string>
+    <string name="playback_headset_desc">Yhdistetyt kuulokkeet tai kuulokemikrofoni toistavat äänet. Pois päältä: äänet kuuluvat aina puhelimesta.</string>
+    <string name="playback_output_media">Kun kaiunpoisto on pois päältä, äänet toistetaan kuin media: kaiuttimesta, kuulokkeista tai Bluetooth-kaiuttimesta.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonin äänenvoimakkuus</string>
