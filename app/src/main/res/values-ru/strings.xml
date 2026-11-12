@@ -67,6 +67,10 @@
     <string name="update_text">На GitHub есть версия новее этой (%1$s).</string>
     <string name="not_now">Не сейчас</string>
     <string name="download">Скачать</string>
+    <string name="update_check_button">Проверить сейчас</string>
+    <string name="update_checking">Проверяем…</string>
+    <string name="update_failed">Не удалось спросить GitHub. Попробуйте позже.</string>
+    <string name="update_latest">У вас новейшая версия (%1$s).</string>
 
     <!-- Server screen: header and controls -->
     <string name="settings">Настройки</string>
@@ -198,7 +202,7 @@
     <string name="settings_playback">Воспроизведение</string>
     <string name="settings_capture">Запись</string>
     <string name="settings_ui">Интерфейс</string>
-    <string name="settings_save">Сохранить и применить</string>
+    <string name="settings_autosave">Всё сохраняется сразу, как только вы это меняете.</string>
     <string name="cant_be_undone">Это нельзя отменить</string>
     <string name="quiet">Тихо</string>
     <string name="loud">Громко</string>
@@ -218,7 +222,7 @@
     <string name="general_call_mute">Отключать звук во время звонков</string>
     <string name="general_call_mute_desc">Когда звонит телефон или начинается звонок, микрофон и звук отключаются (и звук трансляции, которую вы смотрите) и включаются снова после его окончания. Ваша трансляция ставится на паузу, чтобы зрители не видели звонок. То, что вы отключили сами, остаётся отключённым.</string>
     <string name="general_updates">Проверять обновления</string>
-    <string name="general_updates_desc">Раз в день PocketTS спрашивает у GitHub, не вышла ли новая версия, и сообщает об этом на экране подключения. О вас ничего не отправляется.</string>
+    <string name="general_updates_desc">PocketTS спрашивает у GitHub новейшую версию, только когда вы нажмёте «Проверить сейчас». О вас ничего не отправляется. Найденная новая версия показывается здесь и на экране подключения.</string>
     <string name="general_screen_on">Не выключать экран</string>
     <string name="general_screen_on_desc">Экран не гаснет, пока вы подключены и приложение открыто. Пока вы ведёте или смотрите трансляцию, он и так остаётся включённым.</string>
     <string name="general_spacers">Разрешить вход в разделители</string>

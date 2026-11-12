@@ -580,7 +580,7 @@ object Session : TsClient.Listener {
     /** The microphone's level and whether it's "on", for the settings' meter. */
     fun micLevel(): Pair<Float, Boolean> = sender?.let { it.level to it.active } ?: (0f to false)
 
-    /** Measuring only (settings open): nothing is sent. */
+    /** Settings open: the microphone keeps measuring even when muted; talking goes on as usual. */
     fun micTest(on: Boolean) {
         sender?.testing = on
     }
@@ -609,16 +609,13 @@ object Session : TsClient.Listener {
         player?.voiceGain = v.voiceGain
         if (v.activation != VoiceSettings.Activation.PTT) setPtt(false)
         if (_state.value.phase == Phase.IDLE) return
-        if (v.callAudio != old.callAudio) {
-            // Call audio or media: playback and the microphone start again
+        if (v.callAudio != old.callAudio || v.earpiece != old.earpiece || v.useHeadset != old.useHeadset) {
+            // Call audio or media, or another place for it (the loudspeaker, the earpiece, headphones): playback and
+            // the microphone start again. Only asking Android to switch the route while the sound is already running
+            // is ignored by some phones; starting it anew goes where it's asked.
             worker.execute { stopAudio(); startAudio() }
         } else {
             if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) sender?.reconfigure()
-            // The loudspeaker or the earpiece, headphones or not: followed while connected
-            if (v.earpiece != old.earpiece || v.useHeadset != old.useHeadset) {
-                route?.set(v.earpiece, v.useHeadset)
-                player?.device = phoneSpeaker(v)
-            }
         }
     }
 
@@ -645,6 +642,9 @@ object Session : TsClient.Listener {
     }
 
     private fun startSender() {
+        // The settings are open while the audio restarts (a route change does): the new microphone keeps measuring,
+        // and a push-to-talk held through it stays held
+        val testing = sender?.testing ?: false
         sender = MicSender(
             settings = { _state.value.voice },
             // Whispering doesn't need the channel's talk power (the server decides who may be whispered to)
@@ -659,6 +659,8 @@ object Session : TsClient.Listener {
         ).also {
             it.muted = _state.value.inputMuted
             it.whisperHeld = _state.value.whisperHeld
+            it.pttHeld = _state.value.pttHeld
+            it.testing = testing
         }
         route?.audioStarted() // also when the microphone is allowed only later
     }

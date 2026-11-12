@@ -67,6 +67,10 @@
     <string name="update_text">Tätä (%1$s) uudempi versio on GitHubissa.</string>
     <string name="not_now">Ei nyt</string>
     <string name="download">Lataa</string>
+    <string name="update_check_button">Tarkista nyt</string>
+    <string name="update_checking">Tarkistetaan…</string>
+    <string name="update_failed">GitHubia ei voitu kysyä. Yritä myöhemmin uudelleen.</string>
+    <string name="update_latest">Sinulla on uusin versio (%1$s).</string>
 
     <!-- Server screen: header and controls -->
     <string name="settings">Asetukset</string>
@@ -196,7 +200,7 @@
     <string name="settings_playback">Toisto</string>
     <string name="settings_capture">Äänitys</string>
     <string name="settings_ui">Käyttöliittymä</string>
-    <string name="settings_save">Tallenna ja ota käyttöön</string>
+    <string name="settings_autosave">Kaikki tallentuu heti, kun muutat sitä.</string>
     <string name="cant_be_undone">Tätä ei voi perua</string>
     <string name="quiet">Hiljaa</string>
     <string name="loud">Kovaa</string>
@@ -216,7 +220,7 @@
     <string name="general_call_mute">Mykistä puhelun ajaksi</string>
     <string name="general_call_mute_desc">Kun puhelin soi tai puhelu alkaa, mikrofoni ja ääni menevät pois päältä (myös katsomasi striimin ääni) ja palaavat, kun puhelu päättyy. Jakamasi striimi tauotetaan, jotta katsojat eivät näe puhelua. Itse mykistämäsi pysyy mykistettynä.</string>
     <string name="general_updates">Tarkista päivitykset</string>
-    <string name="general_updates_desc">Kerran päivässä PocketTS kysyy GitHubilta, onko uudempi versio julkaistu, ja kertoo siitä yhdistämisnäkymässä. Sinusta ei lähetetä mitään.</string>
+    <string name="general_updates_desc">PocketTS kysyy GitHubilta uusinta versiota vasta, kun napautat Tarkista nyt. Sinusta ei lähetetä mitään. Uudempi versio näkyy täällä ja yhdistämisnäkymässä.</string>
     <string name="general_screen_on">Pidä näyttö päällä</string>
     <string name="general_screen_on_desc">Näyttö ei sammu, kun olet yhdistettynä ja sovellus on auki. Kun jaat tai katsot striimiä, se pysyy päällä joka tapauksessa.</string>
     <string name="general_spacers">Salli liittyminen välikappaleisiin</string>

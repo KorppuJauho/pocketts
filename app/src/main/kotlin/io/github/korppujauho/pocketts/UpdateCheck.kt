@@ -7,29 +7,41 @@ import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Whether a newer PocketTS is out on GitHub, for the version installed from there (Google Play updates apps by
- * itself). At most once a day it asks GitHub for the latest release; nothing about the person is sent. The answer
- * shows as a card on the connect screen until it's dismissed or that version is installed. Off in
- * Settings > General > Check for updates.
+ * itself). GitHub is asked only when the person taps Check for update (Settings › General); nothing about them is
+ * sent. A newer one found shows as a card on the connect screen until it's dismissed or that version is installed.
  */
 object UpdateCheck {
     data class Release(val version: String, val url: String)
 
+    /** What the last Check for update came to: the newest release on GitHub, or why it couldn't be asked. */
+    data class Outcome(val version: String? = null, val failed: Boolean = false)
+
     private const val LATEST = "https://api.github.com/repos/KorppuJauho/pocketts/releases/latest"
     private const val RELEASES = "https://github.com/KorppuJauho/pocketts/releases"
-    private const val DAY_MS = 24 * 3600 * 1000L
 
     private val _available = MutableStateFlow<Release?>(null)
     val available: StateFlow<Release?> = _available
 
+    private val _checking = MutableStateFlow(false)
+    val checking: StateFlow<Boolean> = _checking
+
+    private val _outcome = MutableStateFlow<Outcome?>(null)
+    val outcome: StateFlow<Outcome?> = _outcome
+
     /** Whether this build checks at all (the GitHub release does; test builds don't). */
     val enabled: Boolean get() = BuildConfig.UPDATE_CHECK
 
+    /** A release found by an earlier check shows again, without asking GitHub. */
     fun start(context: Context) {
-        if (!enabled || !VoiceSettings.load(context).checkUpdates) return
+        if (!enabled) return
         val prefs = context.applicationContext.getSharedPreferences("updates", Context.MODE_PRIVATE)
-        // The last answer shows at once; GitHub is asked again only after a day
         prefs.getString("version", null)?.let { offer(prefs, it, prefs.getString("url", null) ?: RELEASES) }
-        if (System.currentTimeMillis() - prefs.getLong("checked", 0) < DAY_MS) return
+    }
+
+    /** GitHub is asked for the newest release (the tap on Check for update); the answer is said where it was asked. */
+    fun check(context: Context) {
+        if (!enabled || !_checking.compareAndSet(false, true)) return
+        _outcome.value = null
         Thread({
             try {
                 val c = java.net.URL(LATEST).openConnection() as java.net.HttpURLConnection
@@ -42,14 +54,20 @@ object UpdateCheck {
                 } finally {
                     c.disconnect()
                 }
-                val release = body?.let { Json.parse(it) as? Map<*, *> } ?: return@Thread
-                val version = (release["tag_name"] as? String)?.removePrefix("v")?.trim()?.ifEmpty { null } ?: return@Thread
+                val release = body?.let { Json.parse(it) as? Map<*, *> }
+                val version = (release?.get("tag_name") as? String)?.removePrefix("v")?.trim()?.ifEmpty { null }
+                if (version == null) throw IllegalStateException("no version in GitHub's answer")
                 val url = (release["html_url"] as? String)?.takeIf { it.startsWith("https://github.com/") } ?: RELEASES
-                prefs.edit().putLong("checked", System.currentTimeMillis()).putString("version", version).putString("url", url).apply()
+                val prefs = context.applicationContext.getSharedPreferences("updates", Context.MODE_PRIVATE)
+                prefs.edit().putString("version", version).putString("url", url).apply()
                 AppLog.log("Update check: latest is $version")
                 offer(prefs, version, url)
+                _outcome.value = Outcome(version)
             } catch (e: Exception) {
                 AppLog.log("Update check failed: ${e.javaClass.simpleName}")
+                _outcome.value = Outcome(failed = true)
+            } finally {
+                _checking.value = false
             }
         }, "update-check").apply { isDaemon = true }.start()
     }

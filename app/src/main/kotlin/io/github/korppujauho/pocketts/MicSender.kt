@@ -32,7 +32,7 @@ class MicSender(
     /** Microphone off: nothing is recorded (the phone's microphone indicator goes away too). */
     @Volatile var muted = false
         set(value) { field = value; wake() }
-    /** Settings open: the level is measured (even when muted) but nothing is sent. */
+    /** Settings open: the level is measured even when muted (talking goes on as usual). */
     @Volatile var testing = false
         set(value) { field = value; wake() }
     /** The microphone's level (RMS, 0 - 1), for the meter. */
@@ -148,7 +148,7 @@ class MicSender(
                     }
                 }
                 active = on
-                val go = on && !muted && !testing && canSend(whisper)
+                val go = on && !muted && canSend(whisper)
                 if (go && sending && sentWhisper != whisper) {
                     // From talking to whispering, or back: the one ends, the other starts
                     sendStop(sentWhisper)

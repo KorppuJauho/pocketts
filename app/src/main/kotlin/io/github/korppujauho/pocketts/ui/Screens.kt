@@ -372,14 +372,14 @@ fun PrimaryButton(text: String, enabled: Boolean = true, modifier: Modifier = Mo
 }
 
 @Composable
-fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SecondaryButton(text: String, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier.clip(RoundedCornerShape(6.dp)).background(Ts.card)
             .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(6.dp))
-            .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 8.dp),
+            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(text, color = Ts.text.copy(alpha = if (enabled) 1f else 0.5f), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
     }
 }
 
