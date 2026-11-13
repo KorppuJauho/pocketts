@@ -253,6 +253,32 @@
     <string name="playback_output_earpiece_desc">Kuten puhelussa: pidä puhelinta korvalla. Näyttö sammuu siksi aikaa.</string>
     <string name="playback_headset">Käytä yhdistettyjä kuulokkeita</string>
     <string name="playback_headset_desc">Yhdistetyt kuulokkeet, kuulokemikrofoni tai Bluetooth-kaiutin toistavat äänet. Pois päältä: äänet kuuluvat aina puhelimesta.</string>
+    <string name="audio_in_use">Käytössä nyt</string>
+    <string name="audio_in_use_idle">Yhdistä palvelimelle, niin näet, mikä toistaa ja mikä äänittää.</string>
+    <string name="audio_in_use_unsaved">Muutokset näkyvät tässä, kun valitset Tallenna ja ota käyttöön.</string>
+    <string name="audio_mode">Tila</string>
+    <string name="audio_mode_call">Puhelu</string>
+    <string name="audio_mode_media">Media</string>
+    <string name="audio_playback">Toisto</string>
+    <string name="audio_playback_waiting">Näkyy, kun joku puhuu</string>
+    <string name="audio_microphone">Mikrofoni</string>
+    <string name="audio_mic_phone">Puhelimen mikrofoni</string>
+    <string name="audio_mic_wired">Kuulokemikrofoni (johdollinen)</string>
+    <string name="audio_mic_none">Ei äänitä</string>
+    <string name="audio_mic_no_permission">Ei lupaa</string>
+    <string name="audio_device_wired">Johdolliset kuulokkeet</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, puhelun laatu)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (kuulokoje)</string>
+    <string name="audio_device_unnamed">Kuulokkeet</string>
+    <string name="audio_device_other">Muu laite (%1$d)</string>
+    <string name="audio_hint_call">Media sen sijaan: kovempi ääni, mutta muut voivat kuulla oman äänensä takaisin.</string>
+    <string name="audio_hint_media">Puhelu sen sijaan: kaikusi poistetaan, mutta äänet ovat hiljaisempia.</string>
+    <string name="audio_hint_switch">Muuta Äänitys-välilehdellä ›</string>
+    <string name="audio_hint_earpiece">Kuuloke toistaa aina puheluna.</string>
+    <string name="audio_hint_bluetooth">Bluetooth-kuulokkeet lähettävät mikrofoninsa vain puhelussa, mikä myös heikentää niiden äänenlaatua.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonin äänenvoimakkuus</string>

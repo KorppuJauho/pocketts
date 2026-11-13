@@ -531,6 +531,7 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     }
     override fun micLevel() = Session.micLevel()
     override fun micTest(on: Boolean) = Session.micTest(on)
+    override fun audioInUse() = Session.audioInUse()
     override fun playTestSound() = TestSound.play(Session.state.value.voice)
     override fun setAvatar(uri: android.net.Uri) = Session.setAvatar(context, uri)
     override fun removeAvatar() = Session.removeAvatar()

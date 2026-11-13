@@ -272,6 +272,32 @@
     <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
     <string name="playback_headset">Používat připojená sluchátka</string>
     <string name="playback_headset_desc">Připojená sluchátka, náhlavní souprava nebo Bluetooth reproduktor přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
+    <string name="audio_in_use">Používaný zvuk</string>
+    <string name="audio_in_use_idle">Připojte se k serveru a uvidíte, co přehrává a co nahrává.</string>
+    <string name="audio_in_use_unsaved">Změny se zde ukážou po Uložit a použít.</string>
+    <string name="audio_mode">Režim</string>
+    <string name="audio_mode_call">Hovor</string>
+    <string name="audio_mode_media">Média</string>
+    <string name="audio_playback">Přehrávání</string>
+    <string name="audio_playback_waiting">Ukáže se, když někdo mluví</string>
+    <string name="audio_microphone">Mikrofon</string>
+    <string name="audio_mic_phone">Mikrofon telefonu</string>
+    <string name="audio_mic_wired">Mikrofon náhlavní soupravy (kabelový)</string>
+    <string name="audio_mic_none">Nenahrává</string>
+    <string name="audio_mic_no_permission">Bez oprávnění</string>
+    <string name="audio_device_wired">Kabelová sluchátka</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, kvalita hovoru)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (naslouchátko)</string>
+    <string name="audio_device_unnamed">Sluchátka</string>
+    <string name="audio_device_other">Jiné zařízení (%1$d)</string>
+    <string name="audio_hint_call">Místo toho média: hlasitější, ale ostatní mohou slyšet vlastní hlas zpět.</string>
+    <string name="audio_hint_media">Místo toho hovor: vaše ozvěna se odstraní, ale hlasy jsou tišší.</string>
+    <string name="audio_hint_switch">Změnit v Nahrávání ›</string>
+    <string name="audio_hint_earpiece">Sluchátko telefonu vždy hraje jako hovor.</string>
+    <string name="audio_hint_bluetooth">Bluetooth sluchátka posílají svůj mikrofon jen při hovoru, což také snižuje jejich kvalitu zvuku.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Hlasitost mikrofonu</string>

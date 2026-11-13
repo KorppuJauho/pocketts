@@ -271,6 +271,32 @@
     <string name="playback_output_earpiece_desc">As in a phone call: hold the phone to your ear. The screen turns off there.</string>
     <string name="playback_headset">Use connected headphones</string>
     <string name="playback_headset_desc">Headphones, a headset or a Bluetooth speaker play the voices while connected. Off: the phone itself always plays them.</string>
+    <string name="audio_in_use">Audio in use</string>
+    <string name="audio_in_use_idle">Connect to a server to see what plays and records.</string>
+    <string name="audio_in_use_unsaved">Changes show here after Save &amp; Apply.</string>
+    <string name="audio_mode">Mode</string>
+    <string name="audio_mode_call">Phone call</string>
+    <string name="audio_mode_media">Media</string>
+    <string name="audio_playback">Playback</string>
+    <string name="audio_playback_waiting">Shows when someone talks</string>
+    <string name="audio_microphone">Microphone</string>
+    <string name="audio_mic_phone">Phone\'s microphone</string>
+    <string name="audio_mic_wired">Headset microphone (wired)</string>
+    <string name="audio_mic_none">Not recording</string>
+    <string name="audio_mic_no_permission">No permission</string>
+    <string name="audio_device_wired">Wired headphones</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, call quality)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (hearing aid)</string>
+    <string name="audio_device_unnamed">Headphones</string>
+    <string name="audio_device_other">Other device (%1$d)</string>
+    <string name="audio_hint_call">Media instead: louder, but others may hear their own voice back.</string>
+    <string name="audio_hint_media">Phone call instead: your echo is removed, but voices are quieter.</string>
+    <string name="audio_hint_switch">Change in Capture ›</string>
+    <string name="audio_hint_earpiece">The earpiece always plays as a phone call.</string>
+    <string name="audio_hint_bluetooth">Bluetooth headphones send their microphone only in a phone call, which also lowers their sound quality.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Microphone volume</string>

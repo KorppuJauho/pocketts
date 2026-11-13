@@ -585,6 +585,34 @@ object Session : TsClient.Listener {
         sender?.testing = on
     }
 
+    /** What the voices play through and what records right now (Settings › Playback); null when not connected. */
+    fun audioInUse(): AudioInUse? {
+        if (!::app.isInitialized || _state.value.phase != Phase.CONNECTED) return null
+        val p = player ?: return null
+        val v = _state.value.voice
+        val am = app.getSystemService(android.media.AudioManager::class.java)
+        // Android says where the voices really go only while they play; between talks, where they would go
+        val playback = p.routed ?: when {
+            v.callAudio && android.os.Build.VERSION.SDK_INT >= 31 -> am.communicationDevice
+            v.callAudio -> null
+            p.device != null -> p.device
+            android.os.Build.VERSION.SDK_INT >= 33 -> am.getAudioDevicesForAttributes(
+                android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build()
+            ).firstOrNull()?.let { a -> am.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS).firstOrNull { it.type == a.type } }
+            else -> null
+        }
+        val session = sender?.sessionId ?: 0
+        val mic = if (session == 0) null else am.activeRecordingConfigurations.firstOrNull { it.clientAudioSessionId == session }?.audioDevice
+        return AudioInUse(
+            call = v.callAudio,
+            playback = AudioInUse.device(playback),
+            microphone = AudioInUse.device(mic),
+            noMicPermission = !micPermitted(),
+            bluetooth = am.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS).any { it.type in AudioInUse.BLUETOOTH },
+        )
+    }
+
     /**
      * This phone plays call audio from its earpiece though the loudspeaker was asked for: the loudspeaker is what was
      * chosen, so voices play as media from now on (that's always the loudspeaker), without echo cancellation, and it's

@@ -250,6 +250,32 @@
     <string name="playback_output_earpiece_desc">像打电话一样：把手机贴近耳朵，屏幕会自动熄灭。</string>
     <string name="playback_headset">使用已连接的耳机</string>
     <string name="playback_headset_desc">连接耳机、耳麦或蓝牙音箱时由它们播放语音。关闭后始终由手机本身播放。</string>
+    <string name="audio_in_use">当前音频</string>
+    <string name="audio_in_use_idle">连接到服务器后可查看播放和录音所用的设备。</string>
+    <string name="audio_in_use_unsaved">保存并应用后，更改会显示在这里。</string>
+    <string name="audio_mode">模式</string>
+    <string name="audio_mode_call">通话</string>
+    <string name="audio_mode_media">媒体</string>
+    <string name="audio_playback">播放</string>
+    <string name="audio_playback_waiting">有人说话时显示</string>
+    <string name="audio_microphone">麦克风</string>
+    <string name="audio_mic_phone">手机麦克风</string>
+    <string name="audio_mic_wired">耳麦麦克风（有线）</string>
+    <string name="audio_mic_none">未在录音</string>
+    <string name="audio_mic_no_permission">没有权限</string>
+    <string name="audio_device_wired">有线耳机</string>
+    <string name="audio_device_bluetooth">%1$s（蓝牙）</string>
+    <string name="audio_device_bluetooth_call">%1$s（蓝牙，通话音质）</string>
+    <string name="audio_device_bluetooth_le">%1$s（低功耗蓝牙）</string>
+    <string name="audio_device_usb">%1$s（USB）</string>
+    <string name="audio_device_hearing_aid">%1$s（助听器）</string>
+    <string name="audio_device_unnamed">耳机</string>
+    <string name="audio_device_other">其他设备（%1$d）</string>
+    <string name="audio_hint_call">改用媒体：声音更大，但其他人可能会听到自己的回声。</string>
+    <string name="audio_hint_media">改用通话：会消除你的回声，但语音更小。</string>
+    <string name="audio_hint_switch">在“采集”中更改 ›</string>
+    <string name="audio_hint_earpiece">听筒始终以通话方式播放。</string>
+    <string name="audio_hint_bluetooth">蓝牙耳机只在通话中发送其麦克风声音，这也会降低它们的音质。</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">麦克风音量</string>

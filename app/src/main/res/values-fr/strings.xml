@@ -256,6 +256,32 @@
     <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
     <string name="playback_headset">Utiliser le casque connecté</string>
     <string name="playback_headset_desc">Un casque, des écouteurs ou une enceinte Bluetooth connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
+    <string name="audio_in_use">Audio utilisé</string>
+    <string name="audio_in_use_idle">Connectez-vous à un serveur pour voir ce qui joue et ce qui enregistre.</string>
+    <string name="audio_in_use_unsaved">Les changements apparaissent ici après Enregistrer et appliquer.</string>
+    <string name="audio_mode">Mode</string>
+    <string name="audio_mode_call">Appel</string>
+    <string name="audio_mode_media">Multimédia</string>
+    <string name="audio_playback">Lecture</string>
+    <string name="audio_playback_waiting">S’affiche quand quelqu’un parle</string>
+    <string name="audio_microphone">Micro</string>
+    <string name="audio_mic_phone">Micro du téléphone</string>
+    <string name="audio_mic_wired">Micro du casque (filaire)</string>
+    <string name="audio_mic_none">N’enregistre pas</string>
+    <string name="audio_mic_no_permission">Pas d’autorisation</string>
+    <string name="audio_device_wired">Casque filaire</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, qualité appel)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (aide auditive)</string>
+    <string name="audio_device_unnamed">Casque</string>
+    <string name="audio_device_other">Autre appareil (%1$d)</string>
+    <string name="audio_hint_call">Multimédia à la place : plus fort, mais les autres peuvent entendre leur propre voix en retour.</string>
+    <string name="audio_hint_media">Appel à la place : votre écho est supprimé, mais les voix sont plus faibles.</string>
+    <string name="audio_hint_switch">Modifier dans Capture ›</string>
+    <string name="audio_hint_earpiece">L’écouteur joue toujours comme un appel.</string>
+    <string name="audio_hint_bluetooth">Les casques Bluetooth n’envoient leur micro que pendant un appel, ce qui baisse aussi leur qualité sonore.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volume du micro</string>

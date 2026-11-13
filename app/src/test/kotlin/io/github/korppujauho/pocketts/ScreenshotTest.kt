@@ -390,6 +390,11 @@ object Example {
         override fun micLevel() = 0.022f to true
         override fun micTest(on: Boolean) {}
         override fun playTestSound() {}
+        override fun audioInUse() = AudioInUse(
+            call = true,
+            playback = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER, "Phone"),
+            microphone = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_MIC, "Phone"),
+        )
     }
 
     fun model(): ServerModel {

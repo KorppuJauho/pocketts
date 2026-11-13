@@ -41,6 +41,9 @@ class MicSender(
     /** Whether it's "on" right now (as the meter shows it). */
     @Volatile var active = false
         private set
+    /** The recording's audio session while it records (0 when not), to find which microphone Android gave it. */
+    @Volatile var sessionId = 0
+        private set
 
     @Volatile private var running = true
     @Volatile private var restart = false
@@ -103,9 +106,19 @@ class MicSender(
         var sending = false
         var sentWhisper = false // what [sending] is: a whisper or talking
         AppLog.log("Microphone on (echo ${s.callAudio}, noise ${s.noiseSuppression}, gain ${s.autoGainControl})")
+        var frames = 0 // since recording started, for looking which microphone records now and then
+        var lastMic = -1 // the microphone last logged (its id)
         try {
             rec.startRecording()
+            sessionId = rec.audioSessionId
             while (running && !restart && !(muted && !testing)) {
+                // Which microphone Android records from: soon after starting, then every 5 s (headsets come and go)
+                if (frames++ % 250 == 5) {
+                    rec.routedDevice?.takeIf { it.id != lastMic }?.let {
+                        lastMic = it.id
+                        AppLog.log("Microphone: ${io.github.korppujauho.pocketts.proto.LogPrivacy.person(it.productName)} (type ${it.type})")
+                    }
+                }
                 var got = 0
                 while (got < FRAME) {
                     val n = rec.read(pcm, got, FRAME - got)
@@ -165,6 +178,7 @@ class MicSender(
                 }
             }
         } finally {
+            sessionId = 0
             if (sending) {
                 sendStop(sentWhisper)
                 onTalking(false, sentWhisper)
