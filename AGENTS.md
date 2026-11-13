@@ -55,15 +55,16 @@ Without Docker: JDK 17 or later, Android SDK platform 37, NDK 29.0.14206865 and 
   addresses.
 - Never put passwords, keys or tokens in a command; read them from the environment or `dev.env`. Approved commands
   are saved in plain text in the agent's settings.
-- Don't commit `dist/`, `dev.env`, keystores, regenerated pictures in `docs/screenshots/`, or your agent's own files
-  (such as `.claude/settings.local.json`).
+- Don't commit `dist/`, `dev.env`, keystores, or your agent's own files (such as `.claude/settings.local.json`).
 
 ## Pull requests
 
 - Against `main`. The title starts with `fix:`, `feat:`, `docs:`, `perf:`, `build:` or `chore:`, followed by a
   short description in lowercase.
 - The description says what changed, why and how it was tested (phone and Android version). Plain and short.
-- Changes on screen need screenshots of the changed parts in the description, before and after. `scripts/dev.sh
-  screenshots` makes pictures of the screens with example data; attach the ones that changed, but don't commit the
-  regenerated files.
+- Changes on screen need pictures of the changed parts in the description. Run `scripts/dev.sh screenshots`, commit
+  only the pictures in `docs/screenshots/` of the screens you changed, and show them in the description with links
+  pinned to that commit (`https://raw.githubusercontent.com/<owner>/pocketts/<commit>/docs/screenshots/<name>.png`):
+  relative links show nothing in a pull request. If another pull request changed the same picture first, make it
+  again after that one is merged.
 - When the pull request changes, update its description to match.
