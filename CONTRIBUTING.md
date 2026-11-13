@@ -19,7 +19,8 @@ Thank you for helping. PocketTS is a small project, and these rules keep reviews
   For example: `fix: the earpiece setting is ignored while connected`.
 - The description says what changed, why, and how it was tested: which phone, which Android version, what you did.
 - **Changes on screen need screenshots** of the changed parts in the description, before and after, so they can be
-  checked at a glance. A short video for anything that moves.
+  checked at a glance: link the pictures the pull request commits (see below), or drag screenshots into the
+  description. A short video for anything that moves.
 - When the pull request changes, its description is updated to match.
 
 ## Building and testing
@@ -51,8 +52,9 @@ especially behaves differently from one phone maker to another.
   and say so in the pull request. [TRANSLATIONS.md](TRANSLATIONS.md) has the details.
 - **Comments** say why, in plain English.
 - **Tests** for new behaviour wherever it can be tested without a phone (most of the TeamSpeak protocol can).
-- The picture files in `docs/screenshots/` (for the README and Google Play) are made again for each release, so
-  pull requests leave them unchanged. The screenshots for review go in the pull request's description.
+- **Pictures of the screens:** `scripts/dev.sh screenshots` makes the pictures in `docs/screenshots/` (for the README
+  and Google Play) with example data. Commit the pictures of the screens you changed, and only those. If another
+  pull request changed the same picture first, make it again after that one is merged.
 
 ## AI tools
 
