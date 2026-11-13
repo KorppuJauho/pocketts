@@ -253,6 +253,32 @@
     <string name="playback_output_earpiece_desc">Wie bei einem Anruf: Halte das Telefon ans Ohr. Der Bildschirm schaltet sich dort aus.</string>
     <string name="playback_headset">Verbundene Kopfhörer verwenden</string>
     <string name="playback_headset_desc">Kopfhörer, ein Headset oder ein Bluetooth-Lautsprecher geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
+    <string name="audio_in_use">Audio in Verwendung</string>
+    <string name="audio_in_use_idle">Verbinde dich mit einem Server, um zu sehen, was abspielt und aufnimmt.</string>
+    <string name="audio_in_use_unsaved">Änderungen erscheinen hier nach Speichern &amp; anwenden.</string>
+    <string name="audio_mode">Modus</string>
+    <string name="audio_mode_call">Anruf</string>
+    <string name="audio_mode_media">Medien</string>
+    <string name="audio_playback">Wiedergabe</string>
+    <string name="audio_playback_waiting">Erscheint, wenn jemand spricht</string>
+    <string name="audio_microphone">Mikrofon</string>
+    <string name="audio_mic_phone">Mikrofon des Telefons</string>
+    <string name="audio_mic_wired">Headset-Mikrofon (kabelgebunden)</string>
+    <string name="audio_mic_none">Nimmt nicht auf</string>
+    <string name="audio_mic_no_permission">Keine Berechtigung</string>
+    <string name="audio_device_wired">Kabelgebundene Kopfhörer</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, Anrufqualität)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (Hörgerät)</string>
+    <string name="audio_device_unnamed">Kopfhörer</string>
+    <string name="audio_device_other">Anderes Gerät (%1$d)</string>
+    <string name="audio_hint_call">Stattdessen Medien: lauter, aber andere hören vielleicht ihre eigene Stimme zurück.</string>
+    <string name="audio_hint_media">Stattdessen Anruf: Dein Echo wird entfernt, aber die Stimmen sind leiser.</string>
+    <string name="audio_hint_switch">In Aufnahme ändern ›</string>
+    <string name="audio_hint_earpiece">Der Hörer spielt immer als Anruf.</string>
+    <string name="audio_hint_bluetooth">Bluetooth-Kopfhörer senden ihr Mikrofon nur bei einem Anruf, was auch ihre Klangqualität senkt.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonlautstärke</string>

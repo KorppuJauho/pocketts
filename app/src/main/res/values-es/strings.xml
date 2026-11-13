@@ -256,6 +256,32 @@
     <string name="playback_output_earpiece_desc">Como en una llamada: acerca el teléfono al oído. La pantalla se apaga ahí.</string>
     <string name="playback_headset">Usar los auriculares conectados</string>
     <string name="playback_headset_desc">Unos auriculares o un altavoz Bluetooth conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
+    <string name="audio_in_use">Audio en uso</string>
+    <string name="audio_in_use_idle">Conéctate a un servidor para ver qué reproduce y qué graba.</string>
+    <string name="audio_in_use_unsaved">Los cambios se ven aquí tras Guardar y aplicar.</string>
+    <string name="audio_mode">Modo</string>
+    <string name="audio_mode_call">Llamada</string>
+    <string name="audio_mode_media">Multimedia</string>
+    <string name="audio_playback">Reproducción</string>
+    <string name="audio_playback_waiting">Se muestra cuando alguien habla</string>
+    <string name="audio_microphone">Micrófono</string>
+    <string name="audio_mic_phone">Micrófono del teléfono</string>
+    <string name="audio_mic_wired">Micrófono del auricular (con cable)</string>
+    <string name="audio_mic_none">No graba</string>
+    <string name="audio_mic_no_permission">Sin permiso</string>
+    <string name="audio_device_wired">Auriculares con cable</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, calidad de llamada)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (audífono)</string>
+    <string name="audio_device_unnamed">Auriculares</string>
+    <string name="audio_device_other">Otro dispositivo (%1$d)</string>
+    <string name="audio_hint_call">Multimedia en su lugar: más alto, pero los demás pueden oír su propia voz de vuelta.</string>
+    <string name="audio_hint_media">Llamada en su lugar: se elimina tu eco, pero las voces suenan más bajas.</string>
+    <string name="audio_hint_switch">Cambiar en Captura ›</string>
+    <string name="audio_hint_earpiece">El auricular siempre suena como una llamada.</string>
+    <string name="audio_hint_bluetooth">Los auriculares Bluetooth solo envían su micrófono en una llamada, lo que también reduce su calidad de sonido.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volumen del micrófono</string>

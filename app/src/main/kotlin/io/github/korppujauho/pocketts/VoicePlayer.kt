@@ -91,6 +91,10 @@ class VoicePlayer(
     /** The device to play from, when not Android's own choice (the phone's loudspeaker though headphones are connected). */
     @Volatile var device: android.media.AudioDeviceInfo? = null
 
+    /** Where Android really sends the voices, while they play (null between talks: Android says only while playing). */
+    @Volatile var routed: android.media.AudioDeviceInfo? = null
+        private set
+
     private fun mixLoop() {
         val bufferBytes = maxOf(
             AudioTrack.getMinBufferSize(RATE, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT),
@@ -119,6 +123,8 @@ class VoicePlayer(
         var idleSince = System.currentTimeMillis()
         var playing = false
         var playsFrom: android.media.AudioDeviceInfo? = null
+        var frames = 0 // since playing started, for looking where the voices go now and then
+        var lastRouted = -1 // the device last logged (its id)
 
         try {
             while (running) {
@@ -130,13 +136,25 @@ class VoicePlayer(
                 }
                 val active = synchronized(lock) {
                     if (talkers.isEmpty() && System.currentTimeMillis() - idleSince > IDLE_PAUSE_MS) {
-                        if (playing) { track.pause(); track.flush(); playing = false }
+                        if (playing) { track.pause(); track.flush(); playing = false; routed = null }
                         while (running && talkers.isEmpty()) lock.wait(1000)
                     }
                     talkers.values.toList()
                 }
                 if (!running) break
-                if (!playing) { track.play(); playing = true }
+                if (!playing) { track.play(); playing = true; frames = 0 }
+                // Where Android sends the voices: soon after starting, then once a second (it can move them)
+                if (frames++ % 50 == 5) {
+                    val now = track.routedDevice
+                    routed = now
+                    if (now != null && now.id != lastRouted) {
+                        lastRouted = now.id
+                        AppLog.log(
+                            "Voices play from ${io.github.korppujauho.pocketts.proto.LogPrivacy.person(now.productName)} " +
+                                "(type ${now.type}, ${if (communication) "call" else "media"})"
+                        )
+                    }
+                }
 
                 mix.fill(0)
                 for (t in active) addFrame(t, mix)
@@ -149,6 +167,7 @@ class VoicePlayer(
         } catch (e: Exception) {
             AppLog.log("Voice playback stopped: $e")
         } finally {
+            routed = null
             track.release()
             synchronized(lock) {
                 talkers.values.forEach { it.decoder?.close() }

@@ -259,6 +259,32 @@
     <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
     <string name="playback_headset">Использовать подключённые наушники</string>
     <string name="playback_headset_desc">Подключённые наушники, гарнитура или Bluetooth-колонка воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
+    <string name="audio_in_use">Используемый звук</string>
+    <string name="audio_in_use_idle">Подключитесь к серверу, чтобы увидеть, что воспроизводит и что записывает.</string>
+    <string name="audio_in_use_unsaved">Изменения появятся здесь после «Сохранить и применить».</string>
+    <string name="audio_mode">Режим</string>
+    <string name="audio_mode_call">Звонок</string>
+    <string name="audio_mode_media">Медиа</string>
+    <string name="audio_playback">Вывод</string>
+    <string name="audio_playback_waiting">Появится, когда кто-то заговорит</string>
+    <string name="audio_microphone">Микрофон</string>
+    <string name="audio_mic_phone">Микрофон телефона</string>
+    <string name="audio_mic_wired">Микрофон гарнитуры (проводной)</string>
+    <string name="audio_mic_none">Не записывает</string>
+    <string name="audio_mic_no_permission">Нет разрешения</string>
+    <string name="audio_device_wired">Проводные наушники</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, качество звонка)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (слуховой аппарат)</string>
+    <string name="audio_device_unnamed">Наушники</string>
+    <string name="audio_device_other">Другое устройство (%1$d)</string>
+    <string name="audio_hint_call">Вместо этого медиа: громче, но другие могут слышать свой голос эхом.</string>
+    <string name="audio_hint_media">Вместо этого звонок: ваше эхо убирается, но голоса тише.</string>
+    <string name="audio_hint_switch">Изменить в «Записи» ›</string>
+    <string name="audio_hint_earpiece">Разговорный динамик всегда играет как звонок.</string>
+    <string name="audio_hint_bluetooth">Bluetooth-наушники передают свой микрофон только во время звонка, что также снижает качество их звука.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Громкость микрофона</string>
