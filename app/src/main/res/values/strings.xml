@@ -262,15 +262,28 @@
     <string name="playback_event_sounds_desc">Short sounds when someone comes into or leaves your channel, for messages, pokes and streams, and for the microphone and sound buttons.</string>
     <string name="playback_sound_volume">Sound volume</string>
     <string name="playback_play_sound">Play a sound</string>
-    <string name="playback_call_volume">With echo cancellation on, voices follow the call volume: press a volume button while connected.</string>
+    <string name="playback_call_volume">Playing as a phone call, voices follow the call volume: press a volume button while connected.</string>
     <string name="playback_media_volume">Voices follow the media volume.</string>
-    <string name="playback_output">Voices play through</string>
     <string name="playback_output_speaker">Loudspeaker</string>
     <string name="playback_output_earpiece">Earpiece</string>
-    <string name="playback_output_speaker_desc">Voices come from the phone\'s loudspeaker, so you don\'t need to hold the phone.</string>
-    <string name="playback_output_earpiece_desc">As in a phone call: hold the phone to your ear. The screen turns off there.</string>
     <string name="playback_headset">Use connected headphones</string>
     <string name="playback_headset_desc">Headphones, a headset or a Bluetooth speaker play the voices while connected. Off: the phone itself always plays them.</string>
+    <string name="play_as">Voices play as</string>
+    <string name="play_media">Media</string>
+    <string name="play_call">Phone call</string>
+    <string name="play_ear">At your ear</string>
+    <string name="play_media_sound">Best sound quality, media volume</string>
+    <string name="play_media_echo">Others may hear an echo unless you use push-to-talk or headphones</string>
+    <string name="play_media_bluetooth">Bluetooth headphones\' microphone can\'t be used</string>
+    <string name="play_call_echo">Echo removed, call volume</string>
+    <string name="play_call_bluetooth">Bluetooth headphones\' microphone works</string>
+    <string name="play_call_quieter">Quieter; Bluetooth sound is call quality</string>
+    <string name="play_call_speakers">Bluetooth speakers without a microphone aren\'t used</string>
+    <string name="play_ear_screen">The screen turns off at your ear</string>
+    <string name="play_ear_quieter">Quieter, as it\'s meant for your ear</string>
+    <string name="capture_echo_follows">Echo cancellation is on while voices play as a phone call (Playback › Voices play as).</string>
+    <string name="a11y_pro">Plus: %1$s</string>
+    <string name="a11y_con">Minus: %1$s</string>
     <string name="audio_in_use">Audio in use</string>
     <string name="audio_in_use_idle">Connect to a server to see what plays and records.</string>
     <string name="audio_in_use_unsaved">Changes show here after Save &amp; Apply.</string>
@@ -292,11 +305,6 @@
     <string name="audio_device_hearing_aid">%1$s (hearing aid)</string>
     <string name="audio_device_unnamed">Headphones</string>
     <string name="audio_device_other">Other device (%1$d)</string>
-    <string name="audio_hint_call">Media instead: louder, but others may hear their own voice back.</string>
-    <string name="audio_hint_media">Phone call instead: your echo is removed, but voices are quieter.</string>
-    <string name="audio_hint_switch">Change in Capture ›</string>
-    <string name="audio_hint_earpiece">The earpiece always plays as a phone call.</string>
-    <string name="audio_hint_bluetooth">Bluetooth headphones send their microphone only in a phone call, which also lowers their sound quality.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Microphone volume</string>
@@ -312,11 +320,8 @@
     <string name="capture_vad_delay">Delay before deactivation</string>
     <string name="capture_processing">Signal processing</string>
     <string name="capture_noise">Remove background noise</string>
-    <string name="capture_echo">Echo cancellation (phone call mode)</string>
     <string name="capture_agc">Automatic gain control</string>
-    <string name="capture_echo_desc">Voices play like a phone call: through your headset, or else the phone\'s loudspeaker. A Bluetooth speaker without a microphone isn\'t used, and Bluetooth headphones switch to their call sound, for other apps too. Turn it off for the best sound and for Bluetooth speakers, and use headphones or push-to-talk so the microphone doesn\'t pick up the speaker.</string>
-    <string name="capture_echo_earpiece">On while voices play through the earpiece (Playback): the earpiece only works as a phone call, which has echo cancellation.</string>
-    <string name="echo_refused">This phone can\'t play echo-cancelled voices through its loudspeaker, so echo cancellation is off. Push-to-talk or headphones avoid echo.</string>
+    <string name="echo_refused">This phone can\'t play phone call sound through its loudspeaker, so voices play as media. Push-to-talk or headphones avoid echo.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Show admin functions</string>
