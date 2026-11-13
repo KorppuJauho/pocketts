@@ -24,6 +24,7 @@ data class VoiceSettings(
     val muteOnCalls: Boolean = true, // the microphone and sound go off while a phone call rings or goes on
     val joinSpacers: Boolean = false, // tapping a spacer channel joins it (some servers' AFK channel is one)
     val keepScreenOn: Boolean = false, // the screen stays on while connected (always while sharing or watching a stream)
+    val checkUpdates: Boolean = true, // the GitHub version asks GitHub once a day whether a newer one is out
     val turnUrl: String = "", // a relay (TURN) server for streams, e.g. turn:relay.example.com:3478
     val turnUser: String = "",
     val turnPassword: String = "",
@@ -85,6 +86,7 @@ data class VoiceSettings(
                 muteOnCalls = p.getBoolean("muteOnCalls", d.muteOnCalls),
                 joinSpacers = p.getBoolean("joinSpacers", d.joinSpacers),
                 keepScreenOn = p.getBoolean("keepScreenOn", d.keepScreenOn),
+                checkUpdates = p.getBoolean("checkUpdates", d.checkUpdates),
                 turnUrl = p.getString("turnUrl", d.turnUrl).orEmpty(),
                 turnUser = p.getString("turnUser", d.turnUser).orEmpty(),
                 turnPassword = try {
@@ -127,6 +129,7 @@ data class VoiceSettings(
             .putBoolean("muteOnCalls", muteOnCalls)
             .putBoolean("joinSpacers", joinSpacers)
             .putBoolean("keepScreenOn", keepScreenOn)
+            .putBoolean("checkUpdates", checkUpdates)
             .putString("turnUrl", turnUrl.trim())
             .putString("turnUser", turnUser.trim())
             .remove("turnPassword") // kept with the other secrets (see secretPrefs)

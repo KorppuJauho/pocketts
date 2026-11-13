@@ -67,10 +67,6 @@
     <string name="update_text">Na GitHub je dostupná novější verze než tato (%1$s).</string>
     <string name="not_now">Teď ne</string>
     <string name="download">Stáhnout</string>
-    <string name="update_check_button">Zkontrolovat nyní</string>
-    <string name="update_checking">Kontroluje se…</string>
-    <string name="update_failed">GitHub se zeptat nepodařilo. Zkuste to později.</string>
-    <string name="update_latest">Máte nejnovější verzi (%1$s).</string>
 
     <!-- Server screen: header and controls -->
     <string name="settings">Nastavení</string>
@@ -214,7 +210,7 @@
     <string name="settings_capture">Nahrávání</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">Rozhraní</string>
-    <string name="settings_autosave">Vše se uloží hned, jak to změníte.</string>
+    <string name="settings_save">Uložit a použít</string>
     <string name="cant_be_undone">Tuto akci nelze vrátit zpět</string>
     <string name="quiet">Potichu</string>
     <string name="loud">Nahlas</string>
@@ -234,7 +230,7 @@
     <string name="general_call_mute">Ztlumit během telefonních hovorů</string>
     <string name="general_call_mute_desc">Při vyzvánění nebo zahájení telefonního hovoru se vypne mikrofon i zvuk (včetně zvuku sledovaného přenosu). Po skončení hovoru se znovu zapnou. Sdílený přenos se pozastaví, aby diváci hovor neviděli. Co jste ztlumili ručně, zůstane ztlumené.</string>
     <string name="general_updates">Kontrolovat aktualizace</string>
-    <string name="general_updates_desc">PocketTS se GitHubu na nejnovější verzi zeptá, jen když klepnete na Zkontrolovat nyní. Žádné údaje o vás se neodesílají. Najde-li se novější, oznámí se tady i na připojovací obrazovce.</string>
+    <string name="general_updates_desc">PocketTS se jednou denně dotáže na GitHub, zda vyšla nová verze, a upozorní na ni na připojovací obrazovce. Žádné údaje o vás se neodesílají.</string>
     <string name="general_screen_on">Ponechat obrazovku zapnutou</string>
     <string name="general_screen_on_desc">Obrazovka nezhasne, dokud jste připojeni a aplikace je otevřená. Při sdílení nebo sledování přenosu zůstává zapnutá vždy.</string>
     <string name="general_spacers">Povolit vstup do oddělovacích kanálů</string>

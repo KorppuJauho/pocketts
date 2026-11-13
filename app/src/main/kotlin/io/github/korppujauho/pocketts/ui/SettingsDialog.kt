@@ -44,7 +44,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -105,7 +104,7 @@ interface SettingsActions {
 /** Who we are on the server, for the profile picture in Settings. */
 data class SelfInfo(val person: io.github.korppujauho.pocketts.proto.ServerModel.Client?, val server: String, val avatarStatus: String?)
 
-/** WebTS's Settings: General, Playback and Capture, saved as each thing is changed. */
+/** WebTS's Settings: General, Playback and Capture, saved with "Save & Apply". */
 @Composable
 fun SettingsDialog(
     voice: VoiceSettings,
@@ -115,11 +114,13 @@ fun SettingsDialog(
     startTab: Int = 0,
     self: SelfInfo? = null,
 ) {
-    SettingsContent(
-        voice, nickname, actions, onDismiss, startTab,
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         // Nearly the whole screen: more settings in view, less scrolling
-        Modifier.fillMaxSize().windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing).padding(8.dp), self,
-    )
+        SettingsContent(
+            voice, nickname, actions, onDismiss, startTab,
+            Modifier.fillMaxSize().windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing).padding(8.dp), self,
+        )
+    }
 }
 
 @Composable
@@ -138,35 +139,13 @@ fun SettingsContent(
     val savedLanguage = remember { actions.language() }
     var language by rememberSaveable { mutableStateOf(savedLanguage) }
 
-    // Every change is saved at once: nothing is lost by closing the window
-    val change: (VoiceSettings) -> Unit = { new ->
-        v = new
-        actions.save(new, nick.trim())
-    }
-    // The nickname is typed: saved once typing has rested
-    var typingNick by remember { mutableStateOf(false) }
-    LaunchedEffect(nick) {
-        if (typingNick) {
-            delay(600)
-            actions.save(v, nick.trim())
-        }
-        typingNick = true
-    }
-
-    // Closing: the language chosen is switched to last, so the screen is made again in it
-    val close = {
-        onDismiss()
-        if (language != savedLanguage) actions.setLanguage(language)
-    }
-
     // While the settings are open the microphone is measured, nothing is sent
     DisposableEffect(Unit) {
         actions.micTest(true)
         onDispose { actions.micTest(false) }
     }
 
-    // The window is here, so closing it any way (the ✕, or a tap outside) goes through [close]
-    Dialog(onDismissRequest = close, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    run {
         Column(
             modifier.clip(RoundedCornerShape(12.dp)).background(Ts.panel),
         ) {
@@ -174,7 +153,7 @@ fun SettingsContent(
                 Text(stringResource(R.string.settings), color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                 androidx.compose.material3.Icon(
                     androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.muted,
-                    modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = close).padding(4.dp),
+                    modifier = Modifier.clip(RoundedCornerShape(6.dp)).clickable(onClick = onDismiss).padding(4.dp),
                 )
             }
             // Scrolls sideways if a narrow screen can't fit them all
@@ -201,25 +180,29 @@ fun SettingsContent(
                 when (tab) {
                     0 -> {
                         if (self != null) ProfilePicture(self, actions)
-                        General(v, nick, { nick = it }, change)
+                        General(v, nick, { nick = it }) { v = it }
                         ChatHistory(actions)
                     }
-                    1 -> Playback(v, actions, change)
-                    2 -> Capture(v, actions, change)
+                    1 -> Playback(v, actions) { v = it }
+                    2 -> Capture(v, actions) { v = it }
                     3 -> {
-                        Ui(v, change)
+                        Ui(v) { v = it }
                         Language(language) { language = it }
                     }
                     else -> {
-                        Advanced(v, change)
+                        Advanced(v) { v = it }
                         ChannelPasswordsGroup(actions)
                         Identity(actions)
                     }
                 }
             }
-            // Nothing to press: every change has saved itself already
-            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp)) {
-                Text(stringResource(R.string.settings_autosave), color = Ts.muted, fontSize = 12.5.sp)
+            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
+                PrimaryButton(stringResource(R.string.settings_save)) {
+                    actions.save(v, nick.trim())
+                    onDismiss()
+                    // Last: the screen is made again in the new language
+                    if (language != savedLanguage) actions.setLanguage(language)
+                }
             }
         }
     }
@@ -501,36 +484,14 @@ private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, on
     Group {
         Check(stringResource(R.string.general_call_mute), v.muteOnCalls, info = stringResource(R.string.general_call_mute_desc)) { onChange(v.copy(muteOnCalls = it)) }
     }
-    if (io.github.korppujauho.pocketts.UpdateCheck.enabled) UpdateCheckGroup()
+    if (io.github.korppujauho.pocketts.UpdateCheck.enabled) Group {
+        Check(stringResource(R.string.general_updates), v.checkUpdates, info = stringResource(R.string.general_updates_desc)) { onChange(v.copy(checkUpdates = it)) }
+    }
     Group {
         Check(stringResource(R.string.general_screen_on), v.keepScreenOn, info = stringResource(R.string.general_screen_on_desc)) { onChange(v.copy(keepScreenOn = it)) }
     }
     Group {
         Check(stringResource(R.string.general_spacers), v.joinSpacers, info = stringResource(R.string.general_spacers_desc)) { onChange(v.copy(joinSpacers = it)) }
-    }
-}
-
-/** Check for update: GitHub is asked only when the button is tapped. What it found shows here, and on the connect screen. */
-@Composable
-private fun UpdateCheckGroup() {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val checking by io.github.korppujauho.pocketts.UpdateCheck.checking.collectAsState()
-    val outcome by io.github.korppujauho.pocketts.UpdateCheck.outcome.collectAsState()
-    val found by io.github.korppujauho.pocketts.UpdateCheck.available.collectAsState()
-    val uri = androidx.compose.ui.platform.LocalUriHandler.current
-    Group(stringResource(R.string.general_updates), note = stringResource(R.string.general_updates_desc)) {
-        SecondaryButton(stringResource(R.string.update_check_button), enabled = !checking) {
-            io.github.korppujauho.pocketts.UpdateCheck.check(context)
-        }
-        if (checking) Desc(stringResource(R.string.update_checking))
-        found?.let { r ->
-            Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.update_title, r.version), color = Ts.bright, fontSize = 13.5.sp, modifier = Modifier.weight(1f))
-                SecondaryButton(stringResource(R.string.download)) { uri.openUri(r.url) }
-            }
-        }
-        if (outcome?.failed == true) Desc(stringResource(R.string.update_failed))
-        else outcome?.version?.takeIf { found == null }?.let { Desc(stringResource(R.string.update_latest, it)) }
     }
 }
 

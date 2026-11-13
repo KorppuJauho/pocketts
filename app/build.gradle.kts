@@ -59,8 +59,7 @@ android {
             versionNameSuffix = "-debug"
             manifestPlaceholders["appLabel"] = "PocketTStest"
             buildConfigField("String", "DEV_LOG_URL", "\"${devEnv["DEV_LOG_URL"].orEmpty()}\"")
-            // The check is a tap in the settings (Settings › General): test builds have it too, to try
-            buildConfigField("boolean", "UPDATE_CHECK", "true")
+            buildConfigField("boolean", "UPDATE_CHECK", "false")
         }
         release {
             // Smaller and faster: unused code and resources left out (proguard-rules.pro keeps what WebRTC needs)
