@@ -244,15 +244,28 @@
     <string name="playback_event_sounds_desc">Kurze Töne, wenn jemand deinen Channel betritt oder verlässt, bei Nachrichten, Anstupsern und Streams sowie für die Mikrofon- und Tontasten.</string>
     <string name="playback_sound_volume">Lautstärke der Töne</string>
     <string name="playback_play_sound">Ton abspielen</string>
-    <string name="playback_call_volume">Mit Echounterdrückung folgen die Stimmen der Anruflautstärke: Drück eine Lautstärketaste, während du verbunden bist.</string>
+    <string name="playback_call_volume">Als Anruf folgen die Stimmen der Anruflautstärke: Drück eine Lautstärketaste, während du verbunden bist.</string>
     <string name="playback_media_volume">Die Stimmen folgen der Medienlautstärke.</string>
-    <string name="playback_output">Stimmen kommen aus</string>
     <string name="playback_output_speaker">Lautsprecher</string>
     <string name="playback_output_earpiece">Hörer</string>
-    <string name="playback_output_speaker_desc">Stimmen kommen aus dem Lautsprecher des Telefons, du musst es also nicht halten.</string>
-    <string name="playback_output_earpiece_desc">Wie bei einem Anruf: Halte das Telefon ans Ohr. Der Bildschirm schaltet sich dort aus.</string>
     <string name="playback_headset">Verbundene Kopfhörer verwenden</string>
     <string name="playback_headset_desc">Kopfhörer, ein Headset oder ein Bluetooth-Lautsprecher geben die Stimmen wieder, solange sie verbunden sind. Aus: Das Telefon selbst gibt sie immer wieder.</string>
+    <string name="play_as">Stimmen spielen als</string>
+    <string name="play_media">Medien</string>
+    <string name="play_call">Anruf</string>
+    <string name="play_ear">Am Ohr</string>
+    <string name="play_media_sound">Beste Klangqualität, Medienlautstärke</string>
+    <string name="play_media_echo">Andere hören vielleicht ein Echo, außer du nutzt Push-to-Talk oder Kopfhörer</string>
+    <string name="play_media_bluetooth">Das Mikrofon von Bluetooth-Kopfhörern kann nicht genutzt werden</string>
+    <string name="play_call_echo">Echo entfernt, Anruflautstärke</string>
+    <string name="play_call_bluetooth">Das Mikrofon von Bluetooth-Kopfhörern funktioniert</string>
+    <string name="play_call_quieter">Leiser; Bluetooth-Klang in Anrufqualität</string>
+    <string name="play_call_speakers">Bluetooth-Lautsprecher ohne Mikrofon werden nicht genutzt</string>
+    <string name="play_ear_screen">Der Bildschirm geht am Ohr aus</string>
+    <string name="play_ear_quieter">Leiser, da fürs Ohr gedacht</string>
+    <string name="capture_echo_follows">Die Echounterdrückung ist an, wenn Stimmen als Anruf spielen (Wiedergabe › Stimmen spielen als).</string>
+    <string name="a11y_pro">Plus: %1$s</string>
+    <string name="a11y_con">Minus: %1$s</string>
     <string name="audio_in_use">Audio in Verwendung</string>
     <string name="audio_in_use_idle">Verbinde dich mit einem Server, um zu sehen, was abspielt und aufnimmt.</string>
     <string name="audio_in_use_unsaved">Änderungen erscheinen hier nach Speichern &amp; anwenden.</string>
@@ -274,11 +287,6 @@
     <string name="audio_device_hearing_aid">%1$s (Hörgerät)</string>
     <string name="audio_device_unnamed">Kopfhörer</string>
     <string name="audio_device_other">Anderes Gerät (%1$d)</string>
-    <string name="audio_hint_call">Stattdessen Medien: lauter, aber andere hören vielleicht ihre eigene Stimme zurück.</string>
-    <string name="audio_hint_media">Stattdessen Anruf: Dein Echo wird entfernt, aber die Stimmen sind leiser.</string>
-    <string name="audio_hint_switch">In Aufnahme ändern ›</string>
-    <string name="audio_hint_earpiece">Der Hörer spielt immer als Anruf.</string>
-    <string name="audio_hint_bluetooth">Bluetooth-Kopfhörer senden ihr Mikrofon nur bei einem Anruf, was auch ihre Klangqualität senkt.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonlautstärke</string>
@@ -294,11 +302,8 @@
     <string name="capture_vad_delay">Verzögerung vor dem Abschalten</string>
     <string name="capture_processing">Signalverarbeitung</string>
     <string name="capture_noise">Hintergrundgeräusche entfernen</string>
-    <string name="capture_echo">Echounterdrückung (Anrufmodus)</string>
     <string name="capture_agc">Automatische Verstärkungsregelung</string>
-    <string name="capture_echo_desc">Stimmen klingen wie in einem Anruf: über dein Headset, sonst über den Lautsprecher des Telefons. Ein Bluetooth-Lautsprecher ohne Mikrofon wird nicht genutzt, und Bluetooth-Kopfhörer wechseln zum Anrufklang, auch für andere Apps. Schalte sie für den besten Klang und für Bluetooth-Lautsprecher aus, und nutze Kopfhörer oder Push-to-Talk, damit das Mikrofon den Lautsprecher nicht aufnimmt.</string>
-    <string name="capture_echo_earpiece">An, solange Stimmen aus dem Hörer kommen (Wiedergabe): Der Hörer funktioniert nur im Anrufmodus, der Echounterdrückung hat.</string>
-    <string name="echo_refused">Dieses Telefon kann Stimmen mit Echounterdrückung nicht über den Lautsprecher wiedergeben, daher ist die Echounterdrückung aus. Push-to-Talk oder Kopfhörer vermeiden Echo.</string>
+    <string name="echo_refused">Dieses Telefon kann Anrufton nicht über den Lautsprecher wiedergeben, daher spielen die Stimmen als Medien. Push-to-Talk oder Kopfhörer vermeiden Echo.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Admin-Funktionen anzeigen</string>

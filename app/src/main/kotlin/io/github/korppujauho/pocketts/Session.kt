@@ -609,7 +609,6 @@ object Session : TsClient.Listener {
             playback = AudioInUse.device(playback),
             microphone = AudioInUse.device(mic),
             noMicPermission = !micPermitted(),
-            bluetooth = am.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS).any { it.type in AudioInUse.BLUETOOTH },
         )
     }
 

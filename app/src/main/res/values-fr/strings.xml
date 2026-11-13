@@ -247,15 +247,28 @@
     <string name="playback_event_sounds_desc">De courts sons quand quelqu’un arrive dans votre canal ou le quitte, pour les messages, les pokes et les diffusions, et pour les boutons micro et son.</string>
     <string name="playback_sound_volume">Volume des sons</string>
     <string name="playback_play_sound">Jouer un son</string>
-    <string name="playback_call_volume">Avec l’annulation d’écho, les voix suivent le volume d’appel : appuyez sur un bouton de volume pendant la connexion.</string>
+    <string name="playback_call_volume">Comme un appel, les voix suivent le volume d’appel : appuyez sur un bouton de volume pendant la connexion.</string>
     <string name="playback_media_volume">Les voix suivent le volume multimédia.</string>
-    <string name="playback_output">Les voix sortent par</string>
     <string name="playback_output_speaker">Haut-parleur</string>
     <string name="playback_output_earpiece">Écouteur</string>
-    <string name="playback_output_speaker_desc">Les voix sortent par le haut-parleur du téléphone : inutile de le tenir.</string>
-    <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
     <string name="playback_headset">Utiliser le casque connecté</string>
     <string name="playback_headset_desc">Un casque, des écouteurs ou une enceinte Bluetooth connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
+    <string name="play_as">Les voix jouent comme</string>
+    <string name="play_media">Multimédia</string>
+    <string name="play_call">Appel</string>
+    <string name="play_ear">À l’oreille</string>
+    <string name="play_media_sound">Meilleure qualité sonore, volume multimédia</string>
+    <string name="play_media_echo">Les autres peuvent entendre un écho, sauf avec appuyer pour parler ou un casque</string>
+    <string name="play_media_bluetooth">Le micro d’un casque Bluetooth ne peut pas être utilisé</string>
+    <string name="play_call_echo">Écho supprimé, volume d’appel</string>
+    <string name="play_call_bluetooth">Le micro d’un casque Bluetooth fonctionne</string>
+    <string name="play_call_quieter">Plus faible ; son Bluetooth en qualité d’appel</string>
+    <string name="play_call_speakers">Les enceintes Bluetooth sans micro ne sont pas utilisées</string>
+    <string name="play_ear_screen">L’écran s’éteint à l’oreille</string>
+    <string name="play_ear_quieter">Plus faible, car prévu pour l’oreille</string>
+    <string name="capture_echo_follows">L’annulation d’écho est active quand les voix jouent comme un appel (Lecture › Les voix jouent comme).</string>
+    <string name="a11y_pro">Avantage : %1$s</string>
+    <string name="a11y_con">Inconvénient : %1$s</string>
     <string name="audio_in_use">Audio utilisé</string>
     <string name="audio_in_use_idle">Connectez-vous à un serveur pour voir ce qui joue et ce qui enregistre.</string>
     <string name="audio_in_use_unsaved">Les changements apparaissent ici après Enregistrer et appliquer.</string>
@@ -277,11 +290,6 @@
     <string name="audio_device_hearing_aid">%1$s (aide auditive)</string>
     <string name="audio_device_unnamed">Casque</string>
     <string name="audio_device_other">Autre appareil (%1$d)</string>
-    <string name="audio_hint_call">Multimédia à la place : plus fort, mais les autres peuvent entendre leur propre voix en retour.</string>
-    <string name="audio_hint_media">Appel à la place : votre écho est supprimé, mais les voix sont plus faibles.</string>
-    <string name="audio_hint_switch">Modifier dans Capture ›</string>
-    <string name="audio_hint_earpiece">L’écouteur joue toujours comme un appel.</string>
-    <string name="audio_hint_bluetooth">Les casques Bluetooth n’envoient leur micro que pendant un appel, ce qui baisse aussi leur qualité sonore.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volume du micro</string>
@@ -297,11 +305,8 @@
     <string name="capture_vad_delay">Délai avant désactivation</string>
     <string name="capture_processing">Traitement du signal</string>
     <string name="capture_noise">Supprimer les bruits de fond</string>
-    <string name="capture_echo">Annulation de l’écho (mode appel)</string>
     <string name="capture_agc">Contrôle automatique du gain</string>
-    <string name="capture_echo_desc">Les voix sont jouées comme un appel : dans votre casque, sinon par le haut-parleur du téléphone. Une enceinte Bluetooth sans micro n’est pas utilisée, et un casque Bluetooth passe à son son d’appel, aussi pour les autres apps. Désactivez-la pour le meilleur son et pour les enceintes Bluetooth, et utilisez un casque ou Appuyer pour parler pour que le micro ne capte pas l’enceinte.</string>
-    <string name="capture_echo_earpiece">Activée tant que les voix sortent par l’écouteur (Lecture) : l’écouteur ne fonctionne qu’en mode appel, qui a l’annulation de l’écho.</string>
-    <string name="echo_refused">Ce téléphone ne peut pas jouer les voix avec annulation de l’écho par son haut-parleur : l’annulation de l’écho est donc désactivée. Appuyer pour parler ou un casque évitent l’écho.</string>
+    <string name="echo_refused">Ce téléphone ne peut pas jouer le son d’appel par son haut-parleur : les voix jouent donc comme multimédia. Appuyer pour parler ou un casque évitent l’écho.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Afficher les fonctions d’administration</string>

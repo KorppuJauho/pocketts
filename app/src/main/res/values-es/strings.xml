@@ -247,15 +247,28 @@
     <string name="playback_event_sounds_desc">Sonidos cortos cuando alguien entra en tu canal o sale de él, para mensajes, toques y transmisiones, y para los botones de micrófono y sonido.</string>
     <string name="playback_sound_volume">Volumen de los sonidos</string>
     <string name="playback_play_sound">Reproducir un sonido</string>
-    <string name="playback_call_volume">Con la cancelación de eco activada, las voces siguen el volumen de llamada: pulsa un botón de volumen mientras estás conectado.</string>
+    <string name="playback_call_volume">Como llamada, las voces siguen el volumen de llamada: pulsa un botón de volumen mientras estás conectado.</string>
     <string name="playback_media_volume">Las voces siguen el volumen multimedia.</string>
-    <string name="playback_output">Las voces suenan por</string>
     <string name="playback_output_speaker">Altavoz</string>
     <string name="playback_output_earpiece">Auricular</string>
-    <string name="playback_output_speaker_desc">Las voces suenan por el altavoz del teléfono, así que no hace falta sostenerlo.</string>
-    <string name="playback_output_earpiece_desc">Como en una llamada: acerca el teléfono al oído. La pantalla se apaga ahí.</string>
     <string name="playback_headset">Usar los auriculares conectados</string>
     <string name="playback_headset_desc">Unos auriculares o un altavoz Bluetooth conectados reproducen las voces. Desactivado: las reproduce siempre el propio teléfono.</string>
+    <string name="play_as">Las voces suenan como</string>
+    <string name="play_media">Multimedia</string>
+    <string name="play_call">Llamada</string>
+    <string name="play_ear">Al oído</string>
+    <string name="play_media_sound">Mejor calidad de sonido, volumen multimedia</string>
+    <string name="play_media_echo">Los demás pueden oír eco si no usas pulsar para hablar o auriculares</string>
+    <string name="play_media_bluetooth">No se puede usar el micrófono de los auriculares Bluetooth</string>
+    <string name="play_call_echo">Eco eliminado, volumen de llamada</string>
+    <string name="play_call_bluetooth">Funciona el micrófono de los auriculares Bluetooth</string>
+    <string name="play_call_quieter">Más bajo; el sonido Bluetooth tiene calidad de llamada</string>
+    <string name="play_call_speakers">No se usan los altavoces Bluetooth sin micrófono</string>
+    <string name="play_ear_screen">La pantalla se apaga junto al oído</string>
+    <string name="play_ear_quieter">Más bajo, porque está pensado para el oído</string>
+    <string name="capture_echo_follows">La cancelación de eco está activada mientras las voces suenan como llamada (Reproducción › Las voces suenan como).</string>
+    <string name="a11y_pro">A favor: %1$s</string>
+    <string name="a11y_con">En contra: %1$s</string>
     <string name="audio_in_use">Audio en uso</string>
     <string name="audio_in_use_idle">Conéctate a un servidor para ver qué reproduce y qué graba.</string>
     <string name="audio_in_use_unsaved">Los cambios se ven aquí tras Guardar y aplicar.</string>
@@ -277,11 +290,6 @@
     <string name="audio_device_hearing_aid">%1$s (audífono)</string>
     <string name="audio_device_unnamed">Auriculares</string>
     <string name="audio_device_other">Otro dispositivo (%1$d)</string>
-    <string name="audio_hint_call">Multimedia en su lugar: más alto, pero los demás pueden oír su propia voz de vuelta.</string>
-    <string name="audio_hint_media">Llamada en su lugar: se elimina tu eco, pero las voces suenan más bajas.</string>
-    <string name="audio_hint_switch">Cambiar en Captura ›</string>
-    <string name="audio_hint_earpiece">El auricular siempre suena como una llamada.</string>
-    <string name="audio_hint_bluetooth">Los auriculares Bluetooth solo envían su micrófono en una llamada, lo que también reduce su calidad de sonido.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Volumen del micrófono</string>
@@ -297,11 +305,8 @@
     <string name="capture_vad_delay">Retardo antes de desactivar</string>
     <string name="capture_processing">Procesamiento de señal</string>
     <string name="capture_noise">Eliminar el ruido de fondo</string>
-    <string name="capture_echo">Cancelación de eco (modo llamada)</string>
     <string name="capture_agc">Control automático de ganancia</string>
-    <string name="capture_echo_desc">Las voces suenan como en una llamada: por tus auriculares con micrófono o, si no, por el altavoz del teléfono. Un altavoz Bluetooth sin micrófono no se usa, y los auriculares Bluetooth pasan a su sonido de llamada, también para otras apps. Desactívala para el mejor sonido y para altavoces Bluetooth, y usa auriculares o Pulsar para hablar para que el micrófono no capte el altavoz.</string>
-    <string name="capture_echo_earpiece">Activada mientras las voces suenan por el auricular (Reproducción): el auricular solo funciona en modo llamada, que tiene cancelación de eco.</string>
-    <string name="echo_refused">Este teléfono no puede reproducir voces con cancelación de eco por el altavoz, así que la cancelación de eco está desactivada. Pulsar para hablar o unos auriculares evitan el eco.</string>
+    <string name="echo_refused">Este teléfono no puede reproducir el sonido de llamada por el altavoz, así que las voces suenan como multimedia. Pulsar para hablar o unos auriculares evitan el eco.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Mostrar funciones de administración</string>

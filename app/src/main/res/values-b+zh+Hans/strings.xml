@@ -241,15 +241,28 @@
     <string name="playback_event_sounds_desc">有人进入或离开你的频道、收到消息、戳一下和直播时，以及按麦克风和声音按钮时播放简短的提示音。</string>
     <string name="playback_sound_volume">提示音音量</string>
     <string name="playback_play_sound">播放提示音</string>
-    <string name="playback_call_volume">开启回声消除时，语音跟随通话音量：连接后按音量键即可调节。</string>
+    <string name="playback_call_volume">以通话方式播放时，语音跟随通话音量：连接后按音量键即可调节。</string>
     <string name="playback_media_volume">语音跟随媒体音量。</string>
-    <string name="playback_output">语音播放设备</string>
     <string name="playback_output_speaker">扬声器</string>
     <string name="playback_output_earpiece">听筒</string>
-    <string name="playback_output_speaker_desc">语音从手机扬声器播放，无需把手机拿在耳边。</string>
-    <string name="playback_output_earpiece_desc">像打电话一样：把手机贴近耳朵，屏幕会自动熄灭。</string>
     <string name="playback_headset">使用已连接的耳机</string>
     <string name="playback_headset_desc">连接耳机、耳麦或蓝牙音箱时由它们播放语音。关闭后始终由手机本身播放。</string>
+    <string name="play_as">语音播放方式</string>
+    <string name="play_media">媒体</string>
+    <string name="play_call">通话</string>
+    <string name="play_ear">贴耳</string>
+    <string name="play_media_sound">最佳音质，使用媒体音量</string>
+    <string name="play_media_echo">若不使用按键说话或耳机，其他人可能听到回声</string>
+    <string name="play_media_bluetooth">无法使用蓝牙耳机的麦克风</string>
+    <string name="play_call_echo">消除回声，使用通话音量</string>
+    <string name="play_call_bluetooth">可使用蓝牙耳机的麦克风</string>
+    <string name="play_call_quieter">声音更小；蓝牙为通话音质</string>
+    <string name="play_call_speakers">不使用没有麦克风的蓝牙音箱</string>
+    <string name="play_ear_screen">贴近耳朵时屏幕熄灭</string>
+    <string name="play_ear_quieter">声音更小，因为是贴耳使用</string>
+    <string name="capture_echo_follows">语音以通话方式播放时，回声消除开启（播放 › 语音播放方式）。</string>
+    <string name="a11y_pro">优点：%1$s</string>
+    <string name="a11y_con">缺点：%1$s</string>
     <string name="audio_in_use">当前音频</string>
     <string name="audio_in_use_idle">连接到服务器后可查看播放和录音所用的设备。</string>
     <string name="audio_in_use_unsaved">保存并应用后，更改会显示在这里。</string>
@@ -271,11 +284,6 @@
     <string name="audio_device_hearing_aid">%1$s（助听器）</string>
     <string name="audio_device_unnamed">耳机</string>
     <string name="audio_device_other">其他设备（%1$d）</string>
-    <string name="audio_hint_call">改用媒体：声音更大，但其他人可能会听到自己的回声。</string>
-    <string name="audio_hint_media">改用通话：会消除你的回声，但语音更小。</string>
-    <string name="audio_hint_switch">在“采集”中更改 ›</string>
-    <string name="audio_hint_earpiece">听筒始终以通话方式播放。</string>
-    <string name="audio_hint_bluetooth">蓝牙耳机只在通话中发送其麦克风声音，这也会降低它们的音质。</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">麦克风音量</string>
@@ -291,11 +299,8 @@
     <string name="capture_vad_delay">停用前的延迟</string>
     <string name="capture_processing">信号处理</string>
     <string name="capture_noise">消除背景噪音</string>
-    <string name="capture_echo">回声消除（通话模式）</string>
     <string name="capture_agc">自动增益控制</string>
-    <string name="capture_echo_desc">语音像通话一样播放：通过你的耳麦，否则通过手机扬声器。没有麦克风的蓝牙音箱不会被使用，蓝牙耳机也会切换为通话音质，其他应用同样如此。关闭它可获得最佳音质并使用蓝牙音箱；此时请使用耳机或按键说话，以免麦克风收录音箱的声音。</string>
-    <string name="capture_echo_earpiece">语音通过听筒播放（播放）时保持开启：听筒只能在通话模式下使用，通话模式带有回声消除。</string>
-    <string name="echo_refused">这部手机无法通过扬声器播放带回声消除的语音，因此回声消除已关闭。使用按键说话或耳机可避免回声。</string>
+    <string name="echo_refused">这部手机无法通过扬声器播放通话声音，因此语音以媒体方式播放。使用按键说话或耳机可避免回声。</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">显示管理功能</string>
