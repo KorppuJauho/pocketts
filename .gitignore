@@ -16,6 +16,11 @@ keystore.properties
 *.keystore
 *.jks
 
+# Coding agents' own files, never committed: they can hold approved commands and local paths
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
 # Editors and OS
 .idea/
 *.iml

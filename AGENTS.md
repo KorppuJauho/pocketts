@@ -53,7 +53,10 @@ Without Docker: JDK 17 or later, Android SDK platform 37, NDK 29.0.14206865 and 
   Run both test commands before calling the work done, and report failures as they are.
 - Tests and examples use made-up data (the nickname "Jamie", `example.com`), never real people, servers or
   addresses.
-- Don't commit `dist/`, `dev.env`, keystores, or regenerated pictures in `docs/screenshots/`.
+- Never put passwords, keys or tokens in a command; read them from the environment or `dev.env`. Approved commands
+  are saved in plain text in the agent's settings.
+- Don't commit `dist/`, `dev.env`, keystores, regenerated pictures in `docs/screenshots/`, or your agent's own files
+  (such as `.claude/settings.local.json`).
 
 ## Pull requests
 

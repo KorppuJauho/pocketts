@@ -44,6 +44,8 @@ especially behaves differently from one phone maker to another.
   (`LogPrivacy.person(name)`, `LogPrivacy.server(address)`, …), so they can be taken out when a log is shared. Chat
   text, passwords and keys never go into the log.
 - **New libraries:** ask first. Each one adds size and something more to trust.
+- **Your own editor and agent files** (such as `.claude/settings.local.json`) stay out of the pull request;
+  `.gitignore` covers the common ones.
 - **Text on screen** comes from `app/src/main/res/values/strings.xml`, never written into the code. A new text needs
   the same name in every language file, or the build fails. Translate it if you can; otherwise copy the English text
   and say so in the pull request. [TRANSLATIONS.md](TRANSLATIONS.md) has the details.
