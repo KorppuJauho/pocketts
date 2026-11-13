@@ -296,7 +296,7 @@
     <string name="capture_continuous">Dauerhaft senden</string>
     <string name="capture_ptt_desc">Halte die Taste \"Halten zum Sprechen\", während du sprichst.</string>
     <string name="capture_level">Pegel</string>
-    <string name="capture_level_desc">Der Balken zeigt dein Mikrofon, solange diese Einstellungen offen sind; in der Zeit wird nichts gesendet.</string>
+    <string name="capture_level_desc">Der Balken zeigt dein Mikrofon, solange diese Einstellungen offen sind, auch stummgeschaltet. Sprechen geht wie gewohnt weiter.</string>
     <string name="capture_vad_level">Pegel der Sprachaktivierung</string>
     <string name="capture_vad_level_desc">Nach rechts schieben, um Hintergrundgeräusche zu blockieren. Wenn deine Stimme abbricht, nach links schieben.</string>
     <string name="capture_vad_delay">Verzögerung vor dem Abschalten</string>

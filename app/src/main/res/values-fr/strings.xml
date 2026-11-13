@@ -299,7 +299,7 @@
     <string name="capture_continuous">Transmission continue</string>
     <string name="capture_ptt_desc">Maintenez le bouton « Maintenir pour parler » pendant que vous parlez.</string>
     <string name="capture_level">Niveau</string>
-    <string name="capture_level_desc">La barre montre votre micro tant que ces réglages sont ouverts ; rien n’est envoyé pendant ce temps.</string>
+    <string name="capture_level_desc">La barre montre votre micro tant que ces réglages sont ouverts, même coupé. Vous continuez à parler comme d’habitude.</string>
     <string name="capture_vad_level">Niveau d’activation vocale</string>
     <string name="capture_vad_level_desc">Glissez vers la droite pour bloquer les bruits de fond. Si votre voix est coupée, glissez vers la gauche.</string>
     <string name="capture_vad_delay">Délai avant désactivation</string>

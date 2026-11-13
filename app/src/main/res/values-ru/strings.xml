@@ -302,7 +302,7 @@
     <string name="capture_continuous">Постоянная передача</string>
     <string name="capture_ptt_desc">Удерживайте кнопку «Удерживайте, чтобы говорить», пока говорите.</string>
     <string name="capture_level">Уровень</string>
-    <string name="capture_level_desc">Полоса показывает ваш микрофон, пока открыты эти настройки; в это время ничего не передаётся.</string>
+    <string name="capture_level_desc">Полоса показывает ваш микрофон, пока открыты эти настройки, даже если он выключен. Разговор продолжается как обычно.</string>
     <string name="capture_vad_level">Порог активации голосом</string>
     <string name="capture_vad_level_desc">Сдвиньте вправо, чтобы отсечь фоновый шум. Если ваш голос обрывается, сдвиньте влево.</string>
     <string name="capture_vad_delay">Задержка перед отключением</string>

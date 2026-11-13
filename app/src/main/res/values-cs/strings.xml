@@ -315,7 +315,7 @@
     <string name="capture_continuous">Nepřetržité vysílání</string>
     <string name="capture_ptt_desc">Při mluvení držte tlačítko „Podržením mluvit“.</string>
     <string name="capture_level">Úroveň</string>
-    <string name="capture_level_desc">Ukazatel zobrazuje úroveň mikrofonu, dokud je toto nastavení otevřené. Během toho se nic neodesílá.</string>
+    <string name="capture_level_desc">Ukazatel zobrazuje úroveň mikrofonu, dokud je toto nastavení otevřené, i když je ztlumený. Mluvení pokračuje jako obvykle.</string>
     <string name="capture_vad_level">Práh hlasové aktivace</string>
     <string name="capture_vad_level_desc">Posunutím doprava omezíte hluk na pozadí. Pokud se váš hlas přerušuje, posuňte doleva.</string>
     <string name="capture_vad_delay">Prodleva před deaktivací</string>
