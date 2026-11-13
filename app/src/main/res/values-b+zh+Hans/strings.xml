@@ -285,7 +285,7 @@
     <string name="capture_continuous">持续传输</string>
     <string name="capture_ptt_desc">说话时按住「按住说话」按钮。</string>
     <string name="capture_level">音量电平</string>
-    <string name="capture_level_desc">打开这些设置时，进度条会显示你的麦克风电平；在此期间不会发送任何声音。</string>
+    <string name="capture_level_desc">打开这些设置时，进度条会显示你的麦克风电平，静音时也会显示。说话照常进行。</string>
     <string name="capture_vad_level">语音激活阈值</string>
     <string name="capture_vad_level_desc">向右滑动可屏蔽背景噪音。如果你的声音断断续续，请向左滑动。</string>
     <string name="capture_vad_delay">停用前的延迟</string>

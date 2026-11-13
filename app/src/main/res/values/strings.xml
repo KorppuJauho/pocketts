@@ -306,7 +306,7 @@
     <string name="capture_continuous">Continuous transmission</string>
     <string name="capture_ptt_desc">Hold the \"Hold to talk\" button while you speak.</string>
     <string name="capture_level">Level</string>
-    <string name="capture_level_desc">The bar shows your microphone while these settings are open; nothing is sent meanwhile.</string>
+    <string name="capture_level_desc">The bar shows your microphone while these settings are open, even when it\'s muted. Talking goes on as usual.</string>
     <string name="capture_vad_level">Voice activation level</string>
     <string name="capture_vad_level_desc">Slide right to block background noise. If your voice cuts out, slide left.</string>
     <string name="capture_vad_delay">Delay before deactivation</string>

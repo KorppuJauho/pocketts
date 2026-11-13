@@ -291,7 +291,7 @@
     <string name="capture_continuous">Transmisión continua</string>
     <string name="capture_ptt_desc">Mantén pulsado el botón \"Mantén pulsado para hablar\" mientras hablas.</string>
     <string name="capture_level">Nivel</string>
-    <string name="capture_level_desc">La barra muestra tu micrófono mientras estos ajustes están abiertos; mientras tanto no se envía nada.</string>
+    <string name="capture_level_desc">La barra muestra tu micrófono mientras estos ajustes están abiertos, también silenciado. Puedes seguir hablando como siempre.</string>
     <string name="capture_vad_level">Nivel de activación por voz</string>
     <string name="capture_vad_level_desc">Desliza a la derecha para bloquear el ruido de fondo. Si tu voz se corta, desliza a la izquierda.</string>
     <string name="capture_vad_delay">Retardo antes de desactivar</string>

@@ -288,7 +288,7 @@
     <string name="capture_continuous">Jatkuva lähetys</string>
     <string name="capture_ptt_desc">Pidä \"Pidä pohjassa puhuaksesi\" -painiketta pohjassa puhuessasi.</string>
     <string name="capture_level">Taso</string>
-    <string name="capture_level_desc">Palkki näyttää mikrofonisi tason, kun nämä asetukset ovat auki; sillä välin mitään ei lähetetä.</string>
+    <string name="capture_level_desc">Palkki näyttää mikrofonisi tason, kun nämä asetukset ovat auki, myös mykistettynä. Puhuminen jatkuu tavalliseen tapaan.</string>
     <string name="capture_vad_level">Puheaktivoinnin taso</string>
     <string name="capture_vad_level_desc">Liu\'uta oikealle estääksesi taustamelun. Jos äänesi katkeilee, liu\'uta vasemmalle.</string>
     <string name="capture_vad_delay">Viive ennen katkaisua</string>

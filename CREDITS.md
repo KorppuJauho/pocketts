@@ -9,7 +9,9 @@ People who have helped make PocketTS. Thank you!
   [his fork](https://github.com/Stefan3Dx/pocketts/commit/7d11bea19aa38d032cb50f97bca9e5ddf0aa4f58).
 - **[JohnyCore](https://github.com/JohnyCore)**: found that on some phones voices played from the earpiece with echo
   cancellation on, and suggested the loudspeaker and earpiece choice
-  ([#129](https://github.com/KorppuJauho/pocketts/issues/129)).
+  ([#129](https://github.com/KorppuJauho/pocketts/issues/129)). Suggested choosing media or a phone call in Playback
+  ([#137](https://github.com/KorppuJauho/pocketts/issues/137)), and made talking go on while Settings is open
+  ([#135](https://github.com/KorppuJauho/pocketts/pull/135)).
 - **[chochrunius](https://github.com/chochrunius)**: found that a pasted `ts3server://` link lost its channel and
   passwords, and that connecting again after raising the security level lost a link's channel and privilege key, fixed
   in [their fork](https://github.com/chochrunius/pocketts/commit/9ca66a224c3d6e283689d826f660c40533d61b4e). Their fork
