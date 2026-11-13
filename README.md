@@ -71,9 +71,9 @@ Android asks once to allow installing apps from your browser.
   pictures you send are saved in the channel's files on the server (file transfer), so you need permission to upload
   files in that channel. TeamSpeak app users see them as usual.
 
-## Building it yourself
+## Building it yourself and contributing
 
-See [DEVELOPING.md](DEVELOPING.md).
+See [DEVELOPING.md](DEVELOPING.md) for building, and [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## Credits
 
