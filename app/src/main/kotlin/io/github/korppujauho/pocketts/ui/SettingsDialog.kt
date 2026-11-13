@@ -6,6 +6,7 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -620,6 +621,9 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
 private fun Playback(v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
     PlayAs(v, onChange)
     AudioInUseGroup(v, saved, actions)
+    Group {
+        Check(stringResource(R.string.playback_headset), v.useHeadset, info = stringResource(R.string.playback_headset_desc)) { onChange(v.copy(useHeadset = it)) }
+    }
     Group(
         stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB",
         info = stringResource(if (v.callAudio) R.string.playback_call_volume else R.string.playback_media_volume),
@@ -679,7 +683,6 @@ private fun PlayAs(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
         }
         // Phone call chosen, and this phone played call audio from its earpiece: media it is, and why
         if (v.speakerRefused && !v.earpiece) Desc(stringResource(R.string.echo_refused))
-        Check(stringResource(R.string.playback_headset), v.useHeadset, info = stringResource(R.string.playback_headset_desc)) { onChange(v.copy(useHeadset = it)) }
     }
 }
 
@@ -689,7 +692,10 @@ private fun ProCon(good: Boolean, text: String) {
     // Read out as one line: "Plus: …" or "Minus: …"
     val said = stringResource(if (good) R.string.a11y_pro else R.string.a11y_con, text)
     Row(Modifier.clearAndSetSemantics { contentDescription = said }) {
-        Text(if (good) "✓" else "✗", color = if (good) Ts.green else Ts.red, fontSize = 12.5.sp, lineHeight = 16.sp, modifier = Modifier.width(18.dp))
+        androidx.compose.material3.Icon(
+            if (good) androidx.compose.material.icons.Icons.Filled.Check else androidx.compose.material.icons.Icons.Filled.Close, null,
+            tint = if (good) Ts.green else Ts.red, modifier = Modifier.padding(top = 1.dp, end = 6.dp).size(14.dp),
+        )
         Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
     }
 }
