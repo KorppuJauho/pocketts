@@ -63,16 +63,6 @@ class AudioRoute(
         choose()
     }
 
-    /** The choice changed (Settings › Playback): followed at once. */
-    fun set(earpiece: Boolean, useHeadset: Boolean) {
-        this.earpiece = earpiece
-        this.useHeadset = useHeadset
-        if (!on) return
-        choose()
-        main.removeCallbacks(verdict)
-        main.postDelayed(verdict, 3000)
-    }
-
     /**
      * Playback or the microphone just started: asked for again, now and once they've had time to really run. Some
      * phones (a Galaxy A54) drop what's asked before the app has call audio running, and play from the earpiece.

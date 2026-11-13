@@ -256,7 +256,7 @@
     <string name="playback_output_speaker">Динамик</string>
     <string name="playback_output_earpiece">Разговорный динамик</string>
     <string name="playback_output_speaker_desc">Голоса звучат из динамика телефона, держать его у уха не нужно.</string>
-    <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
+    <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха, намеренно тише динамика. Экран при этом гаснет.</string>
     <string name="playback_headset">Использовать подключённые наушники</string>
     <string name="playback_headset_desc">Подключённые наушники, гарнитура или Bluetooth-колонка воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
 

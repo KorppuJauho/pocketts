@@ -253,7 +253,7 @@
     <string name="playback_output_speaker">Haut-parleur</string>
     <string name="playback_output_earpiece">Écouteur</string>
     <string name="playback_output_speaker_desc">Les voix sortent par le haut-parleur du téléphone : inutile de le tenir.</string>
-    <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille. L’écran s’y éteint.</string>
+    <string name="playback_output_earpiece_desc">Comme un appel : tenez le téléphone à l’oreille, volontairement plus discret que le haut-parleur. L’écran s’y éteint.</string>
     <string name="playback_headset">Utiliser le casque connecté</string>
     <string name="playback_headset_desc">Un casque, des écouteurs ou une enceinte Bluetooth connectés jouent les voix. Désactivé : le téléphone lui-même les joue toujours.</string>
 

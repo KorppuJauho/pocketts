@@ -247,7 +247,7 @@
     <string name="playback_output_speaker">扬声器</string>
     <string name="playback_output_earpiece">听筒</string>
     <string name="playback_output_speaker_desc">语音从手机扬声器播放，无需把手机拿在耳边。</string>
-    <string name="playback_output_earpiece_desc">像打电话一样：把手机贴近耳朵，屏幕会自动熄灭。</string>
+    <string name="playback_output_earpiece_desc">像打电话一样：把手机贴近耳朵，音量刻意比扬声器低。屏幕会自动熄灭。</string>
     <string name="playback_headset">使用已连接的耳机</string>
     <string name="playback_headset_desc">连接耳机、耳麦或蓝牙音箱时由它们播放语音。关闭后始终由手机本身播放。</string>
 

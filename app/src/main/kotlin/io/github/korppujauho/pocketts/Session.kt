@@ -25,6 +25,8 @@ object Session : TsClient.Listener {
     private const val NO_PERMISSION = "2568" // "insufficient client permissions"
     private const val LEVEL_TOO_LOW = "519" // "could not validate client identity": its extra_msg is the level needed
     private const val AVATAR_TOO_BIG = 2565 // over the server's max avatar file size
+    // The earpiece speaker is much quieter than the loudspeaker: its voices are made up for (+6 dB)
+    private const val EARPIECE_GAIN = 2f
 
 
     enum class Phase { IDLE, CONNECTING, CONNECTED }
@@ -606,7 +608,7 @@ object Session : TsClient.Listener {
         v.save(app)
         _state.update { it.copy(voice = v) }
         if (v.debugLog != old.debugLog) AppLog.setDebugLog(app, v.debugLog, v)
-        player?.voiceGain = v.voiceGain
+        player?.voiceGain = playGain(v)
         if (v.activation != VoiceSettings.Activation.PTT) setPtt(false)
         if (_state.value.phase == Phase.IDLE) return
         if (v.callAudio != old.callAudio) {
@@ -614,10 +616,10 @@ object Session : TsClient.Listener {
             worker.execute { stopAudio(); startAudio() }
         } else {
             if (v.noiseSuppression != old.noiseSuppression || v.autoGainControl != old.autoGainControl) sender?.reconfigure()
-            // The loudspeaker or the earpiece, headphones or not: followed while connected
+            // The loudspeaker or the earpiece, headphones or not: playback and the microphone start again, because some
+            // phones ignore the device switch asked for on a running stream
             if (v.earpiece != old.earpiece || v.useHeadset != old.useHeadset) {
-                route?.set(v.earpiece, v.useHeadset)
-                player?.device = phoneSpeaker(v)
+                worker.execute { stopAudio(); startAudio() }
             }
         }
     }
@@ -631,13 +633,16 @@ object Session : TsClient.Listener {
         else app.getSystemService(android.media.AudioManager::class.java).getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
             .firstOrNull { it.type == android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
 
+    /** Everyone's voice gain, with the earpiece's own quietness made up for while the voices come from it. */
+    private fun playGain(v: VoiceSettings) = v.voiceGain * if (v.earpiece) EARPIECE_GAIN else 1f
+
     private fun startAudio() {
         val v = _state.value.voice
         if (v.callAudio) route = AudioRoute(app, ::speakerRefused).also { it.start(v.earpiece, v.useHeadset) }
         player = VoicePlayer(v.callAudio, ::setTalking).also {
             it.device = phoneSpeaker(v)
             it.muted = _state.value.outputMuted
-            it.voiceGain = v.voiceGain
+            it.voiceGain = playGain(v)
         }
         updateGains()
         if (micPermitted()) startSender()
@@ -659,6 +664,9 @@ object Session : TsClient.Listener {
         ).also {
             it.muted = _state.value.inputMuted
             it.whisperHeld = _state.value.whisperHeld
+            // A restart keeps what was going on: the held push-to-talk and the mic test in Settings
+            it.pttHeld = _state.value.pttHeld
+            it.testing = sender?.testing == true
         }
         route?.audioStarted() // also when the microphone is allowed only later
     }
