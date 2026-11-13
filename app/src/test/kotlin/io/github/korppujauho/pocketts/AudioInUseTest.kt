@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -71,7 +72,9 @@ class AudioInUseTest {
         seen("Shows when someone talks")
         seen("Phone call instead: your echo is removed, but voices are quieter.")
         rule.onNodeWithText("Change in Capture ›").performScrollTo().performClick()
-        seen("Echo cancellation (phone call mode)")
+        // Capture opens with echo cancellation scrolled into view (and lit up for a moment)
+        rule.mainClock.advanceTimeBy(500)
+        rule.onNodeWithTag("echoCancellation").assertIsDisplayed()
     }
 
     @Test

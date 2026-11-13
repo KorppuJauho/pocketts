@@ -61,6 +61,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -136,6 +138,8 @@ fun SettingsContent(
     self: SelfInfo? = null,
 ) {
     var tab by rememberSaveable { mutableStateOf(startTab) }
+    // Playback's "Change in Capture" was tapped: echo cancellation lights up once Capture opens
+    var glowEcho by remember { mutableStateOf(false) }
     var v by remember { mutableStateOf(voice) }
     var nick by remember { mutableStateOf(nickname) }
     val savedLanguage = remember { actions.language() }
@@ -185,8 +189,8 @@ fun SettingsContent(
                         General(v, nick, { nick = it }) { v = it }
                         ChatHistory(actions)
                     }
-                    1 -> Playback(v, voice, actions, onCapture = { tab = 2 }) { v = it }
-                    2 -> Capture(v, actions) { v = it }
+                    1 -> Playback(v, voice, actions, onCapture = { glowEcho = true; tab = 2 }) { v = it }
+                    2 -> Capture(v, actions, glowEcho, onGlowShown = { glowEcho = false }) { v = it }
                     3 -> {
                         Ui(v) { v = it }
                         Language(language) { language = it }
@@ -751,7 +755,24 @@ private fun deviceName(d: io.github.korppujauho.pocketts.AudioInUse.Device): Str
     d.name.ifBlank { stringResource(R.string.audio_device_unnamed) }
 
 @Composable
-private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+private fun Capture(
+    v: VoiceSettings, actions: SettingsActions, glowEcho: Boolean = false, onGlowShown: () -> Unit = {},
+    onChange: (VoiceSettings) -> Unit,
+) {
+    // Come from Playback's "Change in Capture": echo cancellation is scrolled to and lights up for a moment. Asked
+    // once, as the tab opens (opening Capture later doesn't light it again)
+    val glowNow = remember { glowEcho }
+    val echoInView = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+    val glow = remember { androidx.compose.animation.core.Animatable(0f) }
+    LaunchedEffect(Unit) {
+        if (!glowNow) return@LaunchedEffect
+        onGlowShown()
+        delay(50) // laid out first, so there's a place to scroll to
+        echoInView.bringIntoView()
+        glow.snapTo(1f)
+        delay(600)
+        glow.animateTo(0f, androidx.compose.animation.core.tween(1200))
+    }
     Group(stringResource(R.string.capture_mic_volume), "${(v.micVolume * 100).roundToInt()}%") {
         TsSlider(v.micVolume, 0f..3f, 29) { onChange(v.copy(micVolume = (it * 10).roundToInt() / 10f)) }
     }
@@ -787,11 +808,16 @@ private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (Voice
         // phone whose loudspeaker doesn't play call audio it's off with the loudspeaker, and can't be turned on.
         // Why it's greyed out is said without a tap; what it does is behind its ⓘ
         val fixed = v.earpiece || v.speakerRefused
-        Check(
-            stringResource(R.string.capture_echo), v.callAudio, enabled = !fixed,
-            info = stringResource(R.string.capture_echo_desc).takeIf { !fixed },
-        ) { onChange(v.copy(echoCancellation = it)) }
-        if (fixed) Desc(stringResource(if (v.earpiece) R.string.capture_echo_earpiece else R.string.echo_refused))
+        Column(
+            Modifier.bringIntoViewRequester(echoInView).clip(RoundedCornerShape(6.dp))
+                .background(Ts.accent.copy(alpha = 0.3f * glow.value)).testTag("echoCancellation"),
+        ) {
+            Check(
+                stringResource(R.string.capture_echo), v.callAudio, enabled = !fixed,
+                info = stringResource(R.string.capture_echo_desc).takeIf { !fixed },
+            ) { onChange(v.copy(echoCancellation = it)) }
+            if (fixed) Desc(stringResource(if (v.earpiece) R.string.capture_echo_earpiece else R.string.echo_refused))
+        }
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }
