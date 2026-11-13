@@ -6,11 +6,14 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
@@ -61,8 +64,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -138,8 +139,6 @@ fun SettingsContent(
     self: SelfInfo? = null,
 ) {
     var tab by rememberSaveable { mutableStateOf(startTab) }
-    // Playback's "Change in Capture" was tapped: echo cancellation lights up once Capture opens
-    var glowEcho by remember { mutableStateOf(false) }
     var v by remember { mutableStateOf(voice) }
     var nick by remember { mutableStateOf(nickname) }
     val savedLanguage = remember { actions.language() }
@@ -189,8 +188,8 @@ fun SettingsContent(
                         General(v, nick, { nick = it }) { v = it }
                         ChatHistory(actions)
                     }
-                    1 -> Playback(v, voice, actions, onCapture = { glowEcho = true; tab = 2 }) { v = it }
-                    2 -> Capture(v, actions, glowEcho, onGlowShown = { glowEcho = false }) { v = it }
+                    1 -> Playback(v, voice, actions) { v = it }
+                    2 -> Capture(v, actions) { v = it }
                     3 -> {
                         Ui(v) { v = it }
                         Language(language) { language = it }
@@ -619,21 +618,12 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
 }
 
 @Composable
-private fun Playback(
-    v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions, onCapture: () -> Unit, onChange: (VoiceSettings) -> Unit,
-) {
-    // Where voices come out: the choice the rest follows (the earpiece brings call audio, and echo cancellation, along)
-    Group(
-        stringResource(R.string.playback_output),
-        info = stringResource(if (v.earpiece) R.string.playback_output_earpiece_desc else R.string.playback_output_speaker_desc),
-    ) {
-        Segmented(
-            listOf(stringResource(R.string.playback_output_speaker), stringResource(R.string.playback_output_earpiece)),
-            if (v.earpiece) 1 else 0,
-        ) { onChange(v.copy(earpiece = it == 1)) }
+private fun Playback(v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+    PlayAs(v, onChange)
+    AudioInUseGroup(v, saved, actions)
+    Group {
         Check(stringResource(R.string.playback_headset), v.useHeadset, info = stringResource(R.string.playback_headset_desc)) { onChange(v.copy(useHeadset = it)) }
     }
-    AudioInUseGroup(v, saved, actions, onCapture)
     Group(
         stringResource(R.string.playback_voice_volume), "${if (v.voiceVolumeDb > 0) "+" else ""}${v.voiceVolumeDb} dB",
         info = stringResource(if (v.callAudio) R.string.playback_call_volume else R.string.playback_media_volume),
@@ -656,12 +646,67 @@ private fun Playback(
 }
 
 /**
- * Audio in use: how the voices play (a phone call or media), through what, and which microphone records, as Android
- * reports it while connected. Only shows; the settings above and echo cancellation (Capture) change it. It shows the
- * saved settings at work, so a change waits for Save & Apply.
+ * Voices play as Media, a Phone call (on the loudspeaker, with echo cancellation) or a phone call At your ear (the
+ * earpiece): the choice the rest follows, with what each brings and costs in view. Choosing Phone call gives the
+ * loudspeaker another try on a phone that played call audio from its earpiece before.
  */
 @Composable
-private fun AudioInUseGroup(v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions, onCapture: () -> Unit) {
+private fun PlayAs(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
+    val selected = when {
+        v.earpiece -> 2
+        v.callAudio -> 1
+        else -> 0
+    }
+    Group(stringResource(R.string.play_as)) {
+        Segmented(
+            listOf(stringResource(R.string.play_media), stringResource(R.string.play_call), stringResource(R.string.play_ear)),
+            selected,
+        ) {
+            onChange(
+                when (it) {
+                    0 -> v.copy(earpiece = false, echoCancellation = false)
+                    1 -> v.copy(earpiece = false, echoCancellation = true, speakerRefusedAt = 0)
+                    else -> v.copy(earpiece = true)
+                }
+            )
+        }
+        val points = when (selected) {
+            0 -> listOf(true to R.string.play_media_sound, false to R.string.play_media_echo, false to R.string.play_media_bluetooth)
+            1 -> listOf(
+                true to R.string.play_call_echo, true to R.string.play_call_bluetooth,
+                false to R.string.play_call_quieter, false to R.string.play_call_speakers,
+            )
+            else -> listOf(true to R.string.play_call_echo, true to R.string.play_ear_screen, false to R.string.play_ear_quieter)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            points.forEach { (good, text) -> ProCon(good, stringResource(text)) }
+        }
+        // Phone call chosen, and this phone played call audio from its earpiece: media it is, and why
+        if (v.speakerRefused && !v.earpiece) Desc(stringResource(R.string.echo_refused))
+    }
+}
+
+/** A ✓ for what a choice brings, or a ✗ for what it costs. */
+@Composable
+private fun ProCon(good: Boolean, text: String) {
+    // Read out as one line: "Plus: …" or "Minus: …"
+    val said = stringResource(if (good) R.string.a11y_pro else R.string.a11y_con, text)
+    Row(Modifier.clearAndSetSemantics { contentDescription = said }) {
+        androidx.compose.material3.Icon(
+            if (good) androidx.compose.material.icons.Icons.Filled.Check else androidx.compose.material.icons.Icons.Filled.Close, null,
+            tint = if (good) Ts.green else Ts.red, modifier = Modifier.padding(top = 1.dp, end = 6.dp).size(14.dp),
+        )
+        Text(text, color = Ts.muted, fontSize = 12.5.sp, lineHeight = 16.sp)
+    }
+}
+
+/**
+ * Audio in use: how the voices play (a phone call or media), through what, and which microphone records, as Android
+ * reports it while connected. Only shows; the choice above changes it. It shows the saved settings at work, so a
+ * change waits for Save & Apply.
+ */
+@Composable
+private fun AudioInUseGroup(v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions) {
     var now by remember { mutableStateOf(actions.audioInUse()) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -690,19 +735,6 @@ private fun AudioInUseGroup(v: VoiceSettings, saved: VoiceSettings, actions: Set
                 },
             )
         }
-        // How to switch: the earpiece and a phone that refuses the loudspeaker leave no choice
-        when {
-            saved.earpiece -> Desc(stringResource(R.string.audio_hint_earpiece))
-            saved.speakerRefused -> Desc(stringResource(R.string.echo_refused))
-            else -> {
-                Desc(stringResource(if (a.call) R.string.audio_hint_call else R.string.audio_hint_media))
-                Text(
-                    stringResource(R.string.audio_hint_switch), color = Ts.accent, fontSize = 12.5.sp,
-                    modifier = Modifier.clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onCapture).padding(vertical = 2.dp),
-                )
-            }
-        }
-        if (a.bluetooth && saved.useHeadset) Desc(stringResource(R.string.audio_hint_bluetooth))
         if (v.earpiece != saved.earpiece || v.useHeadset != saved.useHeadset || v.callAudio != saved.callAudio) {
             Desc(stringResource(R.string.audio_in_use_unsaved))
         }
@@ -755,24 +787,7 @@ private fun deviceName(d: io.github.korppujauho.pocketts.AudioInUse.Device): Str
     d.name.ifBlank { stringResource(R.string.audio_device_unnamed) }
 
 @Composable
-private fun Capture(
-    v: VoiceSettings, actions: SettingsActions, glowEcho: Boolean = false, onGlowShown: () -> Unit = {},
-    onChange: (VoiceSettings) -> Unit,
-) {
-    // Come from Playback's "Change in Capture": echo cancellation is scrolled to and lights up for a moment. Asked
-    // once, as the tab opens (opening Capture later doesn't light it again)
-    val glowNow = remember { glowEcho }
-    val echoInView = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
-    val glow = remember { androidx.compose.animation.core.Animatable(0f) }
-    LaunchedEffect(Unit) {
-        if (!glowNow) return@LaunchedEffect
-        onGlowShown()
-        delay(50) // laid out first, so there's a place to scroll to
-        echoInView.bringIntoView()
-        glow.snapTo(1f)
-        delay(600)
-        glow.animateTo(0f, androidx.compose.animation.core.tween(1200))
-    }
+private fun Capture(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
     Group(stringResource(R.string.capture_mic_volume), "${(v.micVolume * 100).roundToInt()}%") {
         TsSlider(v.micVolume, 0f..3f, 29) { onChange(v.copy(micVolume = (it * 10).roundToInt() / 10f)) }
     }
@@ -804,20 +819,8 @@ private fun Capture(
             modifier = Modifier.clickable { license = true }.padding(vertical = 2.dp),
         )
         if (license) LicenseDialog("licenses/rnnoise.txt", "RNNoise") { license = false }
-        // With the earpiece (Playback) it's on and can't be turned off: the earpiece only plays as call audio. On a
-        // phone whose loudspeaker doesn't play call audio it's off with the loudspeaker, and can't be turned on.
-        // Why it's greyed out is said without a tap; what it does is behind its ⓘ
-        val fixed = v.earpiece || v.speakerRefused
-        Column(
-            Modifier.bringIntoViewRequester(echoInView).clip(RoundedCornerShape(6.dp))
-                .background(Ts.accent.copy(alpha = 0.3f * glow.value)).testTag("echoCancellation"),
-        ) {
-            Check(
-                stringResource(R.string.capture_echo), v.callAudio, enabled = !fixed,
-                info = stringResource(R.string.capture_echo_desc).takeIf { !fixed },
-            ) { onChange(v.copy(echoCancellation = it)) }
-            if (fixed) Desc(stringResource(if (v.earpiece) R.string.capture_echo_earpiece else R.string.echo_refused))
-        }
+        // Set by how voices play (Playback): on with a phone call
+        Desc(stringResource(R.string.capture_echo_follows))
         Check(stringResource(R.string.capture_agc), v.autoGainControl) { onChange(v.copy(autoGainControl = it)) }
     }
 }

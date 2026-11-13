@@ -244,15 +244,28 @@
     <string name="playback_event_sounds_desc">Lyhyet äänet, kun joku tulee kanavallesi tai poistuu siltä, viesteistä, tökkäyksistä ja striimeistä sekä mikrofoni- ja äänipainikkeista.</string>
     <string name="playback_sound_volume">Äänien voimakkuus</string>
     <string name="playback_play_sound">Toista ääni</string>
-    <string name="playback_call_volume">Kun kaiunpoisto on päällä, äänet seuraavat puhelun äänenvoimakkuutta: paina äänenvoimakkuuspainiketta yhdistettynä.</string>
+    <string name="playback_call_volume">Puheluna toistettaessa äänet seuraavat puhelun äänenvoimakkuutta: paina äänenvoimakkuuspainiketta yhdistettynä.</string>
     <string name="playback_media_volume">Äänet seuraavat median äänenvoimakkuutta.</string>
-    <string name="playback_output">Äänet kuuluvat</string>
     <string name="playback_output_speaker">Kaiuttimesta</string>
     <string name="playback_output_earpiece">Kuulokkeesta</string>
-    <string name="playback_output_speaker_desc">Äänet kuuluvat puhelimen kaiuttimesta, joten puhelinta ei tarvitse pitää korvalla.</string>
-    <string name="playback_output_earpiece_desc">Kuten puhelussa: pidä puhelinta korvalla. Näyttö sammuu siksi aikaa.</string>
     <string name="playback_headset">Käytä yhdistettyjä kuulokkeita</string>
     <string name="playback_headset_desc">Yhdistetyt kuulokkeet, kuulokemikrofoni tai Bluetooth-kaiutin toistavat äänet. Pois päältä: äänet kuuluvat aina puhelimesta.</string>
+    <string name="play_as">Äänet toistetaan</string>
+    <string name="play_media">Mediana</string>
+    <string name="play_call">Puheluna</string>
+    <string name="play_ear">Korvalla</string>
+    <string name="play_media_sound">Paras äänenlaatu, median äänenvoimakkuus</string>
+    <string name="play_media_echo">Muut voivat kuulla kaikua, ellet käytä Paina puhuaksesi -tilaa tai kuulokkeita</string>
+    <string name="play_media_bluetooth">Bluetooth-kuulokkeiden mikrofonia ei voi käyttää</string>
+    <string name="play_call_echo">Kaiku poistetaan, puhelun äänenvoimakkuus</string>
+    <string name="play_call_bluetooth">Bluetooth-kuulokkeiden mikrofoni toimii</string>
+    <string name="play_call_quieter">Hiljaisempi; Bluetooth-ääni on puhelun laatua</string>
+    <string name="play_call_speakers">Bluetooth-kaiuttimia ilman mikrofonia ei käytetä</string>
+    <string name="play_ear_screen">Näyttö sammuu korvalla</string>
+    <string name="play_ear_quieter">Hiljaisempi, koska se on tarkoitettu korvalle</string>
+    <string name="capture_echo_follows">Kaiunpoisto on päällä, kun äänet toistetaan puheluna (Toisto › Äänet toistetaan).</string>
+    <string name="a11y_pro">Plussa: %1$s</string>
+    <string name="a11y_con">Miinus: %1$s</string>
     <string name="audio_in_use">Käytössä nyt</string>
     <string name="audio_in_use_idle">Yhdistä palvelimelle, niin näet, mikä toistaa ja mikä äänittää.</string>
     <string name="audio_in_use_unsaved">Muutokset näkyvät tässä, kun valitset Tallenna ja ota käyttöön.</string>
@@ -274,11 +287,6 @@
     <string name="audio_device_hearing_aid">%1$s (kuulokoje)</string>
     <string name="audio_device_unnamed">Kuulokkeet</string>
     <string name="audio_device_other">Muu laite (%1$d)</string>
-    <string name="audio_hint_call">Media sen sijaan: kovempi ääni, mutta muut voivat kuulla oman äänensä takaisin.</string>
-    <string name="audio_hint_media">Puhelu sen sijaan: kaikusi poistetaan, mutta äänet ovat hiljaisempia.</string>
-    <string name="audio_hint_switch">Muuta Äänitys-välilehdellä ›</string>
-    <string name="audio_hint_earpiece">Kuuloke toistaa aina puheluna.</string>
-    <string name="audio_hint_bluetooth">Bluetooth-kuulokkeet lähettävät mikrofoninsa vain puhelussa, mikä myös heikentää niiden äänenlaatua.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Mikrofonin äänenvoimakkuus</string>
@@ -294,11 +302,8 @@
     <string name="capture_vad_delay">Viive ennen katkaisua</string>
     <string name="capture_processing">Signaalinkäsittely</string>
     <string name="capture_noise">Poista taustamelu</string>
-    <string name="capture_echo">Kaiunpoisto (puhelutila)</string>
     <string name="capture_agc">Automaattinen vahvistuksen säätö</string>
-    <string name="capture_echo_desc">Äänet toistetaan kuin puhelussa: kuulokemikrofonista tai muuten puhelimen kaiuttimesta. Bluetooth-kaiutinta, jossa ei ole mikrofonia, ei käytetä, ja Bluetooth-kuulokkeet vaihtavat puheluääneen myös muissa sovelluksissa. Kytke se pois parhaan äänen ja Bluetooth-kaiuttimen takia, ja käytä kuulokkeita tai Paina puhuaksesi -tilaa, ettei mikrofoni poimi kaiuttimen ääntä.</string>
-    <string name="capture_echo_earpiece">Päällä, kun äänet kuuluvat kuulokkeesta (Toisto): puhelimen kuuloke toimii vain puhelutilassa, jossa on kaiunpoisto.</string>
-    <string name="echo_refused">Tämä puhelin ei voi toistaa kaiunpoistettuja ääniä kaiuttimesta, joten kaiunpoisto on pois päältä. Paina puhuaksesi -tila tai kuulokkeet estävät kaiun.</string>
+    <string name="echo_refused">Tämä puhelin ei voi toistaa puhelun ääntä kaiuttimesta, joten äänet toistetaan mediana. Paina puhuaksesi -tila tai kuulokkeet estävät kaiun.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Näytä ylläpitotoiminnot</string>

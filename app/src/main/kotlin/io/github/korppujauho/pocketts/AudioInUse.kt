@@ -16,22 +16,11 @@ data class AudioInUse(
     val microphone: Device?,
     /** PocketTS may not use the microphone. */
     val noMicPermission: Boolean = false,
-    /** Bluetooth headphones are connected (their microphone works only in a phone call). */
-    val bluetooth: Boolean = false,
 ) {
     /** An Android audio device: its kind ([AudioDeviceInfo]'s TYPE_…) and its name, such as "Galaxy Buds". */
     data class Device(val type: Int, val name: String)
 
     companion object {
         fun device(d: AudioDeviceInfo?): Device? = d?.let { Device(it.type, it.productName?.toString().orEmpty()) }
-
-        val BLUETOOTH = setOf(
-            AudioDeviceInfo.TYPE_BLUETOOTH_A2DP, AudioDeviceInfo.TYPE_BLUETOOTH_SCO,
-            AudioDeviceInfo.TYPE_BLE_HEADSET, AudioDeviceInfo.TYPE_BLE_SPEAKER, AudioDeviceInfo.TYPE_BLE_BROADCAST,
-        )
-        val WIRED = setOf(
-            AudioDeviceInfo.TYPE_WIRED_HEADSET, AudioDeviceInfo.TYPE_WIRED_HEADPHONES,
-            AudioDeviceInfo.TYPE_USB_HEADSET, AudioDeviceInfo.TYPE_USB_DEVICE, AudioDeviceInfo.TYPE_USB_ACCESSORY,
-        )
     }
 }

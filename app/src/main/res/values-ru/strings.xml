@@ -250,15 +250,28 @@
     <string name="playback_event_sounds_desc">Короткие звуки, когда кто-то входит в ваш канал или выходит из него, при сообщениях, тычках и трансляциях, а также для кнопок микрофона и звука.</string>
     <string name="playback_sound_volume">Громкость звуков</string>
     <string name="playback_play_sound">Воспроизвести звук</string>
-    <string name="playback_call_volume">С подавлением эха голоса следуют громкости звонка: нажмите кнопку громкости во время подключения.</string>
+    <string name="playback_call_volume">Как звонок голоса следуют громкости звонка: нажмите кнопку громкости во время подключения.</string>
     <string name="playback_media_volume">Голоса следуют громкости медиа.</string>
-    <string name="playback_output">Голоса звучат через</string>
     <string name="playback_output_speaker">Динамик</string>
     <string name="playback_output_earpiece">Разговорный динамик</string>
-    <string name="playback_output_speaker_desc">Голоса звучат из динамика телефона, держать его у уха не нужно.</string>
-    <string name="playback_output_earpiece_desc">Как при звонке: держите телефон у уха. Экран при этом гаснет.</string>
     <string name="playback_headset">Использовать подключённые наушники</string>
     <string name="playback_headset_desc">Подключённые наушники, гарнитура или Bluetooth-колонка воспроизводят голоса. Выключено: голоса всегда звучат из самого телефона.</string>
+    <string name="play_as">Голоса звучат как</string>
+    <string name="play_media">Медиа</string>
+    <string name="play_call">Звонок</string>
+    <string name="play_ear">У уха</string>
+    <string name="play_media_sound">Лучшее качество звука, громкость медиа</string>
+    <string name="play_media_echo">Другие могут слышать эхо, если не использовать «Нажми и говори» или наушники</string>
+    <string name="play_media_bluetooth">Микрофон Bluetooth-наушников использовать нельзя</string>
+    <string name="play_call_echo">Эхо убирается, громкость звонка</string>
+    <string name="play_call_bluetooth">Микрофон Bluetooth-наушников работает</string>
+    <string name="play_call_quieter">Тише; звук Bluetooth в качестве звонка</string>
+    <string name="play_call_speakers">Bluetooth-колонки без микрофона не используются</string>
+    <string name="play_ear_screen">Экран гаснет у уха</string>
+    <string name="play_ear_quieter">Тише, так как рассчитан на ухо</string>
+    <string name="capture_echo_follows">Подавление эха включено, когда голоса звучат как звонок (Воспроизведение › Голоса звучат как).</string>
+    <string name="a11y_pro">Плюс: %1$s</string>
+    <string name="a11y_con">Минус: %1$s</string>
     <string name="audio_in_use">Используемый звук</string>
     <string name="audio_in_use_idle">Подключитесь к серверу, чтобы увидеть, что воспроизводит и что записывает.</string>
     <string name="audio_in_use_unsaved">Изменения появятся здесь после «Сохранить и применить».</string>
@@ -280,11 +293,6 @@
     <string name="audio_device_hearing_aid">%1$s (слуховой аппарат)</string>
     <string name="audio_device_unnamed">Наушники</string>
     <string name="audio_device_other">Другое устройство (%1$d)</string>
-    <string name="audio_hint_call">Вместо этого медиа: громче, но другие могут слышать свой голос эхом.</string>
-    <string name="audio_hint_media">Вместо этого звонок: ваше эхо убирается, но голоса тише.</string>
-    <string name="audio_hint_switch">Изменить в «Записи» ›</string>
-    <string name="audio_hint_earpiece">Разговорный динамик всегда играет как звонок.</string>
-    <string name="audio_hint_bluetooth">Bluetooth-наушники передают свой микрофон только во время звонка, что также снижает качество их звука.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Громкость микрофона</string>
@@ -300,11 +308,8 @@
     <string name="capture_vad_delay">Задержка перед отключением</string>
     <string name="capture_processing">Обработка сигнала</string>
     <string name="capture_noise">Убирать фоновый шум</string>
-    <string name="capture_echo">Подавление эха (режим звонка)</string>
     <string name="capture_agc">Автоматическая регулировка усиления</string>
-    <string name="capture_echo_desc">Голоса звучат как в телефонном звонке: через гарнитуру, а без неё — через динамик телефона. Bluetooth-колонка без микрофона не используется, а Bluetooth-наушники переходят на звук звонка, в том числе для других приложений. Выключите его для лучшего звука и для Bluetooth-колонок, и используйте наушники или «Нажми и говори», чтобы микрофон не улавливал колонку.</string>
-    <string name="capture_echo_earpiece">Включено, пока голоса звучат через разговорный динамик (Воспроизведение): он работает только в режиме звонка, а в нём есть подавление эха.</string>
-    <string name="echo_refused">Этот телефон не может воспроизводить голоса с подавлением эха через динамик, поэтому подавление эха выключено. «Нажми и говори» или наушники помогут избежать эха.</string>
+    <string name="echo_refused">Этот телефон не может воспроизводить звук звонка через динамик, поэтому голоса звучат как медиа. «Нажми и говори» или наушники помогут избежать эха.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Показывать функции администратора</string>

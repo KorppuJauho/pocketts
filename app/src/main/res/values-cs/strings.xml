@@ -263,15 +263,28 @@
     <string name="playback_event_sounds_desc">Krátké zvuky při příchodu do kanálu a odchodu z něj, při zprávách, šťouchnutích a přenosech i při použití tlačítek mikrofonu a zvuku.</string>
     <string name="playback_sound_volume">Hlasitost zvuků</string>
     <string name="playback_play_sound">Přehrát zvuk</string>
-    <string name="playback_call_volume">Při zapnutém potlačení ozvěny se hlasitost hlasů řídí hlasitostí hovoru: během připojení stiskněte tlačítko hlasitosti.</string>
+    <string name="playback_call_volume">Jako hovor se hlasitost hlasů řídí hlasitostí hovoru: během připojení stiskněte tlačítko hlasitosti.</string>
     <string name="playback_media_volume">Hlasitost hlasů se řídí hlasitostí médií.</string>
-    <string name="playback_output">Hlasy se přehrávají přes</string>
     <string name="playback_output_speaker">Reproduktor</string>
     <string name="playback_output_earpiece">Sluchátko telefonu</string>
-    <string name="playback_output_speaker_desc">Hlasy se přehrávají z reproduktoru telefonu, takže ho nemusíte držet.</string>
-    <string name="playback_output_earpiece_desc">Jako při telefonním hovoru: držte telefon u ucha. Obrazovka se přitom vypne.</string>
     <string name="playback_headset">Používat připojená sluchátka</string>
     <string name="playback_headset_desc">Připojená sluchátka, náhlavní souprava nebo Bluetooth reproduktor přehrávají hlasy. Vypnuto: hlasy vždy přehrává samotný telefon.</string>
+    <string name="play_as">Hlasy hrají jako</string>
+    <string name="play_media">Média</string>
+    <string name="play_call">Hovor</string>
+    <string name="play_ear">U ucha</string>
+    <string name="play_media_sound">Nejlepší kvalita zvuku, hlasitost médií</string>
+    <string name="play_media_echo">Ostatní mohou slyšet ozvěnu, pokud nepoužíváte mluvení po stisku nebo sluchátka</string>
+    <string name="play_media_bluetooth">Mikrofon Bluetooth sluchátek nelze použít</string>
+    <string name="play_call_echo">Ozvěna odstraněna, hlasitost hovoru</string>
+    <string name="play_call_bluetooth">Mikrofon Bluetooth sluchátek funguje</string>
+    <string name="play_call_quieter">Tišší; zvuk přes Bluetooth v kvalitě hovoru</string>
+    <string name="play_call_speakers">Bluetooth reproduktory bez mikrofonu se nepoužijí</string>
+    <string name="play_ear_screen">Obrazovka se u ucha vypne</string>
+    <string name="play_ear_quieter">Tišší, protože je určeno k uchu</string>
+    <string name="capture_echo_follows">Potlačení ozvěny je zapnuté, když hlasy hrají jako hovor (Přehrávání › Hlasy hrají jako).</string>
+    <string name="a11y_pro">Plus: %1$s</string>
+    <string name="a11y_con">Mínus: %1$s</string>
     <string name="audio_in_use">Používaný zvuk</string>
     <string name="audio_in_use_idle">Připojte se k serveru a uvidíte, co přehrává a co nahrává.</string>
     <string name="audio_in_use_unsaved">Změny se zde ukážou po Uložit a použít.</string>
@@ -293,11 +306,6 @@
     <string name="audio_device_hearing_aid">%1$s (naslouchátko)</string>
     <string name="audio_device_unnamed">Sluchátka</string>
     <string name="audio_device_other">Jiné zařízení (%1$d)</string>
-    <string name="audio_hint_call">Místo toho média: hlasitější, ale ostatní mohou slyšet vlastní hlas zpět.</string>
-    <string name="audio_hint_media">Místo toho hovor: vaše ozvěna se odstraní, ale hlasy jsou tišší.</string>
-    <string name="audio_hint_switch">Změnit v Nahrávání ›</string>
-    <string name="audio_hint_earpiece">Sluchátko telefonu vždy hraje jako hovor.</string>
-    <string name="audio_hint_bluetooth">Bluetooth sluchátka posílají svůj mikrofon jen při hovoru, což také snižuje jejich kvalitu zvuku.</string>
 
     <!-- Settings › Capture -->
     <string name="capture_mic_volume">Hlasitost mikrofonu</string>
@@ -313,11 +321,8 @@
     <string name="capture_vad_delay">Prodleva před deaktivací</string>
     <string name="capture_processing">Zpracování signálu</string>
     <string name="capture_noise">Potlačit hluk na pozadí</string>
-    <string name="capture_echo">Potlačení ozvěny (režim hovoru)</string>
     <string name="capture_agc">Automatické řízení zesílení</string>
-    <string name="capture_echo_desc">Hlasy se přehrávají jako při telefonním hovoru: přes náhlavní soupravu, jinak přes reproduktor telefonu. Bluetooth reproduktor bez mikrofonu se nepoužije a Bluetooth sluchátka přepnou na zvuk hovoru, i pro ostatní aplikace. Pro nejlepší zvuk a pro Bluetooth reproduktory funkci vypněte a používejte sluchátka nebo mluvení po stisku, aby mikrofon nesnímal reproduktor.</string>
-    <string name="capture_echo_earpiece">Zapnuto, dokud se hlasy přehrávají přes sluchátko telefonu (Přehrávání): to funguje jen v režimu hovoru, který má potlačení ozvěny.</string>
-    <string name="echo_refused">Tento telefon neumí přehrávat hlasy s potlačením ozvěny přes reproduktor, proto je potlačení ozvěny vypnuté. Ozvěně zabrání mluvení po stisku nebo sluchátka.</string>
+    <string name="echo_refused">Tento telefon neumí přehrávat zvuk hovoru přes reproduktor, proto hlasy hrají jako média. Ozvěně zabrání mluvení po stisku nebo sluchátka.</string>
 
     <!-- Settings › UI -->
     <string name="ui_admin">Zobrazovat funkce správce</string>
