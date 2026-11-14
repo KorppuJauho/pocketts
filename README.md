@@ -43,20 +43,22 @@ Security problems: please report them privately, see [SECURITY.md](SECURITY.md).
 
 PocketTS needs Android 10 or newer.
 
-### Google Play (testers wanted)
+### Google Play
 
-PocketTS is in a closed test on Google Play. Before it can be public there, Google needs at least 12 testers who
-stay in the test for 14 days in a row, so every tester helps:
+Install [PocketTS from Google Play](https://play.google.com/store/apps/details?id=io.github.korppujauho.pocketts).
+It gets its updates from there. If you have the GitHub version, the Play version installs over it and keeps your
+settings.
+
+**New versions first:** testers get each new version on Google Play a few days before everyone else.
 
 1. Join the [pocketts-testers](https://groups.google.com/g/pocketts-testers) group with your Google account. Only the
    group's owner sees who has joined.
 2. Open the [test page on Google Play](https://play.google.com/apps/testing/io.github.korppujauho.pocketts) with the
-   same account and choose to become a tester.
-3. Install PocketTS from Google Play. After joining, it can take from a few minutes up to a few hours before Play
-   finds it.
+   same account and choose to become a tester. It can take from a few minutes up to a few hours before Play offers
+   the test version.
 
-The Play version gets its updates from Google Play. If you have the GitHub version, the Play version installs over it
-and keeps your settings. Feedback is welcome in the [issues](https://github.com/KorppuJauho/pocketts/issues).
+Leaving the test on the same page brings back the public version with its next update. Feedback is welcome in the
+[issues](https://github.com/KorppuJauho/pocketts/issues).
 
 ### GitHub
 
