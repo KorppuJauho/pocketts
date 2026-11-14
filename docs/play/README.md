@@ -27,24 +27,21 @@ How PocketTS gets onto Google Play. The texts are in [listing.md](listing.md), t
 3. **Fill in App content** with [console-answers.md](console-answers.md), and the **Main store listing** with
    [listing.md](listing.md) and the graphics.
 
-## Closed test (12 testers, 14 days)
+## Closed test (done)
 
 New personal developer accounts must run a closed test before the app can go public: at least 12 testers, opted in
-for the last 14 days in a row. Testers who leave and come back start their 14 days again.
-
-1. Testing › Closed testing › create a track, and add testers: an email list, or a Google Group they join.
-2. Upload the bundle from the latest release run, with the testers' release notes from [listing.md](listing.md).
-3. Send the testers the opt-in link. They accept it, then install PocketTS from Play with the same Google account.
-   Testers with the GitHub version can install over it (same app and key).
-4. Keep releasing as usual: each release's bundle goes to the closed track. New builds don't restart the 14 days.
-5. After 14 days with 12 or more testers, apply for production access (Dashboard). Google's review usually takes up to
-   a week.
+for 14 days in a row. PocketTS's closed test (the Alpha track, with testers from the pocketts-testers Google Group)
+got production access in November 2026. The Alpha track stays as the early-versions channel: testers get each
+version there first.
 
 ## Each release on Play
 
 With the automatic upload set up (below), the release workflow puts each release's bundle on the closed test track
-as a draft, with this version's changelog headlines as its release notes. Then, in Play Console › Publishing
+(Alpha) as a draft, with this version's changelog headlines as its release notes. Then, in Play Console › Publishing
 overview, check it and "Send for review". Don't send a new version while the previous one is still in review.
+
+Once testers have tried it, it goes public: Testing › Closed testing › Alpha › Releases › **Promote release ›
+Production**, then send that for review too.
 
 Without it (the workflow says so and skips the step):
 
