@@ -12,8 +12,8 @@
   The debug log notes them too, with device names taken out.
 - **Talking with the settings open:** voices go on while Settings is open, as in TeamSpeak's desktop client. A muted
   microphone still sends nothing, and the level bar keeps moving. From JohnyCore.
-- **Portuguese, Polish and Turkish:** PocketTS in eleven languages. Portuguese is written as in Brazil, and phones
-  set to Portugal's Portuguese get it too. A native speaker's review is welcome.
+- **Three more languages:** Portuguese, Polish and Turkish, so PocketTS speaks eleven. Portuguese is written as in
+  Brazil, and phones set to Portugal's Portuguese get it too. A native speaker's review is welcome.
 - **For developers:** CONTRIBUTING.md and AGENTS.md give the rules for pull requests, also for coding agents, and a
   pull request template has a short checklist.
 
