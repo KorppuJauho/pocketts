@@ -9,8 +9,9 @@ to join.
 
 - **Voice:** voice activation, push-to-talk (also a floating button over other apps), whispering to chosen people or
   channels, echo and noise removal, and AI noise removal (RNNoise) for keyboard clicks, fans and the like. Voices
-  play through the loudspeaker or the earpiece, as you choose, or connected headphones. Keeps working with the
-  screen off, and goes quiet during phone calls.
+  play as media or as a phone call (with echo cancellation), on the loudspeaker or at your ear, or through connected
+  headphones, and Settings shows which speaker and microphone are in use. Keeps working with the screen off, and goes
+  quiet during phone calls.
 - **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
   password. Hold a channel for its info.
 - **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
@@ -33,7 +34,7 @@ Your TeamSpeak identity and saved passwords are encrypted on the phone. No accou
 [privacy policy](PRIVACY.md)). The GitHub version asks GitHub once a day whether there's a newer version (you can turn
 that off in Settings).
 
-**Status:** early, being tested. See the [changelog](CHANGELOG.md), and the
+**Status:** young, and public on Google Play since November 2026. See the [changelog](CHANGELOG.md), and the
 [issues](https://github.com/KorppuJauho/pocketts/issues) for what's planned. Questions, ideas and tips are welcome in
 the [discussions](https://github.com/KorppuJauho/pocketts/discussions); bugs go to the issues, where a debug log
 (Settings › Advanced › Debug log, with names and addresses taken out) helps with bugs that are hard to repeat.
