@@ -27,7 +27,7 @@ PocketTS is a voice chat app for TeamSpeak servers, made for phones. Connect to 
 • Channels: who is where, a channel's info and its files
 • Favourite servers in folders, and TeamSpeak's public community servers one tap away
 • Tools for server admins, and your TeamSpeak identity from another TeamSpeak app
-• In eight languages
+• In eleven languages
 
 PRIVATE BY DESIGN
 No account, no ads, no analytics. Your identity and passwords are encrypted on your phone. PocketTS talks only to the servers you choose (and, for a server nickname or an invite, TeamSpeak's nickname or invite service).

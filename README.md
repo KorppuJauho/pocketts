@@ -26,7 +26,8 @@ to join.
   privilege keys from a server's admin; reconnecting by itself when the network changes; and mute, sound and
   disconnect buttons in the notification.
 - **Settings** and sounds for events.
-- **Languages:** English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech (see
+- **Languages:** English, Finnish, German, Spanish, French, Portuguese (Brazil), Polish, Turkish, Simplified Chinese,
+  Russian and Czech (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
 
 Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking (see the
