@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Portuguese (Brazil). An initial AI-made translation; a native speaker's review is welcome. -->
+<resources>
+    <!-- Shared -->
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
+    <string name="delete">Excluir</string>
+    <string name="edit">Editar</string>
+    <string name="remove">Remover</string>
+    <string name="close">Fechar</string>
+    <string name="advanced">Avançado</string>
+    <string name="connect">Conectar</string>
+    <string name="link_title">Conectar a %1$s?</string>
+    <string name="link_subtitle">De um link do TeamSpeak</string>
+    <string name="link_subtitle_invite">De um convite do TeamSpeak</string>
+    <string name="link_address">Endereço</string>
+    <string name="invite_expired">Este convite expirou ou não existe. Peça um novo ou o endereço do servidor.</string>
+    <string name="invite_failed">Não foi possível consultar o convite. Verifique a conexão e tente de novo.</string>
+    <string name="link_channel">Canal</string>
+    <string name="link_password">Senha do servidor</string>
+    <string name="link_password_given">no link</string>
+    <string name="link_leaving">Você vai sair de %1$s primeiro.</string>
+    <string name="link_use_key">Usar a chave de privilégio do link</string>
+    <string name="link_use_key_desc">Ela dá a você direitos neste servidor, como de administrador. Use só se você confia em quem mandou o link.</string>
+    <string name="disconnect">Desconectar</string>
+    <string name="nickname">Apelido</string>
+    <string name="server_address">Endereço ou apelido do servidor</string>
+    <string name="server_password">Senha do servidor</string>
+    <string name="remember_password">Lembrar a senha</string>
+    <string name="channel_password">Senha do canal</string>
+    <string name="join">Entrar</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">Favoritos</string>
+    <string name="favourites_in">Nos favoritos</string>
+    <string name="favourites_save">Salvar nos favoritos</string>
+    <string name="favourite_edit">Editar favorito</string>
+    <string name="favourite_add">Adicionar aos favoritos</string>
+    <string name="favourite_name">Nome nas suas listas</string>
+    <string name="favourite_nickname">Seu apelido neste servidor</string>
+    <string name="favourite_auto">Conectar automaticamente ao abrir o app</string>
+    <string name="favourite_file_port">Porta de transferência de arquivos</string>
+    <string name="favourite_file_port_hint">A do próprio servidor (geralmente 30033)</string>
+    <string name="favourite_file_port_desc">Só se as imagens e os avatares do servidor não carregarem: a transferência de arquivos dele está em outra porta.</string>
+    <string name="favourite_folder">Pasta</string>
+    <string name="favourite_folder_new">Nova pasta…</string>
+    <string name="folder_name">Nome da pasta</string>
+    <string name="folder_edit">Editar pasta</string>
+    <string name="folder_fold">recolher a pasta</string>
+    <string name="folder_unfold">abrir a pasta</string>
+    <string name="connect_show">Abrir o painel de conexão</string>
+    <string name="connect_hide">Recolher o painel de conexão</string>
+    <string name="community_tab">Comunidade</string>
+    <string name="community_desc">Servidores públicos mantidos pelo TeamSpeak. Toque em um para entrar.</string>
+    <string name="community_desc_no_nick">Servidores públicos mantidos pelo TeamSpeak. Digite um apelido acima para entrar em um.</string>
+    <string name="community_worldwide">Mundial</string>
+    <string name="community_eu_east">Europa Oriental</string>
+    <string name="community_emea">Europa, Oriente Médio e África</string>
+    <string name="community_apac">Ásia–Pacífico</string>
+    <string name="community_latam">América Latina</string>
+    <string name="community_na">América do Norte</string>
+    <string name="favourite_channel">Canal para entrar</string>
+    <string name="favourite_channel_hint">O canal padrão do servidor</string>
+    <string name="favourite_channel_desc">O nome do canal, escrito como o servidor mostra. Para um canal dentro de outro, informe o caminho: Jogos/Lobby.</string>
+    <string name="channel_not_joined">Não foi possível entrar em %1$s: esse canal não existe ou a senha está errada. Você está no canal padrão do servidor.</string>
+    <string name="update_title">Saiu o PocketTS %1$s</string>
+    <string name="update_text">Uma versão mais nova que esta (%1$s) está no GitHub.</string>
+    <string name="not_now">Agora não</string>
+    <string name="download">Baixar</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">Configurações</string>
+    <string name="hold_to_talk">Segure para falar</string>
+    <string name="microphone">Microfone</string>
+    <string name="sound">Som</string>
+    <string name="share">Compartilhar</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">Senha</string>
+    <string name="person_sound_off">Som desligado</string>
+    <string name="person_mic_off">Microfone desligado</string>
+    <string name="person_cant_talk">Não pode falar neste canal</string>
+    <string name="person_streaming">Transmitindo</string>
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">VOCÊ</string>
+
+    <!-- Chat -->
+    <string name="event_connected">%1$s se conectou</string>
+    <string name="event_joined_from">%1$s entrou vindo de %2$s</string>
+    <string name="event_you_moved_to">Você foi movido para %1$s</string>
+    <string name="event_you_kicked_from">Você foi expulso de %1$s</string>
+    <string name="event_moved_here_from">%1$s foi movido para cá de %2$s</string>
+    <string name="event_kicked_from">%1$s foi expulso de %2$s</string>
+    <string name="event_moved_to">%1$s foi movido para %2$s</string>
+    <string name="event_kicked_from_channel">%1$s foi expulso do canal</string>
+    <string name="event_left_to">%1$s saiu para %2$s</string>
+    <string name="event_you_kicked_from_server">Você foi expulso do servidor</string>
+    <string name="event_you_banned">Você foi banido</string>
+    <string name="event_lost_connection">%1$s perdeu a conexão</string>
+    <string name="event_kicked_from_server">%1$s foi expulso do servidor</string>
+    <string name="event_banned">%1$s foi banido</string>
+    <string name="event_disconnected">%1$s se desconectou</string>
+    <string name="event_by">" por %1$s"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <string name="event_another_channel">outro canal</string>
+    <string name="chat_channel">Canal</string>
+    <string name="chat_empty_channel">Ainda não há mensagens neste canal.</string>
+    <string name="chat_empty_private">Ainda não há mensagens.</string>
+    <string name="chat_message_to">Mensagem para %1$s…</string>
+    <string name="chat_message_to_channel">Mensagem para o canal…</string>
+    <string name="chat_message_to_them">Mensagem para esta pessoa…</string>
+    <string name="chat_system">Sistema</string>
+    <string name="chat_link_open">Abrir: %1$s</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="one">No máximo %1$d imagem por vez.</item>
+        <item quantity="many">No máximo %1$d imagens por vez.</item>
+        <item quantity="other">No máximo %1$d imagens por vez.</item>
+    </plurals>
+    <string name="chat_camera_needed">Para tirar uma foto, é preciso permitir a câmera.</string>
+    <string name="chat_sending_picture">Enviando imagem %1$d de %2$d…</string>
+    <string name="chat_attached_picture">Uma imagem anexada</string>
+    <string name="chat_remove_picture">Remover a imagem</string>
+    <string name="chat_send_picture">Enviar uma imagem</string>
+    <string name="chat_choose_pictures">Escolher imagens</string>
+    <string name="chat_take_photo">Tirar uma foto</string>
+    <string name="chat_send">Enviar</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">Salvar na galeria</string>
+    <string name="picture_saved">Salva em %1$s</string>
+    <string name="picture_failed">Não deu certo: %1$s</string>
+
+    <!-- Streams: watching -->
+    <string name="stream_watch">ASSISTIR</string>
+    <string name="stream_small_window">Janela pequena</string>
+    <string name="stream_full_screen">Tela cheia</string>
+    <string name="stream_resize">Arraste para mudar o tamanho da transmissão</string>
+    <string name="stream_mini">Transmissão pequena: toque para aumentar, arraste para mover</string>
+    <string name="stream_leave_full_screen">Sair da tela cheia</string>
+    <string name="stream_stop_watching">Parar de assistir</string>
+    <string name="stream_sound_on">Som ligado</string>
+    <string name="stream_sound_off">Som desligado</string>
+    <string name="stream_requesting">Pedindo acesso…</string>
+    <string name="stream_connecting">Conectando…</string>
+    <string name="stream_paused">Pausada</string>
+    <string name="stream_waiting_picture">Conectado, esperando a imagem…</string>
+    <string name="stream_trying">Problema de conexão, ainda tentando…</string>
+    <string name="stream_connection_lost">Conexão perdida.</string>
+    <string name="stream_open_failed">Não foi possível abrir a transmissão.</string>
+    <string name="stream_denied">O pedido de transmissão foi recusado.</string>
+    <string name="stream_ended">Transmissão encerrada.</string>
+    <string name="stream_ended_left_channel">Transmissão encerrada (você não está mais no mesmo canal).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">Compartilhar sua câmera</string>
+    <string name="share_screen_title">Compartilhar sua tela</string>
+    <string name="share_subtitle">Todos no seu canal podem assistir</string>
+    <string name="start">Iniciar</string>
+    <string name="stop">Parar</string>
+    <string name="share_what">O quê</string>
+    <string name="share_camera">Câmera</string>
+    <string name="share_screen">Tela</string>
+    <string name="share_both_cameras">As duas câmeras</string>
+    <string name="camera_front">Frontal</string>
+    <string name="camera_back">Traseira</string>
+    <string name="camera_both">Ambas</string>
+    <string name="share_both_desc">A câmera traseira grande e a frontal pequena no canto. Trocar inverte as duas.</string>
+    <string name="share_quality">Qualidade</string>
+    <string name="share_quality_480">Economia de dados: o mínimo de dados, para redes móveis.</string>
+    <string name="share_quality_720">HD: nítido e leve o bastante para a maioria das conexões.</string>
+    <string name="share_quality_1080">Full HD: o mais nítido, precisa de uma boa conexão nas duas pontas.</string>
+    <string name="share_sound">Som da transmissão</string>
+    <string name="share_sound_on_desc">Os espectadores ouvem seu microfone junto com a imagem. Ele fica em silêncio enquanto seu microfone está mudo e enquanto você fala no canal, para você não ser ouvido duas vezes.</string>
+    <string name="share_sound_off_desc">Sem som com a imagem: fale no canal como de costume.</string>
+    <string name="share_screen_sound">Som do celular</string>
+    <string name="share_screen_sound_on_desc">Os espectadores ouvem o que seu celular toca, como um vídeo ou um jogo. Alguns apps não permitem isso e ficam em silêncio. As vozes do canal não são incluídas.</string>
+    <string name="share_screen_sound_off_desc">Sem som com a imagem.</string>
+    <string name="share_screen_sound_watching">Não enquanto você assiste a uma transmissão: pare de assistir para compartilhar também o som do celular.</string>
+    <string name="share_screen_desc">O Android pergunta mais uma vez antes de começar. Tudo o que estiver na sua tela aparece, inclusive as notificações.</string>
+    <string name="share_sound_quiet">Som da transmissão em silêncio</string>
+    <string name="share_sound_live">Som da transmissão ligado</string>
+    <string name="share_starting">iniciando…</string>
+    <string name="share_paused_call">pausada durante a chamada</string>
+    <string name="share_watching">Assistindo</string>
+    <string name="share_swap_cameras">Trocar as câmeras</string>
+    <string name="share_switch_camera">Alternar câmera</string>
+    <string name="share_turn_locked">Rotação travada (toque para seguir o celular)</string>
+    <string name="share_turn_follows">Rotação segue o celular (toque para travar)</string>
+    <string name="share_light_on">Ring light ligada (toque para desligar)</string>
+    <string name="share_light_off">Ring light: uma tela branca e clara ilumina seu rosto</string>
+    <string name="share_both_unsupported">Este celular não consegue usar as duas câmeras ao mesmo tempo.</string>
+    <string name="share_failed">Não foi possível iniciar o compartilhamento.</string>
+    <string name="share_refused">O TeamSpeak recusou o compartilhamento: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Geral</string>
+    <string name="settings_playback">Reprodução</string>
+    <string name="settings_capture">Captura</string>
+    <string name="settings_ui">Interface</string>
+    <string name="settings_save">Salvar e aplicar</string>
+    <string name="cant_be_undone">Isso não pode ser desfeito</string>
+    <string name="quiet">Baixo</string>
+    <string name="loud">Alto</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">Foto de perfil</string>
+    <string name="avatar_change">Alterar</string>
+    <string name="avatar_desc">Os outros a veem neste servidor. Ela é ajustada para 320 × 320.</string>
+    <string name="general_floating_ptt">Botão flutuante para falar</string>
+    <string name="general_floating_ptt_desc">No modo pressionar para falar, um botão redondo fica na parte de baixo da tela do PocketTS, para você falar enquanto rola o chat. O botão sobre outros apps (abaixo) é uma configuração separada.</string>
+    <string name="general_overlay_ptt">Botão de falar sobre outros apps</string>
+    <string name="general_overlay_ptt_desc">No modo pressionar para falar, um botão redondo aparece quando você vai para outros apps (não no próprio PocketTS). Segure para falar, arraste para mover. O Android pede uma vez para deixar o PocketTS aparecer sobre outros apps.</string>
+    <string name="general_volume_ptt">Botões de volume para falar</string>
+    <string name="general_volume_ptt_desc">No modo pressionar para falar, segurar um botão de volume faz você falar enquanto o app está na tela (em vez de mudar o volume).</string>
+    <string name="general_headset_ptt">Botão do fone para falar</string>
+    <string name="general_headset_ptt_desc">No modo pressionar para falar, aperte o botão do seu fone de ouvido para começar a falar e aperte de novo para parar. Funciona também com a tela desligada. Enquanto isso estiver ligado, o botão não toca nem pausa música.</string>
+    <string name="general_call_mute">Silenciar durante chamadas</string>
+    <string name="general_call_mute_desc">Quando uma chamada telefônica toca ou começa, seu microfone e o som são desligados (e o som de uma transmissão que você assiste) e voltam quando ela termina. Uma transmissão que você compartilha é pausada, para os espectadores não verem a chamada. O que você mesmo tinha silenciado continua silenciado.</string>
+    <string name="general_updates">Procurar atualizações</string>
+    <string name="general_updates_desc">Uma vez por dia, o PocketTS pergunta ao GitHub se saiu uma versão mais nova e avisa na tela de conexão. Nada sobre você é enviado.</string>
+    <string name="general_screen_on">Manter a tela ligada</string>
+    <string name="general_screen_on_desc">A tela não apaga enquanto você está conectado e o app está aberto. Enquanto você compartilha ou assiste a uma transmissão, ela fica ligada de qualquer forma.</string>
+    <string name="general_spacers">Permitir entrar em espaçadores</string>
+    <string name="general_spacers_desc">Tocar em um espaçador (uma linha divisória ou um título na lista de canais) entra nele como em qualquer canal. Alguns servidores usam um como canal AFK. Desligado, não dá para entrar em espaçadores com um toque acidental.</string>
+    <string name="history_title">Histórico do chat</string>
+    <string name="history_desc">Chats de canal, chats privados e quem entrou ou saiu ficam guardados neste celular, criptografados, e aparecem de novo quando você se conecta ao mesmo servidor: por %1$s, no máximo %2$s por conversa. Cutucadas não são guardadas.</string>
+    <plurals name="history_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="one">%1$d linha</item>
+        <item quantity="many">%1$d linhas</item>
+        <item quantity="other">%1$d linhas</item>
+    </plurals>
+    <string name="history_clear">Limpar histórico do chat</string>
+    <string name="history_cleared">Limpo.</string>
+    <string name="history_clear_title">Limpar o histórico do chat?</string>
+    <string name="history_clear_button">Limpar</string>
+    <string name="history_clear_desc">O chat salvo de todos os servidores é removido deste celular, assim como o chat que está na tela agora.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">Volume das vozes</string>
+    <string name="playback_test_sound">Tocar som de teste</string>
+    <string name="playback_event_sounds">Sons de eventos</string>
+    <string name="playback_event_sounds_desc">Sons curtos quando alguém entra no seu canal ou sai dele, para mensagens, cutucadas e transmissões, e para os botões de microfone e som.</string>
+    <string name="playback_sound_volume">Volume dos sons</string>
+    <string name="playback_play_sound">Tocar um som</string>
+    <string name="playback_call_volume">Tocando como chamada telefônica, as vozes seguem o volume de chamada: aperte um botão de volume enquanto estiver conectado.</string>
+    <string name="playback_media_volume">As vozes seguem o volume de mídia.</string>
+    <string name="playback_output_speaker">Alto-falante</string>
+    <string name="playback_output_earpiece">Auricular</string>
+    <string name="playback_headset">Usar fones conectados</string>
+    <string name="playback_headset_desc">Fones de ouvido, um headset ou uma caixa de som Bluetooth tocam as vozes enquanto você está conectado. Desligado: o próprio celular sempre as toca.</string>
+    <string name="play_as">As vozes tocam como</string>
+    <string name="play_media">Mídia</string>
+    <string name="play_call">Chamada</string>
+    <string name="play_ear">No ouvido</string>
+    <string name="play_media_sound">Melhor qualidade de som, volume de mídia</string>
+    <string name="play_media_echo">Os outros podem ouvir eco, a menos que você use pressionar para falar ou fones</string>
+    <string name="play_media_bluetooth">O microfone de fones Bluetooth não pode ser usado</string>
+    <string name="play_call_echo">Eco removido, volume de chamada</string>
+    <string name="play_call_bluetooth">O microfone de fones Bluetooth funciona</string>
+    <string name="play_call_quieter">Mais baixo; o som Bluetooth tem qualidade de chamada</string>
+    <string name="play_call_speakers">Caixas de som Bluetooth sem microfone não são usadas</string>
+    <string name="play_ear_screen">A tela apaga quando está no seu ouvido</string>
+    <string name="play_ear_quieter">Mais baixo, já que é feito para o ouvido</string>
+    <string name="capture_echo_follows">O cancelamento de eco fica ligado enquanto as vozes tocam como chamada (Reprodução › As vozes tocam como).</string>
+    <string name="a11y_pro">Vantagem: %1$s</string>
+    <string name="a11y_con">Desvantagem: %1$s</string>
+    <string name="audio_in_use">Áudio em uso</string>
+    <string name="audio_in_use_idle">Conecte-se a um servidor para ver o que toca e o que grava.</string>
+    <string name="audio_in_use_unsaved">As mudanças aparecem aqui depois de Salvar e aplicar.</string>
+    <string name="audio_mode">Modo</string>
+    <string name="audio_mode_call">Chamada telefônica</string>
+    <string name="audio_mode_media">Mídia</string>
+    <string name="audio_playback">Reprodução</string>
+    <string name="audio_playback_waiting">Aparece quando alguém fala</string>
+    <string name="audio_microphone">Microfone</string>
+    <string name="audio_mic_phone">Microfone do celular</string>
+    <string name="audio_mic_wired">Microfone do headset (com fio)</string>
+    <string name="audio_mic_none">Não está gravando</string>
+    <string name="audio_mic_no_permission">Sem permissão</string>
+    <string name="audio_device_wired">Fones com fio</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, qualidade de chamada)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (aparelho auditivo)</string>
+    <string name="audio_device_unnamed">Fones de ouvido</string>
+    <string name="audio_device_other">Outro dispositivo (%1$d)</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">Volume do microfone</string>
+    <string name="capture_activation">Ativação</string>
+    <string name="capture_vad">Ativação por voz</string>
+    <string name="capture_ptt">Pressionar para falar</string>
+    <string name="capture_continuous">Transmissão contínua</string>
+    <string name="capture_ptt_desc">Segure o botão \"Segure para falar\" enquanto fala.</string>
+    <string name="capture_level">Nível</string>
+    <string name="capture_level_desc">A barra mostra seu microfone enquanto estas configurações estão abertas, mesmo quando ele está mudo. A fala continua como de costume.</string>
+    <string name="capture_vad_level">Nível de ativação por voz</string>
+    <string name="capture_vad_level_desc">Deslize para a direita para bloquear o ruído de fundo. Se sua voz cortar, deslize para a esquerda.</string>
+    <string name="capture_vad_delay">Atraso antes da desativação</string>
+    <string name="capture_processing">Processamento de sinal</string>
+    <string name="capture_noise">Remover ruído de fundo</string>
+    <string name="capture_agc">Controle automático de ganho</string>
+    <string name="echo_refused">Este celular não consegue tocar som de chamada pelo alto-falante, então as vozes tocam como mídia. Pressionar para falar ou fones evitam o eco.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">Mostrar funções de administrador</string>
+    <string name="ui_controls_bottom">Botões embaixo</string>
+    <string name="ui_controls_bottom_desc">Os botões de microfone, som e compartilhar e a troca Canais/Chat ficam na parte de baixo da tela, ao alcance do polegar.</string>
+    <string name="ui_language">Idioma</string>
+    <string name="ui_language_phone">Idioma do celular</string>
+    <string name="ui_admin_desc">O menu de uma pessoa também oferece movê-la para outro canal, expulsá-la do canal ou do servidor e bani-la. O servidor decide se você pode: sem a permissão, ele recusa.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">Conexão de vídeo</string>
+    <string name="relay_desc">As transmissões vão direto entre você e a outra ponta. Atrás de algumas redes, elas precisam de um retransmissor (um servidor TURN): informe um aqui se você tiver.</string>
+    <string name="relay_address">Retransmissor (turn:host:porta)</string>
+    <string name="relay_user">Usuário do retransmissor</string>
+    <string name="relay_password">Senha do retransmissor</string>
+    <string name="relay_only">Sempre pelo retransmissor</string>
+    <string name="advanced_file_port">Um servidor cuja transferência de arquivos está em outra porta (as imagens e os avatares dele não carregam) pode ter a própria porta na parte Avançado do favorito.</string>
+    <string name="passwords_title">Senhas de canal</string>
+    <string name="passwords_desc">As senhas que você escolheu lembrar entram nos canais com um toque. Elas ficam guardadas neste celular, criptografadas.</string>
+    <string name="passwords_forget">Esquecer senhas salvas</string>
+    <string name="passwords_forgotten">Esquecidas.</string>
+    <string name="identity_title">Identidade do TeamSpeak</string>
+    <string name="identity_desc">Sua identidade é quem você é para os servidores (seus grupos e permissões). Guarde uma cópia ou use a de outro app do TeamSpeak.</string>
+    <string name="identity_wipe">Apagar</string>
+    <string name="identity_export">Exportar</string>
+    <string name="identity_import">Importar</string>
+    <string name="identity_imported">Importada. Ela é usada a partir da próxima conexão.</string>
+    <string name="identity_saved">Salva. Guarde o arquivo em um lugar que só você acessa.</string>
+    <string name="identity_wiped">Apagada. Uma nova identidade é criada na próxima conexão.</string>
+    <string name="identity_export_title">Exportar sua identidade</string>
+    <string name="identity_export_subtitle">Mantenha em sigilo</string>
+    <string name="identity_save_file">Salvar em um arquivo</string>
+    <string name="identity_export_what">O arquivo é a sua própria identidade: quem tiver ele é você em todos os servidores, com seus grupos e permissões, como os de um administrador do servidor. Ninguém consegue perceber a diferença.</string>
+    <string name="identity_export_where">Salve em um lugar que só você acessa, como este celular ou um drive privado. Não mande em um chat ou por e-mail, e não publique. Um app do TeamSpeak pode abri-lo, assim como o PocketTS em outro celular.</string>
+    <string name="identity_wipe_title">Apagar sua identidade?</string>
+    <string name="identity_wipe_what">A identidade deste celular é excluída, e uma nova é criada na próxima vez que você se conectar. Para todos os servidores, você passa a ser outra pessoa: seus grupos, suas permissões e tudo o que foi dado à identidade antiga (como direitos de administrador) não vêm junto.</string>
+    <string name="identity_wipe_back">A única volta é uma cópia exportada. Se talvez você a queira de novo, cancele e use Exportar antes.</string>
+    <string name="identity_import_title">Importar uma identidade</string>
+    <string name="identity_import_subtitle">De um app do TeamSpeak</string>
+    <string name="identity_import_desc">Cole a identidade que um app do TeamSpeak exportou ou escolha o arquivo que ele salvou (.ini). Ela substitui a deste celular a partir da próxima conexão.</string>
+    <string name="identity_field">Identidade</string>
+    <string name="identity_choose_file">Escolher um arquivo…</string>
+    <string name="level_title">Nível de segurança</string>
+    <string name="level_desc">Alguns servidores só aceitam identidades a partir de um certo nível. Aumentá-lo mantém a mesma identidade, com seus grupos e permissões.</string>
+    <string name="level_raise_button">Aumentar nível</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">Você</string>
+    <string name="person_away">Ausente</string>
+    <string name="person_away_message">Ausente: %1$s</string>
+    <string name="person_volume">Volume para você</string>
+    <string name="away_message_field">Mensagem de ausência (opcional)</string>
+    <string name="away_back">Voltei</string>
+    <string name="away_update">Atualizar</string>
+    <string name="away_set">Ficar ausente</string>
+    <string name="poke">Cutucar</string>
+    <string name="chat">Chat</string>
+    <string name="poke_title">Cutucar %1$s</string>
+    <string name="poke_subtitle">A pessoa recebe um pop-up com sua mensagem</string>
+    <string name="poke_message_field">Mensagem (opcional)</string>
+    <string name="poked_you">%1$s cutucou você</string>
+    <string name="dismiss">Dispensar</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">Admin</string>
+    <string name="admin_move">Mover</string>
+    <string name="admin_kick">Expulsar</string>
+    <string name="admin_ban">Banir</string>
+    <string name="admin_move_title">Mover %1$s</string>
+    <string name="admin_move_subtitle">Escolha o canal</string>
+    <string name="admin_here_now">Aqui agora</string>
+    <string name="admin_has_password">Tem senha</string>
+    <string name="admin_kick_title">Expulsar %1$s</string>
+    <string name="admin_kick_subtitle">A pessoa vê o motivo</string>
+    <string name="admin_kick_channel">Do canal (para o canal padrão)</string>
+    <string name="admin_kick_server">Do servidor</string>
+    <string name="admin_reason">Motivo (opcional)</string>
+    <string name="admin_ban_title">Banir %1$s</string>
+    <string name="admin_ban_subtitle">Bane a identidade e o endereço IP da pessoa</string>
+    <string name="ban_10_minutes">10 minutos</string>
+    <string name="ban_1_hour">1 hora</string>
+    <string name="ban_1_day">1 dia</string>
+    <string name="ban_1_week">1 semana</string>
+    <string name="ban_permanently">Permanentemente</string>
+
+    <!-- Server info -->
+    <string name="info_title">Informações do servidor</string>
+    <string name="key_button">Chave de privilégio</string>
+    <string name="key_title">Usar uma chave de privilégio</string>
+    <string name="key_subtitle">Do administrador do servidor</string>
+    <string name="key_field">Chave de privilégio</string>
+    <string name="key_use">Usar</string>
+    <string name="key_desc">Uma chave de privilégio dá a você direitos neste servidor, como um grupo do servidor. Cada chave funciona uma vez. Use só chaves de alguém em quem você confia.</string>
+    <string name="key_used">Chave de privilégio usada: seus novos direitos estão ativos.</string>
+    <string name="info_users">Usuários</string>
+    <string name="info_channels">Canais</string>
+    <string name="info_uptime">Tempo ativo</string>
+    <string name="info_created">Criado</string>
+    <string name="info_ago">há %1$s</string>
+    <plurals name="span_minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="many">%1$d minutos</item>
+        <item quantity="other">%1$d minutos</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="one">%1$d hora</item>
+        <item quantity="many">%1$d horas</item>
+        <item quantity="other">%1$d horas</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="one">%1$d mês</item>
+        <item quantity="many">%1$d meses</item>
+        <item quantity="other">%1$d meses</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="one">%1$d ano</item>
+        <item quantity="many">%1$d anos</item>
+        <item quantity="other">%1$d anos</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <string name="level_needed_title">Nível de segurança %1$d necessário</string>
+    <string name="level_raise_title">Aumentar nível de segurança</string>
+    <string name="level_needed_subtitle">Este servidor exige. O seu é %1$d.</string>
+    <string name="level_yours">O seu é %1$d</string>
+    <string name="level_raise">Aumentar</string>
+    <string name="level_estimate">Neste celular, isso leva %1$s em média. Pode ser mais rápido ou mais lento.</string>
+    <string name="level_measuring">Calculando quanto tempo isso leva neste celular…</string>
+    <string name="level_desc_raise">Aumentar é um trabalho de uma vez só. Sua identidade continua a mesma: seus grupos e permissões ficam, e o nível mais alto vale em todos os servidores. Mantenha o app aberto enquanto ele trabalha; Parar guarda o nível alcançado até agora.</string>
+    <string name="level_progress">Nível %1$d de %2$d</string>
+    <string name="level_running_desc">Mantenha o app aberto. Cada nível leva cerca do dobro do tempo do anterior.</string>
+    <string name="level_done">Pronto: seu nível de segurança é %1$d.</string>
+    <string name="level_done_connecting">Pronto: seu nível de segurança é %1$d. Conectando de novo…</string>
+    <string name="level_stopped">Parado no nível %1$d. Aumentar de novo continua daí.</string>
+    <string name="about_under_minute">menos de um minuto</string>
+    <plurals name="about_minutes">
+        <item quantity="one">cerca de um minuto</item>
+        <item quantity="many">cerca de %1$d minutos</item>
+        <item quantity="other">cerca de %1$d minutos</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="one">cerca de uma hora</item>
+        <item quantity="many">cerca de %1$d horas</item>
+        <item quantity="other">cerca de %1$d horas</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">cerca de um dia</item>
+        <item quantity="many">cerca de %1$d dias</item>
+        <item quantity="other">cerca de %1$d dias</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">Servidores</string>
+    <string name="connected">Conectado</string>
+    <string name="connecting_to">Conectando a %1$s…</string>
+    <string name="reconnecting_old">Reconectando… O servidor ainda tem sua conexão antiga: esperando que ele a solte.</string>
+    <string name="reconnecting_try">Conexão perdida. Reconectando… (tentativa %1$d)</string>
+    <string name="channel_password_subtitle">Este canal tem senha</string>
+    <string name="view_channels">Canais</string>
+    <string name="stream_title">Transmissão de %1$s</string>
+    <string name="stream_title_unknown">Transmissão</string>
+    <string name="not_an_address">Isso não parece um endereço de servidor</string>
+    <string name="private_left">%1$s saiu do servidor</string>
+    <string name="private_left_unknown">A pessoa saiu do servidor</string>
+    <string name="level_not_connected">Não conectado: o servidor exige nível de segurança da identidade %1$d. Você pode aumentar o seu em Configurações › Avançado.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">Não foi possível conectar: o servidor não respondeu. Verifique o endereço e a porta.</string>
+    <string name="end_no_such_host">Não foi possível conectar: nenhum servidor encontrado em \"%1$s\". Verifique o endereço.</string>
+    <string name="end_cant_connect">Não foi possível conectar: %1$s</string>
+    <string name="end_network_error">Erro de rede: %1$s</string>
+    <string name="end_network_changed">A rede mudou</string>
+    <string name="end_network_gone">A rede caiu</string>
+    <string name="end_server_silent">O servidor não respondeu</string>
+    <string name="end_server_stopped">O servidor parou de responder</string>
+    <string name="end_lost">Conexão perdida</string>
+    <string name="end_handshake">Não foi possível estabelecer a conexão com o servidor.</string>
+    <string name="end_by_server">Desconectado pelo servidor</string>
+    <string name="end_kicked_channel">Expulso do canal</string>
+    <string name="end_kicked_channel_reason">Expulso do canal: %1$s</string>
+    <string name="end_kicked">Expulso do servidor</string>
+    <string name="end_kicked_reason">Expulso do servidor: %1$s</string>
+    <string name="end_banned">Banido do servidor</string>
+    <string name="end_banned_reason">Banido do servidor: %1$s</string>
+    <string name="end_shut_down">O servidor foi desligado</string>
+    <string name="end_shut_down_reason">O servidor foi desligado: %1$s</string>
+
+    <!-- Admin actions the server refused -->
+    <string name="admin_no_permission_move">Você não tem permissão para mover %1$s.</string>
+    <string name="admin_no_permission_kick_channel">Você não tem permissão para expulsar %1$s do canal.</string>
+    <string name="admin_no_permission_kick_server">Você não tem permissão para expulsar %1$s do servidor.</string>
+    <string name="admin_no_permission_ban">Você não tem permissão para banir %1$s.</string>
+    <string name="admin_failed_move">Não foi possível mover %1$s: %2$s</string>
+    <string name="admin_failed_kick_channel">Não foi possível expulsar %1$s do canal: %2$s</string>
+    <string name="admin_failed_kick_server">Não foi possível expulsar %1$s do servidor: %2$s</string>
+    <string name="admin_failed_ban">Não foi possível banir %1$s: %2$s</string>
+    <string name="channel_no_permission_create">Você não tem permissão para criar o canal %1$s.</string>
+    <string name="channel_no_permission_edit">Você não tem permissão para alterar %1$s.</string>
+    <string name="channel_no_permission_reorder">Você não tem permissão para mover %1$s.</string>
+    <string name="channel_no_permission_delete">Você não tem permissão para excluir %1$s.</string>
+    <string name="channel_failed_create">Não foi possível criar %1$s: %2$s</string>
+    <string name="channel_failed_edit">Não foi possível alterar %1$s: %2$s</string>
+    <string name="channel_failed_reorder">Não foi possível mover %1$s: %2$s</string>
+    <string name="channel_failed_delete">Não foi possível excluir %1$s: %2$s</string>
+    <string name="channels_editing">Editando canais</string>
+    <string name="channels_add">Adicionar</string>
+    <string name="channels_done">Pronto</string>
+    <string name="channels_edit_hint">Segure um canal e arraste para movê-lo. Toque nele para alterar ou excluir.</string>
+    <string name="files_title">Arquivos</string>
+    <string name="files_refresh">Atualizar</string>
+    <string name="files_up">Subir uma pasta</string>
+    <string name="files_folder">Pasta</string>
+    <string name="files_download">Baixar</string>
+    <string name="files_empty">Esta pasta está vazia.</string>
+    <string name="files_downloading">Baixando %1$s…</string>
+    <string name="files_saved">%1$s salvo</string>
+    <string name="files_download_cancelled">Download de %1$s interrompido</string>
+    <string name="files_download_failed">Não foi possível baixar %1$s: %2$s</string>
+    <string name="files_needs_password">Este canal tem senha. Entre nele uma vez com a senha, marcando para lembrá-la, para ver os arquivos.</string>
+    <string name="files_no_permission">Você não tem permissão para ver estes arquivos.</string>
+    <string name="files_not_found">Esta pasta não existe mais.</string>
+    <string name="files_not_connected">Não conectado ao servidor.</string>
+    <string name="files_upload">Enviar</string>
+    <string name="files_new_folder">Nova pasta</string>
+    <string name="files_create">Criar</string>
+    <string name="files_rename">Renomear</string>
+    <string name="files_rename_title">Renomear %1$s</string>
+    <string name="files_name">Nome</string>
+    <string name="files_uploading">Enviando %1$s…</string>
+    <string name="files_uploaded">%1$s enviado</string>
+    <string name="files_upload_cancelled">Envio de %1$s interrompido</string>
+    <string name="files_upload_failed">Não foi possível enviar %1$s: %2$s</string>
+    <string name="files_unreadable">Não foi possível ler esse arquivo.</string>
+    <string name="files_no_permission_change">O servidor não deixa você fazer isso aqui.</string>
+    <string name="files_gone">Isso não existe mais.</string>
+    <string name="files_exists">Já existe algo com esse nome aqui.</string>
+    <string name="files_delete_title">Excluir %1$s?</string>
+    <string name="files_delete_file">O arquivo é removido do servidor para todos.</string>
+    <string name="files_delete_folder">A pasta e tudo o que há nela são removidos do servidor para todos.</string>
+    <string name="files_replace_title">Substituir %1$s?</string>
+    <string name="files_replace_text">Já existe um arquivo com este nome aqui. Substituí-lo remove o antigo para todos.</string>
+    <string name="files_replace">Substituir</string>
+    <string name="channel_info_here">Você está neste canal</string>
+    <string name="channel_info_talk_power">Poder de fala necessário</string>
+    <string name="channel_info_default">O canal padrão do servidor</string>
+    <string name="channel_info_no_description">Sem descrição</string>
+    <string name="channel_info_loading">Carregando…</string>
+    <string name="channel_info_arrange">Organizar</string>
+    <plurals name="channel_people">
+        <item quantity="one">%d pessoa</item>
+        <item quantity="many">%d pessoas</item>
+        <item quantity="other">%d pessoas</item>
+    </plurals>
+    <string name="channel_new_title">Novo canal</string>
+    <string name="channel_new_subtitle">O servidor decide que tipos de canal você pode criar.</string>
+    <string name="channel_edit_subtitle">Configurações do canal</string>
+    <string name="channel_create">Criar</string>
+    <string name="channel_name">Nome</string>
+    <string name="channel_description">Descrição</string>
+    <string name="channel_kind">Tipo</string>
+    <string name="channel_kind_permanent">Permanente</string>
+    <string name="channel_kind_semi">Semipermanente</string>
+    <string name="channel_kind_temporary">Temporário</string>
+    <string name="channel_kind_permanent_desc">Fica até ser excluído.</string>
+    <string name="channel_kind_semi_desc">Fica até o servidor reiniciar.</string>
+    <string name="channel_kind_temporary_desc">Some quando a última pessoa sai. Você é movido para ele quando ele é criado.</string>
+    <string name="channel_password_on">Senha</string>
+    <string name="channel_password_keep">Deixe vazio para manter a atual</string>
+    <string name="channel_codec">Codec de voz</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <string name="channel_quality">Qualidade: %1$d</string>
+    <string name="channel_unlimited">Usuários ilimitados</string>
+    <string name="channel_max_users">Máx. de usuários</string>
+    <string name="channel_parent">Dentro de</string>
+    <string name="channel_top_level">Nível superior</string>
+    <string name="channel_parent_change">Alterar</string>
+    <string name="channel_parent_title">Onde fica</string>
+    <string name="channel_delete_title">Excluir %1$s?</string>
+    <string name="channel_delete_subtitle">Isso não pode ser desfeito.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="one">O %d subcanal dele também é excluído.</item>
+        <item quantity="many">Os %d subcanais dele também são excluídos.</item>
+        <item quantity="other">Os %d subcanais dele também são excluídos.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="one">%d pessoa é movida para o canal padrão.</item>
+        <item quantity="many">%d pessoas são movidas para o canal padrão.</item>
+        <item quantity="other">%d pessoas são movidas para o canal padrão.</item>
+    </plurals>
+    <string name="channel_delete_empty">Não há ninguém nele.</string>
+    <string name="admin_move_needs_password">Não foi possível mover %1$s: o canal precisa da senha. Entre nele uma vez com a senha, marcando para lembrá-la, para mover pessoas para lá.</string>
+
+    <!-- Sending pictures -->
+    <string name="picture_not_sent">A imagem não foi enviada: %1$s</string>
+    <string name="pictures_not_sent">A imagem %1$d de %2$d não foi enviada: %3$s</string>
+    <string name="picture_no_permission">%1$s (sem permissão neste canal)</string>
+    <string name="picture_too_big">A imagem é grande demais (mais de %1$d MB).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">Enviando…</string>
+    <string name="avatar_set">Foto de perfil definida.</string>
+    <string name="avatar_too_big">Este servidor só permite uma foto de perfil muito pequena, ou nenhuma.</string>
+    <string name="avatar_not_allowed">Este servidor não permite que você tenha uma foto de perfil.</string>
+    <string name="avatar_failed">A foto de perfil não foi definida: %1$s</string>
+    <string name="avatar_removed">Foto de perfil removida.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">Isso não é uma identidade do TeamSpeak.</string>
+    <string name="identity_unreadable">A identidade salva não pode ser aberta neste celular. Importe a sua em Configurações › Avançado › Identidade do TeamSpeak ou crie uma nova lá.</string>
+    <string name="identity_export_unreadable">A identidade não pode ser lida, então não pode ser salva.</string>
+    <string name="file_not_written">Não foi possível gravar esse arquivo.</string>
+    <string name="file_not_opened">Esse arquivo não pode ser aberto.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel">Conexão</string>
+    <string name="notification_mute">Silenciar mic</string>
+    <string name="notification_unmute">Ativar mic</string>
+    <string name="notification_sound_off">Desligar som</string>
+    <string name="notification_sound_on">Ligar som</string>
+    <string name="notification_messages">Mensagens e cutucadas</string>
+    <string name="notification_connected">Conectado a %1$s</string>
+    <string name="notification_connecting">Conectando a %1$s</string>
+    <string name="notification_reconnecting">Reconectando a %1$s…</string>
+    <string name="notification_sharing_camera">Compartilhando sua câmera</string>
+    <string name="notification_sharing_cameras">Compartilhando suas câmeras</string>
+    <string name="notification_sharing_screen">Compartilhando sua tela</string>
+    <string name="whisper">Sussurrar</string>
+    <string name="hold_to_whisper">Segure para sussurrar</string>
+    <string name="whispering_to_you">%1$s está sussurrando para você</string>
+    <string name="whisper_list_line">Sussurro: %1$s</string>
+    <string name="whisper_clear">Limpar tudo</string>
+    <string name="whisper_remove">Remover da lista</string>
+    <string name="whisper_channel">Sussurrar para o canal</string>
+    <string name="whisper_channel_off">Parar de sussurrar para o canal</string>
+    <string name="whisper_list_title">Lista de sussurro</string>
+    <string name="whisper_list_subtitle">Enquanto você segura o botão de sussurro, só estes ouvem você.</string>
+    <string name="capture_ai_noise">Remoção de ruído por IA (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Também remove cliques de teclado, um ventilador, uma TV e outros ruídos que a remoção do próprio celular deixa passar, com uma pequena rede neural no celular. Gasta um pouco mais de bateria.</string>
+    <string name="capture_ai_noise_license">Licença do RNNoise</string>
+    <string name="share_torch_on">Lanterna ligada (toque para desligar)</string>
+    <string name="share_torch_off">Lanterna: ilumina o que a câmera traseira filma</string>
+    <string name="share_camera_lost">A câmera parou: uma chamada, outro app ou o celular a tomou.</string>
+    <string name="share_preview_small">Diminuir a prévia</string>
+    <string name="share_lens_switch">Lente %1$s: toque para a próxima lente</string>
+    <string name="debug_log_title">Log de depuração</string>
+    <string name="debug_log">Manter um log de depuração</string>
+    <string name="debug_log_desc">Para relatórios de bugs: o que o app faz, incluindo falhas, guardado só neste celular. Endereços de servidor, nomes e mensagens são removidos. O app nunca o envia: compartilhe você mesmo, por exemplo em um relatório de bug no GitHub. Desligar isso apaga o log.</string>
+    <string name="debug_log_share">Compartilhar log</string>
+    <string name="debug_log_delete">Excluir log</string>
+    <string name="debug_log_empty">O log de depuração está vazio por enquanto.</string>
+    <string name="debug_log_deleted">Log de depuração excluído.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Ligado</string>
+    <string name="a11y_off">Desligado</string>
+    <string name="a11y_about">Sobre %1$s</string>
+    <string name="a11y_talk_start">começar a falar</string>
+    <string name="a11y_talk_stop">parar de falar</string>
+    <string name="a11y_whisper_start">começar a sussurrar</string>
+    <string name="a11y_whisper_stop">parar de sussurrar</string>
+    <string name="a11y_talking">Falando</string>
+    <string name="a11y_whispering">Sussurrando</string>
+    <string name="a11y_unread">Mensagens não lidas</string>
+    <string name="a11y_move_up">Mover para cima</string>
+    <string name="a11y_move_down">Mover para baixo</string>
+    <string name="a11y_show_controls">mostrar os botões</string>
+    <string name="a11y_hide_controls">ocultar os botões</string>
+    <string name="a11y_preview_bigger">aumentar a prévia</string>
+    <string name="a11y_preview_smaller">diminuir a prévia</string>
+</resources>

@@ -1,8 +1,9 @@
 # Translations
 
-PocketTS speaks English, Finnish, German, Spanish, French, Simplified Chinese, Russian and Czech. It follows the phone's
-language, or the one chosen in PocketTS's Settings › UI › Language. On Android 13 and later, that choice is the same
-as the phone's own per-app setting: Settings › Apps › PocketTS › Language.
+PocketTS speaks English, Finnish, German, Spanish, French, Portuguese (Brazil), Polish, Turkish, Simplified
+Chinese, Russian and Czech. It follows the phone's language, or the one chosen in PocketTS's Settings › UI ›
+Language. On Android 13 and later, that choice is the same as the phone's own per-app setting: Settings › Apps ›
+PocketTS › Language. Portuguese is written as in Brazil, and phones set to Portugal's Portuguese get it too.
 
 | Language | File | Checked by a native speaker |
 |---|---|---|
@@ -11,6 +12,9 @@ as the phone's own per-app setting: Settings › Apps › PocketTS › Language.
 | German | `values-de/strings.xml` | not yet |
 | Spanish | `values-es/strings.xml` | not yet |
 | French | `values-fr/strings.xml` | not yet |
+| Portuguese (Brazil) | `values-pt/strings.xml` | not yet |
+| Polish | `values-pl/strings.xml` | not yet |
+| Turkish | `values-tr/strings.xml` | not yet |
 | Simplified Chinese | `values-b+zh+Hans/strings.xml` | not yet |
 | Russian | `values-ru/strings.xml` | not yet |
 | Czech | `values-cs/strings.xml` | not yet |
@@ -47,7 +51,8 @@ them yet.
 
 - Keep the placeholders: `%1$s` is a name or text, `%1$d` a number. Their order in the sentence can change.
 - Plurals (`<plurals>`) have one form per number category of the language (Finnish: one, other; Russian: one, few,
-  many, other; Czech: one, few, many, other, where many is only for fractions; Chinese: other only).
+  many, other; Czech: one, few, many, other, where many is only for fractions; Polish: one, few, many, other; Portuguese: one,
+  many, other; Turkish: one, other; Chinese: other only).
 - In Android's files, an apostrophe is written `\'` and a double quote `\"`. French uses the typographic `’`, which
   needs no escaping.
 - "PocketTS", "TeamSpeak", "GitHub", "Opus Voice" and "Opus Music" stay as they are.

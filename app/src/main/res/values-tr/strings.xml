@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Turkish. An initial AI-made translation; a native speaker's review is welcome. -->
+<resources>
+    <!-- Shared -->
+    <string name="cancel">İptal</string>
+    <string name="save">Kaydet</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+    <string name="remove">Kaldır</string>
+    <string name="close">Kapat</string>
+    <string name="advanced">Gelişmiş</string>
+    <string name="connect">Bağlan</string>
+    <string name="link_title">%1$s sunucusuna bağlanılsın mı?</string>
+    <string name="link_subtitle">Bir TeamSpeak bağlantısından</string>
+    <string name="link_subtitle_invite">Bir TeamSpeak davetinden</string>
+    <string name="link_address">Adres</string>
+    <string name="invite_expired">Bu davetin süresi dolmuş ya da böyle bir davet yok. Yeni bir davet ya da sunucunun adresini iste.</string>
+    <string name="invite_failed">Davet sorgulanamadı. İnternet bağlantını kontrol edip tekrar dene.</string>
+    <string name="link_channel">Kanal</string>
+    <string name="link_password">Sunucu şifresi</string>
+    <string name="link_password_given">bağlantıda var</string>
+    <string name="link_leaving">Önce %1$s sunucusundan ayrılacaksın.</string>
+    <string name="link_use_key">Bağlantıdaki yetki anahtarını kullan</string>
+    <string name="link_use_key_desc">Sana bu sunucuda yönetici gibi yetkiler verir. Yalnızca bağlantıyı gönderen kişiye güveniyorsan kullan.</string>
+    <string name="disconnect">Bağlantıyı kes</string>
+    <string name="nickname">Takma ad</string>
+    <string name="server_address">Sunucu adresi veya takma adı</string>
+    <string name="server_password">Sunucu şifresi</string>
+    <string name="remember_password">Şifreyi hatırla</string>
+    <string name="channel_password">Kanal şifresi</string>
+    <string name="join">Katıl</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">Favoriler</string>
+    <string name="favourites_in">Favorilerde</string>
+    <string name="favourites_save">Favorilere kaydet</string>
+    <string name="favourite_edit">Favoriyi düzenle</string>
+    <string name="favourite_add">Favorilere ekle</string>
+    <string name="favourite_name">Listelerindeki adı</string>
+    <string name="favourite_nickname">Bu sunucudaki takma adın</string>
+    <string name="favourite_auto">Uygulama açılınca otomatik bağlan</string>
+    <string name="favourite_file_port">Dosya aktarım portu</string>
+    <string name="favourite_file_port_hint">Sunucunun kendi portu (genelde 30033)</string>
+    <string name="favourite_file_port_desc">Yalnızca sunucunun resimleri ve avatarları yüklenmiyorsa: dosya aktarımı başka bir porttadır.</string>
+    <string name="favourite_folder">Klasör</string>
+    <string name="favourite_folder_new">Yeni klasör…</string>
+    <string name="folder_name">Klasör adı</string>
+    <string name="folder_edit">Klasörü düzenle</string>
+    <string name="folder_fold">klasörü daralt</string>
+    <string name="folder_unfold">klasörü aç</string>
+    <string name="connect_show">Bağlanma panelini aç</string>
+    <string name="connect_hide">Bağlanma panelini daralt</string>
+    <string name="community_tab">Topluluk</string>
+    <string name="community_desc">TeamSpeak tarafından işletilen herkese açık sunucular. Katılmak için birine dokun.</string>
+    <string name="community_desc_no_nick">TeamSpeak tarafından işletilen herkese açık sunucular. Birine katılmak için yukarıya bir takma ad yaz.</string>
+    <string name="community_worldwide">Dünya geneli</string>
+    <string name="community_eu_east">Doğu Avrupa</string>
+    <string name="community_emea">Avrupa, Orta Doğu ve Afrika</string>
+    <string name="community_apac">Asya–Pasifik</string>
+    <string name="community_latam">Latin Amerika</string>
+    <string name="community_na">Kuzey Amerika</string>
+    <string name="favourite_channel">Katılınacak kanal</string>
+    <string name="favourite_channel_hint">Sunucunun varsayılan kanalı</string>
+    <string name="favourite_channel_desc">Kanalın adı, sunucunun gösterdiği gibi yazılmış hâliyle. Başka bir kanalın içindeki bir kanal için yolunu yaz: Oyunlar/Lobi.</string>
+    <string name="channel_not_joined">%1$s kanalına katılınamadı: böyle bir kanal yok ya da şifresi yanlış. Sunucunun varsayılan kanalındasın.</string>
+    <string name="update_title">PocketTS %1$s çıktı</string>
+    <string name="update_text">Bu sürümden (%1$s) daha yenisi GitHub üzerinde yayında.</string>
+    <string name="not_now">Şimdi değil</string>
+    <string name="download">İndir</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">Ayarlar</string>
+    <string name="hold_to_talk">Konuşmak için basılı tut</string>
+    <string name="microphone">Mikrofon</string>
+    <string name="sound">Ses</string>
+    <string name="share">Paylaş</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">Şifre</string>
+    <string name="person_sound_off">Ses kapalı</string>
+    <string name="person_mic_off">Mikrofon kapalı</string>
+    <string name="person_cant_talk">Bu kanalda konuşamaz</string>
+    <string name="person_streaming">Yayında</string>
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">SEN</string>
+
+    <!-- Chat -->
+    <string name="event_connected">%1$s bağlandı</string>
+    <string name="event_joined_from">%1$s, %2$s kanalından geldi</string>
+    <string name="event_you_moved_to">%1$s kanalına taşındın</string>
+    <string name="event_you_kicked_from">%1$s kanalından atıldın</string>
+    <string name="event_moved_here_from">%1$s, %2$s kanalından buraya taşındı</string>
+    <string name="event_kicked_from">%1$s, %2$s kanalından atıldı</string>
+    <string name="event_moved_to">%1$s, %2$s kanalına taşındı</string>
+    <string name="event_kicked_from_channel">%1$s kanaldan atıldı</string>
+    <string name="event_left_to">%1$s, %2$s kanalına geçti</string>
+    <string name="event_you_kicked_from_server">Sunucudan atıldın</string>
+    <string name="event_you_banned">Yasaklandın</string>
+    <string name="event_lost_connection">%1$s bağlantıyı kaybetti</string>
+    <string name="event_kicked_from_server">%1$s sunucudan atıldı</string>
+    <string name="event_banned">%1$s yasaklandı</string>
+    <string name="event_disconnected">%1$s bağlantıyı kesti</string>
+    <string name="event_by">", %1$s tarafından"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <string name="event_another_channel">(adsız)</string>
+    <string name="chat_channel">Kanal</string>
+    <string name="chat_empty_channel">Bu kanalda henüz mesaj yok.</string>
+    <string name="chat_empty_private">Henüz mesaj yok.</string>
+    <string name="chat_message_to">%1$s için mesaj…</string>
+    <string name="chat_message_to_channel">Kanala mesaj…</string>
+    <string name="chat_message_to_them">Ona mesaj…</string>
+    <string name="chat_system">Sistem</string>
+    <string name="chat_link_open">Aç: %1$s</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="one">Tek seferde en fazla %1$d resim.</item>
+        <item quantity="other">Tek seferde en fazla %1$d resim.</item>
+    </plurals>
+    <string name="chat_camera_needed">Fotoğraf çekmek için kamera izni gerekli.</string>
+    <string name="chat_sending_picture">Resim gönderiliyor: %1$d / %2$d…</string>
+    <string name="chat_attached_picture">Eklenen resim</string>
+    <string name="chat_remove_picture">Resmi kaldır</string>
+    <string name="chat_send_picture">Resim gönder</string>
+    <string name="chat_choose_pictures">Resim seç</string>
+    <string name="chat_take_photo">Fotoğraf çek</string>
+    <string name="chat_send">Gönder</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">Galeriye kaydet</string>
+    <string name="picture_saved">Kaydedildi: %1$s</string>
+    <string name="picture_failed">Yapılamadı: %1$s</string>
+
+    <!-- Streams: watching -->
+    <string name="stream_watch">İZLE</string>
+    <string name="stream_small_window">Küçük pencere</string>
+    <string name="stream_full_screen">Tam ekran</string>
+    <string name="stream_resize">Yayının boyutunu değiştirmek için sürükle</string>
+    <string name="stream_mini">Küçük yayın: büyütmek için dokun, taşımak için sürükle</string>
+    <string name="stream_leave_full_screen">Tam ekrandan çık</string>
+    <string name="stream_stop_watching">İzlemeyi bırak</string>
+    <string name="stream_sound_on">Sesi aç</string>
+    <string name="stream_sound_off">Sesi kapat</string>
+    <string name="stream_requesting">Erişim isteniyor…</string>
+    <string name="stream_connecting">Bağlanıyor…</string>
+    <string name="stream_paused">Duraklatıldı</string>
+    <string name="stream_waiting_picture">Bağlandı, görüntü bekleniyor…</string>
+    <string name="stream_trying">Bağlantı sorunu, hâlâ deneniyor…</string>
+    <string name="stream_connection_lost">Bağlantı koptu.</string>
+    <string name="stream_open_failed">Yayın açılamadı.</string>
+    <string name="stream_denied">Yayın isteği reddedildi.</string>
+    <string name="stream_ended">Yayın bitti.</string>
+    <string name="stream_ended_left_channel">Yayın bitti (artık aynı kanalda değilsin).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">Kameranı paylaş</string>
+    <string name="share_screen_title">Ekranını paylaş</string>
+    <string name="share_subtitle">Kanalındaki herkes izleyebilir</string>
+    <string name="start">Başlat</string>
+    <string name="stop">Durdur</string>
+    <string name="share_what">Ne</string>
+    <string name="share_camera">Kamera</string>
+    <string name="share_screen">Ekran</string>
+    <string name="share_both_cameras">İki kamera</string>
+    <string name="camera_front">Ön</string>
+    <string name="camera_back">Arka</string>
+    <string name="camera_both">İkisi</string>
+    <string name="share_both_desc">Arka kamera büyük, ön kamera köşede küçük görünür. Yer değiştir düğmesi ikisinin yerini değiştirir.</string>
+    <string name="share_quality">Kalite</string>
+    <string name="share_quality_480">Veri tasarrufu: en az veri, mobil ağlar için.</string>
+    <string name="share_quality_720">HD: net ve çoğu bağlantı için yeterince hafif.</string>
+    <string name="share_quality_1080">Full HD: en net görüntü, iki tarafta da iyi bağlantı gerekir.</string>
+    <string name="share_sound">Yayın sesi</string>
+    <string name="share_sound_on_desc">İzleyiciler görüntüyle birlikte mikrofonunu duyar. Mikrofonun kapalıyken ve kanalda konuşurken yayın sesi kesilir, böylece iki kez duyulmazsın.</string>
+    <string name="share_sound_off_desc">Görüntüyle birlikte ses yok: kanalda her zamanki gibi konuş.</string>
+    <string name="share_screen_sound">Telefon sesi</string>
+    <string name="share_screen_sound_on_desc">İzleyiciler telefonunda çalan sesi duyar, örneğin bir video ya da oyun. Bazı uygulamalar buna izin vermez ve sessiz kalır. Kanaldaki konuşmalar dahil değildir.</string>
+    <string name="share_screen_sound_off_desc">Görüntüyle birlikte ses yok.</string>
+    <string name="share_screen_sound_watching">Yayın izlerken olmaz: telefonun sesini de paylaşmak için izlemeyi bırak.</string>
+    <string name="share_screen_desc">Android başlamadan önce bir kez daha sorar. Ekranındaki her şey gösterilir, bildirimler de.</string>
+    <string name="share_sound_quiet">Yayın sesi kapalı</string>
+    <string name="share_sound_live">Yayın sesi açık</string>
+    <string name="share_starting">başlıyor…</string>
+    <string name="share_paused_call">arama sırasında duraklatıldı</string>
+    <string name="share_watching">İzleyenler</string>
+    <string name="share_swap_cameras">Kameraların yerini değiştir</string>
+    <string name="share_switch_camera">Kamerayı değiştir</string>
+    <string name="share_turn_locked">Döndürme kilitli (telefonu izlemesi için dokun)</string>
+    <string name="share_turn_follows">Döndürme telefonu izliyor (kilitlemek için dokun)</string>
+    <string name="share_light_on">Halka ışık açık (kapatmak için dokun)</string>
+    <string name="share_light_off">Halka ışık: parlak beyaz bir ekran yüzünü aydınlatır</string>
+    <string name="share_both_unsupported">Bu telefon iki kamerayı aynı anda kullanamıyor.</string>
+    <string name="share_failed">Paylaşım başlatılamadı.</string>
+    <string name="share_refused">TeamSpeak paylaşımı reddetti: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Genel</string>
+    <string name="settings_playback">Oynatma</string>
+    <string name="settings_capture">Kayıt</string>
+    <string name="settings_ui">Arayüz</string>
+    <string name="settings_save">Kaydet ve Uygula</string>
+    <string name="cant_be_undone">Bu geri alınamaz</string>
+    <string name="quiet">Kısık</string>
+    <string name="loud">Yüksek</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">Profil resmi</string>
+    <string name="avatar_change">Değiştir</string>
+    <string name="avatar_desc">Bu sunucudaki diğer kişiler görür. 320 × 320 boyutuna sığacak şekilde hazırlanır.</string>
+    <string name="general_floating_ptt">Kayan bas-konuş düğmesi</string>
+    <string name="general_floating_ptt_desc">Bas-konuş modunda PocketTS ekranının altında yuvarlak bir düğme durur, böylece sohbeti kaydırırken de konuşabilirsin. Diğer uygulamaların üzerindeki düğme (aşağıda) ayrı bir ayardır.</string>
+    <string name="general_overlay_ptt">Diğer uygulamaların üzerinde konuşma düğmesi</string>
+    <string name="general_overlay_ptt_desc">Bas-konuş modunda, diğer uygulamalara geçtiğinde yuvarlak bir düğme görünür (PocketTS içinde görünmez). Konuşmak için basılı tut, taşımak için sürükle. Android, PocketTS uygulamasının diğer uygulamaların üzerinde görünmesi için bir kez izin ister.</string>
+    <string name="general_volume_ptt">Ses düğmeleriyle bas-konuş</string>
+    <string name="general_volume_ptt_desc">Bas-konuş modunda, uygulama ekrandayken bir ses düğmesini basılı tutunca konuşursun (ses düzeyi değişmez).</string>
+    <string name="general_headset_ptt">Kulaklık düğmesiyle bas-konuş</string>
+    <string name="general_headset_ptt_desc">Bas-konuş modunda, konuşmaya başlamak için kulaklığındaki düğmeye bas, durmak için tekrar bas. Ekran kapalıyken de çalışır. Bu ayar açıkken düğme müziği oynatıp duraklatmaz.</string>
+    <string name="general_call_mute">Telefon görüşmelerinde sessize al</string>
+    <string name="general_call_mute_desc">Bir telefon araması çaldığında ya da başladığında mikrofonun ve sesin kapanır (izlediğin yayının sesi de), arama bitince yeniden açılır. Paylaştığın yayın duraklar, böylece izleyiciler aramayı görmez. Kendin kapattığın her şey kapalı kalır.</string>
+    <string name="general_updates">Güncellemeleri kontrol et</string>
+    <string name="general_updates_desc">PocketTS günde bir kez GitHub üzerinden daha yeni bir sürüm çıkıp çıkmadığına bakar ve çıktıysa bağlanma ekranında söyler. Seninle ilgili hiçbir şey gönderilmez.</string>
+    <string name="general_screen_on">Ekranı açık tut</string>
+    <string name="general_screen_on_desc">Bağlıyken ve uygulama açıkken ekran kararmaz. Yayın paylaşırken ya da izlerken ekran zaten açık kalır.</string>
+    <string name="general_spacers">Ayırıcı kanallara katılmaya izin ver</string>
+    <string name="general_spacers_desc">Bir ayırıcıya (kanal listesindeki bir ayırma çizgisi ya da başlık) dokunmak, ona her kanal gibi katılır. Bazı sunucular birini AFK kanalı olarak kullanır. Kapalıyken ayırıcılara yanlışlıkla dokunarak katılınamaz.</string>
+    <string name="history_title">Sohbet geçmişi</string>
+    <string name="history_desc">Kanal sohbetleri, özel sohbetler ve kimin katılıp ayrıldığı bu telefonda şifrelenmiş olarak saklanır ve aynı sunucuya bağlandığında yeniden gösterilir: son %1$s, sohbet başına en fazla %2$s. Dürtmeler saklanmaz.</string>
+    <plurals name="history_days">
+        <item quantity="one">%1$d gün</item>
+        <item quantity="other">%1$d gün</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="one">%1$d satır</item>
+        <item quantity="other">%1$d satır</item>
+    </plurals>
+    <string name="history_clear">Sohbet geçmişini temizle</string>
+    <string name="history_cleared">Temizlendi.</string>
+    <string name="history_clear_title">Sohbet geçmişi temizlensin mi?</string>
+    <string name="history_clear_button">Temizle</string>
+    <string name="history_clear_desc">Tüm sunucuların kayıtlı sohbetleri bu telefondan silinir, şu an ekrandaki sohbet de.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">Konuşma ses düzeyi</string>
+    <string name="playback_test_sound">Test sesi çal</string>
+    <string name="playback_event_sounds">Olay sesleri</string>
+    <string name="playback_event_sounds_desc">Biri kanalına girdiğinde ya da ayrıldığında; mesajlar, dürtmeler ve yayınlar için; mikrofon ve ses düğmeleri için kısa sesler.</string>
+    <string name="playback_sound_volume">Olay sesi düzeyi</string>
+    <string name="playback_play_sound">Bir ses çal</string>
+    <string name="playback_call_volume">Telefon araması olarak çalınırken konuşmalar arama ses düzeyini izler: ayarlamak için bağlıyken bir ses düğmesine bas.</string>
+    <string name="playback_media_volume">Konuşmalar medya ses düzeyini izler.</string>
+    <string name="playback_output_speaker">Hoparlör</string>
+    <string name="playback_output_earpiece">Ahize</string>
+    <string name="playback_headset">Bağlı kulaklığı kullan</string>
+    <string name="playback_headset_desc">Bağlıyken konuşmaları kulaklık, mikrofonlu kulaklık ya da Bluetooth hoparlör çalar. Kapalıysa konuşmaları her zaman telefonun kendisi çalar.</string>
+    <string name="play_as">Konuşmaların çalınma şekli</string>
+    <string name="play_media">Medya</string>
+    <string name="play_call">Arama</string>
+    <string name="play_ear">Kulakta</string>
+    <string name="play_media_sound">En iyi ses kalitesi, medya ses düzeyi</string>
+    <string name="play_media_echo">Bas-konuş ya da kulaklık kullanmazsan diğerleri yankı duyabilir</string>
+    <string name="play_media_bluetooth">Bluetooth kulaklığın mikrofonu kullanılamaz</string>
+    <string name="play_call_echo">Yankı giderilir, arama ses düzeyi</string>
+    <string name="play_call_bluetooth">Bluetooth kulaklığın mikrofonu çalışır</string>
+    <string name="play_call_quieter">Daha kısık; Bluetooth sesi arama kalitesinde</string>
+    <string name="play_call_speakers">Mikrofonu olmayan Bluetooth hoparlörler kullanılmaz</string>
+    <string name="play_ear_screen">Telefon kulağındayken ekran kapanır</string>
+    <string name="play_ear_quieter">Kulak için yapıldığından daha kısık</string>
+    <string name="capture_echo_follows">Konuşmalar telefon araması olarak çalınırken yankı engelleme açıktır (Oynatma › Konuşmaların çalınma şekli).</string>
+    <string name="a11y_pro">Artı: %1$s</string>
+    <string name="a11y_con">Eksi: %1$s</string>
+    <string name="audio_in_use">Kullanımdaki ses</string>
+    <string name="audio_in_use_idle">Neyin çalıp kaydettiğini görmek için bir sunucuya bağlan.</string>
+    <string name="audio_in_use_unsaved">Değişiklikler, Kaydet ve Uygula sonrasında burada görünür.</string>
+    <string name="audio_mode">Mod</string>
+    <string name="audio_mode_call">Telefon araması</string>
+    <string name="audio_mode_media">Medya</string>
+    <string name="audio_playback">Oynatma</string>
+    <string name="audio_playback_waiting">Biri konuşunca görünür</string>
+    <string name="audio_microphone">Mikrofon</string>
+    <string name="audio_mic_phone">Telefonun mikrofonu</string>
+    <string name="audio_mic_wired">Kulaklık mikrofonu (kablolu)</string>
+    <string name="audio_mic_none">Kayıt yapılmıyor</string>
+    <string name="audio_mic_no_permission">İzin yok</string>
+    <string name="audio_device_wired">Kablolu kulaklık</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, arama kalitesi)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (işitme cihazı)</string>
+    <string name="audio_device_unnamed">Kulaklık</string>
+    <string name="audio_device_other">Diğer cihaz (%1$d)</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">Mikrofon ses düzeyi</string>
+    <string name="capture_activation">Etkinleştirme</string>
+    <string name="capture_vad">Sesle etkinleştirme</string>
+    <string name="capture_ptt">Bas-konuş</string>
+    <string name="capture_continuous">Sürekli iletim</string>
+    <string name="capture_ptt_desc">Konuşurken \"Konuşmak için basılı tut\" düğmesini basılı tut.</string>
+    <string name="capture_level">Seviye</string>
+    <string name="capture_level_desc">Bu ayarlar açıkken çubuk, mikrofonun kapalı olsa bile mikrofonundan geleni gösterir. Konuşma her zamanki gibi sürer.</string>
+    <string name="capture_vad_level">Sesle etkinleştirme seviyesi</string>
+    <string name="capture_vad_level_desc">Arka plan gürültüsünü engellemek için sağa kaydır. Sesin kesiliyorsa sola kaydır.</string>
+    <string name="capture_vad_delay">Devre dışı kalmadan önceki gecikme</string>
+    <string name="capture_processing">Sinyal işleme</string>
+    <string name="capture_noise">Arka plan gürültüsünü gider</string>
+    <string name="capture_agc">Otomatik kazanç kontrolü</string>
+    <string name="echo_refused">Bu telefon arama sesini hoparlörden çalamıyor, bu yüzden konuşmalar medya olarak çalınır. Bas-konuş ya da kulaklık yankıyı önler.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">Yönetici işlevlerini göster</string>
+    <string name="ui_controls_bottom">Düğmeler altta</string>
+    <string name="ui_controls_bottom_desc">Mikrofon, ses ve paylaşma düğmeleri ile Kanallar/Sohbet geçişi ekranın altında, başparmağının yetişeceği yerde durur.</string>
+    <string name="ui_language">Dil</string>
+    <string name="ui_language_phone">Telefonun dili</string>
+    <string name="ui_admin_desc">Bir kişinin menüsünde ayrıca onu başka bir kanala taşıma, kanaldan ya da sunucudan atma ve yasaklama seçenekleri de olur. Buna iznin olup olmadığına sunucu karar verir: iznin yoksa reddeder.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">Video bağlantısı</string>
+    <string name="relay_desc">Yayınlar doğrudan seninle karşı taraf arasında gider. Bazı ağların arkasında bir aktarıcı (TURN sunucusu) gerekir: varsa buraya gir.</string>
+    <string name="relay_address">Aktarıcı (turn:host:port)</string>
+    <string name="relay_user">Aktarıcı kullanıcı adı</string>
+    <string name="relay_password">Aktarıcı şifresi</string>
+    <string name="relay_only">Her zaman aktarıcı üzerinden</string>
+    <string name="advanced_file_port">Dosya aktarımı başka bir portta olan bir sunucu (resimleri ve avatarları yüklenmez) için favorinin Gelişmiş bölümünde kendi portu girilebilir.</string>
+    <string name="passwords_title">Kanal şifreleri</string>
+    <string name="passwords_desc">Hatırlamayı seçtiğin şifreler, kanallarına tek dokunuşla katılmanı sağlar. Bu telefonda şifrelenmiş olarak saklanır.</string>
+    <string name="passwords_forget">Kayıtlı şifreleri unut</string>
+    <string name="passwords_forgotten">Unutuldu.</string>
+    <string name="identity_title">TeamSpeak kimliği</string>
+    <string name="identity_desc">Kimliğin, sunucular için kim olduğundur (grupların ve izinlerin). Bir kopyasını sakla ya da başka bir TeamSpeak uygulamasındakini kullan.</string>
+    <string name="identity_wipe">Sil</string>
+    <string name="identity_export">Dışa aktar</string>
+    <string name="identity_import">İçe aktar</string>
+    <string name="identity_imported">İçe aktarıldı. Bir sonraki bağlantıdan itibaren kullanılır.</string>
+    <string name="identity_saved">Kaydedildi. Dosyayı yalnızca senin erişebileceğin bir yerde sakla.</string>
+    <string name="identity_wiped">Silindi. Bir sonraki bağlantıda yeni bir kimlik oluşturulur.</string>
+    <string name="identity_export_title">Kimliğini dışa aktar</string>
+    <string name="identity_export_subtitle">Gizli tut</string>
+    <string name="identity_save_file">Dosyaya kaydet</string>
+    <string name="identity_export_what">Bu dosya kimliğinin ta kendisidir: ona sahip olan herkes, her sunucuda gruplarınla ve izinlerinle (örneğin sunucu yöneticisi izinleri) sen olur. Kimse farkı anlayamaz.</string>
+    <string name="identity_export_where">Yalnızca senin erişebileceğin bir yerde sakla, örneğin bu telefonda ya da özel bir sürücüde. Sohbette ya da e-postayla gönderme, hiçbir yerde paylaşma. Bir TeamSpeak uygulaması bu dosyayı açabilir, başka bir telefondaki PocketTS de.</string>
+    <string name="identity_wipe_title">Kimliğin silinsin mi?</string>
+    <string name="identity_wipe_what">Bu telefonun kimliği silinir ve bir sonraki bağlanışında yeni bir kimlik oluşturulur. Bundan sonra her sunucu için yeni biri olursun: grupların, izinlerin ve eski kimliğine verilen her şey (örneğin yönetici yetkileri) yeni kimliğe geçmez.</string>
+    <string name="identity_wipe_back">Geri dönmenin tek yolu dışa aktarılmış bir kopyadır. Kimliğe yeniden ihtiyacın olabilirse iptal et ve önce Dışa aktar.</string>
+    <string name="identity_import_title">Kimlik içe aktar</string>
+    <string name="identity_import_subtitle">Bir TeamSpeak uygulamasından</string>
+    <string name="identity_import_desc">Bir TeamSpeak uygulamasının dışa aktardığı kimliği yapıştır ya da kaydettiği dosyayı (.ini) seç. Bir sonraki bağlantıdan itibaren bu telefonun kendi kimliğinin yerini alır.</string>
+    <string name="identity_field">Kimlik</string>
+    <string name="identity_choose_file">Dosya seç…</string>
+    <string name="level_title">Güvenlik seviyesi</string>
+    <string name="level_desc">Bazı sunucular yalnızca en az belirli bir seviyedeki kimlikleri kabul eder. Seviyeyi yükseltmek aynı kimliği grupları ve izinleriyle birlikte korur.</string>
+    <string name="level_raise_button">Seviyeyi yükselt</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">Sen</string>
+    <string name="person_away">Uzakta</string>
+    <string name="person_away_message">Uzakta: %1$s</string>
+    <string name="person_volume">Senin için ses düzeyi</string>
+    <string name="away_message_field">Uzakta mesajı (isteğe bağlı)</string>
+    <string name="away_back">Geri döndüm</string>
+    <string name="away_update">Güncelle</string>
+    <string name="away_set">Uzakta ol</string>
+    <string name="poke">Dürt</string>
+    <string name="chat">Sohbet</string>
+    <string name="poke_title">Dürt: %1$s</string>
+    <string name="poke_subtitle">Mesajını içeren bir açılır pencere görür</string>
+    <string name="poke_message_field">Mesaj (isteğe bağlı)</string>
+    <string name="poked_you">%1$s seni dürttü</string>
+    <string name="dismiss">Kapat</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">Yönetici</string>
+    <string name="admin_move">Taşı</string>
+    <string name="admin_kick">At</string>
+    <string name="admin_ban">Yasakla</string>
+    <string name="admin_move_title">Taşı: %1$s</string>
+    <string name="admin_move_subtitle">Kanalı seç</string>
+    <string name="admin_here_now">Şu an burada</string>
+    <string name="admin_has_password">Şifresi var</string>
+    <string name="admin_kick_title">At: %1$s</string>
+    <string name="admin_kick_subtitle">Nedeni kişiye gösterilir</string>
+    <string name="admin_kick_channel">Kanaldan (varsayılan kanala)</string>
+    <string name="admin_kick_server">Sunucudan</string>
+    <string name="admin_reason">Neden (isteğe bağlı)</string>
+    <string name="admin_ban_title">Yasakla: %1$s</string>
+    <string name="admin_ban_subtitle">Kimliğini ve IP adresini yasaklar</string>
+    <string name="ban_10_minutes">10 dakika</string>
+    <string name="ban_1_hour">1 saat</string>
+    <string name="ban_1_day">1 gün</string>
+    <string name="ban_1_week">1 hafta</string>
+    <string name="ban_permanently">Kalıcı olarak</string>
+
+    <!-- Server info -->
+    <string name="info_title">Sunucu bilgisi</string>
+    <string name="key_button">Yetki anahtarı</string>
+    <string name="key_title">Yetki anahtarı kullan</string>
+    <string name="key_subtitle">Sunucu yöneticisinden</string>
+    <string name="key_field">Yetki anahtarı</string>
+    <string name="key_use">Kullan</string>
+    <string name="key_desc">Yetki anahtarı sana bu sunucuda yetkiler verir, örneğin bir sunucu grubu. Her anahtar yalnızca bir kez çalışır. Yalnızca güvendiğin birinden gelen anahtarları kullan.</string>
+    <string name="key_used">Yetki anahtarı kullanıldı: yeni yetkilerin etkin.</string>
+    <string name="info_users">Kullanıcılar</string>
+    <string name="info_channels">Kanallar</string>
+    <string name="info_uptime">Çalışma süresi</string>
+    <string name="info_created">Oluşturulma</string>
+    <string name="info_ago">%1$s önce</string>
+    <plurals name="span_minutes">
+        <item quantity="one">%1$d dakika</item>
+        <item quantity="other">%1$d dakika</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="one">%1$d saat</item>
+        <item quantity="other">%1$d saat</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="one">%1$d gün</item>
+        <item quantity="other">%1$d gün</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="one">%1$d ay</item>
+        <item quantity="other">%1$d ay</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="one">%1$d yıl</item>
+        <item quantity="other">%1$d yıl</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <string name="level_needed_title">Güvenlik seviyesi %1$d gerekli</string>
+    <string name="level_raise_title">Güvenlik seviyesini yükselt</string>
+    <string name="level_needed_subtitle">Bu sunucu bunu istiyor. Seninki %1$d.</string>
+    <string name="level_yours">Seninki %1$d</string>
+    <string name="level_raise">Yükselt</string>
+    <string name="level_estimate">Bu telefonda bu iş ortalama %1$s sürer. Daha hızlı ya da daha yavaş olabilir.</string>
+    <string name="level_measuring">Bu telefonda ne kadar süreceği hesaplanıyor…</string>
+    <string name="level_desc_raise">Yükseltme tek seferlik bir iştir. Kimliğin aynı kalır: grupların ve izinlerin korunur, yüksek seviye her sunucuda geçerlidir. İş sürerken uygulamayı açık tut; Durdur, o ana kadar ulaşılan seviyeyi korur.</string>
+    <string name="level_progress">Seviye %1$d / %2$d</string>
+    <string name="level_running_desc">Uygulamayı açık tut. Her seviye bir öncekinin yaklaşık iki katı sürer.</string>
+    <string name="level_done">Tamamlandı: güvenlik seviyen %1$d.</string>
+    <string name="level_done_connecting">Tamamlandı: güvenlik seviyen %1$d. Yeniden bağlanılıyor…</string>
+    <string name="level_stopped">Seviye %1$d noktasında durduruldu. Yeniden yükseltince oradan devam eder.</string>
+    <string name="about_under_minute">bir dakikadan kısa</string>
+    <plurals name="about_minutes">
+        <item quantity="one">yaklaşık bir dakika</item>
+        <item quantity="other">yaklaşık %1$d dakika</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="one">yaklaşık bir saat</item>
+        <item quantity="other">yaklaşık %1$d saat</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">yaklaşık bir gün</item>
+        <item quantity="other">yaklaşık %1$d gün</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">Sunucular</string>
+    <string name="connected">Bağlı</string>
+    <string name="connecting_to">Bağlanılıyor: %1$s…</string>
+    <string name="reconnecting_old">Yeniden bağlanılıyor… Sunucuda eski bağlantın hâlâ duruyor: kapanması bekleniyor.</string>
+    <string name="reconnecting_try">Bağlantı koptu. Yeniden bağlanılıyor… (%1$d. deneme)</string>
+    <string name="channel_password_subtitle">Bu kanalın şifresi var</string>
+    <string name="view_channels">Kanallar</string>
+    <string name="stream_title">Yayın: %1$s</string>
+    <string name="stream_title_unknown">Yayın</string>
+    <string name="not_an_address">Bu bir sunucu adresine benzemiyor</string>
+    <string name="private_left">%1$s sunucudan ayrıldı</string>
+    <string name="private_left_unknown">Sunucudan ayrıldı</string>
+    <string name="level_not_connected">Bağlanılmadı: sunucu, kimlik güvenlik seviyesi %1$d istiyor. Seninkini Ayarlar › Gelişmiş bölümünde yükseltebilirsin.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">Bağlanılamadı: sunucudan yanıt yok. Adresi ve portu kontrol et.</string>
+    <string name="end_no_such_host">Bağlanılamadı: \"%1$s\" adresinde sunucu bulunamadı. Adresi kontrol et.</string>
+    <string name="end_cant_connect">Bağlanılamadı: %1$s</string>
+    <string name="end_network_error">Ağ hatası: %1$s</string>
+    <string name="end_network_changed">Ağ değişti</string>
+    <string name="end_network_gone">Ağ bağlantısı kayboldu</string>
+    <string name="end_server_silent">Sunucu yanıt vermedi</string>
+    <string name="end_server_stopped">Sunucu yanıt vermeyi bıraktı</string>
+    <string name="end_lost">Bağlantı koptu</string>
+    <string name="end_handshake">Sunucuyla bağlantı kurulamadı.</string>
+    <string name="end_by_server">Sunucu bağlantıyı kesti</string>
+    <string name="end_kicked_channel">Kanaldan atıldın</string>
+    <string name="end_kicked_channel_reason">Kanaldan atıldın: %1$s</string>
+    <string name="end_kicked">Sunucudan atıldın</string>
+    <string name="end_kicked_reason">Sunucudan atıldın: %1$s</string>
+    <string name="end_banned">Sunucudan yasaklandın</string>
+    <string name="end_banned_reason">Sunucudan yasaklandın: %1$s</string>
+    <string name="end_shut_down">Sunucu kapandı</string>
+    <string name="end_shut_down_reason">Sunucu kapandı: %1$s</string>
+
+    <!-- Admin actions the server refused -->
+    <string name="admin_no_permission_move">%1$s adlı kişiyi taşıma iznin yok.</string>
+    <string name="admin_no_permission_kick_channel">%1$s adlı kişiyi kanaldan atma iznin yok.</string>
+    <string name="admin_no_permission_kick_server">%1$s adlı kişiyi sunucudan atma iznin yok.</string>
+    <string name="admin_no_permission_ban">%1$s adlı kişiyi yasaklama iznin yok.</string>
+    <string name="admin_failed_move">%1$s taşınamadı: %2$s</string>
+    <string name="admin_failed_kick_channel">%1$s kanaldan atılamadı: %2$s</string>
+    <string name="admin_failed_kick_server">%1$s sunucudan atılamadı: %2$s</string>
+    <string name="admin_failed_ban">%1$s yasaklanamadı: %2$s</string>
+    <string name="channel_no_permission_create">%1$s kanalını oluşturma iznin yok.</string>
+    <string name="channel_no_permission_edit">%1$s kanalını değiştirme iznin yok.</string>
+    <string name="channel_no_permission_reorder">%1$s kanalını taşıma iznin yok.</string>
+    <string name="channel_no_permission_delete">%1$s kanalını silme iznin yok.</string>
+    <string name="channel_failed_create">%1$s oluşturulamadı: %2$s</string>
+    <string name="channel_failed_edit">%1$s değiştirilemedi: %2$s</string>
+    <string name="channel_failed_reorder">%1$s taşınamadı: %2$s</string>
+    <string name="channel_failed_delete">%1$s silinemedi: %2$s</string>
+    <string name="channels_editing">Kanallar düzenleniyor</string>
+    <string name="channels_add">Ekle</string>
+    <string name="channels_done">Bitti</string>
+    <string name="channels_edit_hint">Taşımak için bir kanalı basılı tutup sürükle. Değiştirmek ya da silmek için ona dokun.</string>
+    <string name="files_title">Dosyalar</string>
+    <string name="files_refresh">Yenile</string>
+    <string name="files_up">Üst klasör</string>
+    <string name="files_folder">Klasör</string>
+    <string name="files_download">İndir</string>
+    <string name="files_empty">Bu klasör boş.</string>
+    <string name="files_downloading">İndiriliyor: %1$s…</string>
+    <string name="files_saved">Kaydedildi: %1$s</string>
+    <string name="files_download_cancelled">İndirme durduruldu: %1$s</string>
+    <string name="files_download_failed">%1$s indirilemedi: %2$s</string>
+    <string name="files_needs_password">Bu kanalın şifresi var. Dosyalarını görmek için bir kez şifreyle, Şifreyi hatırla seçeneği açıkken katıl.</string>
+    <string name="files_no_permission">Bu dosyaları görme iznin yok.</string>
+    <string name="files_not_found">Bu klasör artık yok.</string>
+    <string name="files_not_connected">Sunucuya bağlı değilsin.</string>
+    <string name="files_upload">Yükle</string>
+    <string name="files_new_folder">Yeni klasör</string>
+    <string name="files_create">Oluştur</string>
+    <string name="files_rename">Yeniden adlandır</string>
+    <string name="files_rename_title">Yeniden adlandır: %1$s</string>
+    <string name="files_name">Ad</string>
+    <string name="files_uploading">Yükleniyor: %1$s…</string>
+    <string name="files_uploaded">Yüklendi: %1$s</string>
+    <string name="files_upload_cancelled">Yükleme durduruldu: %1$s</string>
+    <string name="files_upload_failed">%1$s yüklenemedi: %2$s</string>
+    <string name="files_unreadable">Bu dosya okunamadı.</string>
+    <string name="files_no_permission_change">Sunucu burada bunu yapmana izin vermiyor.</string>
+    <string name="files_gone">Artık orada değil.</string>
+    <string name="files_exists">Bu adda bir şey zaten var.</string>
+    <string name="files_delete_title">%1$s silinsin mi?</string>
+    <string name="files_delete_file">Dosya herkes için sunucudan silinir.</string>
+    <string name="files_delete_folder">Klasör ve içindeki her şey herkes için sunucudan silinir.</string>
+    <string name="files_replace_title">%1$s üzerine yazılsın mı?</string>
+    <string name="files_replace_text">Bu adda bir dosya zaten var. Üzerine yazmak eskisini herkes için siler.</string>
+    <string name="files_replace">Üzerine yaz</string>
+    <string name="channel_info_here">Bu kanaldasın</string>
+    <string name="channel_info_talk_power">Gereken konuşma gücü</string>
+    <string name="channel_info_default">Sunucunun varsayılan kanalı</string>
+    <string name="channel_info_no_description">Açıklama yok</string>
+    <string name="channel_info_loading">Yükleniyor…</string>
+    <string name="channel_info_arrange">Sırala</string>
+    <plurals name="channel_people">
+        <item quantity="one">%d kişi</item>
+        <item quantity="other">%d kişi</item>
+    </plurals>
+    <string name="channel_new_title">Yeni kanal</string>
+    <string name="channel_new_subtitle">Hangi tür kanalları oluşturabileceğine sunucu karar verir.</string>
+    <string name="channel_edit_subtitle">Kanal ayarları</string>
+    <string name="channel_create">Oluştur</string>
+    <string name="channel_name">Ad</string>
+    <string name="channel_description">Açıklama</string>
+    <string name="channel_kind">Tür</string>
+    <string name="channel_kind_permanent">Kalıcı</string>
+    <string name="channel_kind_semi">Yarı kalıcı</string>
+    <string name="channel_kind_temporary">Geçici</string>
+    <string name="channel_kind_permanent_desc">Silinene kadar kalır.</string>
+    <string name="channel_kind_semi_desc">Sunucu yeniden başlayana kadar kalır.</string>
+    <string name="channel_kind_temporary_desc">Son kişi ayrılınca kaybolur. Oluşturulunca içine taşınırsın.</string>
+    <string name="channel_password_on">Şifre</string>
+    <string name="channel_password_keep">Mevcut şifreyi korumak için boş bırak</string>
+    <string name="channel_codec">Ses kodeki</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <string name="channel_quality">Kalite: %1$d</string>
+    <string name="channel_unlimited">Sınırsız kullanıcı</string>
+    <string name="channel_max_users">En fazla kullanıcı</string>
+    <string name="channel_parent">İçinde</string>
+    <string name="channel_top_level">En üst seviye</string>
+    <string name="channel_parent_change">Değiştir</string>
+    <string name="channel_parent_title">Nereye gidecek</string>
+    <string name="channel_delete_title">%1$s silinsin mi?</string>
+    <string name="channel_delete_subtitle">Bu geri alınamaz.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="one">%d alt kanalı da silinir.</item>
+        <item quantity="other">%d alt kanalı da silinir.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="one">%d kişi varsayılan kanala taşınır.</item>
+        <item quantity="other">%d kişi varsayılan kanala taşınır.</item>
+    </plurals>
+    <string name="channel_delete_empty">İçinde kimse yok.</string>
+    <string name="admin_move_needs_password">%1$s taşınamadı: kanal şifre istiyor. Kişileri oraya taşımak için bir kez şifreyle, Şifreyi hatırla seçeneği açıkken katıl.</string>
+
+    <!-- Sending pictures -->
+    <string name="picture_not_sent">Resim gönderilmedi: %1$s</string>
+    <string name="pictures_not_sent">Resim %1$d / %2$d gönderilmedi: %3$s</string>
+    <string name="picture_no_permission">%1$s (bu kanalda izin yok)</string>
+    <string name="picture_too_big">Resim çok büyük (%1$d MB üzeri).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">Yükleniyor…</string>
+    <string name="avatar_set">Profil resmi ayarlandı.</string>
+    <string name="avatar_too_big">Bu sunucu yalnızca çok küçük bir profil resmine izin veriyor ya da hiç izin vermiyor.</string>
+    <string name="avatar_not_allowed">Bu sunucu sana profil resmi izni vermiyor.</string>
+    <string name="avatar_failed">Profil resmi ayarlanamadı: %1$s</string>
+    <string name="avatar_removed">Profil resmi kaldırıldı.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">Bu bir TeamSpeak kimliği değil.</string>
+    <string name="identity_unreadable">Kayıtlı kimlik bu telefonda açılamıyor. Kendi kimliğini Ayarlar › Gelişmiş › TeamSpeak kimliği bölümünde içe aktar ya da orada yeni bir tane oluştur.</string>
+    <string name="identity_export_unreadable">Kimlik okunamıyor, bu yüzden kaydedilemiyor.</string>
+    <string name="file_not_written">Bu dosya yazılamadı.</string>
+    <string name="file_not_opened">Bu dosya açılamıyor.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel">Bağlantı</string>
+    <string name="notification_mute">Mikrofonu kapat</string>
+    <string name="notification_unmute">Mikrofonu aç</string>
+    <string name="notification_sound_off">Sesi kapat</string>
+    <string name="notification_sound_on">Sesi aç</string>
+    <string name="notification_messages">Mesajlar ve dürtmeler</string>
+    <string name="notification_connected">Bağlı: %1$s</string>
+    <string name="notification_connecting">Bağlanılıyor: %1$s</string>
+    <string name="notification_reconnecting">Yeniden bağlanılıyor: %1$s…</string>
+    <string name="notification_sharing_camera">Kameran paylaşılıyor</string>
+    <string name="notification_sharing_cameras">Kameraların paylaşılıyor</string>
+    <string name="notification_sharing_screen">Ekranın paylaşılıyor</string>
+    <string name="whisper">Fısılda</string>
+    <string name="hold_to_whisper">Fısıldamak için basılı tut</string>
+    <string name="whispering_to_you">%1$s sana fısıldıyor</string>
+    <string name="whisper_list_line">Fısıltı: %1$s</string>
+    <string name="whisper_clear">Tümünü temizle</string>
+    <string name="whisper_remove">Listeden çıkar</string>
+    <string name="whisper_channel">Kanala fısılda</string>
+    <string name="whisper_channel_off">Kanala fısıldamayı bırak</string>
+    <string name="whisper_list_title">Fısıltı listesi</string>
+    <string name="whisper_list_subtitle">Fısıltı düğmesini basılı tuttuğun sürece seni yalnızca bunlar duyar.</string>
+    <string name="capture_ai_noise">Yapay zekâ ile gürültü giderme (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Telefonun kendi gürültü gidermesinin geçirdiği klavye tıklaması, vantilatör, televizyon gibi diğer gürültüleri de telefonda çalışan küçük bir sinir ağıyla giderir. Biraz daha fazla pil kullanır.</string>
+    <string name="capture_ai_noise_license">RNNoise lisansı</string>
+    <string name="share_torch_on">El feneri açık (kapatmak için dokun)</string>
+    <string name="share_torch_off">El feneri: arka kameranın çektiği yeri aydınlatır</string>
+    <string name="share_camera_lost">Kamera durdu: bir arama, başka bir uygulama ya da telefonun kendisi kamerayı aldı.</string>
+    <string name="share_preview_small">Önizlemeyi küçült</string>
+    <string name="share_lens_switch">Lens %1$s: sonraki lens için dokun</string>
+    <string name="debug_log_title">Hata ayıklama günlüğü</string>
+    <string name="debug_log">Hata ayıklama günlüğü tut</string>
+    <string name="debug_log_desc">Hata bildirimleri için: uygulamanın ne yaptığı, çökmeler dahil, yalnızca bu telefonda saklanır. Sunucu adresleri, adlar ve mesajlar çıkarılır. Uygulama günlüğü asla göndermez: kendin paylaş, örneğin GitHub üzerindeki bir hata bildiriminde. Bunu kapatmak günlüğü siler.</string>
+    <string name="debug_log_share">Günlüğü paylaş</string>
+    <string name="debug_log_delete">Günlüğü sil</string>
+    <string name="debug_log_empty">Hata ayıklama günlüğü şimdilik boş.</string>
+    <string name="debug_log_deleted">Hata ayıklama günlüğü silindi.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Açık</string>
+    <string name="a11y_off">Kapalı</string>
+    <string name="a11y_about">%1$s hakkında</string>
+    <string name="a11y_talk_start">konuşmaya başla</string>
+    <string name="a11y_talk_stop">konuşmayı bırak</string>
+    <string name="a11y_whisper_start">fısıldamaya başla</string>
+    <string name="a11y_whisper_stop">fısıldamayı bırak</string>
+    <string name="a11y_talking">Konuşuyor</string>
+    <string name="a11y_whispering">Fısıldıyor</string>
+    <string name="a11y_unread">Okunmamış mesajlar</string>
+    <string name="a11y_move_up">Yukarı taşı</string>
+    <string name="a11y_move_down">Aşağı taşı</string>
+    <string name="a11y_show_controls">düğmeleri göster</string>
+    <string name="a11y_hide_controls">düğmeleri gizle</string>
+    <string name="a11y_preview_bigger">önizlemeyi büyüt</string>
+    <string name="a11y_preview_smaller">önizlemeyi küçült</string>
+</resources>
