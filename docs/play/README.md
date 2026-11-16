@@ -31,17 +31,14 @@ How PocketTS gets onto Google Play. The texts are in [listing.md](listing.md), t
 
 New personal developer accounts must run a closed test before the app can go public: at least 12 testers, opted in
 for 14 days in a row. PocketTS's closed test (the Alpha track, with testers from the pocketts-testers Google Group)
-got production access in November 2026. The Alpha track stays as the early-versions channel: testers get each
-version there first.
+got production access in November 2026. Releases now go straight to production; the Alpha track isn't used.
 
 ## Each release on Play
 
-With the automatic upload set up (below), the release workflow puts each release's bundle on the closed test track
-(Alpha) as a draft, with this version's changelog headlines as its release notes. Then, in Play Console › Publishing
+With the automatic upload set up (below), the release workflow puts each release's bundle on the production track
+as a draft, with this version's changelog headlines as its release notes. Then, in Play Console › Publishing
 overview, check it and "Send for review". Don't send a new version while the previous one is still in review.
-
-Once testers have tried it, it goes public: Testing › Closed testing › Alpha › Releases › **Promote release ›
-Production**, then send that for review too.
+For a careful start, edit the draft's rollout percentage (for example 20%) before sending it, and raise it later.
 
 Without it (the workflow says so and skips the step):
 
@@ -60,8 +57,8 @@ Without it (the workflow says so and skips the step):
 2. In IAM & Admin › **Service accounts**: create one, for example `play-upload`. It needs no roles in the project.
    Open it › Keys › Add key › JSON: the key file downloads. It can publish the app: keep it like the release key.
 3. **Play Console** › Users and permissions › Invite new users: the service account's email
-   (`…@….iam.gserviceaccount.com`). Under App permissions add PocketTS with "Release to testing tracks" (and "View app
-   information"). Invite. It can take a day before the permission works.
+   (`…@….iam.gserviceaccount.com`). Under App permissions add PocketTS with "Release to production, exclude devices,
+   and use Play App Signing", "Release to testing tracks" and "View app information". Invite. It can take a day before the permission works.
 4. **GitHub** › Settings › Environments › `release` › Add environment secret: `PLAY_SERVICE_ACCOUNT_JSON`, the key
    file's whole content. Then delete the downloaded file.
 

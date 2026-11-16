@@ -4,9 +4,9 @@
 #   scripts/play-upload.sh BUNDLE.aab "release notes"
 #
 # PLAY_SERVICE_ACCOUNT_JSON  the service account's key (JSON); without it nothing is uploaded
-# PLAY_TRACK                 the track, by default "alpha" (the closed test)
+# PLAY_TRACK                 the track, by default "production" ("alpha" is the closed test)
 # PLAY_RELEASE_STATUS        "draft" (the default: Play Console's "Send for review" stays a person's step)
-#                            or "completed" (rolled out to the track's testers once Google has reviewed it)
+#                            or "completed" (rolled out to the track's users once Google has reviewed it)
 #
 # Only curl, openssl and jq: the service account signs a token request itself (a JWT), no Google libraries.
 set -euo pipefail
@@ -16,7 +16,7 @@ API=https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PA
 UPLOAD=https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/$PACKAGE
 BUNDLE="${1:?Usage: scripts/play-upload.sh BUNDLE.aab \"release notes\"}"
 NOTES="${2:-}"
-TRACK="${PLAY_TRACK:-alpha}"
+TRACK="${PLAY_TRACK:-production}"
 STATUS="${PLAY_RELEASE_STATUS:-draft}"
 
 if [ -z "${PLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
