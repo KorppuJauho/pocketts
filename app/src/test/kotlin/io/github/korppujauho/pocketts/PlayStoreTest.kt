@@ -86,7 +86,7 @@ class PlayStoreTest {
 
     @Test
     fun settings() = shot("4-settings") {
-        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(), Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
     }
 
     @Test

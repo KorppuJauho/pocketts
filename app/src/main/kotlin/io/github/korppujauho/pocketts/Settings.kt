@@ -2,15 +2,110 @@ package io.github.korppujauho.pocketts
 
 import android.content.Context
 import io.github.korppujauho.pocketts.proto.Identity
+import org.json.JSONArray
+import org.json.JSONObject
 
-/** What the app remembers: the last server and nickname, and the TeamSpeak identity (created once). */
+/**
+ * One of the TeamSpeak identities kept on this phone: a [name] only the person sees, and the [nickname] it connects
+ * with. The identity itself is a secret, kept apart under its [key].
+ */
+data class IdentityEntry(val key: String, val name: String, val nickname: String)
+
+/** What the app remembers: the last server, and the TeamSpeak identities (each created once) with their nicknames. */
 class Settings(private val context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     private val secrets = secretPrefs(context)
 
+    /**
+     * The identities. Before there were several, the phone had one identity and a nickname of its own: they become
+     * the first entry, the default, with the identity kept where it was.
+     */
+    fun identities(): List<IdentityEntry> {
+        prefs.getString("identities", null)?.let { saved ->
+            try {
+                val a = JSONArray(saved)
+                val list = (0 until a.length()).map { a.getJSONObject(it) }
+                    .map { IdentityEntry(it.getString("key"), it.optString("name"), it.optString("nickname")) }
+                if (list.isNotEmpty()) return list
+            } catch (_: Exception) {
+            }
+        }
+        val first = IdentityEntry(MAIN, context.getString(R.string.identity_first_name), prefs.getString("nickname", "").orEmpty())
+        saveIdentities(listOf(first))
+        prefs.edit().remove("nickname").apply()
+        return listOf(first)
+    }
+
+    private fun saveIdentities(list: List<IdentityEntry>) {
+        val a = JSONArray()
+        for (e in list) a.put(JSONObject().put("key", e.key).put("name", e.name.trim()).put("nickname", e.nickname.trim()))
+        prefs.edit().putString("identities", a.toString()).apply()
+    }
+
+    /** The identity used unless a favourite or the connect screen picks another: one of [identities]. */
+    var defaultIdentity: String
+        get() {
+            val all = identities()
+            val key = prefs.getString("defaultIdentity", null)
+            return all.firstOrNull { it.key == key }?.key ?: all.first().key
+        }
+        set(v) = prefs.edit().putString("defaultIdentity", v).apply()
+
+    /** [key] while it's one of the identities, else the default one (a favourite's identity may have been deleted). */
+    fun identityKey(key: String?): String = identities().firstOrNull { it.key == key }?.key ?: defaultIdentity
+
+    fun identityEntry(key: String? = null): IdentityEntry {
+        val k = identityKey(key)
+        return identities().first { it.key == k }
+    }
+
+    /** An identity's name and nickname changed. */
+    fun editIdentity(key: String, name: String, nickname: String) =
+        saveIdentities(identities().map { if (it.key == key) it.copy(name = name, nickname = nickname) else it })
+
+    /** The default identity's nickname. */
     var nickname: String
-        get() = prefs.getString("nickname", "").orEmpty()
-        set(v) = prefs.edit().putString("nickname", v).apply()
+        get() = identityEntry().nickname
+        set(v) = setNickname(defaultIdentity, v)
+
+    fun setNickname(key: String, nickname: String) =
+        saveIdentities(identities().map { if (it.key == key) it.copy(nickname = nickname.trim()) else it })
+
+    /**
+     * A new identity named [name], made now or taken from [imported] (an identity exported by a TeamSpeak app, or its
+     * .ini file): its key, or null when [imported] isn't one.
+     */
+    fun newIdentity(name: String, nickname: String, imported: String? = null): String? {
+        val id = if (imported != null) {
+            try {
+                Identity.import(imported)
+            } catch (e: Exception) {
+                return null
+            }
+        } else {
+            Identity.generate(securityLevel = 8)
+        }
+        val key = java.util.UUID.randomUUID().toString().take(8)
+        secrets.edit().putSecret(secretName(key), label(key), id.export()).apply()
+        saveIdentities(identities() + IdentityEntry(key, name.trim(), nickname.trim()))
+        AppLog.log((if (imported != null) "Imported" else "Made") + " a new identity (security level ${id.securityLevel})")
+        return key
+    }
+
+    /**
+     * Deletes an identity; the default one moves to the first left. The last one isn't deleted but let go of (as
+     * [forgetIdentity]): a new one is made in its place at the next connect.
+     */
+    fun deleteIdentity(key: String) {
+        val all = identities()
+        if (all.size <= 1) return forgetIdentity(key)
+        val wasDefault = key == defaultIdentity
+        secrets.edit().remove(secretName(key)).apply()
+        if (key == MAIN) prefs.edit().remove("identity").apply()
+        saveIdentities(all.filter { it.key != key })
+        if (wasDefault) defaultIdentity = identities().first().key
+        AppLog.log("Deleted an identity")
+    }
 
     /** The connect screen's Connect and Community panel is folded shut to its bar. */
     var connectHidden: Boolean
@@ -42,9 +137,9 @@ class Settings(private val context: Context) {
     }
 
     /** Takes an identity exported by a TeamSpeak app, or its .ini file (used from the next connect); null when it worked, else why not. */
-    fun importIdentity(text: String): String? = try {
+    fun importIdentity(text: String, key: String = defaultIdentity): String? = try {
         val id = Identity.import(text)
-        secrets.edit().putSecret("identity", IDENTITY, id.export()).apply()
+        secrets.edit().putSecret(secretName(key), label(key), id.export()).apply()
         AppLog.log("Imported an identity (security level ${id.securityLevel})")
         null
     } catch (e: Exception) {
@@ -52,22 +147,22 @@ class Settings(private val context: Context) {
     }
 
     /** Why the saved identity can't be used, when it can't (it's then left as it is, not replaced by a new one). */
-    fun identityProblem(): String? = try {
-        secrets.getSecret("identity", IDENTITY, old = prefs)
+    fun identityProblem(key: String = defaultIdentity): String? = try {
+        secrets.getSecret(secretName(key), label(key), old = if (key == MAIN) prefs else null)
         null
     } catch (e: SecretBox.Unreadable) {
         context.getString(R.string.identity_unreadable)
     }
 
     /** Saves the identity in place of the old one (the same identity with a raised security level). */
-    fun saveIdentity(id: Identity) {
-        secrets.edit().putSecret("identity", IDENTITY, id.export()).apply()
+    fun saveIdentity(id: Identity, key: String = defaultIdentity) {
+        secrets.edit().putSecret(secretName(key), label(key), id.export()).apply()
     }
 
-    /** Lets go of the saved identity: a new one is made at the next connect. */
-    fun forgetIdentity() {
-        secrets.edit().remove("identity").apply()
-        prefs.edit().remove("identity").apply()
+    /** Lets go of a saved identity: a new one is made in its place at the next connect. */
+    fun forgetIdentity(key: String = defaultIdentity) {
+        secrets.edit().remove(secretName(key)).apply()
+        if (key == MAIN) prefs.edit().remove("identity").apply()
         AppLog.log("Let go of the saved identity; a new one is made at the next connect")
     }
 
@@ -75,9 +170,9 @@ class Settings(private val context: Context) {
      * Kept in TeamSpeak's own export format (encrypted on this phone, and not copied to a new one: export it to move
      * it), so it can be moved to and from other TeamSpeak apps. Throws [IdentityUnreadable] when the saved one can't be decrypted: that one is kept, not silently replaced.
      */
-    fun identity(): Identity {
+    fun identity(key: String = defaultIdentity): Identity {
         val saved = try {
-            secrets.getSecret("identity", IDENTITY, old = prefs)
+            secrets.getSecret(secretName(key), label(key), old = if (key == MAIN) prefs else null)
         } catch (e: SecretBox.Unreadable) {
             AppLog.log("The saved identity can't be decrypted, keeping it and not making a new one: ${e.message}")
             throw IdentityUnreadable(context.getString(R.string.identity_unreadable))
@@ -90,7 +185,7 @@ class Settings(private val context: Context) {
             }
         }
         val id = Identity.generate(securityLevel = 8)
-        secrets.edit().putSecret("identity", IDENTITY, id.export()).apply()
+        secrets.edit().putSecret(secretName(key), label(key), id.export()).apply()
         AppLog.log("Made a new identity (security level ${id.securityLevel})")
         return id
     }
@@ -99,5 +194,10 @@ class Settings(private val context: Context) {
 
     private companion object {
         const val IDENTITY = "settings/identity"
+        // The identity the phone had before there were several stays where it was, so nothing is moved
+        const val MAIN = "main"
+
+        fun secretName(key: String) = if (key == MAIN) "identity" else "identity.$key"
+        fun label(key: String) = if (key == MAIN) IDENTITY else "$IDENTITY/$key"
     }
 }

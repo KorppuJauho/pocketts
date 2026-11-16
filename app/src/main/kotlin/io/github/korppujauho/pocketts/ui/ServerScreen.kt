@@ -153,7 +153,6 @@ fun ServerScreen(
     state: Session.UiState,
     actions: ServerActions,
     settingsActions: SettingsActions? = null,
-    nickname: String = "",
     startView: View = View.CHANNELS,
     startChat: Chat.Key = Chat.Key.Channel(0),
     startSettings: Int? = null,
@@ -297,8 +296,11 @@ fun ServerScreen(
                                 },
                                 onClick = {
                                     serversMenu = false
+                                    // With the identity connected with, when it isn't the default one
+                                    val default = settingsActions?.identities()?.firstOrNull { it.isDefault }?.key
                                     addingFavorite = io.github.korppujauho.pocketts.Favorite(
-                                        state.address, state.serverName, nickname, folder = favorites.firstOrNull()?.folder.orEmpty(),
+                                        state.address, state.serverName, folder = favorites.firstOrNull()?.folder.orEmpty(),
+                                        identity = state.identity.takeIf { it != default }.orEmpty(),
                                     )
                                 },
                             )
@@ -453,7 +455,7 @@ fun ServerScreen(
     }
     settings?.let { tab ->
         if (settingsActions != null) SettingsDialog(
-            state.voice, nickname, settingsActions, onDismiss = { settings = null }, startTab = tab,
+            state.voice, settingsActions, onDismiss = { settings = null }, startTab = tab,
             self = SelfInfo(state.client(state.ownId), state.serverKey, state.avatarStatus),
         )
     }
@@ -540,6 +542,7 @@ fun ServerScreen(
         FavoriteDialog(
             f, onSave = { actions.addFavorite(it); addingFavorite = null }, onDelete = null,
             folders = io.github.korppujauho.pocketts.Favorites.byFolder(favorites).map { it.first }.ifEmpty { listOf("") },
+            identities = remember { settingsActions?.identities().orEmpty() },
         ) { addingFavorite = null }
     }
     pokeTarget?.let { p ->

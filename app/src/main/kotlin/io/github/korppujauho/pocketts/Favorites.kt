@@ -22,6 +22,7 @@ data class Favorite(
     val channelPassword: String = "",
     val channelId: Int = 0,
     val folder: String = "",
+    val identity: String = "", // the identity it connects with ("" or one since deleted: the default one)
 ) {
     val label: String get() = name.ifBlank { address }
 }
@@ -49,7 +50,7 @@ object Favorites {
                 o.optString("address"), o.optString("name"), o.optString("nickname"),
                 if (inList) password(o.optString("password")) else passwords.optString(i), o.optBoolean("auto"),
                 o.optInt("filePort", 0).takeIf { it in 1..65535 }, o.optString("channel"), channelPasswords.optString(i),
-                o.optInt("channelId", 0), o.optString("folder"),
+                o.optInt("channelId", 0), o.optString("folder"), o.optString("identity"),
             )
         }.filter { it.address.isNotBlank() }
         if (inList) save(c, list)
@@ -85,6 +86,7 @@ object Favorites {
                         if (f.channel.isNotBlank()) put("channel", f.channel.trim())
                         if (f.channel.isNotBlank() && f.channelId > 0) put("channelId", f.channelId)
                         if (f.folder.isNotBlank()) put("folder", f.folder.trim())
+                        if (f.identity.isNotBlank()) put("identity", f.identity)
                     }
             )
         }

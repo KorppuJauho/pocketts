@@ -72,7 +72,8 @@ import io.github.korppujauho.pocketts.R
 
 /** What the connect screen can ask for. */
 interface ConnectActions {
-    fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean)
+    /** Connects with [identity] (its key). */
+    fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean, identity: String)
     fun connectFavorite(f: Favorite)
     fun saveFavorite(old: Favorite?, new: Favorite)
     fun removeFavorite(f: Favorite)
@@ -107,6 +108,9 @@ fun ConnectScreen(
 ) {
     var settings by remember { mutableStateOf(false) }
     var nick by remember { mutableStateOf(nickname) }
+    // Who to connect as: the default identity, unless another is chosen (the choice shows when there are several)
+    var identities by remember { mutableStateOf(settingsActions?.identities().orEmpty()) }
+    var identity by remember { mutableStateOf(identities.firstOrNull { it.isDefault }?.key.orEmpty()) }
     var addr by remember { mutableStateOf(address) }
     var pw by remember { mutableStateOf(password) }
     var remember by remember { mutableStateOf(password.isNotEmpty()) }
@@ -161,7 +165,11 @@ fun ConnectScreen(
                 if (!hidden) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
                 if (!hidden) androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // The same nickname on both pages
+                        // The same identity and nickname on both pages
+                        if (identities.size > 1) IdentityChoice(identities, identity) { key ->
+                            identity = key
+                            identities.firstOrNull { it.key == key }?.nickname?.takeIf { it.isNotBlank() }?.let { nick = it }
+                        }
                         TsField(nick, { nick = it }, stringResource(R.string.nickname))
                         if (page == 0) {
                             TsField(addr, { addr = it }, stringResource(R.string.server_address), placeholder = "ts.example.com", keyboard = KeyboardType.Uri)
@@ -172,9 +180,9 @@ fun ConnectScreen(
                             UpdateCard()
                             PrimaryButton(
                                 stringResource(R.string.connect), enabled = nick.isNotBlank() && addr.isNotBlank(), modifier = Modifier.fillMaxWidth(),
-                            ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known) }
+                            ) { actions.connect(addr.trim(), nick.trim(), pw, remember, favorite && !known, identity) }
                         } else {
-                            CommunityServers(nick.trim()) { actions.connect(it, nick.trim(), "", false, false) }
+                            CommunityServers(nick.trim()) { actions.connect(it, nick.trim(), "", false, false, identity) }
                         }
                     }
                 }
@@ -183,21 +191,19 @@ fun ConnectScreen(
     }
 
     if (settings && settingsActions != null) {
-        // A nickname saved in the settings shows in the form at once
-        val saving = remember(settingsActions) {
-            object : SettingsActions by settingsActions {
-                override fun save(voice: io.github.korppujauho.pocketts.VoiceSettings, nickname: String) {
-                    settingsActions.save(voice, nickname)
-                    if (nickname.isNotEmpty()) nick = nickname
-                }
-            }
-        }
-        SettingsDialog(voice, nick, saving, onDismiss = { settings = false })
+        SettingsDialog(voice, settingsActions, onDismiss = {
+            settings = false
+            // Identities added, deleted or renamed in the settings, and a changed nickname, show in the form at once
+            identities = settingsActions.identities()
+            val now = identities.firstOrNull { it.key == identity } ?: identities.firstOrNull { it.isDefault }
+            identity = now?.key.orEmpty()
+            now?.nickname?.takeIf { it.isNotBlank() }?.let { nick = it }
+        })
     }
     editing?.let { f ->
         FavoriteDialog(
             f, onSave = { actions.saveFavorite(f, it); editing = null }, onDelete = { actions.removeFavorite(f); editing = null },
-            folders = folders.map { it.first },
+            folders = folders.map { it.first }, identities = identities,
         ) { editing = null }
     }
     renaming?.let { folder ->
@@ -565,8 +571,11 @@ fun CheckRow(text: String, checked: Boolean, enabled: Boolean = true, onChange: 
  */
 @Composable
 fun FavoriteDialog(
-    f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Unit)?, folders: List<String> = listOf(f.folder), onDismiss: () -> Unit,
+    f: Favorite, onSave: (Favorite) -> Unit, onDelete: (() -> Unit)?, folders: List<String> = listOf(f.folder),
+    identities: List<IdentityInfo> = emptyList(), onDismiss: () -> Unit,
 ) {
+    // "": the default identity; one since deleted is the default one too
+    var identity by remember { mutableStateOf(f.identity.takeIf { k -> identities.any { it.key == k } }.orEmpty()) }
     var folder by remember { mutableStateOf(f.folder) }
     var newFolder by remember { mutableStateOf<String?>(null) } // a new folder's name being typed, when that was chosen
     val firstFolder = stringResource(R.string.favourites)
@@ -597,6 +606,7 @@ fun FavoriteDialog(
                         if (ch == f.channel) f.channelId else 0, // another channel typed: its id is learned again
                         // A new folder left without a name: where it was; the first folder's own name is that folder
                         newFolder?.trim()?.ifEmpty { null }?.let { if (it == firstFolder) "" else it } ?: folder,
+                        identity,
                     )
                 )
             }
@@ -605,6 +615,7 @@ fun FavoriteDialog(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 TsField(name, { name = it }, stringResource(R.string.favourite_name), placeholder = address)
                 TsField(address, { address = it }, stringResource(R.string.server_address), keyboard = KeyboardType.Uri)
+                if (identities.size > 1) IdentityChoice(identities, identity, withDefault = true) { identity = it }
                 TsField(nick, { nick = it }, stringResource(R.string.favourite_nickname))
                 TsField(pw, { pw = it }, stringResource(R.string.server_password), password = true)
                 TsField(channel, { channel = it }, stringResource(R.string.favourite_channel), placeholder = stringResource(R.string.favourite_channel_hint))

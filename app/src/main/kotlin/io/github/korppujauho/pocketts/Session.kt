@@ -78,6 +78,7 @@ object Session : TsClient.Listener {
         val away: Boolean = false,
         val awayMessage: String = "",
         val neededLevel: Int = 0, // the server refused our identity's security level: the level it needs
+        val identity: String = "", // the identity connected with (or refused for its security level), by its key
         val download: FileDownload? = null, // a file from the file browser being saved (or one being sent to it)
         val downloadResult: String? = null, // ... and how the last one went, as words
     ) {
@@ -281,6 +282,7 @@ object Session : TsClient.Listener {
         // channel turned out to be (its id and path), to remember it.
         val channel: String = "", val channelPassword: String = "", val privilegeKey: String = "",
         val channelId: Int = 0, val onChannel: ((Int, String) -> Unit)? = null,
+        val identity: String = "", // its key ("": the default one)
     )
     private var target: Target? = null
     // The channel asked for when connecting, until we see where the server put us: it doesn't refuse a missing channel
@@ -298,10 +300,10 @@ object Session : TsClient.Listener {
     fun connect(
         context: Context, address: String, nickname: String, serverPassword: String, filePort: Int? = null,
         channel: String = "", channelPassword: String = "", privilegeKey: String = "",
-        channelId: Int = 0, onChannel: ((Int, String) -> Unit)? = null,
+        channelId: Int = 0, onChannel: ((Int, String) -> Unit)? = null, identity: String = "",
     ) {
         app = context.applicationContext
-        connectTo(Target(address, nickname, serverPassword, filePort, channel, channelPassword, privilegeKey, channelId, onChannel))
+        connectTo(Target(address, nickname, serverPassword, filePort, channel, channelPassword, privilegeKey, channelId, onChannel, identity))
     }
 
     private fun connectTo(t: Target) {
@@ -343,12 +345,13 @@ object Session : TsClient.Listener {
             return
         }
         val prev = _state.value
+        val identityKey = Settings(app).identityKey(t.identity)
         if (!keepChat) synchronized(historyLock) { historyServer = null }
         _voices.value = Voices()
         _state.value = UiState(
             phase = Phase.CONNECTING, address = address, inputMuted = prev.inputMuted, outputMuted = prev.outputMuted,
             volumes = Settings(app).volumes(), voice = VoiceSettings.load(app), micAllowed = micPermitted(),
-            reconnecting = if (keepChat) retries else 0,
+            reconnecting = if (keepChat) retries else 0, identity = identityKey,
             chat = if (keepChat) prev.chat else emptyMap(), privateTabs = if (keepChat) prev.privateTabs else emptyList(),
             pokes = if (keepChat) prev.pokes else emptyList(), away = prev.away && keepChat, awayMessage = prev.awayMessage,
         )
@@ -357,7 +360,7 @@ object Session : TsClient.Listener {
         ConnectionService.start(app, app.getString(R.string.notification_connecting, address))
         worker.execute {
             val identity = try {
-                Settings(app).identity() // made on first use, which takes a moment
+                Settings(app).identity(identityKey) // made on first use, which takes a moment
             } catch (e: Settings.IdentityUnreadable) {
                 finish(e.message)
                 return@execute
@@ -1483,6 +1486,7 @@ object Session : TsClient.Listener {
         _state.value = UiState(
             phase = Phase.IDLE, error = if (level > 0) null else reason, address = s.address, inputMuted = s.inputMuted,
             outputMuted = s.outputMuted, volumes = s.volumes, voice = s.voice, micAllowed = s.micAllowed, neededLevel = level,
+            identity = if (level > 0) s.identity else "",
         )
         if (::app.isInitialized) ConnectionService.stop(app)
         pendingSwitch?.let { next ->

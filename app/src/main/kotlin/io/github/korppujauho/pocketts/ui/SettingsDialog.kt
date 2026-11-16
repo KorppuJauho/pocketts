@@ -76,7 +76,7 @@ import io.github.korppujauho.pocketts.R
 
 /** What the settings window needs besides the settings themselves. */
 interface SettingsActions {
-    fun save(voice: VoiceSettings, nickname: String)
+    fun save(voice: VoiceSettings)
     /** The microphone's level (RMS 0 - 1) and whether it counts as "on". */
     fun micLevel(): Pair<Float, Boolean>
     fun micTest(on: Boolean)
@@ -85,18 +85,19 @@ interface SettingsActions {
     fun audioInUse(): io.github.korppujauho.pocketts.AudioInUse? = null
     fun setAvatar(uri: android.net.Uri) {}
     fun removeAvatar() {}
-    /** Saves the identity into the file the person chose (TeamSpeak's .ini format); null when it worked, else why not. */
-    fun exportIdentity(uri: android.net.Uri): String? = null
-    /** Takes an identity exported from a TeamSpeak app; null when it worked, else why not. */
-    fun importIdentity(text: String): String? = null
+    /** The identities kept on this phone. */
+    fun identities(): List<IdentityInfo> = emptyList()
+    /** An identity's name and nickname changed (connected with it, the server hears the new nickname). */
+    fun editIdentity(key: String, name: String, nickname: String) {}
+    fun makeDefaultIdentity(key: String) {}
+    /** A new identity, made now or taken from [text] (exported by a TeamSpeak app); null when it worked, else why not. */
+    fun newIdentity(name: String, nickname: String, text: String?): String? = null
     /** The same from a file a TeamSpeak app saved (its .ini export). */
-    fun importIdentityFile(uri: android.net.Uri): String? = null
-    /** Why the saved identity can't be used, when it can't. */
-    fun identityProblem(): String? = null
-    /** Lets go of the saved identity: a new one is made at the next connect. */
-    fun forgetIdentity() {}
-    /** The identity's security level (null when it can't be read). */
-    fun securityLevel(): Int? = null
+    fun newIdentityFile(name: String, nickname: String, uri: android.net.Uri): String? = null
+    /** Saves an identity into the file the person chose (TeamSpeak's .ini format); null when it worked, else why not. */
+    fun exportIdentity(key: String, uri: android.net.Uri): String? = null
+    /** Deletes an identity (its favourites then use the default one); the last one is let go of, and made again at the next connect. */
+    fun deleteIdentity(key: String) {}
     /** Forgets every server's chat history, and the lines on screen. */
     fun clearChatHistory() {}
     /** Forgets every remembered channel password. */
@@ -113,7 +114,6 @@ data class SelfInfo(val person: io.github.korppujauho.pocketts.proto.ServerModel
 @Composable
 fun SettingsDialog(
     voice: VoiceSettings,
-    nickname: String,
     actions: SettingsActions,
     onDismiss: () -> Unit,
     startTab: Int = 0,
@@ -122,7 +122,7 @@ fun SettingsDialog(
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         // Nearly the whole screen: more settings in view, less scrolling
         SettingsContent(
-            voice, nickname, actions, onDismiss, startTab,
+            voice, actions, onDismiss, startTab,
             Modifier.fillMaxSize().windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing).padding(8.dp), self,
         )
     }
@@ -131,7 +131,6 @@ fun SettingsDialog(
 @Composable
 fun SettingsContent(
     voice: VoiceSettings,
-    nickname: String,
     actions: SettingsActions,
     onDismiss: () -> Unit,
     startTab: Int = 0,
@@ -140,7 +139,6 @@ fun SettingsContent(
 ) {
     var tab by rememberSaveable { mutableStateOf(startTab) }
     var v by remember { mutableStateOf(voice) }
-    var nick by remember { mutableStateOf(nickname) }
     val savedLanguage = remember { actions.language() }
     var language by rememberSaveable { mutableStateOf(savedLanguage) }
 
@@ -184,8 +182,9 @@ fun SettingsContent(
             ) {
                 when (tab) {
                     0 -> {
+                        Identities(actions)
                         if (self != null) ProfilePicture(self, actions)
-                        General(v, nick, { nick = it }) { v = it }
+                        General(v) { v = it }
                         ChatHistory(actions)
                     }
                     1 -> Playback(v, voice, actions) { v = it }
@@ -197,13 +196,12 @@ fun SettingsContent(
                     else -> {
                         Advanced(v) { v = it }
                         ChannelPasswordsGroup(actions)
-                        Identity(actions)
                     }
                 }
             }
             Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
                 PrimaryButton(stringResource(R.string.settings_save)) {
-                    actions.save(v, nick.trim())
+                    actions.save(v)
                     onDismiss()
                     // Last: the screen is made again in the new language
                     if (language != savedLanguage) actions.setLanguage(language)
@@ -331,96 +329,27 @@ private fun ProfilePicture(self: SelfInfo, actions: SettingsActions) {
     }
 }
 
+/** Who the person is to servers: the identities, the default one starred; one opens with a tap, and New identity adds one. */
 @Composable
-private fun Identity(actions: SettingsActions) {
-    var importing by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf<String?>(null) }
-    var problem by remember { mutableStateOf(actions.identityProblem()) }
-    val imported = stringResource(R.string.identity_imported)
-    val saved = stringResource(R.string.identity_saved)
-    val wiped = stringResource(R.string.identity_wiped)
-    val done = { error: String? ->
-        status = error ?: imported
-        if (error == null) problem = null
-        importing = false
+private fun Identities(actions: SettingsActions) {
+    var list by remember { mutableStateOf(actions.identities()) }
+    var open by remember { mutableStateOf<String?>(null) }
+    var adding by remember { mutableStateOf(false) }
+    Group(stringResource(R.string.identities_title), info = stringResource(R.string.identities_desc)) {
+        IdentityList(list) { open = it.key }
+        SecondaryButton(stringResource(R.string.identity_new)) { adding = true }
     }
-    val pickFile = androidx.activity.compose.rememberLauncherForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
-    ) { uri -> if (uri != null) done(actions.importIdentityFile(uri)) }
-    var warning by remember { mutableStateOf(false) }
-    var wiping by remember { mutableStateOf(false) }
-    val saveFile = androidx.activity.compose.rememberLauncherForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")
-    ) { uri -> if (uri != null) status = actions.exportIdentity(uri) ?: saved }
-    Group(stringResource(R.string.identity_title), note = stringResource(R.string.identity_desc)) {
-        problem?.let { Desc(it) }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton(stringResource(R.string.identity_wipe)) { wiping = true }
-            if (problem == null) SecondaryButton(stringResource(R.string.identity_export)) { warning = true }
-            SecondaryButton(stringResource(R.string.identity_import)) { importing = true }
-        }
-        status?.let { Desc(it) }
-    }
-    // The security level: some servers need a higher one than a new identity has
-    var level by remember { mutableStateOf(actions.securityLevel()) }
-    var raising by remember { mutableStateOf(false) }
-    level?.let { current ->
-        Group(stringResource(R.string.level_title), badge = "$current", info = stringResource(R.string.level_desc)) {
-            SecondaryButton(stringResource(R.string.level_raise_button)) { raising = true }
-        }
-        if (raising) RaiseLevelDialog(current, onClose = { raising = false; level = actions.securityLevel() })
-    }
-    // Export: what the file means first, then a file of the person's choosing (not shared to an app)
-    if (warning) {
-        TsDialog(
-            onDismiss = { warning = false }, title = stringResource(R.string.identity_export_title), icon = androidx.compose.material.icons.Icons.Rounded.Warning,
-            tint = Ts.amber, subtitle = stringResource(R.string.identity_export_subtitle),
-            buttons = {
-                PillButton(stringResource(R.string.cancel)) { warning = false }
-                PillButton(stringResource(R.string.identity_save_file), PillKind.PRIMARY) {
-                    warning = false
-                    saveFile.launch("pocketts-identity.ini")
-                }
-            },
-        ) {
-            Desc(stringResource(R.string.identity_export_what))
-            Desc(stringResource(R.string.identity_export_where))
+    open?.let { key ->
+        list.firstOrNull { it.key == key }?.let { e ->
+            IdentityDialog(e, list, actions) {
+                open = null
+                list = actions.identities()
+            }
         }
     }
-    // Wipe: what's lost first, with a way to keep a copy
-    if (wiping) {
-        TsDialog(
-            onDismiss = { wiping = false }, title = stringResource(R.string.identity_wipe_title), icon = androidx.compose.material.icons.Icons.Rounded.Warning,
-            tint = Ts.red, subtitle = stringResource(R.string.cant_be_undone),
-            buttons = {
-                PillButton(stringResource(R.string.cancel)) { wiping = false }
-                PillButton(stringResource(R.string.identity_wipe), PillKind.DANGER) {
-                    actions.forgetIdentity()
-                    problem = null
-                    wiping = false
-                    status = wiped
-                }
-            },
-        ) {
-            Desc(stringResource(R.string.identity_wipe_what))
-            Desc(stringResource(R.string.identity_wipe_back))
-        }
-    }
-    if (importing) {
-        var text by remember { mutableStateOf("") }
-        TsDialog(
-            onDismiss = { importing = false }, title = stringResource(R.string.identity_import_title), icon = androidx.compose.material.icons.Icons.Rounded.Key,
-            subtitle = stringResource(R.string.identity_import_subtitle),
-            buttons = {
-                PillButton(stringResource(R.string.cancel)) { importing = false }
-                PillButton(stringResource(R.string.identity_import), PillKind.PRIMARY, enabled = text.isNotBlank()) { done(actions.importIdentity(text)) }
-            },
-        ) {
-            Desc(stringResource(R.string.identity_import_desc))
-            // Hidden like a password while it's on screen
-            TsField(text, { text = it }, stringResource(R.string.identity_field), password = true)
-            PillButton(stringResource(R.string.identity_choose_file), modifier = Modifier.fillMaxWidth()) { pickFile.launch(arrayOf("*/*")) }
-        }
+    if (adding) NewIdentityDialog(actions) {
+        adding = false
+        list = actions.identities()
     }
 }
 
@@ -470,10 +399,7 @@ private fun ChatHistory(actions: SettingsActions) {
 }
 
 @Composable
-private fun General(v: VoiceSettings, nick: String, onNick: (String) -> Unit, onChange: (VoiceSettings) -> Unit) {
-    Group(stringResource(R.string.nickname)) {
-        TsField(nick, onNick, stringResource(R.string.nickname))
-    }
+private fun General(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
     Group {
         Check(stringResource(R.string.general_floating_ptt), v.floatingPtt, info = stringResource(R.string.general_floating_ptt_desc)) { onChange(v.copy(floatingPtt = it)) }
     }

@@ -27,6 +27,7 @@ import io.github.korppujauho.pocketts.ui.ConnectScreen
 import io.github.korppujauho.pocketts.ui.PocketTsTheme
 import io.github.korppujauho.pocketts.ui.ServerActions
 import io.github.korppujauho.pocketts.ui.ServerScreen
+import io.github.korppujauho.pocketts.ui.IdentityInfo
 import io.github.korppujauho.pocketts.ui.SettingsActions
 
 class MainActivity : ComponentActivity() {
@@ -287,10 +288,11 @@ private fun App() {
         Connect(state, favs)
         // The server needs a higher security level than our identity's: raise it, then connect again
         if (state.neededLevel > 0) {
-            val current = remember { IdentityRaise.level(ctx) }
+            val current = remember { IdentityRaise.level(ctx, state.identity) }
             if (current != null) {
                 io.github.korppujauho.pocketts.ui.RaiseLevelDialog(
-                    current, needed = state.neededLevel, onReached = Session::connectAgain, onClose = Session::dismissNeededLevel,
+                    current, needed = state.neededLevel, identity = state.identity, onReached = Session::connectAgain,
+                    onClose = Session::dismissNeededLevel,
                 )
             }
         }
@@ -298,7 +300,7 @@ private fun App() {
         val egl = Session.streams().egl
         androidx.compose.foundation.layout.Box {
             ServerScreen(
-                state, SessionActions, AppSettingsActions(ctx), settings.nickname, favorites = favs, egl = egl,
+                state, SessionActions, AppSettingsActions(ctx), favorites = favs, egl = egl,
                 canBoth = canBoth, pip = pip, voices = voices,
             )
             if (pip) io.github.korppujauho.pocketts.ui.PipPlayer(state.stream, egl)
@@ -323,24 +325,28 @@ private fun App() {
     }
 }
 
-/** Connects (the microphone is asked for once; talking starts when it's allowed). */
+/**
+ * Connects with [identity] (by its key; "" is the default one). The microphone is asked for once; talking starts when
+ * it's allowed. [keepNickname]: the nickname typed is remembered as the identity's.
+ */
 private fun connect(
     context: Context, address: String, nickname: String, password: String, filePort: Int? = null,
     channel: String = "", channelPassword: String = "", privilegeKey: String = "",
-    channelId: Int = 0, onChannel: ((Int, String) -> Unit)? = null,
+    channelId: Int = 0, identity: String = "", keepNickname: Boolean = true, onChannel: ((Int, String) -> Unit)? = null,
 ) {
     Settings(context).let {
-        it.nickname = nickname
+        if (keepNickname) it.setNickname(it.identityKey(identity), nickname)
         it.address = address
     }
     MainActivity.current?.ensureMic()
-    Session.connect(context, address, nickname, password, filePort, channel, channelPassword, privilegeKey, channelId, onChannel)
+    Session.connect(context, address, nickname, password, filePort, channel, channelPassword, privilegeKey, channelId, onChannel, identity)
 }
 
 private fun connectFavorite(context: Context, f: Favorite) =
     connect(
-        context, f.address, f.nickname.ifBlank { Settings(context).nickname }, f.password, f.filePort,
-        channel = f.channel, channelPassword = f.channelPassword, channelId = f.channelId,
+        context, f.address, f.nickname.ifBlank { Settings(context).identityEntry(f.identity).nickname }, f.password, f.filePort,
+        channel = f.channel, channelPassword = f.channelPassword, channelId = f.channelId, identity = f.identity,
+        keepNickname = false, // a favourite's own nickname is only for its server
     ) { id, path ->
         // Where its channel is now (learned on the first visit, or renamed since): remembered in the favourite
         val ctx = context.applicationContext
@@ -361,14 +367,14 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
     ConnectScreen(
         settings.nickname, settings.address, settings.serverPassword, favs, state.error,
         actions = object : ConnectActions {
-            override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {
+            override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean, identity: String) {
                 // A teamspeak:// or tmspk.gg link pasted in: as when it's opened (an invite is looked up, then asked
                 // about). A ts3server:// one connects straight away, with its channel and passwords; one with a
                 // privilege key is asked about first, as when it's opened.
                 val ts3 = address.trim().startsWith("ts3server://", ignoreCase = true)
                 val link = if (ts3) JoinLink.parse(address) else null
                 if (JoinLink.isLink(address) && (!ts3 || link == null || link.token.isNotEmpty())) {
-                    settings.nickname = nickname
+                    settings.setNickname(settings.identityKey(identity), nickname)
                     openLinkText(ctx, address)
                     return
                 }
@@ -376,9 +382,15 @@ private fun Connect(state: Session.UiState, favs: List<Favorite>) {
                 val server = link?.address ?: address
                 val pw = password.ifEmpty { link?.password.orEmpty() }
                 settings.serverPassword = if (remember) pw else ""
-                // A new favourite goes into the first folder
-                if (favorite) saveFavorites(ctx, favs + Favorite(server, password = if (remember) pw else "", folder = favs.firstOrNull()?.folder.orEmpty()))
-                connect(ctx, server, nickname, pw, channel = link?.channel.orEmpty(), channelPassword = link?.channelPassword.orEmpty())
+                // A new favourite goes into the first folder, with the identity chosen (when not the default one)
+                if (favorite) saveFavorites(
+                    ctx,
+                    favs + Favorite(
+                        server, password = if (remember) pw else "", folder = favs.firstOrNull()?.folder.orEmpty(),
+                        identity = identity.takeIf { it != settings.defaultIdentity }.orEmpty(),
+                    ),
+                )
+                connect(ctx, server, nickname, pw, channel = link?.channel.orEmpty(), channelPassword = link?.channelPassword.orEmpty(), identity = identity)
             }
             override fun connectFavorite(f: Favorite) = connectFavorite(ctx, f)
             override fun saveFavorite(old: Favorite?, new: Favorite) =
@@ -512,7 +524,7 @@ private object SessionActions : ServerActions {
 }
 
 private class AppSettingsActions(private val context: Context) : SettingsActions {
-    override fun save(voice: VoiceSettings, nickname: String) {
+    override fun save(voice: VoiceSettings) {
         // Turned on: Android's own page to allow it, if not allowed yet
         if (voice.overlayPtt && !Session.state.value.voice.overlayPtt && !TalkOverlay.allowed(context)) {
             MainActivity.current?.startActivity(
@@ -520,10 +532,6 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
             )
         }
         Session.updateVoice(voice)
-        if (nickname.isNotEmpty() && nickname != Settings(context).nickname) {
-            Settings(context).nickname = nickname
-            Session.setNickname(nickname)
-        }
     }
     override fun language() = AppLanguage.current(context)
     override fun setLanguage(tag: String) {
@@ -535,10 +543,43 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun playTestSound() = TestSound.play(Session.state.value.voice)
     override fun setAvatar(uri: android.net.Uri) = Session.setAvatar(context, uri)
     override fun removeAvatar() = Session.removeAvatar()
-    override fun exportIdentity(uri: android.net.Uri): String? = try {
+    override fun identities(): List<IdentityInfo> {
+        val s = Settings(context)
+        val default = s.defaultIdentity
+        val all = s.identities()
+        // A favourite without one of its own (or with one since deleted) uses the default one
+        val used = favorites.value.map { f -> all.firstOrNull { it.key == f.identity }?.key ?: default }
+        return all.map { e ->
+            IdentityInfo(
+                e.key, e.name, e.nickname, isDefault = e.key == default, level = IdentityRaise.level(context, e.key),
+                problem = s.identityProblem(e.key), favourites = used.count { it == e.key },
+            )
+        }
+    }
+    override fun editIdentity(key: String, name: String, nickname: String) {
+        val s = Settings(context)
+        val was = s.identityEntry(key).nickname
+        s.editIdentity(key, name.trim(), nickname.trim())
+        // Connected with it: the server hears the new nickname now
+        val state = Session.state.value
+        if (nickname.isNotBlank() && nickname.trim() != was && state.phase == Session.Phase.CONNECTED && state.identity == key) {
+            Session.setNickname(nickname.trim())
+        }
+    }
+    override fun makeDefaultIdentity(key: String) {
+        Settings(context).defaultIdentity = key
+    }
+    override fun newIdentity(name: String, nickname: String, text: String?): String? =
+        if (Settings(context).newIdentity(name, nickname, text) == null) context.getString(R.string.identity_not_valid) else null
+    override fun newIdentityFile(name: String, nickname: String, uri: android.net.Uri): String? {
+        val text = readIdentityFile(uri) ?: return context.getString(R.string.file_not_opened)
+        return newIdentity(name, nickname, text)
+    }
+    override fun exportIdentity(key: String, uri: android.net.Uri): String? = try {
         // Into the file the person chose, as TeamSpeak apps save it (so they can open it too); nowhere else
         val s = Settings(context)
-        val ini = s.identity().exportIni("PocketTS", s.nickname)
+        val e = s.identityEntry(key)
+        val ini = s.identity(e.key).exportIni(e.name.ifBlank { "PocketTS" }, e.nickname)
         context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(ini.toByteArray(Charsets.UTF_8)) }
             ?: throw java.io.IOException("no file")
         AppLog.log("Identity saved to a file")
@@ -549,9 +590,17 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
         AppLog.log("Couldn't save the identity: ${e.javaClass.simpleName}")
         context.getString(R.string.file_not_written)
     }
-    override fun importIdentity(text: String): String? = Settings(context).importIdentity(text)
-    override fun importIdentityFile(uri: android.net.Uri): String? = try {
-        val text = context.contentResolver.openInputStream(uri)?.use { input ->
+    override fun deleteIdentity(key: String) {
+        val s = Settings(context)
+        val default = s.defaultIdentity
+        s.deleteIdentity(key)
+        // Its favourites use the default one from now on (also when the default one was the one deleted)
+        if (key != default) saveFavorites(context, favorites.value.map { if (it.identity == key) it.copy(identity = "") else it })
+    }
+
+    /** An identity file a TeamSpeak app saved (its .ini export); null when it can't be read. */
+    private fun readIdentityFile(uri: android.net.Uri): String? = try {
+        context.contentResolver.openInputStream(uri)?.use { input ->
             // An identity file is small: past 64 KB it isn't one
             val out = java.io.ByteArrayOutputStream()
             val buf = ByteArray(8192)
@@ -562,14 +611,10 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
             }
             out.toString(Charsets.UTF_8.name())
         }
-        if (text == null) context.getString(R.string.file_not_opened) else importIdentity(text)
     } catch (e: Exception) {
         AppLog.log("Couldn't read the identity file: ${e.javaClass.simpleName}")
-        context.getString(R.string.file_not_opened)
+        null
     }
-    override fun identityProblem(): String? = Settings(context).identityProblem()
-    override fun forgetIdentity() = Settings(context).forgetIdentity()
-    override fun securityLevel(): Int? = IdentityRaise.level(context)
     override fun clearChatHistory() = Session.clearChatHistory(context)
     override fun forgetChannelPasswords() = ChannelPasswords(context).clear()
 }

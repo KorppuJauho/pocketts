@@ -35,7 +35,7 @@ class FavouriteDragTest {
     private class Seen : ConnectActions {
         val moves = mutableListOf<Triple<String, String, Int>>()
         val connects = mutableListOf<String>()
-        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {}
+        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean, identity: String) {}
         override fun connectFavorite(f: Favorite) { connects += f.address }
         override fun saveFavorite(old: Favorite?, new: Favorite) {}
         override fun removeFavorite(f: Favorite) {}
