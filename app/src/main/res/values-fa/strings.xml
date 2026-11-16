@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Persian (Farsi, Iran). Translated from values/strings.xml. -->
+<resources>
+
+    <!-- Shared -->
+    <string name="cancel">لغو</string>
+    <string name="save">ذخیره</string>
+    <string name="delete">حذف</string>
+    <string name="edit">ویرایش</string>
+    <string name="remove">برداشتن</string>
+    <string name="close">بستن</string>
+    <string name="advanced">پیشرفته</string>
+    <string name="connect">اتصال</string>
+    <string name="link_title">اتصال به %1$s؟</string>
+    <string name="link_subtitle">از یک لینک TeamSpeak</string>
+    <string name="link_subtitle_invite">از یک دعوت‌نامه TeamSpeak</string>
+    <string name="link_address">آدرس</string>
+    <string name="invite_expired">این دعوت منقضی شده یا وجود ندارد. دعوت جدید یا آدرس سرور را بخواهید.</string>
+    <string name="invite_failed">بررسی دعوت ممکن نشد. اتصال را بررسی کنید و دوباره امتحان کنید.</string>
+    <string name="link_channel">کانال</string>
+    <string name="link_password">رمز سرور</string>
+    <string name="link_password_given">در لینک</string>
+    <string name="link_leaving">اول از %1$s خارج می‌شوید.</string>
+    <string name="link_use_key">استفاده از کلید دسترسی ویژه در لینک</string>
+    <string name="link_use_key_desc">به شما در این سرور دسترسی‌هایی مثل ادمین می‌دهد. فقط اگر به کسی که لینک را فرستاده اعتماد دارید، از آن استفاده کنید.</string>
+    <string name="disconnect">قطع اتصال</string>
+    <string name="nickname">نام مستعار</string>
+    <string name="server_address">آدرس یا نام مستعار سرور</string>
+    <string name="server_password">رمز سرور</string>
+    <string name="remember_password">به خاطر سپردن رمز</string>
+    <string name="channel_password">رمز کانال</string>
+    <string name="join">پیوستن</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">علاقه‌مندی‌ها</string>
+    <string name="favourites_in">در علاقه‌مندی‌ها</string>
+    <string name="favourites_save">ذخیره در علاقه‌مندی‌ها</string>
+    <string name="favourite_edit">ویرایش علاقه‌مندی</string>
+    <string name="favourite_add">افزودن به علاقه‌مندی‌ها</string>
+    <string name="favourite_name">نام در فهرست‌های شما</string>
+    <string name="favourite_nickname">نام مستعار شما در این سرور</string>
+    <string name="favourite_auto">اتصال خودکار هنگام باز شدن برنامه</string>
+    <string name="favourite_file_port">پورت انتقال فایل</string>
+    <string name="favourite_file_port_hint">پورت خود سرور (معمولاً 30033)</string>
+    <string name="favourite_file_port_desc">فقط اگر تصویرها و آواتارهای سرور بارگیری نمی‌شوند: انتقال فایل آن روی پورت دیگری است.</string>
+    <string name="favourite_folder">پوشه</string>
+    <string name="favourite_folder_new">پوشه جدید…</string>
+    <string name="folder_name">نام پوشه</string>
+    <string name="folder_edit">ویرایش پوشه</string>
+    <string name="folder_fold">بستن پوشه</string>
+    <string name="folder_unfold">باز کردن پوشه</string>
+    <string name="connect_show">باز کردن پنل اتصال</string>
+    <string name="connect_hide">بستن پنل اتصال</string>
+    <string name="community_tab">انجمن</string>
+    <string name="community_desc">سرورهای عمومی که TeamSpeak اداره می‌کند. برای پیوستن، روی یکی بزنید.</string>
+    <string name="community_desc_no_nick">سرورهای عمومی که TeamSpeak اداره می‌کند. برای پیوستن، بالا یک نام مستعار بنویسید.</string>
+    <string name="community_worldwide">سراسر جهان</string>
+    <string name="community_eu_east">اروپای شرقی</string>
+    <string name="community_emea">اروپا، خاورمیانه و آفریقا</string>
+    <string name="community_apac">آسیا–اقیانوسیه</string>
+    <string name="community_latam">آمریکای لاتین</string>
+    <string name="community_na">آمریکای شمالی</string>
+    <string name="favourite_channel">کانال برای پیوستن</string>
+    <string name="favourite_channel_hint">کانال پیش‌فرض سرور</string>
+    <string name="favourite_channel_desc">نام کانال، همان‌طور که سرور نشان می‌دهد. برای کانالی داخل کانال دیگر، مسیرش را بنویسید: Games/Lobby.</string>
+    <string name="channel_not_joined">پیوستن به %1$s ممکن نشد: چنین کانالی نیست، یا رمزش اشتباه است. شما در کانال پیش‌فرض سرور هستید.</string>
+    <string name="update_title">PocketTS %1$s منتشر شد</string>
+    <string name="update_text">نسخه‌ای جدیدتر از این نسخه (%1$s) در GitHub هست.</string>
+    <string name="not_now">الان نه</string>
+    <string name="download">دانلود</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">تنظیمات</string>
+    <string name="hold_to_talk">برای صحبت نگه دارید</string>
+    <string name="microphone">میکروفون</string>
+    <string name="sound">صدا</string>
+    <string name="share">اشتراک‌گذاری</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">رمز</string>
+    <string name="person_sound_off">صدا خاموش</string>
+    <string name="person_mic_off">میکروفون خاموش</string>
+    <string name="person_cant_talk">در این کانال نمی‌تواند صحبت کند</string>
+    <string name="person_streaming">در حال استریم</string>
+    <!-- Short tags after a name, in capitals as in the TeamSpeak app -->
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">شما</string>
+
+    <!-- Chat -->
+    <!-- The chat's lines about people coming and going. %1$s and %2$s are names (a person's, a channel's), shown bold -->
+    <string name="event_connected">%1$s وصل شد</string>
+    <string name="event_joined_from">%1$s از %2$s آمد</string>
+    <string name="event_you_moved_to">شما به %1$s منتقل شدید</string>
+    <string name="event_you_kicked_from">شما از %1$s اخراج شدید</string>
+    <string name="event_moved_here_from">%1$s از %2$s به اینجا منتقل شد</string>
+    <string name="event_kicked_from">%1$s از %2$s اخراج شد</string>
+    <string name="event_moved_to">%1$s به %2$s منتقل شد</string>
+    <string name="event_kicked_from_channel">%1$s از کانال اخراج شد</string>
+    <string name="event_left_to">%1$s به %2$s رفت</string>
+    <string name="event_you_kicked_from_server">شما از سرور اخراج شدید</string>
+    <string name="event_you_banned">شما بن شدید</string>
+    <string name="event_lost_connection">اتصال %1$s قطع شد</string>
+    <string name="event_kicked_from_server">%1$s از سرور اخراج شد</string>
+    <string name="event_banned">%1$s بن شد</string>
+    <string name="event_disconnected">%1$s خارج شد</string>
+    <!-- Added after a line: who did it (%1$s), and the reason they gave (%1$s). Keep the space at the start -->
+    <string name="event_by">"، توسط %1$s"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <!-- A channel without a name -->
+    <string name="event_another_channel">کانالی دیگر</string>
+    <string name="chat_channel">کانال</string>
+    <string name="chat_empty_channel">هنوز پیامی در این کانال نیست.</string>
+    <string name="chat_empty_private">هنوز پیامی نیست.</string>
+    <!-- The message box's hint: %1$s is the channel's or the person's name -->
+    <string name="chat_message_to">پیام به %1$s…</string>
+    <string name="chat_message_to_channel">پیام به کانال…</string>
+    <string name="chat_message_to_them">پیام به او…</string>
+    <!-- The sender of a line from the server itself -->
+    <string name="chat_system">سیستم</string>
+    <!-- A link's card: %1$s is the website's name, such as example.com -->
+    <string name="chat_link_open">باز کردن: %1$s</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="one">هر بار حداکثر %1$d تصویر.</item>
+        <item quantity="other">هر بار حداکثر %1$d تصویر.</item>
+    </plurals>
+    <string name="chat_camera_needed">برای گرفتن عکس، باید اجازه دسترسی به دوربین را بدهید.</string>
+    <string name="chat_sending_picture">ارسال تصویر %1$d از %2$d…</string>
+    <string name="chat_attached_picture">تصویر پیوست‌شده</string>
+    <string name="chat_remove_picture">برداشتن تصویر</string>
+    <string name="chat_send_picture">ارسال تصویر</string>
+    <string name="chat_choose_pictures">انتخاب تصویرها</string>
+    <string name="chat_take_photo">گرفتن عکس</string>
+    <string name="chat_send">ارسال</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">ذخیره در گالری</string>
+    <!-- %1$s is the folder, Pictures/PocketTS -->
+    <string name="picture_saved">در %1$s ذخیره شد</string>
+    <!-- %1$s is the reason, as the phone gives it -->
+    <string name="picture_failed">انجام نشد: %1$s</string>
+
+    <!-- Streams: watching -->
+    <!-- The button next to someone who streams, in capitals as in the TeamSpeak app -->
+    <string name="stream_watch">تماشا</string>
+    <string name="stream_small_window">پنجره کوچک</string>
+    <string name="stream_full_screen">تمام‌صفحه</string>
+    <string name="stream_resize">برای تغییر اندازه استریم بکشید</string>
+    <string name="stream_mini">استریم کوچک: برای بزرگ‌تر شدن بزنید، برای جابه‌جایی بکشید</string>
+    <string name="stream_leave_full_screen">خروج از تمام‌صفحه</string>
+    <string name="stream_stop_watching">توقف تماشا</string>
+    <string name="stream_sound_on">صدا روشن</string>
+    <string name="stream_sound_off">صدا خاموش</string>
+    <string name="stream_requesting">در حال درخواست دسترسی…</string>
+    <string name="stream_connecting">در حال اتصال…</string>
+    <string name="stream_paused">مکث شده</string>
+    <string name="stream_waiting_picture">وصل شد، در انتظار تصویر…</string>
+    <string name="stream_trying">مشکل در اتصال، هنوز در حال تلاش…</string>
+    <string name="stream_connection_lost">اتصال قطع شد.</string>
+    <string name="stream_open_failed">استریم باز نشد.</string>
+    <string name="stream_denied">درخواست استریم رد شد.</string>
+    <string name="stream_ended">استریم تمام شد.</string>
+    <string name="stream_ended_left_channel">استریم تمام شد (دیگر در همان کانال نیستید).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">اشتراک‌گذاری دوربین</string>
+    <string name="share_screen_title">اشتراک‌گذاری صفحه</string>
+    <string name="share_subtitle">همه در کانال شما می‌توانند تماشا کنند</string>
+    <string name="start">شروع</string>
+    <string name="stop">توقف</string>
+    <string name="share_what">چه چیزی</string>
+    <string name="share_camera">دوربین</string>
+    <string name="share_screen">صفحه</string>
+    <string name="share_both_cameras">هر دو دوربین</string>
+    <string name="camera_front">جلو</string>
+    <string name="camera_back">عقب</string>
+    <string name="camera_both">هر دو</string>
+    <string name="share_both_desc">دوربین عقب بزرگ، دوربین جلو کوچک در گوشه. «جابه‌جایی» جایشان را عوض می‌کند.</string>
+    <string name="share_quality">کیفیت</string>
+    <string name="share_quality_480">صرفه‌جویی در داده: کمترین مصرف داده، برای اینترنت همراه.</string>
+    <string name="share_quality_720">HD: واضح، و به‌اندازه کافی سبک برای بیشتر اتصال‌ها.</string>
+    <string name="share_quality_1080">Full HD: واضح‌ترین، به اتصال خوب در هر دو طرف نیاز دارد.</string>
+    <string name="share_sound">صدای استریم</string>
+    <string name="share_sound_on_desc">بینندگان صدای میکروفون شما را همراه تصویر می‌شنوند. وقتی میکروفون بی‌صداست و وقتی در کانال صحبت می‌کنید ساکت می‌شود، تا صدایتان دو بار شنیده نشود.</string>
+    <string name="share_sound_off_desc">بدون صدا همراه تصویر: مثل همیشه در کانال صحبت کنید.</string>
+    <string name="share_screen_sound">صدای گوشی</string>
+    <string name="share_screen_sound_on_desc">بینندگان آنچه گوشی پخش می‌کند، مثل ویدیو یا بازی، را می‌شنوند. برخی برنامه‌ها اجازه نمی‌دهند و بی‌صدا می‌مانند. صدای افراد کانال پخش نمی‌شود.</string>
+    <string name="share_screen_sound_off_desc">بدون صدا همراه تصویر.</string>
+    <string name="share_screen_sound_watching">هنگام تماشای استریم ممکن نیست: برای اشتراک صدای گوشی، تماشا را متوقف کنید.</string>
+    <string name="share_screen_desc">اندروید پیش از شروع یک بار دیگر می‌پرسد. همه چیز روی صفحه نمایش داده می‌شود، اعلان‌ها هم.</string>
+    <string name="share_sound_quiet">صدای استریم ساکت</string>
+    <string name="share_sound_live">صدای استریم روشن</string>
+    <string name="share_starting">در حال شروع…</string>
+    <string name="share_paused_call">در طول تماس متوقف شد</string>
+    <string name="share_watching">در حال تماشا</string>
+    <string name="share_swap_cameras">جابه‌جایی دوربین‌ها</string>
+    <string name="share_switch_camera">تعویض دوربین</string>
+    <string name="share_turn_locked">چرخش قفل است (برای همراهی با گوشی بزنید)</string>
+    <string name="share_turn_follows">چرخش همراه گوشی است (برای قفل بزنید)</string>
+    <string name="share_light_on">نور حلقه‌ای روشن (برای خاموش کردن بزنید)</string>
+    <string name="share_light_off">نور حلقه‌ای: صفحه‌ای سفید و روشن چهره‌تان را روشن می‌کند</string>
+    <string name="share_both_unsupported">این گوشی نمی‌تواند هم‌زمان از هر دو دوربین استفاده کند.</string>
+    <string name="share_failed">اشتراک‌گذاری شروع نشد.</string>
+    <!-- %1$s is TeamSpeak's reason -->
+    <string name="share_refused">TeamSpeak اشتراک‌گذاری را رد کرد: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_general">عمومی</string>
+    <string name="settings_playback">پخش</string>
+    <string name="settings_capture">ضبط</string>
+    <!-- The tab with how the app looks and what it offers -->
+    <string name="settings_ui">رابط کاربری</string>
+    <string name="settings_save">ذخیره و اعمال</string>
+    <string name="cant_be_undone">این کار برگشت‌پذیر نیست</string>
+    <string name="quiet">آرام</string>
+    <string name="loud">بلند</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">تصویر پروفایل</string>
+    <string name="avatar_change">تغییر</string>
+    <string name="avatar_desc">دیگران آن را در این سرور می‌بینند. برای اندازه ۳۲۰ × ۳۲۰ مناسب است.</string>
+    <string name="general_floating_ptt">دکمه شناور فشار برای صحبت</string>
+    <string name="general_floating_ptt_desc">در حالت فشار برای صحبت، یک دکمه گرد پایین صفحه PocketTS می‌ماند تا هنگام پیمایش چت هم بتوانید صحبت کنید. دکمه روی برنامه‌های دیگر (پایین‌تر) تنظیم جداگانه‌ای است.</string>
+    <string name="general_overlay_ptt">دکمه صحبت روی برنامه‌های دیگر</string>
+    <string name="general_overlay_ptt_desc">در حالت فشار برای صحبت، وقتی به برنامه‌های دیگر می‌روید (نه در خود PocketTS) یک دکمه گرد نمایش داده می‌شود. برای صحبت نگهش دارید، برای جابه‌جایی بکشیدش. اندروید یک بار اجازه نمایش PocketTS روی برنامه‌های دیگر را می‌پرسد.</string>
+    <string name="general_volume_ptt">فشار برای صحبت با دکمه‌های صدا</string>
+    <string name="general_volume_ptt_desc">در حالت فشار برای صحبت، وقتی برنامه روی صفحه است، با نگه داشتن دکمه صدا صحبت می‌کنید (به‌جای تغییر بلندی صدا).</string>
+    <string name="general_headset_ptt">فشار برای صحبت با دکمه هدست</string>
+    <string name="general_headset_ptt_desc">در حالت فشار برای صحبت، دکمه هدفون را بزنید تا صحبت شروع شود و دوباره بزنید تا تمام شود. با صفحه خاموش هم کار می‌کند. تا وقتی این گزینه روشن است، این دکمه موسیقی را پخش یا متوقف نمی‌کند.</string>
+    <string name="general_call_mute">بی‌صدا شدن هنگام تماس تلفنی</string>
+    <string name="general_call_mute_desc">وقتی تماس تلفنی زنگ می‌خورد یا شروع می‌شود، میکروفون و صدای شما (و صدای استریمی که تماشا می‌کنید) خاموش می‌شود و پس از پایان تماس برمی‌گردد. استریمی که به اشتراک می‌گذارید متوقف می‌شود تا بینندگان تماس را نبینند. هر چه خودتان بی‌صدا کرده بودید، بی‌صدا می‌ماند.</string>
+    <string name="general_updates">بررسی به‌روزرسانی</string>
+    <string name="general_updates_desc">PocketTS روزی یک بار از GitHub می‌پرسد که آیا نسخه جدیدتری آمده است، و در صفحه اتصال خبر می‌دهد. هیچ اطلاعاتی درباره شما فرستاده نمی‌شود.</string>
+    <string name="general_screen_on">روشن ماندن صفحه</string>
+    <string name="general_screen_on_desc">تا وقتی وصل هستید و برنامه باز است، صفحه خاموش نمی‌شود. هنگام اشتراک‌گذاری یا تماشای استریم، صفحه در هر صورت روشن می‌ماند.</string>
+    <string name="general_spacers">اجازه پیوستن به کانال‌های جداکننده</string>
+    <string name="general_spacers_desc">زدن روی جداکننده (خط یا عنوانی در فهرست کانال‌ها) مثل هر کانال دیگری شما را به آن می‌برد. برخی سرورها از یکی از آن‌ها به‌عنوان کانال AFK استفاده می‌کنند. اگر خاموش باشد، با یک لمس اتفاقی وارد جداکننده‌ها نمی‌شوید.</string>
+    <string name="history_title">تاریخچه چت</string>
+    <!-- %1$s is how many days (history_days), %2$s how many lines (history_lines) -->
+    <string name="history_desc">چت‌های کانال، چت‌های خصوصی و ورود و خروج افراد، رمزگذاری‌شده روی این گوشی نگه داشته می‌شوند و وقتی دوباره به همان سرور وصل شوید نمایش داده می‌شوند: %1$s اخیر، حداکثر %2$s در هر گفتگو. پوک‌ها نگه داشته نمی‌شوند.</string>
+    <plurals name="history_days">
+        <item quantity="one">%1$d روز</item>
+        <item quantity="other">%1$d روز</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="one">%1$d خط</item>
+        <item quantity="other">%1$d خط</item>
+    </plurals>
+    <string name="history_clear">پاک کردن تاریخچه چت</string>
+    <string name="history_cleared">پاک شد.</string>
+    <string name="history_clear_title">تاریخچه چت پاک شود؟</string>
+    <string name="history_clear_button">پاک کردن</string>
+    <string name="history_clear_desc">چت ذخیره‌شده همه سرورها از این گوشی پاک می‌شود، و چتی که الان روی صفحه است هم.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">بلندی صدای افراد</string>
+    <string name="playback_test_sound">پخش صدای آزمایشی</string>
+    <string name="playback_event_sounds">صدای رویدادها</string>
+    <string name="playback_event_sounds_desc">صداهای کوتاه وقتی کسی به کانال شما می‌آید یا از آن می‌رود، برای پیام‌ها، پوک‌ها و استریم‌ها، و برای دکمه‌های میکروفون و صدا.</string>
+    <string name="playback_sound_volume">بلندی صداها</string>
+    <string name="playback_play_sound">پخش یک صدا</string>
+    <string name="playback_call_volume">در پخش به‌صورت تماس تلفنی، صداها از بلندی تماس پیروی می‌کنند: هنگام اتصال، یک دکمه صدا را بزنید.</string>
+    <string name="playback_media_volume">صداها از بلندی رسانه پیروی می‌کنند.</string>
+    <string name="playback_output_speaker">بلندگو</string>
+    <string name="playback_output_earpiece">بلندگوی مکالمه</string>
+    <string name="playback_headset">استفاده از هدفون وصل‌شده</string>
+    <string name="playback_headset_desc">هنگام اتصال، هدفون، هدست یا بلندگوی بلوتوثی صداها را پخش می‌کند. خاموش: همیشه خود گوشی آن‌ها را پخش می‌کند.</string>
+    <string name="play_as">پخش صداها به‌صورت</string>
+    <string name="play_media">رسانه</string>
+    <string name="play_call">تماس تلفنی</string>
+    <string name="play_ear">کنار گوش</string>
+    <string name="play_media_sound">بهترین کیفیت صدا، بلندی رسانه</string>
+    <string name="play_media_echo">اگر از فشار برای صحبت یا هدفون استفاده نکنید، شاید دیگران اکو بشنوند</string>
+    <string name="play_media_bluetooth">از میکروفون هدفون بلوتوثی نمی‌توان استفاده کرد</string>
+    <string name="play_call_echo">بدون اکو، بلندی تماس</string>
+    <string name="play_call_bluetooth">میکروفون هدفون بلوتوثی کار می‌کند</string>
+    <string name="play_call_quieter">آرام‌تر؛ صدای بلوتوث با کیفیت تماس است</string>
+    <string name="play_call_speakers">بلندگوهای بلوتوثی بدون میکروفون استفاده نمی‌شوند</string>
+    <string name="play_ear_screen">کنار گوش، صفحه خاموش می‌شود</string>
+    <string name="play_ear_quieter">آرام‌تر، چون برای کنار گوش است</string>
+    <string name="capture_echo_follows">حذف اکو وقتی روشن است که صداها به‌صورت تماس تلفنی پخش شوند (پخش › پخش صداها به‌صورت).</string>
+    <string name="a11y_pro">مزیت: %1$s</string>
+    <string name="a11y_con">عیب: %1$s</string>
+    <string name="audio_in_use">صدای در حال استفاده</string>
+    <string name="audio_in_use_idle">برای دیدن آنچه پخش و ضبط می‌شود، به یک سرور وصل شوید.</string>
+    <string name="audio_in_use_unsaved">تغییرات پس از «ذخیره و اعمال» اینجا نمایش داده می‌شوند.</string>
+    <string name="audio_mode">حالت</string>
+    <string name="audio_mode_call">تماس تلفنی</string>
+    <string name="audio_mode_media">رسانه</string>
+    <string name="audio_playback">پخش</string>
+    <string name="audio_playback_waiting">وقتی کسی صحبت کند نمایش داده می‌شود</string>
+    <string name="audio_microphone">میکروفون</string>
+    <string name="audio_mic_phone">میکروفون گوشی</string>
+    <string name="audio_mic_wired">میکروفون هدست (سیمی)</string>
+    <string name="audio_mic_none">ضبط نمی‌شود</string>
+    <string name="audio_mic_no_permission">بدون اجازه</string>
+    <string name="audio_device_wired">هدفون سیمی</string>
+    <string name="audio_device_bluetooth">%1$s (بلوتوث)</string>
+    <string name="audio_device_bluetooth_call">%1$s (بلوتوث، کیفیت تماس)</string>
+    <string name="audio_device_bluetooth_le">%1$s (بلوتوث LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (سمعک)</string>
+    <string name="audio_device_unnamed">هدفون</string>
+    <string name="audio_device_other">دستگاه دیگر (%1$d)</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">بلندی میکروفون</string>
+    <string name="capture_activation">فعال‌سازی</string>
+    <string name="capture_vad">فعال‌سازی با صدا</string>
+    <string name="capture_ptt">فشار برای صحبت</string>
+    <string name="capture_continuous">ارسال پیوسته</string>
+    <string name="capture_ptt_desc">هنگام صحبت، دکمه «برای صحبت نگه دارید» را نگه دارید.</string>
+    <string name="capture_level">سطح</string>
+    <string name="capture_level_desc">تا وقتی این تنظیمات باز است، نوار صدای میکروفون شما را نشان می‌دهد، حتی وقتی بی‌صداست. صحبت مثل همیشه ادامه دارد.</string>
+    <string name="capture_vad_level">سطح فعال‌سازی با صدا</string>
+    <string name="capture_vad_level_desc">برای جلوگیری از نویز پس‌زمینه، آن را بالا ببرید. اگر صدایتان قطع می‌شود، پایین بیاورید.</string>
+    <string name="capture_vad_delay">تأخیر پیش از غیرفعال شدن</string>
+    <string name="capture_processing">پردازش سیگنال</string>
+    <string name="capture_noise">حذف نویز پس‌زمینه</string>
+    <string name="capture_agc">کنترل خودکار بهره</string>
+    <string name="echo_refused">این گوشی نمی‌تواند صدای تماس را از بلندگو پخش کند، پس صداها به‌صورت رسانه پخش می‌شوند. فشار برای صحبت یا هدفون از اکو جلوگیری می‌کند.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">نمایش امکانات ادمین</string>
+    <string name="ui_controls_bottom">دکمه‌ها در پایین</string>
+    <string name="ui_controls_bottom_desc">دکمه‌های میکروفون، صدا و اشتراک‌گذاری و کلید کانال‌ها/چت پایین صفحه قرار می‌گیرند، در دسترس انگشت شست شما.</string>
+    <string name="ui_language">زبان</string>
+    <string name="ui_language_phone">زبان گوشی</string>
+    <string name="ui_admin_desc">منوی هر فرد گزینه‌های انتقال او به کانال دیگر، اخراج از کانال یا سرور و بن کردن را هم دارد. سرور تصمیم می‌گیرد که اجازه دارید یا نه: بدون مجوز، درخواست را رد می‌کند.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">اتصال ویدیو</string>
+    <string name="relay_desc">استریم‌ها مستقیم بین شما و طرف مقابل جابه‌جا می‌شوند. پشت برخی شبکه‌ها به یک رله (سرور TURN) نیاز دارند: اگر دارید، اینجا واردش کنید.</string>
+    <string name="relay_address">رله (turn:host:port)</string>
+    <string name="relay_user">نام کاربری رله</string>
+    <string name="relay_password">رمز رله</string>
+    <string name="relay_only">همیشه از طریق رله</string>
+    <string name="advanced_file_port">سروری که انتقال فایلش روی پورت دیگری است (تصویرها و آواتارهایش بارگیری نمی‌شوند) می‌تواند در بخش «پیشرفته» علاقه‌مندی، پورت خودش را داشته باشد.</string>
+    <string name="passwords_title">رمزهای کانال</string>
+    <string name="passwords_desc">با رمزهایی که به خاطر سپرده‌اید، با یک لمس وارد کانالشان می‌شوید. این رمزها رمزگذاری‌شده روی این گوشی نگه داشته می‌شوند.</string>
+    <string name="passwords_forget">فراموش کردن رمزهای ذخیره‌شده</string>
+    <string name="passwords_forgotten">فراموش شد.</string>
+    <string name="identity_title">هویت TeamSpeak</string>
+    <string name="identity_desc">هویت شما چیزی است که سرورها شما را با آن می‌شناسند (گروه‌ها و مجوزهایتان). یک نسخه از آن نگه دارید، یا از هویت یک برنامه TeamSpeak دیگر استفاده کنید.</string>
+    <string name="identity_wipe">پاک کردن</string>
+    <string name="identity_export">خروجی</string>
+    <string name="identity_import">وارد کردن</string>
+    <string name="identity_imported">وارد شد. از اتصال بعدی استفاده می‌شود.</string>
+    <string name="identity_saved">ذخیره شد. فایل را جایی نگه دارید که فقط خودتان به آن دسترسی دارید.</string>
+    <string name="identity_wiped">پاک شد. در اتصال بعدی هویت جدیدی ساخته می‌شود.</string>
+    <string name="identity_export_title">خروجی گرفتن از هویت</string>
+    <string name="identity_export_subtitle">آن را خصوصی نگه دارید</string>
+    <string name="identity_save_file">ذخیره در فایل</string>
+    <string name="identity_export_what">این فایل خود هویت شماست: هر کس آن را داشته باشد، در همه سرورها همان شماست، با گروه‌ها و مجوزهایتان، مثل مجوزهای ادمین سرور. هیچ‌کس نمی‌تواند تفاوت را تشخیص دهد.</string>
+    <string name="identity_export_where">آن را جایی ذخیره کنید که فقط خودتان به آن دسترسی دارید، مثل همین گوشی یا یک فضای ذخیره‌سازی خصوصی. آن را در چت یا ایمیل نفرستید و جایی منتشر نکنید. برنامه‌های TeamSpeak می‌توانند آن را باز کنند، PocketTS روی گوشی دیگر هم.</string>
+    <string name="identity_wipe_title">هویت پاک شود؟</string>
+    <string name="identity_wipe_what">هویت این گوشی حذف می‌شود و دفعه بعد که وصل شوید، هویت جدیدی ساخته می‌شود. از آن پس برای همه سرورها فرد جدیدی هستید: گروه‌ها، مجوزها و هر چه به هویت قبلی‌تان داده شده بود (مثل دسترسی ادمین) منتقل نمی‌شود.</string>
+    <string name="identity_wipe_back">تنها راه بازگشت، نسخه‌ای است که از آن خروجی گرفته‌اید. اگر شاید دوباره لازمش داشته باشید، لغو کنید و اول با «خروجی» از آن نسخه بگیرید.</string>
+    <string name="identity_import_title">وارد کردن هویت</string>
+    <string name="identity_import_subtitle">از یک برنامه TeamSpeak</string>
+    <string name="identity_import_desc">هویتی را که یک برنامه TeamSpeak خروجی گرفته جای‌گذاری کنید، یا فایلی را که ذخیره کرده (.ini) انتخاب کنید. از اتصال بعدی جای هویت فعلی این گوشی را می‌گیرد.</string>
+    <string name="identity_field">هویت</string>
+    <string name="identity_choose_file">انتخاب فایل…</string>
+    <string name="level_title">سطح امنیت</string>
+    <string name="level_desc">برخی سرورها فقط هویت‌هایی با حداقل سطح مشخصی را راه می‌دهند. با بالا بردن سطح، هویت همان می‌ماند، با گروه‌ها و مجوزهایش.</string>
+    <string name="level_raise_button">افزایش سطح</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">شما</string>
+    <string name="person_away">غایب</string>
+    <!-- %1$s is their away message -->
+    <string name="person_away_message">غایب: %1$s</string>
+    <string name="person_volume">بلندی صدا برای شما</string>
+    <string name="away_message_field">پیام غیبت (اختیاری)</string>
+    <string name="away_back">برگشتم</string>
+    <string name="away_update">به‌روزرسانی</string>
+    <string name="away_set">اعلام غیبت</string>
+    <string name="poke">پوک</string>
+    <string name="chat">چت</string>
+    <!-- %1$s is the person's name -->
+    <string name="poke_title">پوک به %1$s</string>
+    <string name="poke_subtitle">یک پنجره با پیام شما برایش باز می‌شود</string>
+    <string name="poke_message_field">پیام (اختیاری)</string>
+    <!-- A poke received: %1$s is who poked -->
+    <string name="poked_you">%1$s شما را پوک کرد</string>
+    <string name="dismiss">بستن</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">ادمین</string>
+    <string name="admin_move">انتقال</string>
+    <string name="admin_kick">اخراج</string>
+    <string name="admin_ban">بن</string>
+    <!-- %1$s is the person's name -->
+    <string name="admin_move_title">انتقال %1$s</string>
+    <string name="admin_move_subtitle">کانال را انتخاب کنید</string>
+    <!-- The channel the person is in now -->
+    <string name="admin_here_now">الان اینجاست</string>
+    <string name="admin_has_password">رمز دارد</string>
+    <string name="admin_kick_title">اخراج %1$s</string>
+    <string name="admin_kick_subtitle">دلیل را می‌بیند</string>
+    <string name="admin_kick_channel">از کانال (به کانال پیش‌فرض)</string>
+    <string name="admin_kick_server">از سرور</string>
+    <string name="admin_reason">دلیل (اختیاری)</string>
+    <string name="admin_ban_title">بن کردن %1$s</string>
+    <string name="admin_ban_subtitle">هویت و آدرس IP او بن می‌شود</string>
+    <string name="ban_10_minutes">۱۰ دقیقه</string>
+    <string name="ban_1_hour">۱ ساعت</string>
+    <string name="ban_1_day">۱ روز</string>
+    <string name="ban_1_week">۱ هفته</string>
+    <string name="ban_permanently">دائمی</string>
+
+    <!-- Server info -->
+    <string name="info_title">اطلاعات سرور</string>
+    <string name="key_button">کلید دسترسی ویژه</string>
+    <string name="key_title">استفاده از کلید دسترسی ویژه</string>
+    <string name="key_subtitle">از ادمین سرور</string>
+    <string name="key_field">کلید دسترسی ویژه</string>
+    <string name="key_use">استفاده</string>
+    <string name="key_desc">کلید دسترسی ویژه به شما در این سرور دسترسی‌هایی مثل یک گروه سرور می‌دهد. هر کلید فقط یک بار کار می‌کند. فقط از کلیدهای کسی که به او اعتماد دارید استفاده کنید.</string>
+    <string name="key_used">کلید دسترسی ویژه استفاده شد: دسترسی‌های جدید شما فعال است.</string>
+    <string name="info_users">کاربران</string>
+    <string name="info_channels">کانال‌ها</string>
+    <string name="info_uptime">زمان روشن بودن</string>
+    <string name="info_created">ساخته‌شده</string>
+    <!-- %1$s is a time span, such as "3 months" -->
+    <string name="info_ago">%1$s پیش</string>
+    <plurals name="span_minutes">
+        <item quantity="one">%1$d دقیقه</item>
+        <item quantity="other">%1$d دقیقه</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="one">%1$d ساعت</item>
+        <item quantity="other">%1$d ساعت</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="one">%1$d روز</item>
+        <item quantity="other">%1$d روز</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="one">%1$d ماه</item>
+        <item quantity="other">%1$d ماه</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="one">%1$d سال</item>
+        <item quantity="other">%1$d سال</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <!-- %1$d is the level the server needs -->
+    <string name="level_needed_title">سطح امنیت %1$d لازم است</string>
+    <string name="level_raise_title">افزایش سطح امنیت</string>
+    <!-- %1$d is the identity's level now -->
+    <string name="level_needed_subtitle">این سرور به آن نیاز دارد. سطح شما %1$d است.</string>
+    <string name="level_yours">سطح شما: %1$d</string>
+    <string name="level_raise">افزایش</string>
+    <!-- %1$s is a rough time, such as "about 3 minutes" -->
+    <string name="level_estimate">روی این گوشی این کار به‌طور میانگین %1$s طول می‌کشد. ممکن است زودتر یا دیرتر تمام شود.</string>
+    <string name="level_measuring">در حال محاسبه زمان لازم روی این گوشی…</string>
+    <string name="level_desc_raise">افزایش سطح یک کار یک‌باره است. هویت شما همان می‌ماند: گروه‌ها و مجوزهایتان می‌مانند و سطح بالاتر در همه سرورها کار می‌کند. تا وقتی کار ادامه دارد برنامه را باز نگه دارید؛ «توقف» سطحی را که تا آن لحظه رسیده‌اید نگه می‌دارد.</string>
+    <!-- %1$d is the level reached, %2$d the level aimed at -->
+    <string name="level_progress">سطح %1$d از %2$d</string>
+    <string name="level_running_desc">برنامه را باز نگه دارید. هر سطح حدود دو برابر سطح قبلی طول می‌کشد.</string>
+    <string name="level_done">انجام شد: سطح امنیت شما %1$d است.</string>
+    <string name="level_done_connecting">انجام شد: سطح امنیت شما %1$d است. در حال اتصال دوباره…</string>
+    <string name="level_stopped">در سطح %1$d متوقف شد. افزایش دوباره از همان‌جا ادامه پیدا می‌کند.</string>
+    <string name="about_under_minute">کمتر از یک دقیقه</string>
+    <plurals name="about_minutes">
+        <item quantity="one">حدود یک دقیقه</item>
+        <item quantity="other">حدود %1$d دقیقه</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="one">حدود یک ساعت</item>
+        <item quantity="other">حدود %1$d ساعت</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">حدود یک روز</item>
+        <item quantity="other">حدود %1$d روز</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">سرورها</string>
+    <string name="connected">متصل</string>
+    <!-- %1$s is the server's address -->
+    <string name="connecting_to">در حال اتصال به %1$s…</string>
+    <string name="reconnecting_old">در حال اتصال دوباره… سرور هنوز اتصال قبلی شما را نگه داشته است: منتظر می‌مانیم تا رهایش کند.</string>
+    <!-- %1$d is which try this is -->
+    <string name="reconnecting_try">اتصال قطع شد. در حال اتصال دوباره… (تلاش %1$d)</string>
+    <string name="channel_password_subtitle">این کانال رمز دارد</string>
+    <string name="view_channels">کانال‌ها</string>
+    <!-- The stream player's title: %1$s is whose stream -->
+    <string name="stream_title">استریم %1$s</string>
+    <string name="stream_title_unknown">استریم</string>
+    <string name="not_an_address">این شبیه آدرس سرور نیست</string>
+    <!-- A private chat's person left: %1$s is their name -->
+    <string name="private_left">%1$s از سرور خارج شد</string>
+    <string name="private_left_unknown">از سرور خارج شد</string>
+    <string name="level_not_connected">اتصال برقرار نشد: سرور به سطح امنیت هویت %1$d نیاز دارد. می‌توانید سطح خود را در تنظیمات › پیشرفته افزایش دهید.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">اتصال ممکن نشد: سرور پاسخی نداد. آدرس و پورت را بررسی کنید.</string>
+    <!-- %1$s is the address typed -->
+    <string name="end_no_such_host">اتصال ممکن نشد: سروری در «%1$s» پیدا نشد. آدرس را بررسی کنید.</string>
+    <!-- %1$s is the phone's own error -->
+    <string name="end_cant_connect">اتصال ممکن نشد: %1$s</string>
+    <string name="end_network_error">خطای شبکه: %1$s</string>
+    <string name="end_network_changed">شبکه تغییر کرد</string>
+    <string name="end_network_gone">شبکه قطع شد</string>
+    <string name="end_server_silent">سرور پاسخ نداد</string>
+    <string name="end_server_stopped">سرور دیگر پاسخ نمی‌دهد</string>
+    <string name="end_lost">اتصال قطع شد</string>
+    <string name="end_handshake">برقراری اتصال با سرور ممکن نشد.</string>
+    <string name="end_by_server">سرور اتصال را قطع کرد</string>
+    <string name="end_kicked_channel">از کانال اخراج شدید</string>
+    <!-- %1$s is the reason the admin gave -->
+    <string name="end_kicked_channel_reason">از کانال اخراج شدید: %1$s</string>
+    <string name="end_kicked">از سرور اخراج شدید</string>
+    <string name="end_kicked_reason">از سرور اخراج شدید: %1$s</string>
+    <string name="end_banned">از سرور بن شدید</string>
+    <string name="end_banned_reason">از سرور بن شدید: %1$s</string>
+    <string name="end_shut_down">سرور خاموش شد</string>
+    <string name="end_shut_down_reason">سرور خاموش شد: %1$s</string>
+
+    <!-- Admin actions the server refused: %1$s is the person's name, %2$s the server's reason -->
+    <string name="admin_no_permission_move">اجازه انتقال %1$s را ندارید.</string>
+    <string name="admin_no_permission_kick_channel">اجازه اخراج %1$s از کانال را ندارید.</string>
+    <string name="admin_no_permission_kick_server">اجازه اخراج %1$s از سرور را ندارید.</string>
+    <string name="admin_no_permission_ban">اجازه بن کردن %1$s را ندارید.</string>
+    <string name="admin_failed_move">انتقال %1$s ممکن نشد: %2$s</string>
+    <string name="admin_failed_kick_channel">اخراج %1$s از کانال ممکن نشد: %2$s</string>
+    <string name="admin_failed_kick_server">اخراج %1$s از سرور ممکن نشد: %2$s</string>
+    <string name="admin_failed_ban">بن کردن %1$s ممکن نشد: %2$s</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_no_permission_create">اجازه ساختن کانال %1$s را ندارید.</string>
+    <string name="channel_no_permission_edit">اجازه تغییر %1$s را ندارید.</string>
+    <string name="channel_no_permission_reorder">اجازه جابه‌جا کردن %1$s را ندارید.</string>
+    <string name="channel_no_permission_delete">اجازه حذف %1$s را ندارید.</string>
+    <!-- %1$s: the channel, %2$s: the server's reason -->
+    <string name="channel_failed_create">ساختن %1$s ممکن نشد: %2$s</string>
+    <string name="channel_failed_edit">تغییر %1$s ممکن نشد: %2$s</string>
+    <string name="channel_failed_reorder">جابه‌جا کردن %1$s ممکن نشد: %2$s</string>
+    <string name="channel_failed_delete">حذف %1$s ممکن نشد: %2$s</string>
+    <string name="channels_editing">ویرایش کانال‌ها</string>
+    <string name="channels_add">افزودن</string>
+    <string name="channels_done">تمام</string>
+    <string name="channels_edit_hint">برای جابه‌جا کردن کانال، آن را نگه دارید و بکشید. برای تغییر یا حذف، رویش بزنید.</string>
+    <string name="files_title">فایل‌ها</string>
+    <string name="files_refresh">تازه‌سازی</string>
+    <string name="files_up">یک پوشه بالاتر</string>
+    <string name="files_folder">پوشه</string>
+    <string name="files_download">دانلود</string>
+    <string name="files_empty">این پوشه خالی است.</string>
+    <string name="files_downloading">در حال دانلود %1$s…</string>
+    <string name="files_saved">%1$s ذخیره شد</string>
+    <string name="files_download_cancelled">دانلود %1$s متوقف شد</string>
+    <string name="files_download_failed">دانلود %1$s ممکن نشد: %2$s</string>
+    <string name="files_needs_password">این کانال رمز دارد. برای دیدن فایل‌هایش، یک بار با رمز به آن بپیوندید و رمز را به خاطر بسپارید.</string>
+    <string name="files_no_permission">اجازه دیدن این فایل‌ها را ندارید.</string>
+    <string name="files_not_found">این پوشه دیگر وجود ندارد.</string>
+    <string name="files_not_connected">به سرور وصل نیستید.</string>
+    <string name="files_upload">آپلود</string>
+    <string name="files_new_folder">پوشه جدید</string>
+    <string name="files_create">ساختن</string>
+    <string name="files_rename">تغییر نام</string>
+    <string name="files_rename_title">تغییر نام %1$s</string>
+    <string name="files_name">نام</string>
+    <string name="files_uploading">در حال آپلود %1$s…</string>
+    <string name="files_uploaded">%1$s آپلود شد</string>
+    <string name="files_upload_cancelled">آپلود %1$s متوقف شد</string>
+    <string name="files_upload_failed">آپلود %1$s ممکن نشد: %2$s</string>
+    <string name="files_unreadable">خواندن آن فایل ممکن نشد.</string>
+    <string name="files_no_permission_change">سرور اینجا اجازه این کار را به شما نمی‌دهد.</string>
+    <string name="files_gone">دیگر وجود ندارد.</string>
+    <string name="files_exists">چیزی با این نام از قبل اینجا هست.</string>
+    <string name="files_delete_title">%1$s حذف شود؟</string>
+    <string name="files_delete_file">فایل برای همه از سرور حذف می‌شود.</string>
+    <string name="files_delete_folder">پوشه و هر چه در آن است برای همه از سرور حذف می‌شود.</string>
+    <string name="files_replace_title">%1$s جایگزین شود؟</string>
+    <string name="files_replace_text">فایلی با این نام از قبل اینجا هست. با جایگزین کردن، فایل قبلی برای همه حذف می‌شود.</string>
+    <string name="files_replace">جایگزین کردن</string>
+    <string name="channel_info_here">شما در این کانال هستید</string>
+    <string name="channel_info_talk_power">قدرت صحبت لازم</string>
+    <string name="channel_info_default">کانال پیش‌فرض سرور</string>
+    <string name="channel_info_no_description">بدون توضیحات</string>
+    <string name="channel_info_loading">در حال بارگیری…</string>
+    <string name="channel_info_arrange">مرتب کردن</string>
+    <plurals name="channel_people">
+        <item quantity="one">%d نفر</item>
+        <item quantity="other">%d نفر</item>
+    </plurals>
+    <string name="channel_new_title">کانال جدید</string>
+    <string name="channel_new_subtitle">سرور تعیین می‌کند چه نوع کانال‌هایی می‌توانید بسازید.</string>
+    <string name="channel_edit_subtitle">تنظیمات کانال</string>
+    <string name="channel_create">ساختن</string>
+    <string name="channel_name">نام</string>
+    <string name="channel_description">توضیحات</string>
+    <string name="channel_kind">نوع</string>
+    <string name="channel_kind_permanent">دائمی</string>
+    <string name="channel_kind_semi">نیمه‌دائمی</string>
+    <string name="channel_kind_temporary">موقت</string>
+    <string name="channel_kind_permanent_desc">تا وقتی حذف نشود می‌ماند.</string>
+    <string name="channel_kind_semi_desc">تا راه‌اندازی دوباره سرور می‌ماند.</string>
+    <string name="channel_kind_temporary_desc">وقتی آخرین نفر خارج شود، از بین می‌رود. پس از ساخته شدن، به آن منتقل می‌شوید.</string>
+    <string name="channel_password_on">رمز</string>
+    <string name="channel_password_keep">برای حفظ رمز فعلی، خالی بگذارید</string>
+    <string name="channel_codec">کدک صدا</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <!-- %1$d: 0 to 10 -->
+    <string name="channel_quality">کیفیت: %1$d</string>
+    <string name="channel_unlimited">کاربران نامحدود</string>
+    <string name="channel_max_users">حداکثر کاربران</string>
+    <string name="channel_parent">داخل</string>
+    <string name="channel_top_level">بالاترین سطح</string>
+    <string name="channel_parent_change">تغییر</string>
+    <string name="channel_parent_title">کجا قرار بگیرد</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_delete_title">%1$s حذف شود؟</string>
+    <string name="channel_delete_subtitle">این کار برگشت‌پذیر نیست.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="one">%d زیرکانال آن هم حذف می‌شود.</item>
+        <item quantity="other">%d زیرکانال آن هم حذف می‌شوند.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="one">%d نفر به کانال پیش‌فرض منتقل می‌شود.</item>
+        <item quantity="other">%d نفر به کانال پیش‌فرض منتقل می‌شوند.</item>
+    </plurals>
+    <string name="channel_delete_empty">کسی در آن نیست.</string>
+    <string name="admin_move_needs_password">انتقال %1$s ممکن نشد: کانال رمز دارد. برای انتقال افراد به آنجا، یک بار با رمز به آن بپیوندید و رمز را به خاطر بسپارید.</string>
+
+    <!-- Sending pictures: %1$s / %3$s is the reason -->
+    <string name="picture_not_sent">تصویر ارسال نشد: %1$s</string>
+    <!-- %1$d is which picture, %2$d of how many -->
+    <string name="pictures_not_sent">تصویر %1$d از %2$d ارسال نشد: %3$s</string>
+    <string name="picture_no_permission">%1$s (بدون اجازه در این کانال)</string>
+    <!-- %1$d is the limit in megabytes -->
+    <string name="picture_too_big">تصویر خیلی بزرگ است (بیش از %1$d مگابایت).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">در حال آپلود…</string>
+    <string name="avatar_set">تصویر پروفایل تنظیم شد.</string>
+    <string name="avatar_too_big">این سرور فقط تصویر پروفایل خیلی کوچک را می‌پذیرد، یا اصلاً نمی‌پذیرد.</string>
+    <string name="avatar_not_allowed">این سرور به شما اجازه تصویر پروفایل نمی‌دهد.</string>
+    <string name="avatar_failed">تصویر پروفایل تنظیم نشد: %1$s</string>
+    <string name="avatar_removed">تصویر پروفایل برداشته شد.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">این یک هویت TeamSpeak نیست.</string>
+    <string name="identity_unreadable">هویت ذخیره‌شده روی این گوشی باز نمی‌شود. هویت خود را در تنظیمات › پیشرفته › هویت TeamSpeak وارد کنید، یا همان‌جا یک هویت جدید بسازید.</string>
+    <string name="identity_export_unreadable">هویت خوانده نمی‌شود، پس ذخیره هم نمی‌شود.</string>
+    <string name="file_not_written">نوشتن آن فایل ممکن نشد.</string>
+    <string name="file_not_opened">آن فایل باز نمی‌شود.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel">اتصال</string>
+    <string name="notification_mute">بی‌صدا</string>
+    <string name="notification_unmute">لغو بی‌صدا</string>
+    <string name="notification_sound_off">صدا خاموش</string>
+    <string name="notification_sound_on">صدا روشن</string>
+    <string name="notification_messages">پیام‌ها و پوک‌ها</string>
+    <!-- %1$s is the server's name or address -->
+    <string name="notification_connected">متصل به %1$s</string>
+    <string name="notification_connecting">در حال اتصال به %1$s</string>
+    <string name="notification_reconnecting">در حال اتصال دوباره به %1$s…</string>
+    <string name="notification_sharing_camera">در حال اشتراک‌گذاری دوربین</string>
+    <string name="notification_sharing_cameras">در حال اشتراک‌گذاری دوربین‌ها</string>
+    <string name="notification_sharing_screen">در حال اشتراک‌گذاری صفحه</string>
+    <string name="whisper">نجوا</string>
+    <string name="hold_to_whisper">برای نجوا نگه دارید</string>
+    <string name="whispering_to_you">%1$s با شما نجوا می‌کند</string>
+    <string name="whisper_list_line">نجوا: %1$s</string>
+    <string name="whisper_clear">پاک کردن همه</string>
+    <string name="whisper_remove">حذف از فهرست</string>
+    <string name="whisper_channel">نجوا با کانال</string>
+    <string name="whisper_channel_off">توقف نجوا با کانال</string>
+    <string name="whisper_list_title">فهرست نجوا</string>
+    <string name="whisper_list_subtitle">تا وقتی دکمه نجوا را نگه داشته‌اید، فقط این‌ها صدایتان را می‌شنوند.</string>
+    <string name="capture_ai_noise">حذف نویز با هوش مصنوعی (RNNoise)</string>
+    <string name="capture_ai_noise_desc">صدای کیبورد، پنکه، تلویزیون و نویزهای دیگری را هم که حذف نویز خود گوشی رد می‌کند، با یک شبکه عصبی کوچک روی گوشی حذف می‌کند. کمی باتری بیشتر مصرف می‌کند.</string>
+    <string name="capture_ai_noise_license">مجوز RNNoise</string>
+    <string name="share_torch_on">چراغ‌قوه روشن (برای خاموش کردن بزنید)</string>
+    <string name="share_torch_off">چراغ‌قوه: آنچه دوربین عقب فیلم می‌گیرد را روشن می‌کند</string>
+    <string name="share_camera_lost">دوربین متوقف شد: یک تماس، برنامه‌ای دیگر یا خود گوشی آن را گرفت.</string>
+    <string name="share_preview_small">کوچک کردن پیش‌نمایش</string>
+    <string name="share_lens_switch">لنز %1$s: برای لنز بعدی بزنید</string>
+    <string name="debug_log_title">گزارش اشکال‌زدایی</string>
+    <string name="debug_log">نگه داشتن گزارش اشکال‌زدایی</string>
+    <string name="debug_log_desc">برای گزارش باگ: کارهایی که برنامه انجام می‌دهد، از جمله کرش‌ها، فقط روی این گوشی نگه داشته می‌شود. آدرس سرورها، نام‌ها و پیام‌ها حذف می‌شوند. برنامه هرگز آن را نمی‌فرستد: خودتان آن را به اشتراک بگذارید، مثلاً در یک گزارش باگ در GitHub. با خاموش کردن این گزینه، گزارش حذف می‌شود.</string>
+    <string name="debug_log_share">اشتراک‌گذاری گزارش</string>
+    <string name="debug_log_delete">حذف گزارش</string>
+    <string name="debug_log_empty">گزارش اشکال‌زدایی فعلاً خالی است.</string>
+    <string name="debug_log_deleted">گزارش اشکال‌زدایی حذف شد.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">روشن</string>
+    <string name="a11y_off">خاموش</string>
+    <string name="a11y_about">درباره %1$s</string>
+    <string name="a11y_talk_start">شروع صحبت</string>
+    <string name="a11y_talk_stop">توقف صحبت</string>
+    <string name="a11y_whisper_start">شروع نجوا</string>
+    <string name="a11y_whisper_stop">توقف نجوا</string>
+    <string name="a11y_talking">در حال صحبت</string>
+    <string name="a11y_whispering">در حال نجوا</string>
+    <string name="a11y_unread">پیام‌های خوانده‌نشده</string>
+    <string name="a11y_move_up">انتقال به بالا</string>
+    <string name="a11y_move_down">انتقال به پایین</string>
+    <string name="a11y_show_controls">نمایش دکمه‌ها</string>
+    <string name="a11y_hide_controls">پنهان کردن دکمه‌ها</string>
+    <string name="a11y_preview_bigger">بزرگ‌تر کردن پیش‌نمایش</string>
+    <string name="a11y_preview_smaller">کوچک‌تر کردن پیش‌نمایش</string>
+</resources>

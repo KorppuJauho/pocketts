@@ -168,10 +168,16 @@ private fun Chip(text: String, color: Color) {
 @Composable
 fun ValueBadge(text: String) {
     Text(
-        text, color = Ts.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+        ltr(text), color = Ts.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
         modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(Ts.accent.copy(alpha = 0.16f)).padding(horizontal = 8.dp, vertical = 3.dp),
     )
 }
+
+/**
+ * A value that reads left to right (a number with its unit, a count like 3 / 10), kept so within right-to-left text:
+ * there it would read "10 / 3" or "s 0.6". Unicode's left-to-right isolate around it, which shows nothing.
+ */
+fun ltr(text: String) = "\u2066$text\u2069"
 
 /** Writing a poke. */
 @Composable
@@ -248,7 +254,7 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeK
                 val max = v["virtualserver_maxclients"]?.toIntOrNull() ?: 0
                 val res = androidx.compose.ui.platform.LocalResources.current
                 val stats = buildList {
-                    add(res.getString(R.string.info_users) to if (max > 0) "${state.clientCount} / $max" else "${state.clientCount}")
+                    add(res.getString(R.string.info_users) to if (max > 0) ltr("${state.clientCount} / $max") else "${state.clientCount}")
                     add(res.getString(R.string.info_channels) to "${state.channelCount}")
                     v["virtualserver_uptime"]?.toLongOrNull()?.let {
                         val since = v["received_at"]?.toLongOrNull()?.let { at -> System.currentTimeMillis() - at } ?: 0
@@ -321,7 +327,7 @@ fun ChannelInfoDialog(
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (here) Text(stringResource(R.string.channel_info_here), color = Ts.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             val stats = buildList {
-                add(res.getString(R.string.info_users) to if (ch.maxClients >= 0) "$people / ${ch.maxClients}" else "$people")
+                add(res.getString(R.string.info_users) to if (ch.maxClients >= 0) ltr("$people / ${ch.maxClients}") else "$people")
                 add(
                     res.getString(R.string.channel_kind) to res.getString(
                         when {
