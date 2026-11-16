@@ -17,8 +17,8 @@ object AppLanguage {
     /** The translations, each by its own name ("" is the phone's language). */
     val choices = listOf(
         "en" to "English", "fi" to "Suomi", "de" to "Deutsch", "es" to "Español",
-        "fr" to "Français", "pt" to "Português", "pl" to "Polski", "tr" to "Türkçe", "zh-Hans" to "简体中文",
-        "ru" to "Русский", "cs" to "Čeština",
+        "fr" to "Français", "it" to "Italiano", "pt" to "Português", "pl" to "Polski", "tr" to "Türkçe",
+        "zh-Hans" to "简体中文", "ru" to "Русский", "uk" to "Українська", "cs" to "Čeština",
     )
 
     private fun prefs(context: Context) = context.getSharedPreferences("settings", Context.MODE_PRIVATE)

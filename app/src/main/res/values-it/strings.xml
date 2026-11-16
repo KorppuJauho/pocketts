@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Italian. TeamSpeak's own words follow the TeamSpeak client's Italian translation where known, see TRANSLATIONS.md. -->
+<resources>
+    <!-- Shared -->
+    <string name="cancel">Annulla</string>
+    <string name="save">Salva</string>
+    <string name="delete">Elimina</string>
+    <string name="edit">Modifica</string>
+    <string name="remove">Rimuovi</string>
+    <string name="close">Chiudi</string>
+    <string name="advanced">Avanzate</string>
+    <string name="connect">Connetti</string>
+    <string name="link_title">Connetterti a %1$s?</string>
+    <string name="link_subtitle">Da un link TeamSpeak</string>
+    <string name="link_subtitle_invite">Da un invito TeamSpeak</string>
+    <string name="link_address">Indirizzo</string>
+    <string name="invite_expired">Questo invito è scaduto o non esiste. Chiedine uno nuovo, oppure l\'indirizzo del server.</string>
+    <string name="invite_failed">Impossibile trovare l\'invito. Controlla la connessione e riprova.</string>
+    <string name="link_channel">Canale</string>
+    <string name="link_password">Password del server</string>
+    <string name="link_password_given">nel link</string>
+    <string name="link_leaving">Prima uscirai da %1$s.</string>
+    <string name="link_use_key">Usa la chiave privilegi del link</string>
+    <string name="link_use_key_desc">Ti dà diritti su questo server, ad esempio da admin. Usala solo se ti fidi di chi ha inviato il link.</string>
+    <string name="disconnect">Disconnetti</string>
+    <string name="nickname">Nickname</string>
+    <string name="server_address">Indirizzo o nickname del server</string>
+    <string name="server_password">Password del server</string>
+    <string name="remember_password">Ricorda la password</string>
+    <string name="channel_password">Password del canale</string>
+    <string name="join">Entra</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">Preferiti</string>
+    <string name="favourites_in">Nei preferiti</string>
+    <string name="favourites_save">Salva nei preferiti</string>
+    <string name="favourite_edit">Modifica preferito</string>
+    <string name="favourite_add">Aggiungi ai preferiti</string>
+    <string name="favourite_name">Nome nelle tue liste</string>
+    <string name="favourite_nickname">Il tuo nickname su questo server</string>
+    <string name="favourite_auto">Connetti automaticamente all\'apertura dell\'app</string>
+    <string name="favourite_file_port">Porta trasferimento file</string>
+    <string name="favourite_file_port_hint">Quella del server (di solito 30033)</string>
+    <string name="favourite_file_port_desc">Solo se le immagini e gli avatar del server non si caricano: il suo trasferimento file è su un\'altra porta.</string>
+    <string name="favourite_folder">Cartella</string>
+    <string name="favourite_folder_new">Nuova cartella…</string>
+    <string name="folder_name">Nome della cartella</string>
+    <string name="folder_edit">Modifica cartella</string>
+    <string name="folder_fold">chiudi la cartella</string>
+    <string name="folder_unfold">apri la cartella</string>
+    <string name="connect_show">Apri il pannello di connessione</string>
+    <string name="connect_hide">Chiudi il pannello di connessione</string>
+    <string name="community_tab">Community</string>
+    <string name="community_desc">Server pubblici gestiti da TeamSpeak. Toccane uno per entrare.</string>
+    <string name="community_desc_no_nick">Server pubblici gestiti da TeamSpeak. Scrivi un nickname qui sopra per entrare.</string>
+    <string name="community_worldwide">Tutto il mondo</string>
+    <string name="community_eu_east">Europa dell\'Est</string>
+    <string name="community_emea">Europa, Medio Oriente e Africa</string>
+    <string name="community_apac">Asia-Pacifico</string>
+    <string name="community_latam">America Latina</string>
+    <string name="community_na">America del Nord</string>
+    <string name="favourite_channel">Canale in cui entrare</string>
+    <string name="favourite_channel_hint">Il canale predefinito del server</string>
+    <string name="favourite_channel_desc">Il nome del canale, scritto come lo mostra il server. Per un canale dentro un altro, indica il percorso: Giochi/Lobby.</string>
+    <string name="channel_not_joined">Impossibile entrare in %1$s: il canale non esiste o la password è sbagliata. Sei nel canale predefinito del server.</string>
+    <string name="update_title">È uscito PocketTS %1$s</string>
+    <string name="update_text">Su GitHub c\'è una versione più recente di questa (%1$s).</string>
+    <string name="not_now">Non ora</string>
+    <string name="download">Scarica</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">Impostazioni</string>
+    <string name="hold_to_talk">Tieni premuto per parlare</string>
+    <string name="microphone">Microfono</string>
+    <string name="sound">Audio</string>
+    <string name="share">Condividi</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">Password</string>
+    <string name="person_sound_off">Audio disattivato</string>
+    <string name="person_mic_off">Microfono disattivato</string>
+    <string name="person_cant_talk">Non può parlare in questo canale</string>
+    <string name="person_streaming">In streaming</string>
+    <!-- Short tags after a name, in capitals as in the TeamSpeak app -->
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">TU</string>
+
+    <!-- Chat -->
+    <string name="event_connected">%1$s si è connesso</string>
+    <string name="event_joined_from">%1$s è entrato provenendo da %2$s</string>
+    <string name="event_you_moved_to">Sei stato spostato in %1$s</string>
+    <string name="event_you_kicked_from">Sei stato espulso da %1$s</string>
+    <string name="event_moved_here_from">%1$s è stato spostato qui da %2$s</string>
+    <string name="event_kicked_from">%1$s è stato espulso da %2$s</string>
+    <string name="event_moved_to">%1$s è stato spostato in %2$s</string>
+    <string name="event_kicked_from_channel">%1$s è stato espulso dal canale</string>
+    <string name="event_left_to">%1$s è andato in %2$s</string>
+    <string name="event_you_kicked_from_server">Sei stato espulso dal server</string>
+    <string name="event_you_banned">Sei stato bannato</string>
+    <string name="event_lost_connection">%1$s ha perso la connessione</string>
+    <string name="event_kicked_from_server">%1$s è stato espulso dal server</string>
+    <string name="event_banned">%1$s è stato bannato</string>
+    <string name="event_disconnected">%1$s si è disconnesso</string>
+    <!-- Added after a line: who did it, and the reason they gave. Keep the space at the start -->
+    <string name="event_by">" da parte di %1$s"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <!-- A channel without a name -->
+    <string name="event_another_channel">un altro canale</string>
+    <string name="chat_channel">Canale</string>
+    <string name="chat_empty_channel">Ancora nessun messaggio in questo canale.</string>
+    <string name="chat_empty_private">Ancora nessun messaggio.</string>
+    <string name="chat_message_to">Messaggio a %1$s…</string>
+    <string name="chat_message_to_channel">Messaggio al canale…</string>
+    <string name="chat_message_to_them">Messaggio…</string>
+    <string name="chat_system">Sistema</string>
+    <string name="chat_link_open">Apri: %1$s</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="one">Al massimo %1$d immagine alla volta.</item>
+        <item quantity="many">Al massimo %1$d immagini alla volta.</item>
+        <item quantity="other">Al massimo %1$d immagini alla volta.</item>
+    </plurals>
+    <string name="chat_camera_needed">Per scattare una foto devi consentire l\'uso della fotocamera.</string>
+    <string name="chat_sending_picture">Invio immagine %1$d di %2$d…</string>
+    <string name="chat_attached_picture">Un\'immagine allegata</string>
+    <string name="chat_remove_picture">Rimuovi l\'immagine</string>
+    <string name="chat_send_picture">Invia un\'immagine</string>
+    <string name="chat_choose_pictures">Scegli immagini</string>
+    <string name="chat_take_photo">Scatta una foto</string>
+    <string name="chat_send">Invia</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">Salva nella galleria</string>
+    <string name="picture_saved">Salvata in %1$s</string>
+    <string name="picture_failed">Non ha funzionato: %1$s</string>
+
+    <!-- Streams: watching -->
+    <string name="stream_watch">GUARDA</string>
+    <string name="stream_small_window">Finestra piccola</string>
+    <string name="stream_full_screen">Schermo intero</string>
+    <string name="stream_resize">Trascina per cambiare la dimensione dello stream</string>
+    <string name="stream_mini">Stream piccolo: tocca per ingrandirlo, trascina per spostarlo</string>
+    <string name="stream_leave_full_screen">Esci da schermo intero</string>
+    <string name="stream_stop_watching">Smetti di guardare</string>
+    <string name="stream_sound_on">Audio attivo</string>
+    <string name="stream_sound_off">Audio disattivato</string>
+    <string name="stream_requesting">Richiesta di accesso…</string>
+    <string name="stream_connecting">Connessione…</string>
+    <string name="stream_paused">In pausa</string>
+    <string name="stream_waiting_picture">Connesso, in attesa dell\'immagine…</string>
+    <string name="stream_trying">Problema di connessione, sto riprovando…</string>
+    <string name="stream_connection_lost">Connessione persa.</string>
+    <string name="stream_open_failed">Impossibile aprire lo stream.</string>
+    <string name="stream_denied">La richiesta dello stream è stata rifiutata.</string>
+    <string name="stream_ended">Stream terminato.</string>
+    <string name="stream_ended_left_channel">Stream terminato (non sei più nello stesso canale).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">Condividi la fotocamera</string>
+    <string name="share_screen_title">Condividi lo schermo</string>
+    <string name="share_subtitle">Tutti nel tuo canale possono guardare</string>
+    <string name="start">Avvia</string>
+    <string name="stop">Ferma</string>
+    <string name="share_what">Cosa</string>
+    <string name="share_camera">Fotocamera</string>
+    <string name="share_screen">Schermo</string>
+    <string name="share_both_cameras">Entrambe le fotocamere</string>
+    <string name="camera_front">Anteriore</string>
+    <string name="camera_back">Posteriore</string>
+    <string name="camera_both">Entrambe</string>
+    <string name="share_both_desc">La fotocamera posteriore grande, quella anteriore piccola nell\'angolo. Il pulsante di scambio le inverte.</string>
+    <string name="share_quality">Qualità</string>
+    <string name="share_quality_480">Risparmio dati: meno dati possibile, per le reti mobili.</string>
+    <string name="share_quality_720">HD: nitido e abbastanza leggero per la maggior parte delle connessioni.</string>
+    <string name="share_quality_1080">Full HD: il più nitido, serve una buona connessione da entrambe le parti.</string>
+    <string name="share_sound">Audio dello stream</string>
+    <string name="share_sound_on_desc">Chi guarda sente il tuo microfono insieme all\'immagine. Si zittisce mentre il microfono è disattivato e mentre parli nel canale, così non ti si sente due volte.</string>
+    <string name="share_sound_off_desc">Nessun audio con l\'immagine: parla nel canale come al solito.</string>
+    <string name="share_screen_sound">Audio del telefono</string>
+    <string name="share_screen_sound_on_desc">Chi guarda sente ciò che riproduce il telefono, come un video o un gioco. Alcune app non lo consentono e restano mute. Le voci del canale non sono incluse.</string>
+    <string name="share_screen_sound_off_desc">Nessun audio con l\'immagine.</string>
+    <string name="share_screen_sound_watching">Non mentre guardi uno stream: smetti di guardare per condividere anche l\'audio del telefono.</string>
+    <string name="share_screen_desc">Android chiede ancora una volta prima di iniziare. Viene mostrato tutto ciò che c\'è sullo schermo, anche le notifiche.</string>
+    <string name="share_sound_quiet">Audio dello stream muto</string>
+    <string name="share_sound_live">Audio dello stream attivo</string>
+    <string name="share_starting">avvio…</string>
+    <string name="share_paused_call">in pausa durante la chiamata</string>
+    <string name="share_watching">Spettatori</string>
+    <string name="share_swap_cameras">Scambia le fotocamere</string>
+    <string name="share_switch_camera">Cambia fotocamera</string>
+    <string name="share_turn_locked">Rotazione bloccata (tocca per seguire il telefono)</string>
+    <string name="share_turn_follows">La rotazione segue il telefono (tocca per bloccare)</string>
+    <string name="share_light_on">Luce ad anello accesa (tocca per spegnere)</string>
+    <string name="share_light_off">Luce ad anello: uno schermo bianco e luminoso ti illumina il viso</string>
+    <string name="share_both_unsupported">Questo telefono non può usare entrambe le fotocamere insieme.</string>
+    <string name="share_failed">Impossibile avviare la condivisione.</string>
+    <string name="share_refused">TeamSpeak ha rifiutato la condivisione: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Generali</string>
+    <string name="settings_playback">Riproduzione</string>
+    <string name="settings_capture">Acquisizione</string>
+    <string name="settings_ui">Interfaccia</string>
+    <string name="settings_save">Salva e applica</string>
+    <string name="cant_be_undone">Non si può annullare</string>
+    <string name="quiet">Basso</string>
+    <string name="loud">Alto</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">Immagine del profilo</string>
+    <string name="avatar_change">Cambia</string>
+    <string name="avatar_desc">Gli altri la vedono su questo server. È pensata per 320 × 320.</string>
+    <string name="general_floating_ptt">Pulsante push-to-talk mobile</string>
+    <string name="general_floating_ptt_desc">In modalità push-to-talk, un pulsante rotondo resta in fondo alla schermata di PocketTS, così puoi parlare mentre scorri la chat. Il pulsante sopra le altre app (sotto) è un\'impostazione a parte.</string>
+    <string name="general_overlay_ptt">Pulsante per parlare sopra le altre app</string>
+    <string name="general_overlay_ptt_desc">In modalità push-to-talk, appare un pulsante rotondo quando passi ad altre app (non in PocketTS stessa). Tienilo premuto per parlare, trascinalo per spostarlo. Android chiede una volta di consentire a PocketTS di apparire sopra le altre app.</string>
+    <string name="general_volume_ptt">Tasti del volume come push-to-talk</string>
+    <string name="general_volume_ptt_desc">In modalità push-to-talk, tenere premuto un tasto del volume ti fa parlare mentre l\'app è sullo schermo (invece di cambiare il volume).</string>
+    <string name="general_headset_ptt">Tasto delle cuffie come push-to-talk</string>
+    <string name="general_headset_ptt_desc">In modalità push-to-talk, premi il tasto delle cuffie per iniziare a parlare e premilo di nuovo per smettere. Funziona anche a schermo spento. Mentre è attivo, il tasto non avvia né mette in pausa la musica.</string>
+    <string name="general_call_mute">Silenzia durante le chiamate</string>
+    <string name="general_call_mute_desc">Quando una chiamata squilla o inizia, microfono e audio si disattivano (anche l\'audio di uno stream che guardi) e si riattivano quando finisce. Uno stream che condividi va in pausa, così chi guarda non vede la chiamata. Ciò che avevi disattivato tu resta disattivato.</string>
+    <string name="general_updates">Controlla aggiornamenti</string>
+    <string name="general_updates_desc">Una volta al giorno, PocketTS chiede a GitHub se è uscita una versione più recente e lo indica nella schermata di connessione. Non viene inviato nulla su di te.</string>
+    <string name="general_screen_on">Mantieni lo schermo acceso</string>
+    <string name="general_screen_on_desc">Lo schermo non si spegne mentre sei connesso e l\'app è aperta. Mentre condividi o guardi uno stream, resta comunque acceso.</string>
+    <string name="general_spacers">Consenti di entrare nei canali spaziatori</string>
+    <string name="general_spacers_desc">Toccare uno spaziatore (una linea divisoria o un titolo nella lista dei canali) ti fa entrare come in qualsiasi canale. Alcuni server ne usano uno come canale AFK. Se disattivato, non puoi entrarci con un tocco per sbaglio.</string>
+    <string name="history_title">Cronologia chat</string>
+    <!-- %1$s is how many days (history_days), %2$s how many lines (history_lines) -->
+    <string name="history_desc">Le chat dei canali, le chat private e chi è entrato o uscito vengono conservati su questo telefono, cifrati, e mostrati di nuovo quando ti connetti allo stesso server: gli ultimi %1$s, al massimo %2$s per conversazione. I poke non vengono conservati.</string>
+    <plurals name="history_days">
+        <item quantity="one">%1$d giorno</item>
+        <item quantity="many">%1$d giorni</item>
+        <item quantity="other">%1$d giorni</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="one">%1$d riga</item>
+        <item quantity="many">%1$d righe</item>
+        <item quantity="other">%1$d righe</item>
+    </plurals>
+    <string name="history_clear">Cancella la cronologia chat</string>
+    <string name="history_cleared">Cancellata.</string>
+    <string name="history_clear_title">Cancellare la cronologia chat?</string>
+    <string name="history_clear_button">Cancella</string>
+    <string name="history_clear_desc">Le chat salvate di tutti i server vengono rimosse da questo telefono, insieme alla chat ora sullo schermo.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">Volume delle voci</string>
+    <string name="playback_test_sound">Riproduci suono di prova</string>
+    <string name="playback_event_sounds">Suoni per gli eventi</string>
+    <string name="playback_event_sounds_desc">Brevi suoni quando qualcuno entra o esce dal tuo canale, per messaggi, poke e stream, e per i pulsanti del microfono e dell\'audio.</string>
+    <string name="playback_sound_volume">Volume dei suoni</string>
+    <string name="playback_play_sound">Riproduci un suono</string>
+    <string name="playback_call_volume">In modalità chiamata, le voci seguono il volume di chiamata: premi un tasto del volume mentre sei connesso.</string>
+    <string name="playback_media_volume">Le voci seguono il volume multimediale.</string>
+    <string name="playback_output_speaker">Altoparlante</string>
+    <string name="playback_output_earpiece">Auricolare</string>
+    <string name="playback_headset">Usa le cuffie collegate</string>
+    <string name="playback_headset_desc">Cuffie, auricolari con microfono o una cassa Bluetooth riproducono le voci mentre sei connesso. Se disattivato, le riproduce sempre il telefono stesso.</string>
+    <string name="play_as">Riproduci le voci come</string>
+    <string name="play_media">Media</string>
+    <string name="play_call">Chiamata</string>
+    <string name="play_ear">All\'orecchio</string>
+    <string name="play_media_sound">Miglior qualità audio, volume multimediale</string>
+    <string name="play_media_echo">Gli altri potrebbero sentire l\'eco, a meno che tu non usi il push-to-talk o le cuffie</string>
+    <string name="play_media_bluetooth">Il microfono delle cuffie Bluetooth non si può usare</string>
+    <string name="play_call_echo">Eco rimossa, volume di chiamata</string>
+    <string name="play_call_bluetooth">Il microfono delle cuffie Bluetooth funziona</string>
+    <string name="play_call_quieter">Più basso; l\'audio Bluetooth ha qualità da chiamata</string>
+    <string name="play_call_speakers">Le casse Bluetooth senza microfono non vengono usate</string>
+    <string name="play_ear_screen">Lo schermo si spegne all\'orecchio</string>
+    <string name="play_ear_quieter">Più basso, perché è pensato per l\'orecchio</string>
+    <string name="capture_echo_follows">La cancellazione dell\'eco è attiva quando le voci sono riprodotte come chiamata (Riproduzione › Riproduci le voci come).</string>
+    <string name="a11y_pro">Pro: %1$s</string>
+    <string name="a11y_con">Contro: %1$s</string>
+    <string name="audio_in_use">Audio in uso</string>
+    <string name="audio_in_use_idle">Connettiti a un server per vedere cosa riproduce e registra.</string>
+    <string name="audio_in_use_unsaved">Le modifiche appaiono qui dopo Salva e applica.</string>
+    <string name="audio_mode">Modalità</string>
+    <string name="audio_mode_call">Chiamata</string>
+    <string name="audio_mode_media">Media</string>
+    <string name="audio_playback">Riproduzione</string>
+    <string name="audio_playback_waiting">Appare quando qualcuno parla</string>
+    <string name="audio_microphone">Microfono</string>
+    <string name="audio_mic_phone">Microfono del telefono</string>
+    <string name="audio_mic_wired">Microfono delle cuffie (con filo)</string>
+    <string name="audio_mic_none">Non registra</string>
+    <string name="audio_mic_no_permission">Nessun permesso</string>
+    <string name="audio_device_wired">Cuffie con filo</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth, qualità chiamata)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (apparecchio acustico)</string>
+    <string name="audio_device_unnamed">Cuffie</string>
+    <string name="audio_device_other">Altro dispositivo (%1$d)</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">Volume del microfono</string>
+    <string name="capture_activation">Attivazione</string>
+    <string name="capture_vad">Attivazione vocale</string>
+    <string name="capture_ptt">Push-to-talk</string>
+    <string name="capture_continuous">Trasmissione continua</string>
+    <string name="capture_ptt_desc">Tieni premuto il pulsante \"Tieni premuto per parlare\" mentre parli.</string>
+    <string name="capture_level">Livello</string>
+    <string name="capture_level_desc">La barra mostra il tuo microfono mentre queste impostazioni sono aperte, anche quando è disattivato. Si parla come al solito.</string>
+    <string name="capture_vad_level">Livello di attivazione vocale</string>
+    <string name="capture_vad_level_desc">Scorri a destra per bloccare il rumore di fondo. Se la tua voce si interrompe, scorri a sinistra.</string>
+    <string name="capture_vad_delay">Ritardo prima della disattivazione</string>
+    <string name="capture_processing">Elaborazione del segnale</string>
+    <string name="capture_noise">Rimuovi il rumore di fondo</string>
+    <string name="capture_agc">Controllo automatico del guadagno</string>
+    <string name="echo_refused">Questo telefono non può riprodurre l\'audio di chiamata dall\'altoparlante, quindi le voci sono riprodotte come media. Push-to-talk o cuffie evitano l\'eco.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">Mostra le funzioni admin</string>
+    <string name="ui_controls_bottom">Pulsanti in basso</string>
+    <string name="ui_controls_bottom_desc">I pulsanti di microfono, audio e condivisione e lo scambio Canali/Chat stanno in fondo allo schermo, a portata di pollice.</string>
+    <string name="ui_language">Lingua</string>
+    <string name="ui_language_phone">Lingua del telefono</string>
+    <string name="ui_admin_desc">Il menu di una persona offre anche di spostarla in un altro canale, espellerla dal canale o dal server e bannarla. Decide il server se puoi farlo: senza il permesso, rifiuta.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">Connessione video</string>
+    <string name="relay_desc">Gli stream vanno direttamente tra te e l\'altra parte. Dietro alcune reti serve un relay (un server TURN): inseriscine uno qui se ce l\'hai.</string>
+    <string name="relay_address">Relay (turn:host:porta)</string>
+    <string name="relay_user">Nome utente del relay</string>
+    <string name="relay_password">Password del relay</string>
+    <string name="relay_only">Sempre tramite il relay</string>
+    <string name="advanced_file_port">Un server con il trasferimento file su un\'altra porta (le sue immagini e gli avatar non si caricano) può avere la sua porta nella parte Avanzate del preferito.</string>
+    <string name="passwords_title">Password dei canali</string>
+    <string name="passwords_desc">Le password che hai scelto di ricordare ti fanno entrare nei loro canali con un tocco. Sono conservate su questo telefono, cifrate.</string>
+    <string name="passwords_forget">Dimentica le password salvate</string>
+    <string name="passwords_forgotten">Dimenticate.</string>
+    <string name="identity_title">Identità TeamSpeak</string>
+    <string name="identity_desc">La tua identità è chi sei per i server (i tuoi gruppi e permessi). Conservane una copia, o usa quella di un\'altra app TeamSpeak.</string>
+    <string name="identity_wipe">Cancella</string>
+    <string name="identity_export">Esporta</string>
+    <string name="identity_import">Importa</string>
+    <string name="identity_imported">Importata. Verrà usata dalla prossima connessione.</string>
+    <string name="identity_saved">Salvata. Tieni il file dove solo tu puoi accedervi.</string>
+    <string name="identity_wiped">Cancellata. Alla prossima connessione verrà creata una nuova identità.</string>
+    <string name="identity_export_title">Esporta la tua identità</string>
+    <string name="identity_export_subtitle">Tienila privata</string>
+    <string name="identity_save_file">Salva in un file</string>
+    <string name="identity_export_what">Il file è la tua identità stessa: chiunque lo abbia è te su ogni server, con i tuoi gruppi e permessi, come quelli di un admin del server. Nessuno può notare la differenza.</string>
+    <string name="identity_export_where">Salvalo dove solo tu puoi accedervi, come questo telefono o un archivio privato. Non inviarlo in chat o per email, e non pubblicarlo. Un\'app TeamSpeak può aprirlo, e anche PocketTS su un altro telefono.</string>
+    <string name="identity_wipe_title">Cancellare la tua identità?</string>
+    <string name="identity_wipe_what">L\'identità di questo telefono viene eliminata e ne verrà creata una nuova alla prossima connessione. Per ogni server sarai una persona nuova: i tuoi gruppi, i permessi e tutto ciò che era dato alla vecchia identità (come i diritti da admin) non ti seguono.</string>
+    <string name="identity_wipe_back">L\'unico modo per tornare indietro è una copia esportata. Se potrebbe servirti di nuovo, annulla ed esportala prima.</string>
+    <string name="identity_import_title">Importa un\'identità</string>
+    <string name="identity_import_subtitle">Da un\'app TeamSpeak</string>
+    <string name="identity_import_desc">Incolla l\'identità esportata da un\'app TeamSpeak, o scegli il file che ha salvato (.ini). Sostituisce quella di questo telefono dalla prossima connessione.</string>
+    <string name="identity_field">Identità</string>
+    <string name="identity_choose_file">Scegli un file…</string>
+    <string name="level_title">Livello di sicurezza</string>
+    <string name="level_desc">Alcuni server accettano solo identità con almeno un certo livello. Alzarlo mantiene la stessa identità, con i suoi gruppi e permessi.</string>
+    <string name="level_raise_button">Alza il livello</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">Tu</string>
+    <string name="person_away">Assente</string>
+    <string name="person_away_message">Assente: %1$s</string>
+    <string name="person_volume">Volume per te</string>
+    <string name="away_message_field">Messaggio di assenza (facoltativo)</string>
+    <string name="away_back">Sono tornato</string>
+    <string name="away_update">Aggiorna</string>
+    <string name="away_set">Imposta assente</string>
+    <string name="poke">Poke</string>
+    <string name="chat">Chat</string>
+    <string name="poke_title">Poke a %1$s</string>
+    <string name="poke_subtitle">Riceve un popup con il tuo messaggio</string>
+    <string name="poke_message_field">Messaggio (facoltativo)</string>
+    <string name="poked_you">%1$s ti ha mandato un poke</string>
+    <string name="dismiss">Chiudi</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">Admin</string>
+    <string name="admin_move">Sposta</string>
+    <string name="admin_kick">Espelli</string>
+    <string name="admin_ban">Banna</string>
+    <string name="admin_move_title">Sposta %1$s</string>
+    <string name="admin_move_subtitle">Scegli il canale</string>
+    <!-- The channel the person is in now -->
+    <string name="admin_here_now">Qui ora</string>
+    <string name="admin_has_password">Ha una password</string>
+    <string name="admin_kick_title">Espelli %1$s</string>
+    <string name="admin_kick_subtitle">Vedrà il motivo</string>
+    <string name="admin_kick_channel">Dal canale (nel canale predefinito)</string>
+    <string name="admin_kick_server">Dal server</string>
+    <string name="admin_reason">Motivo (facoltativo)</string>
+    <string name="admin_ban_title">Banna %1$s</string>
+    <string name="admin_ban_subtitle">Banna la sua identità e il suo indirizzo IP</string>
+    <string name="ban_10_minutes">10 minuti</string>
+    <string name="ban_1_hour">1 ora</string>
+    <string name="ban_1_day">1 giorno</string>
+    <string name="ban_1_week">1 settimana</string>
+    <string name="ban_permanently">Per sempre</string>
+
+    <!-- Server info -->
+    <string name="info_title">Info server</string>
+    <string name="key_button">Chiave privilegi</string>
+    <string name="key_title">Usa una chiave privilegi</string>
+    <string name="key_subtitle">Dall\'admin del server</string>
+    <string name="key_field">Chiave privilegi</string>
+    <string name="key_use">Usa</string>
+    <string name="key_desc">Una chiave privilegi ti dà diritti su questo server, ad esempio un gruppo server. Ogni chiave funziona una sola volta. Usa solo chiavi di qualcuno di cui ti fidi.</string>
+    <string name="key_used">Chiave privilegi usata: i tuoi nuovi diritti sono attivi.</string>
+    <string name="info_users">Utenti</string>
+    <string name="info_channels">Canali</string>
+    <string name="info_uptime">Attivo da</string>
+    <string name="info_created">Creato</string>
+    <!-- %1$s is a time span, such as "3 months" -->
+    <string name="info_ago">%1$s fa</string>
+    <plurals name="span_minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="many">%1$d minuti</item>
+        <item quantity="other">%1$d minuti</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="one">%1$d ora</item>
+        <item quantity="many">%1$d ore</item>
+        <item quantity="other">%1$d ore</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="one">%1$d giorno</item>
+        <item quantity="many">%1$d giorni</item>
+        <item quantity="other">%1$d giorni</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="one">%1$d mese</item>
+        <item quantity="many">%1$d mesi</item>
+        <item quantity="other">%1$d mesi</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="one">%1$d anno</item>
+        <item quantity="many">%1$d anni</item>
+        <item quantity="other">%1$d anni</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <string name="level_needed_title">Serve il livello di sicurezza %1$d</string>
+    <string name="level_raise_title">Alza il livello di sicurezza</string>
+    <string name="level_needed_subtitle">Questo server lo richiede. Il tuo è %1$d.</string>
+    <string name="level_yours">Il tuo è %1$d</string>
+    <string name="level_raise">Alza</string>
+    <!-- %1$s is a rough time, such as "about 3 minutes" -->
+    <string name="level_estimate">Su questo telefono ci vogliono in media %1$s. Può essere più veloce o più lento.</string>
+    <string name="level_measuring">Calcolo del tempo necessario su questo telefono…</string>
+    <string name="level_desc_raise">Alzarlo è un lavoro da fare una volta sola. La tua identità resta la stessa: gruppi e permessi restano, e il livello più alto vale su ogni server. Tieni l\'app aperta mentre lavora; Ferma mantiene il livello raggiunto finora.</string>
+    <string name="level_progress">Livello %1$d di %2$d</string>
+    <string name="level_running_desc">Tieni l\'app aperta. Ogni livello richiede circa il doppio del tempo del precedente.</string>
+    <string name="level_done">Fatto: il tuo livello di sicurezza è %1$d.</string>
+    <string name="level_done_connecting">Fatto: il tuo livello di sicurezza è %1$d. Riconnessione…</string>
+    <string name="level_stopped">Fermato al livello %1$d. Alzandolo di nuovo si riparte da lì.</string>
+    <string name="about_under_minute">meno di un minuto</string>
+    <plurals name="about_minutes">
+        <item quantity="one">circa un minuto</item>
+        <item quantity="many">circa %1$d minuti</item>
+        <item quantity="other">circa %1$d minuti</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="one">circa un\'ora</item>
+        <item quantity="many">circa %1$d ore</item>
+        <item quantity="other">circa %1$d ore</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">circa un giorno</item>
+        <item quantity="many">circa %1$d giorni</item>
+        <item quantity="other">circa %1$d giorni</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">Server</string>
+    <string name="connected">Connesso</string>
+    <string name="connecting_to">Connessione a %1$s…</string>
+    <string name="reconnecting_old">Riconnessione… Il server ha ancora la tua vecchia connessione: aspetto che la rilasci.</string>
+    <string name="reconnecting_try">Connessione persa. Riconnessione… (tentativo %1$d)</string>
+    <string name="channel_password_subtitle">Questo canale ha una password</string>
+    <string name="view_channels">Canali</string>
+    <string name="stream_title">Stream di %1$s</string>
+    <string name="stream_title_unknown">Stream</string>
+    <string name="not_an_address">Non sembra un indirizzo di server</string>
+    <string name="private_left">%1$s ha lasciato il server</string>
+    <string name="private_left_unknown">Ha lasciato il server</string>
+    <string name="level_not_connected">Non connesso: il server richiede il livello di sicurezza dell\'identità %1$d. Puoi alzare il tuo in Impostazioni › Avanzate.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">Impossibile connettersi: nessuna risposta dal server. Controlla indirizzo e porta.</string>
+    <string name="end_no_such_host">Impossibile connettersi: nessun server trovato a \"%1$s\". Controlla l\'indirizzo.</string>
+    <string name="end_cant_connect">Impossibile connettersi: %1$s</string>
+    <string name="end_network_error">Errore di rete: %1$s</string>
+    <string name="end_network_changed">La rete è cambiata</string>
+    <string name="end_network_gone">La rete non è più disponibile</string>
+    <string name="end_server_silent">Il server non ha risposto</string>
+    <string name="end_server_stopped">Il server ha smesso di rispondere</string>
+    <string name="end_lost">Connessione persa</string>
+    <string name="end_handshake">Impossibile stabilire la connessione al server.</string>
+    <string name="end_by_server">Disconnesso dal server</string>
+    <string name="end_kicked_channel">Espulso dal canale</string>
+    <string name="end_kicked_channel_reason">Espulso dal canale: %1$s</string>
+    <string name="end_kicked">Espulso dal server</string>
+    <string name="end_kicked_reason">Espulso dal server: %1$s</string>
+    <string name="end_banned">Bannato dal server</string>
+    <string name="end_banned_reason">Bannato dal server: %1$s</string>
+    <string name="end_shut_down">Il server si è spento</string>
+    <string name="end_shut_down_reason">Il server si è spento: %1$s</string>
+
+    <!-- Admin actions the server refused: %1$s is the person's name, %2$s the server's reason -->
+    <string name="admin_no_permission_move">Non hai il permesso di spostare %1$s.</string>
+    <string name="admin_no_permission_kick_channel">Non hai il permesso di espellere %1$s dal canale.</string>
+    <string name="admin_no_permission_kick_server">Non hai il permesso di espellere %1$s dal server.</string>
+    <string name="admin_no_permission_ban">Non hai il permesso di bannare %1$s.</string>
+    <string name="admin_failed_move">Impossibile spostare %1$s: %2$s</string>
+    <string name="admin_failed_kick_channel">Impossibile espellere %1$s dal canale: %2$s</string>
+    <string name="admin_failed_kick_server">Impossibile espellere %1$s dal server: %2$s</string>
+    <string name="admin_failed_ban">Impossibile bannare %1$s: %2$s</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_no_permission_create">Non hai il permesso di creare il canale %1$s.</string>
+    <string name="channel_no_permission_edit">Non hai il permesso di modificare %1$s.</string>
+    <string name="channel_no_permission_reorder">Non hai il permesso di spostare %1$s.</string>
+    <string name="channel_no_permission_delete">Non hai il permesso di eliminare %1$s.</string>
+    <!-- %1$s: the channel, %2$s: the server's reason -->
+    <string name="channel_failed_create">Impossibile creare %1$s: %2$s</string>
+    <string name="channel_failed_edit">Impossibile modificare %1$s: %2$s</string>
+    <string name="channel_failed_reorder">Impossibile spostare %1$s: %2$s</string>
+    <string name="channel_failed_delete">Impossibile eliminare %1$s: %2$s</string>
+    <string name="channels_editing">Modifica dei canali</string>
+    <string name="channels_add">Aggiungi</string>
+    <string name="channels_done">Fatto</string>
+    <string name="channels_edit_hint">Tieni premuto un canale e trascinalo per spostarlo. Toccalo per modificarlo o eliminarlo.</string>
+    <string name="files_title">File</string>
+    <string name="files_refresh">Aggiorna</string>
+    <string name="files_up">Cartella superiore</string>
+    <string name="files_folder">Cartella</string>
+    <string name="files_download">Scarica</string>
+    <string name="files_empty">Questa cartella è vuota.</string>
+    <string name="files_downloading">Download di %1$s…</string>
+    <string name="files_saved">%1$s salvato</string>
+    <string name="files_download_cancelled">Download di %1$s interrotto</string>
+    <string name="files_download_failed">Impossibile scaricare %1$s: %2$s</string>
+    <string name="files_needs_password">Questo canale ha una password. Entraci una volta con la password, ricordandola, per vederne i file.</string>
+    <string name="files_no_permission">Non hai il permesso di vedere questi file.</string>
+    <string name="files_not_found">Questa cartella non c\'è più.</string>
+    <string name="files_not_connected">Non connesso al server.</string>
+    <string name="files_upload">Carica</string>
+    <string name="files_new_folder">Nuova cartella</string>
+    <string name="files_create">Crea</string>
+    <string name="files_rename">Rinomina</string>
+    <string name="files_rename_title">Rinomina %1$s</string>
+    <string name="files_name">Nome</string>
+    <string name="files_uploading">Caricamento di %1$s…</string>
+    <string name="files_uploaded">%1$s caricato</string>
+    <string name="files_upload_cancelled">Caricamento di %1$s interrotto</string>
+    <string name="files_upload_failed">Impossibile caricare %1$s: %2$s</string>
+    <string name="files_unreadable">Impossibile leggere quel file.</string>
+    <string name="files_no_permission_change">Il server non ti permette di farlo qui.</string>
+    <string name="files_gone">Non c\'è più.</string>
+    <string name="files_exists">Qui c\'è già qualcosa con quel nome.</string>
+    <string name="files_delete_title">Eliminare %1$s?</string>
+    <string name="files_delete_file">Il file viene rimosso dal server per tutti.</string>
+    <string name="files_delete_folder">La cartella e tutto il suo contenuto vengono rimossi dal server per tutti.</string>
+    <string name="files_replace_title">Sostituire %1$s?</string>
+    <string name="files_replace_text">Qui c\'è già un file con questo nome. Sostituirlo rimuove quello vecchio per tutti.</string>
+    <string name="files_replace">Sostituisci</string>
+    <string name="channel_info_here">Sei in questo canale</string>
+    <string name="channel_info_talk_power">Potere di parola richiesto</string>
+    <string name="channel_info_default">Il canale predefinito del server</string>
+    <string name="channel_info_no_description">Nessuna descrizione</string>
+    <string name="channel_info_loading">Caricamento…</string>
+    <string name="channel_info_arrange">Riordina</string>
+    <plurals name="channel_people">
+        <item quantity="one">%d persona</item>
+        <item quantity="many">%d persone</item>
+        <item quantity="other">%d persone</item>
+    </plurals>
+    <string name="channel_new_title">Nuovo canale</string>
+    <string name="channel_new_subtitle">Il server decide che tipi di canale puoi creare.</string>
+    <string name="channel_edit_subtitle">Impostazioni del canale</string>
+    <string name="channel_create">Crea</string>
+    <string name="channel_name">Nome</string>
+    <string name="channel_description">Descrizione</string>
+    <string name="channel_kind">Tipo</string>
+    <string name="channel_kind_permanent">Permanente</string>
+    <string name="channel_kind_semi">Semi-permanente</string>
+    <string name="channel_kind_temporary">Temporaneo</string>
+    <string name="channel_kind_permanent_desc">Resta finché non viene eliminato.</string>
+    <string name="channel_kind_semi_desc">Resta finché il server non si riavvia.</string>
+    <string name="channel_kind_temporary_desc">Sparisce quando esce l\'ultima persona. Ci vieni spostato quando viene creato.</string>
+    <string name="channel_password_on">Password</string>
+    <string name="channel_password_keep">Lascia vuoto per mantenere quella attuale</string>
+    <string name="channel_codec">Codec voce</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <!-- %1$d: 0 to 10 -->
+    <string name="channel_quality">Qualità: %1$d</string>
+    <string name="channel_unlimited">Utenti illimitati</string>
+    <string name="channel_max_users">Utenti max</string>
+    <string name="channel_parent">Dentro</string>
+    <string name="channel_top_level">Livello principale</string>
+    <string name="channel_parent_change">Cambia</string>
+    <string name="channel_parent_title">Dove va</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_delete_title">Eliminare %1$s?</string>
+    <string name="channel_delete_subtitle">Non si può annullare.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="one">Viene eliminato anche il suo %d sottocanale.</item>
+        <item quantity="many">Vengono eliminati anche i suoi %d sottocanali.</item>
+        <item quantity="other">Vengono eliminati anche i suoi %d sottocanali.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="one">%d persona viene spostata nel canale predefinito.</item>
+        <item quantity="many">%d persone vengono spostate nel canale predefinito.</item>
+        <item quantity="other">%d persone vengono spostate nel canale predefinito.</item>
+    </plurals>
+    <string name="channel_delete_empty">Non c\'è nessuno.</string>
+    <string name="admin_move_needs_password">Impossibile spostare %1$s: il canale richiede la password. Entraci una volta con la password, ricordandola, per spostarci le persone.</string>
+
+    <!-- Sending pictures: %1$s / %3$s is the reason -->
+    <string name="picture_not_sent">L\'immagine non è stata inviata: %1$s</string>
+    <!-- %1$d is which picture, %2$d of how many -->
+    <string name="pictures_not_sent">L\'immagine %1$d di %2$d non è stata inviata: %3$s</string>
+    <string name="picture_no_permission">%1$s (nessun permesso in questo canale)</string>
+    <!-- %1$d is the limit in megabytes -->
+    <string name="picture_too_big">L\'immagine è troppo grande (oltre %1$d MB).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">Caricamento…</string>
+    <string name="avatar_set">Immagine del profilo impostata.</string>
+    <string name="avatar_too_big">Questo server consente solo un\'immagine del profilo molto piccola, o nessuna.</string>
+    <string name="avatar_not_allowed">Questo server non ti consente un\'immagine del profilo.</string>
+    <string name="avatar_failed">L\'immagine del profilo non è stata impostata: %1$s</string>
+    <string name="avatar_removed">Immagine del profilo rimossa.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">Non è un\'identità TeamSpeak.</string>
+    <string name="identity_unreadable">L\'identità salvata non si può aprire su questo telefono. Importa la tua in Impostazioni › Avanzate › Identità TeamSpeak, o creane una nuova lì.</string>
+    <string name="identity_export_unreadable">Impossibile leggere l\'identità, quindi non si può salvare.</string>
+    <string name="file_not_written">Impossibile scrivere quel file.</string>
+    <string name="file_not_opened">Impossibile aprire quel file.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel">Connessione</string>
+    <string name="notification_mute">Silenzia</string>
+    <string name="notification_unmute">Riattiva</string>
+    <string name="notification_sound_off">Audio off</string>
+    <string name="notification_sound_on">Audio on</string>
+    <string name="notification_messages">Messaggi e poke</string>
+    <!-- %1$s is the server's name or address -->
+    <string name="notification_connected">Connesso a %1$s</string>
+    <string name="notification_connecting">Connessione a %1$s</string>
+    <string name="notification_reconnecting">Riconnessione a %1$s…</string>
+    <string name="notification_sharing_camera">Condivisione della fotocamera</string>
+    <string name="notification_sharing_cameras">Condivisione delle fotocamere</string>
+    <string name="notification_sharing_screen">Condivisione dello schermo</string>
+    <string name="whisper">Sussurra</string>
+    <string name="hold_to_whisper">Tieni premuto per sussurrare</string>
+    <string name="whispering_to_you">%1$s ti sta sussurrando</string>
+    <string name="whisper_list_line">Sussurro: %1$s</string>
+    <string name="whisper_clear">Cancella tutto</string>
+    <string name="whisper_remove">Rimuovi dalla lista</string>
+    <string name="whisper_channel">Sussurra al canale</string>
+    <string name="whisper_channel_off">Smetti di sussurrare al canale</string>
+    <string name="whisper_list_title">Lista sussurri</string>
+    <string name="whisper_list_subtitle">Mentre tieni premuto il pulsante sussurro, ti sentono solo loro.</string>
+    <string name="capture_ai_noise">Rimozione rumore IA (RNNoise)</string>
+    <string name="capture_ai_noise_desc">Rimuove anche i clic della tastiera, una ventola, una TV e altri rumori che la rimozione del telefono lascia passare, con una piccola rete neurale sul telefono. Consuma un po\' più di batteria.</string>
+    <string name="capture_ai_noise_license">Licenza di RNNoise</string>
+    <string name="share_torch_on">Torcia accesa (tocca per spegnere)</string>
+    <string name="share_torch_off">Torcia: illumina ciò che riprende la fotocamera posteriore</string>
+    <string name="share_camera_lost">La fotocamera si è fermata: l\'ha presa una chiamata, un\'altra app o il telefono.</string>
+    <string name="share_preview_small">Rimpicciolisci l\'anteprima</string>
+    <string name="share_lens_switch">Obiettivo %1$s: tocca per il successivo</string>
+    <string name="debug_log_title">Log di debug</string>
+    <string name="debug_log">Tieni un log di debug</string>
+    <string name="debug_log_desc">Per le segnalazioni di bug: cosa fa l\'app, crash inclusi, conservato solo su questo telefono. Indirizzi dei server, nomi e messaggi vengono tolti. L\'app non lo invia mai: condividilo tu, ad esempio in una segnalazione di bug su GitHub. Disattivarlo lo elimina.</string>
+    <string name="debug_log_share">Condividi log</string>
+    <string name="debug_log_delete">Elimina log</string>
+    <string name="debug_log_empty">Il log di debug per ora è vuoto.</string>
+    <string name="debug_log_deleted">Log di debug eliminato.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">Attivo</string>
+    <string name="a11y_off">Disattivo</string>
+    <string name="a11y_about">Info su %1$s</string>
+    <string name="a11y_talk_start">inizia a parlare</string>
+    <string name="a11y_talk_stop">smetti di parlare</string>
+    <string name="a11y_whisper_start">inizia a sussurrare</string>
+    <string name="a11y_whisper_stop">smetti di sussurrare</string>
+    <string name="a11y_talking">Sta parlando</string>
+    <string name="a11y_whispering">Sta sussurrando</string>
+    <string name="a11y_unread">Messaggi non letti</string>
+    <string name="a11y_move_up">Sposta su</string>
+    <string name="a11y_move_down">Sposta giù</string>
+    <string name="a11y_show_controls">mostra i pulsanti</string>
+    <string name="a11y_hide_controls">nascondi i pulsanti</string>
+    <string name="a11y_preview_bigger">ingrandisci l\'anteprima</string>
+    <string name="a11y_preview_smaller">rimpicciolisci l\'anteprima</string>
+</resources>
