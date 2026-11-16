@@ -10,7 +10,7 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 /**
- * Portuguese, Polish and Turkish phones get their own texts, with the product names as they are and counts in the
+ * Portuguese, Polish, Turkish, Italian and Ukrainian phones get their own texts, with the product names as they are and counts in the
  * language's own forms; the language list has each by its own name. A Portugal phone gets the Portuguese too.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -40,4 +40,10 @@ class NewLanguagesTest {
 
     @Test @Config(qualifiers = "tr-rTR")
     fun turkish() = ownTexts("tr", "Türkçe")
+
+    @Test @Config(qualifiers = "it-rIT")
+    fun italian() = ownTexts("it", "Italiano")
+
+    @Test @Config(qualifiers = "uk-rUA")
+    fun ukrainian() = ownTexts("uk", "Українська")
 }
