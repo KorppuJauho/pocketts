@@ -497,6 +497,11 @@
     <string name="admin_failed_kick_channel">%1$s konnte nicht aus dem Channel gekickt werden: %2$s</string>
     <string name="admin_failed_kick_server">%1$s konnte nicht vom Server gekickt werden: %2$s</string>
     <string name="admin_failed_ban">%1$s konnte nicht gebannt werden: %2$s</string>
+    <string name="admin_groups">Servergruppen</string>
+    <string name="admin_groups_desc">Ausgegraute Gruppen brauchen mehr Rechte, als du hast. Die Standardgruppe des Servers kann weder vergeben noch entzogen werden: Sie hat, wer keine anderen Gruppen hat.</string>
+    <string name="admin_groups_none">Der Server hat seine Gruppen nicht mitgeteilt.</string>
+    <string name="admin_no_permission_groups">Du darfst die Servergruppen von %1$s nicht ändern.</string>
+    <string name="admin_failed_groups">Die Servergruppen von %1$s konnten nicht geändert werden: %2$s</string>
     <string name="channel_no_permission_create">Du darfst den Channel %1$s nicht erstellen.</string>
     <string name="channel_no_permission_edit">Du darfst %1$s nicht ändern.</string>
     <string name="channel_no_permission_reorder">Du darfst %1$s nicht verschieben.</string>

@@ -264,6 +264,22 @@ class ScreenshotTest {
     }
 
     @Test
+    fun personAdminPopup() = popup("popup-person-admin") {
+        val s = Example.state()
+        io.github.korppujauho.pocketts.ui.PersonSheet(
+            s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {},
+            admin = true, onGroups = {},
+        )
+    }
+
+    @Test
+    fun serverGroupsPopup() = popup("popup-server-groups") {
+        io.github.korppujauho.pocketts.ui.ServerGroupsDialog(
+            Example.state().client(2)!!.copy(serverGroups = listOf(7)), Example.groupChoices, onChange = { _, _ -> }, onDismiss = {},
+        )
+    }
+
+    @Test
     fun personPopup() = popup("popup-person") {
         val s = Example.state()
         io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {}, whispered = true, onWhisper = {})
@@ -396,6 +412,14 @@ object Example {
             microphone = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_MIC, "Phone"),
         )
     }
+
+    /** An admin's view of a server's groups: theirs to give, and the default one, which isn't. */
+    val groupChoices = listOf(
+        ServerModel.GroupChoice(ServerModel.Group(6, "Server Admin", 300, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(9, "Moderator", 0, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(7, "Member", 0, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(8, "Guest", 0, 0), canAdd = false, canRemove = false),
+    )
 
     fun model(): ServerModel {
         val m = ServerModel()

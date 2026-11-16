@@ -3,6 +3,11 @@ package io.github.korppujauho.pocketts.proto
 /** What we know about the server: channels, who is where, who is talking. Fed with every command (on one thread). */
 class ServerModel {
     private companion object {
+        // TeamSpeak's numbers for i_group_member_add_power and i_group_member_remove_power, as a TeamSpeak 6 server
+        // tells them (in notifyclientneededpermissions, and as failed_permid when one falls short)
+        const val GROUP_MEMBER_ADD_POWER = 170
+        const val GROUP_MEMBER_REMOVE_POWER = 172
+
         val BANNER = Regex("""^(https|ts3image)://\S{1,500}$""", RegexOption.IGNORE_CASE)
         val MYTS_AVATAR = Regex("""^(?:\d+,)?(https://storage\.googleapis\.com/ts-sys-myts-avatars/[A-Za-z0-9-]{1,64}/[0-9]{1,20})$""")
         val SPACER = Regex("""^\[([^\]]*)spacer[^\]]*](.*)$""")
@@ -69,6 +74,7 @@ class ServerModel {
         val prioritySpeaker: Boolean = false,
         val talking: Boolean = false,
         val serverGroups: List<Int> = emptyList(),
+        val databaseId: Int = 0, // the server's lasting number for their identity: groups are given by it
         val channelGroup: Int = 0,
         val iconId: Long = 0,
         val avatar: String = "", // the avatar's hash ("" = none)
@@ -81,8 +87,18 @@ class ServerModel {
         val version: String = "",
     )
 
-    /** A server or channel group: its name and icon, and its place in the order. */
-    data class Group(val id: Int, val name: String, val iconId: Long, val sortId: Int)
+    /**
+     * A server or channel group: its name and icon, and its place in the order. Its [type]: 0 a template, 1 a group
+     * for people, 2 one for query logins. The powers needed to put someone in it or take them out (TeamSpeak's
+     * i_group_needed_member_add_power and _remove_power).
+     */
+    data class Group(
+        val id: Int, val name: String, val iconId: Long, val sortId: Int,
+        val type: Int = 1, val neededAddPower: Int = 0, val neededRemovePower: Int = 0,
+    )
+
+    /** A server group as a person's groups can be changed: whether our permissions let us put someone in it, or take them out. */
+    data class GroupChoice(val group: Group, val canAdd: Boolean, val canRemove: Boolean)
 
     /** A channel with its sub-channels and the people in it, in the server's order. */
     data class Node(val channel: Channel, val clients: List<Client>, val children: List<Node>)
@@ -104,12 +120,19 @@ class ServerModel {
     val channelGroups = HashMap<Int, Group>()
     val clients = LinkedHashMap<Int, Client>()
 
+    /**
+     * Our own permissions the server tells (by number), the whole set each time it changes: the ones the app needs
+     * to know what it may do. Absent is none.
+     */
+    val ownPermissions = HashMap<Int, Int>()
+
     val ownClient: Client? get() = clients[ownClientId]
     val ownChannel: Channel? get() = ownClient?.let { channels[it.channel] }
 
     fun clear() {
         serverName = ""; welcomeMessage = ""; ownClientId = 0
         serverVars.clear(); channels.clear(); clients.clear(); serverGroups.clear(); channelGroups.clear(); streams.clear()
+        ownPermissions.clear()
     }
 
     /** Returns true when something shown changed. */
@@ -129,6 +152,13 @@ class ServerModel {
             }
             "notifyservergrouplist", "servergrouplist" -> readGroups(serverGroups, "sgid", cmd)
             "notifychannelgrouplist", "channelgrouplist" -> readGroups(channelGroups, "cgid", cmd)
+            "notifyclientneededpermissions" -> {
+                ownPermissions.clear()
+                for (g in cmd.groups) {
+                    val id = g["permid"]?.toIntOrNull() ?: continue
+                    ownPermissions[id] = g["permvalue"]?.toIntOrNull() ?: continue
+                }
+            }
             "notifyservergroupclientadded", "notifyservergroupclientdeleted" -> for (g in cmd.groups) {
                 val id = g["clid"]?.toIntOrNull() ?: continue
                 val sgid = g["sgid"]?.toIntOrNull() ?: continue
@@ -221,7 +251,25 @@ class ServerModel {
         for (g in cmd.groups) {
             val id = g[idKey]?.toIntOrNull() ?: continue
             if (id <= 0) continue
-            into[id] = Group(id, g["name"].orEmpty(), g["iconid"]?.let { unsignedId(it) } ?: 0, g["sortid"]?.toIntOrNull() ?: 0)
+            into[id] = Group(
+                id, g["name"].orEmpty(), g["iconid"]?.let { unsignedId(it) } ?: 0, g["sortid"]?.toIntOrNull() ?: 0,
+                g["type"]?.toIntOrNull() ?: 1, g["n_member_addp"]?.toIntOrNull() ?: 0, g["n_member_removep"]?.toIntOrNull() ?: 0,
+            )
+        }
+    }
+
+    /**
+     * The server groups people can be put in (not templates or query groups), in the server's order, each with whether
+     * our powers reach the power it needs. The server's default group is never given or taken by hand (the server
+     * refuses): it's what someone without other groups has.
+     */
+    fun serverGroupChoices(): List<GroupChoice> {
+        val default = serverVars["virtualserver_default_server_group"]?.toIntOrNull()
+        val add = ownPermissions[GROUP_MEMBER_ADD_POWER] ?: 0
+        val remove = ownPermissions[GROUP_MEMBER_REMOVE_POWER] ?: 0
+        return serverGroups.values.filter { it.type == 1 }.sortedWith(compareBy<Group> { it.sortId }.thenBy { it.id }).map {
+            val own = it.id != default
+            GroupChoice(it, canAdd = own && add > 0 && add >= it.neededAddPower, canRemove = own && remove > 0 && remove >= it.neededRemovePower)
         }
     }
 
@@ -348,6 +396,7 @@ class ServerModel {
         prioritySpeaker = g["client_is_priority_speaker"]?.let { it == "1" } ?: old.prioritySpeaker,
         streaming = g["client_is_streaming"]?.let { it == "1" } ?: old.streaming,
         serverGroups = g["client_servergroups"]?.split(',')?.mapNotNull { it.trim().toIntOrNull() } ?: old.serverGroups,
+        databaseId = g["client_database_id"]?.toIntOrNull() ?: old.databaseId,
         channelGroup = g["client_channel_group_id"]?.toIntOrNull() ?: old.channelGroup,
         iconId = g["client_icon_id"]?.let { unsignedId(it) } ?: old.iconId,
         avatar = g["client_flag_avatar"] ?: old.avatar,

@@ -497,6 +497,11 @@
     <string name="admin_failed_kick_channel">Käyttäjää %1$s ei voitu potkaista kanavalta: %2$s</string>
     <string name="admin_failed_kick_server">Käyttäjää %1$s ei voitu potkaista palvelimelta: %2$s</string>
     <string name="admin_failed_ban">Käyttäjälle %1$s ei voitu antaa porttikieltoa: %2$s</string>
+    <string name="admin_groups">Palvelinryhmät</string>
+    <string name="admin_groups_desc">Harmaina näkyvät ryhmät vaativat enemmän oikeuksia kuin sinulla on. Palvelimen oletusryhmää ei voi antaa eikä ottaa pois: se on niillä, joilla ei ole muita ryhmiä.</string>
+    <string name="admin_groups_none">Palvelin ei ole kertonut ryhmiään.</string>
+    <string name="admin_no_permission_groups">Sinulla ei ole oikeutta muuttaa käyttäjän %1$s palvelinryhmiä.</string>
+    <string name="admin_failed_groups">Käyttäjän %1$s palvelinryhmiä ei voitu muuttaa: %2$s</string>
     <string name="channel_no_permission_create">Sinulla ei ole lupaa luoda kanavaa %1$s.</string>
     <string name="channel_no_permission_edit">Sinulla ei ole lupaa muuttaa kanavaa %1$s.</string>
     <string name="channel_no_permission_reorder">Sinulla ei ole lupaa siirtää kanavaa %1$s.</string>

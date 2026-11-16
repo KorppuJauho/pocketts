@@ -77,6 +77,7 @@ fun PersonSheet(
     onMove: () -> Unit = {},
     onKick: () -> Unit = {},
     onBan: () -> Unit = {},
+    onGroups: (() -> Unit)? = null,
     whispered: Boolean = false,
     onWhisper: (() -> Unit)? = null,
 ) {
@@ -151,7 +152,7 @@ fun PersonSheet(
                     )
                 }
             }
-            if (admin) AdminTiles(onMove, onKick, onBan)
+            if (admin) AdminTiles(onMove, onKick, onBan, onGroups)
         }
     }
 }

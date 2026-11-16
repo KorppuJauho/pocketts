@@ -1,6 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,8 +15,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.SwapVert
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.RadioButton
@@ -141,9 +145,9 @@ private fun Choice(text: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
-/** The person menu's admin row (Settings › UI › Show admin functions). */
+/** The person menu's admin row (Settings › UI › Show admin functions), and their server groups under it. */
 @Composable
-fun AdminTiles(onMove: () -> Unit, onKick: () -> Unit, onBan: () -> Unit) {
+fun AdminTiles(onMove: () -> Unit, onKick: () -> Unit, onBan: () -> Unit, onGroups: (() -> Unit)? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -151,5 +155,51 @@ fun AdminTiles(onMove: () -> Unit, onKick: () -> Unit, onBan: () -> Unit) {
             ActionTile(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.admin_kick), Modifier.weight(1f), tint = Ts.red, onClick = onKick)
             ActionTile(Icons.Rounded.Block, stringResource(R.string.admin_ban), Modifier.weight(1f), tint = Ts.red, onClick = onBan)
         }
+        if (onGroups != null) {
+            PillButton(stringResource(R.string.admin_groups), modifier = Modifier.fillMaxWidth(), onClick = onGroups)
+        }
+    }
+}
+
+/**
+ * A person's server groups: the server's groups for people, theirs ticked. A tick puts them in at once, taking it
+ * off takes them out, and the ticks follow what the server then says. Groups our permissions don't reach, and the
+ * server's default group, are greyed out.
+ */
+@Composable
+fun ServerGroupsDialog(
+    person: ServerModel.Client, choices: List<ServerModel.GroupChoice>, onChange: (ServerModel.Group, Boolean) -> Unit, onDismiss: () -> Unit,
+) {
+    TsDialog(
+        onDismiss = onDismiss, title = stringResource(R.string.admin_groups), subtitle = person.nickname, icon = Icons.Rounded.Groups,
+        buttons = { PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss) },
+    ) {
+        if (choices.isEmpty()) {
+            Desc(stringResource(R.string.admin_groups_none))
+            return@TsDialog
+        }
+        Column {
+            for (c in choices) {
+                val member = c.group.id in person.serverGroups
+                val enabled = if (member) c.canRemove else c.canAdd
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+                        .toggleable(member, enabled = enabled, role = androidx.compose.ui.semantics.Role.Checkbox) { onChange(c.group, it) }
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        member, onCheckedChange = null, enabled = enabled,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Ts.accent, uncheckedColor = Ts.muted,
+                            disabledCheckedColor = Ts.accent.copy(alpha = 0.4f), disabledUncheckedColor = Ts.faint,
+                        ),
+                        modifier = Modifier.padding(12.dp),
+                    )
+                    Text(c.group.name, color = if (enabled) Ts.text else Ts.muted, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
+        }
+        Desc(stringResource(R.string.admin_groups_desc))
     }
 }

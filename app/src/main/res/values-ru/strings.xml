@@ -519,6 +519,11 @@
     <string name="admin_failed_kick_channel">Не удалось выгнать пользователя %1$s из канала: %2$s</string>
     <string name="admin_failed_kick_server">Не удалось выгнать пользователя %1$s с сервера: %2$s</string>
     <string name="admin_failed_ban">Не удалось забанить пользователя %1$s: %2$s</string>
+    <string name="admin_groups">Группы сервера</string>
+    <string name="admin_groups_desc">Серые группы требуют больше прав, чем у вас есть. Группу сервера по умолчанию нельзя выдать или забрать: она есть у тех, у кого нет других групп.</string>
+    <string name="admin_groups_none">Сервер не сообщил свои группы.</string>
+    <string name="admin_no_permission_groups">У вас нет прав менять группы сервера пользователя %1$s.</string>
+    <string name="admin_failed_groups">Не удалось изменить группы сервера пользователя %1$s: %2$s</string>
     <string name="channel_no_permission_create">У вас нет разрешения создать канал %1$s.</string>
     <string name="channel_no_permission_edit">У вас нет разрешения изменить канал %1$s.</string>
     <string name="channel_no_permission_reorder">У вас нет разрешения переместить канал %1$s.</string>
