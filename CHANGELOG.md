@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.8.0 (2026-11-15)
+
+- **Voices play as:** Settings › Playback starts with one choice: Media, Phone call or At your ear. Under it, what
+  the chosen way brings and costs is listed: the volume it follows (media or call), the sound quality, echo, and
+  whether Bluetooth headphones' microphone works. Echo cancellation follows the choice (on with a phone call), so its
+  checkbox in Capture is gone. Existing settings carry over as they were. On a phone that played call audio from its
+  earpiece, choosing Phone call gives the loudspeaker another try. Suggested by JohnyCore.
+- **Audio in use:** Settings › Playback shows, while connected, whether voices play as media or a phone call, the
+  speaker or headphones they really play through, and the microphone that really records, as Android reports them.
+  The debug log notes them too, with device names taken out.
+- **Talking with the settings open:** voices go on while Settings is open, as in TeamSpeak's desktop client. A muted
+  microphone still sends nothing, and the level bar keeps moving. From JohnyCore.
+- **Three more languages:** Portuguese, Polish and Turkish, so PocketTS speaks eleven. Portuguese is written as in
+  Brazil, and phones set to Portugal's Portuguese get it too. A native speaker's review is welcome.
+- **For developers:** CONTRIBUTING.md and AGENTS.md give the rules for pull requests, also for coding agents, and a
+  pull request template has a short checklist.
+
 ## 1.7.0 (2026-11-11)
 
 - **Loudspeaker or earpiece:** Settings › Playback has "Voices play through", with Loudspeaker and Earpiece, followed
