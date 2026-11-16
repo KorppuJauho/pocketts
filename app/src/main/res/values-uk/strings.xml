@@ -553,6 +553,15 @@
     <string name="admin_failed_kick_channel">Не вдалося вигнати %1$s з каналу: %2$s</string>
     <string name="admin_failed_kick_server">Не вдалося вигнати %1$s із сервера: %2$s</string>
     <string name="admin_failed_ban">Не вдалося заблокувати %1$s: %2$s</string>
+    <string name="admin_groups">Групи</string>
+    <string name="admin_server_groups">Серверні групи</string>
+    <string name="admin_channel_group">Група каналу в %1$s</string>
+    <string name="admin_groups_desc">Сірі групи потребують більше дозволів, ніж маєте ви. Типову групу сервера не можна надати чи забрати: її мають ті, хто не має інших груп.</string>
+    <string name="admin_groups_none">Сервер не повідомив свої групи.</string>
+    <string name="admin_no_permission_groups">У вас немає дозволу змінювати серверні групи %1$s.</string>
+    <string name="admin_failed_groups">Не вдалося змінити серверні групи %1$s: %2$s</string>
+    <string name="admin_no_permission_channel_group">У вас немає дозволу змінювати групу каналу для %1$s.</string>
+    <string name="admin_failed_channel_group">Не вдалося змінити групу каналу для %1$s: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">У вас немає дозволу створити канал %1$s.</string>
     <string name="channel_no_permission_edit">У вас немає дозволу змінювати %1$s.</string>
