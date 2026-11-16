@@ -422,6 +422,7 @@ private object SessionActions : ServerActions {
     override fun ban(person: ServerModel.Client, seconds: Long, reason: String) = Session.ban(person, seconds, reason)
     override fun setServerGroup(person: ServerModel.Client, group: ServerModel.Group, member: Boolean) =
         Session.setServerGroup(person, group, member)
+    override fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) = Session.setChannelGroup(person, group)
     override fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) = Session.createChannel(settings)
     override fun editChannel(channel: ServerModel.Channel, settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) =
         Session.editChannel(channel, settings)

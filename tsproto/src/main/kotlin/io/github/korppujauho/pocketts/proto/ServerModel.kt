@@ -100,6 +100,18 @@ class ServerModel {
     /** A server group as a person's groups can be changed: whether our permissions let us put someone in it, or take them out. */
     data class GroupChoice(val group: Group, val canAdd: Boolean, val canRemove: Boolean)
 
+    /**
+     * Our powers to put people in groups and take them out (TeamSpeak's i_group_member_add_power and _remove_power),
+     * where we are now: a channel group can raise them in its channel. None (0) is never enough.
+     */
+    data class GroupPowers(val add: Int = 0, val remove: Int = 0) {
+        fun canAdd(g: Group) = add > 0 && add >= g.neededAddPower
+        fun canRemove(g: Group) = remove > 0 && remove >= g.neededRemovePower
+
+        /** Someone's channel group changed from [from] to [to]: the one is taken, the other given. */
+        fun canSwitch(from: Group?, to: Group) = canAdd(to) && (from == null || canRemove(from))
+    }
+
     /** A channel with its sub-channels and the people in it, in the server's order. */
     data class Node(val channel: Channel, val clients: List<Client>, val children: List<Node>)
 
@@ -180,6 +192,8 @@ class ServerModel {
             "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
                 val id = g["clid"]?.toIntOrNull() ?: continue
                 val c = clients[id] ?: continue
+                // Their group in another channel isn't the one shown
+                if (g["cid"]?.toIntOrNull()?.let { it != c.channel } == true) continue
                 clients[id] = c.copy(channelGroup = g["cgid"]?.toIntOrNull() ?: c.channelGroup)
             }
             "notifyserverupdated" -> {
@@ -265,13 +279,23 @@ class ServerModel {
      */
     fun serverGroupChoices(): List<GroupChoice> {
         val default = serverVars["virtualserver_default_server_group"]?.toIntOrNull()
-        val add = ownPermissions[GROUP_MEMBER_ADD_POWER] ?: 0
-        val remove = ownPermissions[GROUP_MEMBER_REMOVE_POWER] ?: 0
-        return serverGroups.values.filter { it.type == 1 }.sortedWith(compareBy<Group> { it.sortId }.thenBy { it.id }).map {
+        val powers = groupPowers
+        return forPeople(serverGroups).map {
             val own = it.id != default
-            GroupChoice(it, canAdd = own && add > 0 && add >= it.neededAddPower, canRemove = own && remove > 0 && remove >= it.neededRemovePower)
+            GroupChoice(it, canAdd = own && powers.canAdd(it), canRemove = own && powers.canRemove(it))
         }
     }
+
+    /**
+     * The channel groups people can be given (not templates), in the server's order. Everyone has one in each channel
+     * (the server's default one unless given another), so giving one takes the other.
+     */
+    fun channelGroupChoices(): List<Group> = forPeople(channelGroups)
+
+    val groupPowers: GroupPowers get() = GroupPowers(ownPermissions[GROUP_MEMBER_ADD_POWER] ?: 0, ownPermissions[GROUP_MEMBER_REMOVE_POWER] ?: 0)
+
+    private fun forPeople(groups: Map<Int, Group>) =
+        groups.values.filter { it.type == 1 }.sortedWith(compareBy<Group> { it.sortId }.thenBy { it.id })
 
     /**
      * A person's badges as the TeamSpeak app shows them: their channel group's icon, their server groups' icons (in the

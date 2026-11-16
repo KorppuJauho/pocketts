@@ -508,11 +508,15 @@
     <string name="admin_failed_kick_channel">No se ha podido expulsar a %1$s del canal: %2$s</string>
     <string name="admin_failed_kick_server">No se ha podido expulsar a %1$s del servidor: %2$s</string>
     <string name="admin_failed_ban">No se ha podido banear a %1$s: %2$s</string>
-    <string name="admin_groups">Grupos del servidor</string>
+    <string name="admin_groups">Grupos</string>
+    <string name="admin_server_groups">Grupos del servidor</string>
+    <string name="admin_channel_group">Grupo de canal en %1$s</string>
     <string name="admin_groups_desc">Los grupos en gris necesitan más permisos de los que tienes. El grupo predeterminado del servidor no se puede dar ni quitar: lo tiene quien no tiene otros grupos.</string>
     <string name="admin_groups_none">El servidor no ha indicado sus grupos.</string>
     <string name="admin_no_permission_groups">No tienes permiso para cambiar los grupos del servidor de %1$s.</string>
     <string name="admin_failed_groups">No se pudieron cambiar los grupos del servidor de %1$s: %2$s</string>
+    <string name="admin_no_permission_channel_group">No tienes permiso para cambiar el grupo de canal de %1$s.</string>
+    <string name="admin_failed_channel_group">No se pudo cambiar el grupo de canal de %1$s: %2$s</string>
     <string name="channel_no_permission_create">No tienes permiso para crear el canal %1$s.</string>
     <string name="channel_no_permission_edit">No tienes permiso para cambiar %1$s.</string>
     <string name="channel_no_permission_reorder">No tienes permiso para mover %1$s.</string>

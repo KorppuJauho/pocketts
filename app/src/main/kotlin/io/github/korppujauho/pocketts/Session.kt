@@ -66,6 +66,8 @@ object Session : TsClient.Listener {
         val whisperHeld: Boolean = false,
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
         val groupChoices: List<ServerModel.GroupChoice> = emptyList(), // the server groups people can be put in, and which we may change
+        val channelGroupChoices: List<ServerModel.Group> = emptyList(), // the channel groups people can be given
+        val groupPowers: ServerModel.GroupPowers = ServerModel.GroupPowers(), // ours, where we are
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
         val sendingProgress: Pair<Int, Int>? = null, // sending several pictures: which one (from 1), of how many
@@ -764,6 +766,7 @@ object Session : TsClient.Listener {
         KICK_SERVER("kick from the server", R.string.admin_no_permission_kick_server, R.string.admin_failed_kick_server),
         BAN("ban", R.string.admin_no_permission_ban, R.string.admin_failed_ban),
         SERVER_GROUPS("change the server groups of", R.string.admin_no_permission_groups, R.string.admin_failed_groups),
+        CHANNEL_GROUP("change the channel group of", R.string.admin_no_permission_channel_group, R.string.admin_failed_channel_group),
         CREATE_CHANNEL("create the channel", R.string.channel_no_permission_create, R.string.channel_failed_create),
         EDIT_CHANNEL("change the channel", R.string.channel_no_permission_edit, R.string.channel_failed_edit),
         REORDER_CHANNEL("move the channel", R.string.channel_no_permission_reorder, R.string.channel_failed_reorder),
@@ -836,6 +839,15 @@ object Session : TsClient.Listener {
         )
     }
 
+    /** Channel group [group] for them in the channel they're in, in place of the one they have there. */
+    fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) {
+        if (person.databaseId <= 0) return
+        admin(
+            AdminAction.CHANNEL_GROUP, person, "setclientchannelgroup",
+            "cgid" to group.id, "cid" to person.channel, "cldbid" to person.databaseId,
+        )
+    }
+
     /** The longest reason given with a kick or a ban (TeamSpeak's limit). */
     const val REASON_MAX = 40
 
@@ -843,7 +855,7 @@ object Session : TsClient.Listener {
         val (action, who) = asked
         val id = cmd["id"] ?: return
         // Whom, as the log may say it: a person, or a channel
-        val whom = if (action.ordinal <= AdminAction.SERVER_GROUPS.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
+        val whom = if (action.ordinal <= AdminAction.CHANNEL_GROUP.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
         if (id == "0") return AppLog.log("Admin: ${action.log} $whom")
         AppLog.log("Admin: couldn't ${action.log} $whom, error $id: ${LogPrivacy.text(cmd["msg"])} (permission ${cmd["failed_permid"]})")
         val message = when (id) {
@@ -1559,6 +1571,8 @@ object Session : TsClient.Listener {
                 server = HashMap(model.serverVars),
                 badges = model.clients.values.associate { c -> c.id to model.badges(c) },
                 groupChoices = model.serverGroupChoices(),
+                channelGroupChoices = model.channelGroupChoices(),
+                groupPowers = model.groupPowers,
                 streams = HashMap(model.streams),
                 serverIcon = model.serverVars["virtualserver_icon_id"]?.toLongOrNull()?.let { v -> if (v < 0) v + (1L shl 32) else v } ?: 0,
                 channelCount = model.channels.size,

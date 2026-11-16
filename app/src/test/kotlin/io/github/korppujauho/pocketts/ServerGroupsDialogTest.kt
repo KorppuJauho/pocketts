@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import io.github.korppujauho.pocketts.proto.ServerModel
@@ -24,12 +25,14 @@ import org.robolectric.annotation.GraphicsMode
 class ServerGroupsDialogTest {
     @get:Rule val rule = createComposeRule()
     private val asked = mutableListOf<Pair<Int, Boolean>>()
+    private val channelGroup = mutableListOf<Int>()
 
-    private fun dialog() = rule.setContent {
+    private fun dialog(powers: ServerModel.GroupPowers = ServerModel.GroupPowers(75, 75)) = rule.setContent {
         PocketTsTheme {
             ServerGroupsDialog(
-                ServerModel.Client(3, 1, "Lee", databaseId = 234, serverGroups = listOf(7)), Example.groupChoices,
+                ServerModel.Client(3, 1, "Lee", databaseId = 234, serverGroups = listOf(7), channelGroup = 8), Example.groupChoices,
                 onChange = { g, member -> asked += g.id to member }, onDismiss = {},
+                channelGroups = Example.channelGroups.copy(powers = powers), onChannelGroup = { channelGroup += it.id },
             )
         }
     }
@@ -44,9 +47,24 @@ class ServerGroupsDialogTest {
     }
 
     @Test
+    fun aChannelGroupIsChosenInTheirChannel() {
+        dialog()
+        rule.onNodeWithText("Channel group in Default Channel").assertExists()
+        rule.onNodeWithText("Operator").performClick()
+        assertEquals(listOf(6), channelGroup)
+    }
+
+    @Test
+    fun aChannelGroupBeyondOurPowerIsGreyedOut() {
+        dialog(ServerModel.GroupPowers(30, 30))
+        rule.onNodeWithText("Channel Admin").assertIsNotEnabled().performClick()
+        assertEquals(emptyList<Int>(), channelGroup)
+    }
+
+    @Test
     fun theDefaultGroupIsGreyedOut() {
         dialog()
-        rule.onNodeWithText("Guest").assertIsNotEnabled().performClick()
+        rule.onAllNodesWithText("Guest")[0].assertIsNotEnabled().performClick()
         assertEquals(emptyList<Pair<Int, Boolean>>(), asked)
     }
 }

@@ -78,6 +78,8 @@ interface ServerActions {
     fun ban(person: ServerModel.Client, seconds: Long, reason: String) {}
     /** Into a server group, or out of it. */
     fun setServerGroup(person: ServerModel.Client, group: ServerModel.Group, member: Boolean) {}
+    /** Their channel group in the channel they're in. */
+    fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) {}
     /** Admin: a new channel. */
     fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) {}
     /** Admin: a channel changed. */
@@ -534,7 +536,9 @@ fun ServerScreen(
         val now = state.client(p.id)
         if (now == null) groupsTarget = null else ServerGroupsDialog(
             now, state.groupChoices, onChange = { group, member -> actions.setServerGroup(now, group, member) },
-            onDismiss = { groupsTarget = null },
+            onDismiss = { groupsTarget = null }, server = state.serverKey,
+            channelGroups = ChannelGroups(state.channel(now.channel)?.displayName.orEmpty(), state.channelGroupChoices, state.groupPowers),
+            onChannelGroup = { actions.setChannelGroup(now, it) },
         )
     }
     moveTarget?.let { p ->
