@@ -17,14 +17,25 @@ object UiSounds {
     /**
      * The events. Some are finer than the tones tell apart (kicked from the server, banned; someone connecting to your
      * channel or joining it from another): a sound pack can have a sound for each, the tones play the broader one's.
+     * Some have a sound only in a sound pack ([PACK_ONLY]), as TeamSpeak's packs have sounds for them.
      */
     enum class Cue {
         CONNECTED, DISCONNECTED, CONNECTION_LOST, KICKED, KICKED_SERVER, BANNED,
         CHANNEL_SWITCHED, MOVED, SOMEONE_JOINED, SOMEONE_CONNECTED, SOMEONE_LEFT, SOMEONE_DISCONNECTED, SOMEONE_LOST_CONNECTION,
-        MESSAGE_IN, MESSAGE_OUT, POKE,
-        MIC_OFF, MIC_ON, SOUND_OFF, SOUND_ON,
+        SOMEONE_KICKED_CHANNEL, SOMEONE_KICKED_SERVER, SOMEONE_BANNED,
+        MESSAGE_IN, MESSAGE_OUT, POKE, WHISPER_RECEIVED,
+        MIC_OFF, MIC_ON, SOUND_OFF, SOUND_ON, AWAY_ON, AWAY_OFF,
         STREAM_STARTED, STREAM_STOPPED,
+        TALK_POWER_GRANTED, TALK_POWER_REVOKED, SERVER_GROUP_ADDED, SERVER_GROUP_REMOVED, CHANNEL_GROUP_CHANGED,
+        PERMISSION_REFUSED, CHANNEL_CREATED, CHANNEL_DELETED, CHANNEL_EDITED, YOUR_CHANNEL_EDITED, CHANNEL_MOVED,
     }
+
+    /** Events the tones stay quiet for (as before there were sound packs); a pack may have a sound for them. */
+    val PACK_ONLY = setOf(
+        Cue.WHISPER_RECEIVED, Cue.AWAY_ON, Cue.AWAY_OFF, Cue.TALK_POWER_GRANTED, Cue.TALK_POWER_REVOKED,
+        Cue.SERVER_GROUP_ADDED, Cue.SERVER_GROUP_REMOVED, Cue.CHANNEL_GROUP_CHANGED, Cue.PERMISSION_REFUSED,
+        Cue.CHANNEL_CREATED, Cue.CHANNEL_DELETED, Cue.CHANNEL_EDITED, Cue.YOUR_CHANNEL_EDITED, Cue.CHANNEL_MOVED,
+    )
 
     private const val RATE = 48000
     private val player = Executors.newSingleThreadExecutor { r -> Thread(r, "ui-sounds").apply { isDaemon = true } }
@@ -39,7 +50,7 @@ object UiSounds {
                 if (v.soundPack && SoundPack.pack != null) {
                     // An event the pack has no sound for is quiet, as in TeamSpeak
                     SoundPack.pcm(cue)?.let { out(it.samples, v, it.rate, it.channels) }
-                } else {
+                } else if (cue !in PACK_ONLY) {
                     val tone = TONE_OF[cue] ?: cue
                     val pcm = synchronized(made) { made.getOrPut(tone) { make(tone) } }
                     out(pcm, v)
@@ -55,6 +66,7 @@ object UiSounds {
         Cue.KICKED_SERVER to Cue.KICKED, Cue.BANNED to Cue.KICKED,
         Cue.SOMEONE_CONNECTED to Cue.SOMEONE_JOINED,
         Cue.SOMEONE_DISCONNECTED to Cue.SOMEONE_LEFT, Cue.SOMEONE_LOST_CONNECTION to Cue.SOMEONE_LEFT,
+        Cue.SOMEONE_KICKED_CHANNEL to Cue.SOMEONE_LEFT, Cue.SOMEONE_KICKED_SERVER to Cue.SOMEONE_LEFT, Cue.SOMEONE_BANNED to Cue.SOMEONE_LEFT,
     )
 
     private fun out(pcm: ShortArray, v: VoiceSettings, rate: Int = RATE, channels: Int = 1) {
@@ -106,8 +118,12 @@ object UiSounds {
 
     private fun make(cue: Cue): ShortArray = render(
         when (cue) {
-            Cue.KICKED_SERVER, Cue.BANNED, Cue.SOMEONE_CONNECTED, Cue.SOMEONE_DISCONNECTED, Cue.SOMEONE_LOST_CONNECTION ->
+            Cue.KICKED_SERVER, Cue.BANNED, Cue.SOMEONE_CONNECTED, Cue.SOMEONE_DISCONNECTED, Cue.SOMEONE_LOST_CONNECTION,
+            Cue.SOMEONE_KICKED_CHANNEL, Cue.SOMEONE_KICKED_SERVER, Cue.SOMEONE_BANNED ->
                 error("played with its broader event's tone")
+            Cue.WHISPER_RECEIVED, Cue.AWAY_ON, Cue.AWAY_OFF, Cue.TALK_POWER_GRANTED, Cue.TALK_POWER_REVOKED,
+            Cue.SERVER_GROUP_ADDED, Cue.SERVER_GROUP_REMOVED, Cue.CHANNEL_GROUP_CHANGED, Cue.PERMISSION_REFUSED,
+            Cue.CHANNEL_CREATED, Cue.CHANNEL_DELETED, Cue.CHANNEL_EDITED, Cue.YOUR_CHANNEL_EDITED, Cue.CHANNEL_MOVED -> error("no tone")
             // A soft chord rising: you're in
             Cue.CONNECTED -> listOf(Note(0, C4, ms = 380), Note(110, E4, ms = 380), Note(220, G4, ms = 520))
             // The same falling: you left

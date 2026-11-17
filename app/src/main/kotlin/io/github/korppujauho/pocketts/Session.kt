@@ -835,6 +835,7 @@ object Session : TsClient.Listener {
         val whom = if (action.ordinal <= AdminAction.BAN.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
         if (id == "0") return AppLog.log("Admin: ${action.log} $whom")
         AppLog.log("Admin: couldn't ${action.log} $whom, error $id: ${LogPrivacy.text(cmd["msg"])} (permission ${cmd["failed_permid"]})")
+        if (id == NO_PERMISSION) sound(Cue.PERMISSION_REFUSED)
         val message = when (id) {
             NO_PERMISSION -> app.getString(action.noPermission, who)
             WRONG_CHANNEL_PASSWORD -> app.getString(R.string.admin_move_needs_password, who)
@@ -982,7 +983,7 @@ object Session : TsClient.Listener {
                 } else {
                     val p = person(clid) ?: continue
                     if (to == here && here > 0) out += Cue.SOMEONE_JOINED
-                    else if (p.channel == here) out += Cue.SOMEONE_LEFT
+                    else if (p.channel == here) out += if (reason == 4) Cue.SOMEONE_KICKED_CHANNEL else Cue.SOMEONE_LEFT
                 }
             }
             // Connected into your channel (reason 0), or came from a channel you don't see
@@ -1000,7 +1001,13 @@ object Session : TsClient.Listener {
                 if (clid == me) {
                     if (reason == 5 || reason == 6) { kicked = true; out += if (reason == 6) Cue.BANNED else Cue.KICKED_SERVER }
                 } else if (person(clid)?.channel == here) {
-                    out += when (reason) { 8 -> Cue.SOMEONE_DISCONNECTED; 3 -> Cue.SOMEONE_LOST_CONNECTION; else -> Cue.SOMEONE_LEFT }
+                    out += when (reason) {
+                        8 -> Cue.SOMEONE_DISCONNECTED
+                        3 -> Cue.SOMEONE_LOST_CONNECTION
+                        5 -> Cue.SOMEONE_KICKED_SERVER
+                        6 -> Cue.SOMEONE_BANNED
+                        else -> Cue.SOMEONE_LEFT
+                    }
                 }
             }
             // A stream in your channel (yours too) starts or stops
@@ -1011,6 +1018,30 @@ object Session : TsClient.Listener {
                 if (clid > 0 && (clid == me || model.clients[clid]?.channel == here)) {
                     out += if (cmd.name == "notifystreamstarted") Cue.STREAM_STARTED else Cue.STREAM_STOPPED
                 }
+            }
+            // Talk power given or taken (a talker in a moderated channel)
+            "notifyclientupdated" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() != me) continue
+                val talker = g["client_is_talker"]?.let { it == "1" } ?: continue
+                if (talker != model.ownClient?.isTalker) out += if (talker) Cue.TALK_POWER_GRANTED else Cue.TALK_POWER_REVOKED
+            }
+            // Your own groups changed
+            "notifyservergroupclientadded", "notifyservergroupclientdeleted" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() == me) {
+                    out += if (cmd.name == "notifyservergroupclientadded") Cue.SERVER_GROUP_ADDED else Cue.SERVER_GROUP_REMOVED
+                }
+            }
+            "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() != me || g["cid"]?.toIntOrNull() != here) continue
+                if (g["cgid"]?.toIntOrNull() != model.ownClient?.channelGroup) out += Cue.CHANNEL_GROUP_CHANGED
+            }
+            // Channels changing. An edit counts when someone made it (the server also answers a description asked
+            // for with an edit, without anyone behind it)
+            "notifychannelcreated" -> out += Cue.CHANNEL_CREATED
+            "notifychanneldeleted" -> out += Cue.CHANNEL_DELETED
+            "notifychannelmoved" -> out += Cue.CHANNEL_MOVED
+            "notifychanneledited" -> if (cmd["invokerid"] != null) {
+                out += if (cmd["cid"]?.toIntOrNull() == here) Cue.YOUR_CHANNEL_EDITED else Cue.CHANNEL_EDITED
             }
         }
         return out.distinct()
@@ -1350,6 +1381,7 @@ object Session : TsClient.Listener {
         // Who's whispering to us (until they stop, or talk to the channel instead)
         if (voice.data.isNotEmpty() && (voice.clientId in _voices.value.whispering) != voice.whisper) {
             _voices.update { v -> v.copy(whispering = if (voice.whisper) v.whispering + voice.clientId else v.whispering - voice.clientId) }
+            if (voice.whisper) sound(Cue.WHISPER_RECEIVED)
         }
     }
 
@@ -1459,6 +1491,7 @@ object Session : TsClient.Listener {
 
     /** Away (with a message) or back, as the others see it. */
     fun setAway(away: Boolean, message: String = "") {
+        if (away != _state.value.away) UiSounds.play(if (away) Cue.AWAY_ON else Cue.AWAY_OFF, _state.value.voice, _state.value.outputMuted)
         _state.update { it.copy(away = away, awayMessage = if (away) message else "") }
         client?.sendCommand(Commands.build("clientupdate", "client_away" to away, "client_away_message" to if (away) message else ""))
     }

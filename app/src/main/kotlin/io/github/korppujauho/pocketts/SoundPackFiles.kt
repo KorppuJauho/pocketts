@@ -67,6 +67,30 @@ object SoundPackFiles {
         Cue.SOUND_ON to Names(listOf("SOUND_PLAYBACK_UNMUTED"), listOf("sound_resumed")),
         Cue.STREAM_STARTED to Names(emptyList(), listOf("stream_started")),
         Cue.STREAM_STOPPED to Names(emptyList(), listOf("stream_stopped")),
+        Cue.SOMEONE_KICKED_CHANNEL to Names(
+            listOf("CLIENT_WAS_KICKED_FROM_CHANNEL_FROM_CURRENT_CHANNEL_STAYS", "CLIENT_WAS_KICKED_FROM_CHANNEL_FROM_CURRENT_CHANNEL_DISAPPEARS"),
+            listOf("neutral_kicked_channel_awayfromcurrentchannel"),
+        ),
+        Cue.SOMEONE_KICKED_SERVER to Names(listOf("CLIENT_WAS_KICKED_FROM_SERVER_CURRENT_CHANNEL"), listOf("neutral_kicked_server_currentchannel")),
+        Cue.SOMEONE_BANNED to Names(listOf("CLIENT_WAS_BANNED_CURRENT_CHANNEL"), listOf("neutral_banned_server_currentchannel")),
+        Cue.WHISPER_RECEIVED to Names(listOf("SPECIAL_WHISPER_NOTIFY"), listOf("whisper_received")),
+        Cue.AWAY_ON to Names(emptyList(), listOf("away_activated")),
+        Cue.AWAY_OFF to Names(emptyList(), listOf("away_deactivated")),
+        Cue.TALK_POWER_GRANTED to Names(listOf("YOU_WERE_GRANTED_TALK_POWER"), listOf("talkpower_granted")),
+        Cue.TALK_POWER_REVOKED to Names(listOf("YOU_WERE_REVOKED_TALK_POWER"), listOf("talkpower_revoked")),
+        Cue.SERVER_GROUP_ADDED to Names(listOf("YOU_SERVERGROUP_ADDED_BY_USER", "YOU_SERVERGROUP_ADDED_BY_SERVER"), listOf("servergroup_assigned")),
+        Cue.SERVER_GROUP_REMOVED to Names(listOf("YOU_SERVERGROUP_REMOVED_BY_USER", "YOU_SERVERGROUP_REMOVED_BY_SERVER"), listOf("servergroup_revoked")),
+        Cue.CHANNEL_GROUP_CHANGED to Names(listOf("YOU_CHANNELGROUP_CHANGED_BY_USER", "YOU_CHANNELGROUP_CHANGED_BY_SERVER"), listOf("channelgroup_changed")),
+        Cue.PERMISSION_REFUSED to Names(listOf("SERVER_INSUFFICIENT_PERMISSIONS"), listOf("insufficient_permissions")),
+        Cue.CHANNEL_CREATED to Names(listOf("CHANNEL_CREATED_BY_OTHER", "CHANNEL_CREATED_BY_YOU"), listOf("channel_created")),
+        Cue.CHANNEL_DELETED to Names(
+            listOf("CHANNEL_DELETED_BY_OTHER", "CHANNEL_DELETED_BY_YOU", "CHANNEL_DELETED_BY_SERVER"), listOf("channel_deleted"),
+        ),
+        Cue.CHANNEL_EDITED to Names(
+            listOf("CHANNEL_EDITED_OTHER_BY_OTHER", "CHANNEL_EDITED_OTHER_BY_YOU", "CHANNEL_EDITED_OTHER_BY_SERVER"), listOf("channel_edited"),
+        ),
+        Cue.YOUR_CHANNEL_EDITED to Names(listOf("CHANNEL_EDITED_CURRENT_BY_OTHER", "CHANNEL_EDITED_CURRENT_BY_YOU"), listOf("your_channel_was_edited")),
+        Cue.CHANNEL_MOVED to Names(listOf("CHANNEL_MOVED_BY_OTHER", "CHANNEL_MOVED_BY_YOU"), listOf("channel_moved")),
     )
 
     /** A finer event without a sound of its own plays its broader one's. */
@@ -76,6 +100,10 @@ object SoundPackFiles {
         Cue.SOMEONE_CONNECTED to Cue.SOMEONE_JOINED,
         Cue.SOMEONE_DISCONNECTED to Cue.SOMEONE_LEFT,
         Cue.SOMEONE_LOST_CONNECTION to Cue.SOMEONE_DISCONNECTED,
+        Cue.SOMEONE_KICKED_CHANNEL to Cue.SOMEONE_LEFT,
+        Cue.SOMEONE_KICKED_SERVER to Cue.SOMEONE_DISCONNECTED,
+        Cue.SOMEONE_BANNED to Cue.SOMEONE_KICKED_SERVER,
+        Cue.YOUR_CHANNEL_EDITED to Cue.CHANNEL_EDITED,
     )
 
     /** A pack's name and settings from its settings.ini (TeamSpeak 3): the [info] name, and each key's file. */

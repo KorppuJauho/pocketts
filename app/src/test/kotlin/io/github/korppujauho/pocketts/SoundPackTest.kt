@@ -43,6 +43,30 @@ class SoundPackTest {
         assertFalse("notes.wav" in m.values)
     }
 
+    /** A TeamSpeak 6 pack's file names (only the names): every event finds its own sound. */
+    @Test
+    fun aTeamSpeak6PackCoversEveryEvent() {
+        val names = """
+            away_activated away_deactivated call_incoming call_outgoing channel_created channel_deleted channel_edited
+            channel_moved channel_switched channelgroup_changed chat_inbound chat_message_inbound chat_message_outbound
+            chat_outbound client_joined client_left connected connection_lost disconnected error incoming_call
+            insufficient_permissions mic_activated mic_muted neutral_banned_server_currentchannel
+            neutral_connection_connected_currentchannel neutral_connection_connectionlost_currentchannel
+            neutral_connection_disconnected_currentchannel neutral_kicked_channel_awayfromcurrentchannel
+            neutral_kicked_channel_tocurrentchannel neutral_kicked_server_currentchannel neutral_moved_awayfromcurrentchannel
+            neutral_moved_tocurrentchannel neutral_switched_awayfromcurrentchannel neutral_switched_tocurrentchannel
+            no_whisper_target_found servergroup_assigned servergroup_revoked sound_muted sound_resumed stop_talking
+            stream_started stream_stopped talkpower_granted talkpower_requested talkpower_revoked whisper_received
+            you_edited_server you_kicked_channel you_kicked_server you_were_banned you_were_moved you_were_poked
+            your_channel_was_edited
+        """.trim().split(Regex("\\s+")).map { "$it.wav" }.toSet()
+        val m = SoundPackFiles.match(names, null)
+        assertEquals(emptyList<Cue>(), Cue.entries.filter { it !in m })
+        assertEquals("whisper_received.wav", m[Cue.WHISPER_RECEIVED])
+        assertEquals("neutral_kicked_server_currentchannel.wav", m[Cue.SOMEONE_KICKED_SERVER])
+        assertEquals("your_channel_was_edited.wav", m[Cue.YOUR_CHANNEL_EDITED])
+    }
+
     @Test
     fun theSurestFormatWhenThereAreTwo() {
         assertEquals("connected.wav", SoundPackFiles.match(setOf("connected.mp3", "connected.wav"), null)[Cue.CONNECTED])
