@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Check
@@ -70,6 +71,7 @@ import androidx.compose.ui.window.DialogProperties
 import io.github.korppujauho.pocketts.VoiceSettings
 import io.github.korppujauho.pocketts.VoiceSettings.Activation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.R
@@ -97,6 +99,11 @@ interface SettingsActions {
     fun forgetIdentity() {}
     /** The identity's security level (null when it can't be read). */
     fun securityLevel(): Int? = null
+    /** The sound pack imported (null when none). */
+    fun soundPack(): SoundPackInfo? = null
+    /** Imports a sound pack from a folder (a tree from the folder picker) or a .zip; null when it worked, else why not. */
+    fun importSoundPack(uri: android.net.Uri, folder: Boolean): String? = null
+    fun removeSoundPack() {}
     /** Forgets every server's chat history, and the lines on screen. */
     fun clearChatHistory() {}
     /** Forgets every remembered channel password. */
@@ -105,6 +112,9 @@ interface SettingsActions {
     fun language(): String = ""
     fun setLanguage(tag: String) {}
 }
+
+/** An imported sound pack: its name, and how many of the [of] events have a sound. */
+data class SoundPackInfo(val name: String, val events: Int, val of: Int)
 
 /** Who we are on the server, for the profile picture in Settings. */
 data class SelfInfo(val person: io.github.korppujauho.pocketts.proto.ServerModel.Client?, val server: String, val avatarStatus: String?)
@@ -638,9 +648,74 @@ private fun Playback(v: VoiceSettings, saved: VoiceSettings, actions: SettingsAc
         Check(stringResource(R.string.playback_event_sounds), v.uiSounds, info = stringResource(R.string.playback_event_sounds_desc)) { onChange(v.copy(uiSounds = it)) }
     }
     if (v.uiSounds) {
+        SoundPackGroup(v, actions, onChange)
         Group(stringResource(R.string.playback_sound_volume), "${(v.uiSoundVolume * 100).roundToInt()}%") {
             TsSlider(v.uiSoundVolume, 0f..1f, 19) { onChange(v.copy(uiSoundVolume = (it * 20).roundToInt() / 20f)) }
             SecondaryButton(stringResource(R.string.playback_play_sound)) { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
+        }
+    }
+}
+
+/**
+ * The tones or the person's own sound pack: Tones | the pack's name once one is imported, how many events it has a
+ * sound for, and Import (a folder or a .zip) and Remove. Importing chooses the pack; it takes effect with Save & Apply,
+ * as the rest.
+ */
+@Composable
+private fun SoundPackGroup(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+    var pack by remember { mutableStateOf(actions.soundPack()) }
+    var choosing by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf<String?>(null) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val importing = stringResource(R.string.sound_pack_importing)
+    val res = androidx.compose.ui.platform.LocalResources.current
+    val import = { uri: android.net.Uri, folder: Boolean ->
+        status = importing
+        scope.launch {
+            val error = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { actions.importSoundPack(uri, folder) }
+            pack = actions.soundPack()
+            status = error ?: pack?.let { res.getString(R.string.sound_pack_imported, it.name) }
+            if (error == null) onChange(v.copy(soundPack = true))
+        }
+        Unit
+    }
+    val pickFolder = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()
+    ) { uri -> if (uri != null) import(uri, true) }
+    val pickZip = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) import(uri, false) }
+    Group(stringResource(R.string.sound_pack_title), info = stringResource(R.string.sound_pack_desc)) {
+        pack?.let { p ->
+            Segmented(listOf(stringResource(R.string.sound_pack_tones), p.name), if (v.soundPack) 1 else 0) { onChange(v.copy(soundPack = it == 1)) }
+            Desc(stringResource(R.string.sound_pack_events, p.events, p.of))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton(stringResource(R.string.sound_pack_import)) { choosing = true }
+            if (pack != null) SecondaryButton(stringResource(R.string.sound_pack_remove)) {
+                actions.removeSoundPack()
+                pack = null
+                status = null
+                onChange(v.copy(soundPack = false))
+            }
+        }
+        status?.let { Desc(it) }
+    }
+    if (choosing) {
+        TsDialog(
+            onDismiss = { choosing = false }, title = stringResource(R.string.sound_pack_import_title),
+            icon = androidx.compose.material.icons.Icons.Rounded.LibraryMusic,
+            buttons = { PillButton(stringResource(R.string.cancel)) { choosing = false } },
+        ) {
+            Desc(stringResource(R.string.sound_pack_import_desc))
+            PillButton(stringResource(R.string.sound_pack_folder), PillKind.PRIMARY, modifier = Modifier.fillMaxWidth()) {
+                choosing = false
+                pickFolder.launch(null)
+            }
+            PillButton(stringResource(R.string.sound_pack_zip), modifier = Modifier.fillMaxWidth()) {
+                choosing = false
+                pickZip.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+            }
         }
     }
 }

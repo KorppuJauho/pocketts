@@ -10,13 +10,17 @@ import kotlin.math.sin
 
 /**
  * The app's own sounds for events, as WebTS plays them for the same events (TeamSpeak's own sound files aren't ours to
- * use): low, soft tones made here, in the style of chat apps' sounds. Played the way voices are (call audio or media),
- * at their own volume (Settings > Playback).
+ * use): low, soft tones made here, in the style of chat apps' sounds. Or the person's own sound pack ([SoundPack]),
+ * when chosen. Played the way voices are (call audio or media), at their own volume (Settings > Playback).
  */
 object UiSounds {
+    /**
+     * The events. Some are finer than the tones tell apart (kicked from the server, banned; someone connecting to your
+     * channel or joining it from another): a sound pack can have a sound for each, the tones play the broader one's.
+     */
     enum class Cue {
-        CONNECTED, DISCONNECTED, CONNECTION_LOST, KICKED,
-        CHANNEL_SWITCHED, MOVED, SOMEONE_JOINED, SOMEONE_LEFT,
+        CONNECTED, DISCONNECTED, CONNECTION_LOST, KICKED, KICKED_SERVER, BANNED,
+        CHANNEL_SWITCHED, MOVED, SOMEONE_JOINED, SOMEONE_CONNECTED, SOMEONE_LEFT, SOMEONE_DISCONNECTED, SOMEONE_LOST_CONNECTION,
         MESSAGE_IN, MESSAGE_OUT, POKE,
         MIC_OFF, MIC_ON, SOUND_OFF, SOUND_ON,
         STREAM_STARTED, STREAM_STOPPED,
@@ -32,15 +36,28 @@ object UiSounds {
         if (soundOff && cue != Cue.SOUND_OFF) return
         player.execute {
             try {
-                val pcm = synchronized(made) { made.getOrPut(cue) { make(cue) } }
-                out(pcm, v)
+                if (v.soundPack && SoundPack.pack != null) {
+                    // An event the pack has no sound for is quiet, as in TeamSpeak
+                    SoundPack.pcm(cue)?.let { out(it.samples, v, it.rate, it.channels) }
+                } else {
+                    val tone = TONE_OF[cue] ?: cue
+                    val pcm = synchronized(made) { made.getOrPut(tone) { make(tone) } }
+                    out(pcm, v)
+                }
             } catch (e: Exception) {
                 AppLog.log("Sound $cue not played: $e")
             }
         }
     }
 
-    private fun out(pcm: ShortArray, v: VoiceSettings) {
+    /** The finer events play their broader one's tone. */
+    private val TONE_OF = mapOf(
+        Cue.KICKED_SERVER to Cue.KICKED, Cue.BANNED to Cue.KICKED,
+        Cue.SOMEONE_CONNECTED to Cue.SOMEONE_JOINED,
+        Cue.SOMEONE_DISCONNECTED to Cue.SOMEONE_LEFT, Cue.SOMEONE_LOST_CONNECTION to Cue.SOMEONE_LEFT,
+    )
+
+    private fun out(pcm: ShortArray, v: VoiceSettings, rate: Int = RATE, channels: Int = 1) {
         val gain = v.uiSoundVolume
         val scaled = ShortArray(pcm.size) { (pcm[it] * gain).toInt().toShort() }
         val track = AudioTrack.Builder()
@@ -51,7 +68,8 @@ object UiSounds {
                     .build()
             )
             .setAudioFormat(
-                AudioFormat.Builder().setSampleRate(RATE).setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                AudioFormat.Builder().setSampleRate(rate)
+                    .setChannelMask(if (channels == 2) AudioFormat.CHANNEL_OUT_STEREO else AudioFormat.CHANNEL_OUT_MONO)
                     .setEncoding(AudioFormat.ENCODING_PCM_16BIT).build()
             )
             .setTransferMode(AudioTrack.MODE_STATIC)
@@ -60,7 +78,7 @@ object UiSounds {
         try {
             track.write(scaled, 0, scaled.size)
             track.play()
-            Thread.sleep(scaled.size * 1000L / RATE + 60)
+            Thread.sleep(scaled.size * 1000L / (rate * channels) + 60)
         } finally {
             track.release()
         }
@@ -88,6 +106,8 @@ object UiSounds {
 
     private fun make(cue: Cue): ShortArray = render(
         when (cue) {
+            Cue.KICKED_SERVER, Cue.BANNED, Cue.SOMEONE_CONNECTED, Cue.SOMEONE_DISCONNECTED, Cue.SOMEONE_LOST_CONNECTION ->
+                error("played with its broader event's tone")
             // A soft chord rising: you're in
             Cue.CONNECTED -> listOf(Note(0, C4, ms = 380), Note(110, E4, ms = 380), Note(220, G4, ms = 520))
             // The same falling: you left

@@ -985,19 +985,23 @@ object Session : TsClient.Listener {
                     else if (p.channel == here) out += Cue.SOMEONE_LEFT
                 }
             }
-            // Connected into your channel, or came from a channel you don't see
+            // Connected into your channel (reason 0), or came from a channel you don't see
             "notifycliententerview" -> for (g in cmd.groups) {
+                g["reasonid"]?.toIntOrNull()?.let { reason = it }
                 val clid = g["clid"]?.toIntOrNull() ?: continue
                 if (clid == me || g["client_type"] == "1") continue
-                if (g["ctid"]?.toIntOrNull() == here && here > 0) out += Cue.SOMEONE_JOINED
+                if (g["ctid"]?.toIntOrNull() == here && here > 0) out += if (reason == 0) Cue.SOMEONE_CONNECTED else Cue.SOMEONE_JOINED
             }
-            // Left the server from your channel; or you were kicked or banned
+            // Left the server from your channel (disconnected, lost the connection, or another way); or you were
+            // kicked from the server (5) or banned (6)
             "notifyclientleftview" -> for (g in cmd.groups) {
                 g["reasonid"]?.toIntOrNull()?.let { reason = it }
                 val clid = g["clid"]?.toIntOrNull() ?: continue
                 if (clid == me) {
-                    if (reason == 5 || reason == 6) { kicked = true; out += Cue.KICKED }
-                } else if (person(clid)?.channel == here) out += Cue.SOMEONE_LEFT
+                    if (reason == 5 || reason == 6) { kicked = true; out += if (reason == 6) Cue.BANNED else Cue.KICKED_SERVER }
+                } else if (person(clid)?.channel == here) {
+                    out += when (reason) { 8 -> Cue.SOMEONE_DISCONNECTED; 3 -> Cue.SOMEONE_LOST_CONNECTION; else -> Cue.SOMEONE_LEFT }
+                }
             }
             // A stream in your channel (yours too) starts or stops
             "notifystreamstarted", "notifystreamstopped" -> {

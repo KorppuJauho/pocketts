@@ -82,11 +82,12 @@ object AppLanguage {
     }
 }
 
-/** The app itself: here only for the language on older Androids ([AppLanguage]). */
+/** The app itself: here for the language on older Androids ([AppLanguage]), and the sound pack imported before. */
 class PocketApp : android.app.Application() {
     override fun onCreate() {
         super.onCreate()
         AppLanguage.apply(this)
+        SoundPack.load(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

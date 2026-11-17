@@ -570,6 +570,19 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun identityProblem(): String? = Settings(context).identityProblem()
     override fun forgetIdentity() = Settings(context).forgetIdentity()
     override fun securityLevel(): Int? = IdentityRaise.level(context)
+    override fun soundPack() = SoundPack.pack?.let {
+        io.github.korppujauho.pocketts.ui.SoundPackInfo(it.name, it.files.size, UiSounds.Cue.entries.size)
+    }
+    override fun importSoundPack(uri: android.net.Uri, folder: Boolean): String? = try {
+        SoundPack.import(context, uri, folder)
+        null
+    } catch (e: SoundPack.ImportFailed) {
+        e.message
+    } catch (e: Exception) {
+        AppLog.log("Sound pack not imported: ${e.javaClass.simpleName}")
+        context.getString(R.string.file_not_opened)
+    }
+    override fun removeSoundPack() = SoundPack.remove(context)
     override fun clearChatHistory() = Session.clearChatHistory(context)
     override fun forgetChannelPasswords() = ChannelPasswords(context).clear()
 }
