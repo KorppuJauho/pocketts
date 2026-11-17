@@ -28,7 +28,7 @@ to join.
   disconnect buttons in the notification.
 - **Settings** and sounds for events.
 - **Languages:** English, Finnish, German, Spanish, French, Italian, Portuguese (Brazil), Polish, Turkish, Simplified
-  Chinese, Russian, Ukrainian and Czech (see
+  Chinese, Russian, Ukrainian, Czech, Arabic and Persian (see
   [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
 
 Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking (see the

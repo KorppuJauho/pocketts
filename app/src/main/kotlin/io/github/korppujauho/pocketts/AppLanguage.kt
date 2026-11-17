@@ -19,6 +19,7 @@ object AppLanguage {
         "en" to "English", "fi" to "Suomi", "de" to "Deutsch", "es" to "Español",
         "fr" to "Français", "it" to "Italiano", "pt" to "Português", "pl" to "Polski", "tr" to "Türkçe",
         "zh-Hans" to "简体中文", "ru" to "Русский", "uk" to "Українська", "cs" to "Čeština",
+        "ar" to "العربية", "fa" to "فارسی",
     )
 
     private fun prefs(context: Context) = context.getSharedPreferences("settings", Context.MODE_PRIVATE)

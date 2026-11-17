@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app text in Arabic (Modern Standard Arabic). Placeholders (%1$s, %1$d) as in values/strings.xml.
+-->
+<resources>
+
+    <!-- Shared -->
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="delete">حذف</string>
+    <string name="edit">تعديل</string>
+    <string name="remove">إزالة</string>
+    <string name="close">إغلاق</string>
+    <string name="advanced">متقدم</string>
+    <string name="connect">اتصال</string>
+    <string name="link_title">الاتصال بـ %1$s؟</string>
+    <string name="link_subtitle">من رابط TeamSpeak</string>
+    <string name="link_subtitle_invite">من دعوة TeamSpeak</string>
+    <string name="link_address">العنوان</string>
+    <string name="invite_expired">انتهت صلاحية هذه الدعوة أو أنها غير موجودة. اطلب دعوة جديدة، أو عنوان الخادم.</string>
+    <string name="invite_failed">تعذّر البحث عن الدعوة. تحقق من الاتصال وحاول مجددًا.</string>
+    <string name="link_channel">القناة</string>
+    <string name="link_password">كلمة مرور الخادم</string>
+    <string name="link_password_given">موجودة في الرابط</string>
+    <string name="link_leaving">ستغادر %1$s أولًا.</string>
+    <string name="link_use_key">استخدم مفتاح الامتياز الموجود في الرابط</string>
+    <string name="link_use_key_desc">يمنحك صلاحيات على هذا الخادم، مثل صلاحيات المشرف. لا تستخدمه إلا إذا كنت تثق بمن أرسل الرابط.</string>
+    <string name="disconnect">قطع الاتصال</string>
+    <string name="nickname">الاسم المستعار</string>
+    <string name="server_address">عنوان الخادم أو اسمه المستعار</string>
+    <string name="server_password">كلمة مرور الخادم</string>
+    <string name="remember_password">تذكّر كلمة المرور</string>
+    <string name="channel_password">كلمة مرور القناة</string>
+    <string name="join">انضمام</string>
+
+    <!-- Connect screen -->
+    <string name="favourites">المفضلة</string>
+    <string name="favourites_in">في المفضلة</string>
+    <string name="favourites_save">حفظ في المفضلة</string>
+    <string name="favourite_edit">تعديل المفضّل</string>
+    <string name="favourite_add">إضافة إلى المفضلة</string>
+    <string name="favourite_name">الاسم في قوائمك</string>
+    <string name="favourite_nickname">اسمك المستعار على هذا الخادم</string>
+    <string name="favourite_auto">الاتصال تلقائيًا عند فتح التطبيق</string>
+    <string name="favourite_file_port">منفذ نقل الملفات</string>
+    <string name="favourite_file_port_hint">منفذ الخادم نفسه (عادةً 30033)</string>
+    <string name="favourite_file_port_desc">فقط إذا لم تُحمَّل صور الخادم وصوره الرمزية: نقل الملفات لديه على منفذ آخر.</string>
+    <string name="favourite_folder">المجلد</string>
+    <string name="favourite_folder_new">مجلد جديد…</string>
+    <string name="folder_name">اسم المجلد</string>
+    <string name="folder_edit">تعديل المجلد</string>
+    <string name="folder_fold">طي المجلد</string>
+    <string name="folder_unfold">فتح المجلد</string>
+    <string name="connect_show">فتح لوحة الاتصال</string>
+    <string name="connect_hide">طي لوحة الاتصال</string>
+    <string name="community_tab">المجتمع</string>
+    <string name="community_desc">خوادم عامة تديرها TeamSpeak. اضغط على أحدها للانضمام.</string>
+    <string name="community_desc_no_nick">خوادم عامة تديرها TeamSpeak. اكتب اسمًا مستعارًا في الأعلى للانضمام إلى أحدها.</string>
+    <string name="community_worldwide">عالمي</string>
+    <string name="community_eu_east">شرق أوروبا</string>
+    <string name="community_emea">أوروبا والشرق الأوسط وأفريقيا</string>
+    <string name="community_apac">آسيا والمحيط الهادئ</string>
+    <string name="community_latam">أمريكا اللاتينية</string>
+    <string name="community_na">أمريكا الشمالية</string>
+    <string name="favourite_channel">القناة التي تنضم إليها</string>
+    <string name="favourite_channel_hint">القناة الافتراضية للخادم</string>
+    <string name="favourite_channel_desc">اسم القناة كما يعرضه الخادم. لقناة داخل قناة أخرى، اكتب مسارها: ألعاب/الردهة.</string>
+    <string name="channel_not_joined">تعذّر الانضمام إلى %1$s: لا توجد قناة بهذا الاسم، أو كلمة مرورها خاطئة. أنت في القناة الافتراضية للخادم.</string>
+    <string name="update_title">صدر PocketTS %1$s</string>
+    <string name="update_text">يتوفر على GitHub إصدار أحدث من هذا الإصدار (%1$s).</string>
+    <string name="not_now">ليس الآن</string>
+    <string name="download">تنزيل</string>
+
+    <!-- Server screen: header and controls -->
+    <string name="settings">الإعدادات</string>
+    <string name="hold_to_talk">اضغط باستمرار للتحدث</string>
+    <string name="microphone">الميكروفون</string>
+    <string name="sound">الصوت</string>
+    <string name="share">مشاركة</string>
+
+    <!-- Channel list -->
+    <string name="channel_has_password">كلمة مرور</string>
+    <string name="person_sound_off">الصوت مغلق</string>
+    <string name="person_mic_off">الميكروفون مغلق</string>
+    <string name="person_cant_talk">لا يمكنه التحدث في هذه القناة</string>
+    <string name="person_streaming">يبث</string>
+    <!-- Short tags after a name, in capitals as in the TeamSpeak app -->
+    <string name="tag_afk">AFK</string>
+    <string name="tag_you">أنت</string>
+
+    <!-- Chat -->
+    <!-- The chat's lines about people coming and going. %1$s and %2$s are names (a person's, a channel's), shown bold -->
+    <string name="event_connected">اتصل %1$s</string>
+    <string name="event_joined_from">انضم %1$s قادمًا من %2$s</string>
+    <string name="event_you_moved_to">نُقلت إلى %1$s</string>
+    <string name="event_you_kicked_from">طُردت من %1$s</string>
+    <string name="event_moved_here_from">نُقل %1$s إلى هنا من %2$s</string>
+    <string name="event_kicked_from">طُرد %1$s من %2$s</string>
+    <string name="event_moved_to">نُقل %1$s إلى %2$s</string>
+    <string name="event_kicked_from_channel">طُرد %1$s من القناة</string>
+    <string name="event_left_to">غادر %1$s إلى %2$s</string>
+    <string name="event_you_kicked_from_server">طُردت من الخادم</string>
+    <string name="event_you_banned">تم حظرك</string>
+    <string name="event_lost_connection">فقد %1$s الاتصال</string>
+    <string name="event_kicked_from_server">طُرد %1$s من الخادم</string>
+    <string name="event_banned">حُظر %1$s</string>
+    <string name="event_disconnected">قطع %1$s الاتصال</string>
+    <!-- Added after a line: who did it (%1$s), and the reason they gave (%1$s). Keep the space at the start -->
+    <string name="event_by">" بواسطة %1$s"</string>
+    <string name="event_because">" (%1$s)"</string>
+    <!-- A channel without a name -->
+    <string name="event_another_channel">قناة أخرى</string>
+    <string name="chat_channel">القناة</string>
+    <string name="chat_empty_channel">لا رسائل في هذه القناة بعد.</string>
+    <string name="chat_empty_private">لا رسائل بعد.</string>
+    <!-- The message box's hint: %1$s is the channel's or the person's name -->
+    <string name="chat_message_to">رسالة إلى %1$s…</string>
+    <string name="chat_message_to_channel">رسالة إلى القناة…</string>
+    <string name="chat_message_to_them">رسالة إليه…</string>
+    <!-- The sender of a line from the server itself -->
+    <string name="chat_system">النظام</string>
+    <!-- A link's card: %1$s is the website's name, such as example.com -->
+    <string name="chat_link_open">فتح: %1$s</string>
+    <plurals name="chat_pictures_max">
+        <item quantity="zero">%1$d صورة كحد أقصى في المرة الواحدة.</item>
+        <item quantity="one">صورة واحدة كحد أقصى في المرة الواحدة.</item>
+        <item quantity="two">صورتان كحد أقصى في المرة الواحدة.</item>
+        <item quantity="few">%1$d صور كحد أقصى في المرة الواحدة.</item>
+        <item quantity="many">%1$d صورة كحد أقصى في المرة الواحدة.</item>
+        <item quantity="other">%1$d صورة كحد أقصى في المرة الواحدة.</item>
+    </plurals>
+    <string name="chat_camera_needed">التقاط صورة يتطلب السماح باستخدام الكاميرا.</string>
+    <string name="chat_sending_picture">جارٍ إرسال الصورة %1$d من %2$d…</string>
+    <string name="chat_attached_picture">صورة مرفقة</string>
+    <string name="chat_remove_picture">إزالة الصورة</string>
+    <string name="chat_send_picture">إرسال صورة</string>
+    <string name="chat_choose_pictures">اختيار صور</string>
+    <string name="chat_take_photo">التقاط صورة</string>
+    <string name="chat_send">إرسال</string>
+
+    <!-- A picture on the whole screen -->
+    <string name="picture_save">حفظ في المعرض</string>
+    <!-- %1$s is the folder, Pictures/PocketTS -->
+    <string name="picture_saved">حُفظت في %1$s</string>
+    <!-- %1$s is the reason, as the phone gives it -->
+    <string name="picture_failed">لم ينجح ذلك: %1$s</string>
+
+    <!-- Streams: watching -->
+    <!-- The button next to someone who streams, in capitals as in the TeamSpeak app -->
+    <string name="stream_watch">مشاهدة</string>
+    <string name="stream_small_window">نافذة صغيرة</string>
+    <string name="stream_full_screen">ملء الشاشة</string>
+    <string name="stream_resize">اسحب لتغيير حجم البث</string>
+    <string name="stream_mini">بث مصغّر: اضغط لتكبيره، واسحب لنقله</string>
+    <string name="stream_leave_full_screen">الخروج من ملء الشاشة</string>
+    <string name="stream_stop_watching">إيقاف المشاهدة</string>
+    <string name="stream_sound_on">تشغيل الصوت</string>
+    <string name="stream_sound_off">إيقاف الصوت</string>
+    <string name="stream_requesting">جارٍ طلب الوصول…</string>
+    <string name="stream_connecting">جارٍ الاتصال…</string>
+    <string name="stream_paused">متوقف مؤقتًا</string>
+    <string name="stream_waiting_picture">تم الاتصال، بانتظار الصورة…</string>
+    <string name="stream_trying">مشكلة في الاتصال، لا تزال المحاولة جارية…</string>
+    <string name="stream_connection_lost">انقطع الاتصال.</string>
+    <string name="stream_open_failed">تعذّر فتح البث.</string>
+    <string name="stream_denied">رُفض طلب البث.</string>
+    <string name="stream_ended">انتهى البث.</string>
+    <string name="stream_ended_left_channel">انتهى البث (لم تعد في القناة نفسها).</string>
+
+    <!-- Streams: sharing -->
+    <string name="share_camera_title">مشاركة الكاميرا</string>
+    <string name="share_screen_title">مشاركة الشاشة</string>
+    <string name="share_subtitle">يمكن لكل من في قناتك المشاهدة</string>
+    <string name="start">بدء</string>
+    <string name="stop">إيقاف</string>
+    <string name="share_what">ماذا تشارك</string>
+    <string name="share_camera">الكاميرا</string>
+    <string name="share_screen">الشاشة</string>
+    <string name="share_both_cameras">الكاميرتان معًا</string>
+    <string name="camera_front">الأمامية</string>
+    <string name="camera_back">الخلفية</string>
+    <string name="camera_both">كلتاهما</string>
+    <string name="share_both_desc">الكاميرا الخلفية كبيرة، والأمامية صغيرة في الزاوية. زر التبديل يبدّل مكانيهما.</string>
+    <string name="share_quality">الجودة</string>
+    <string name="share_quality_480">توفير البيانات: أقل استهلاك للبيانات، لشبكات الهاتف المحمول.</string>
+    <string name="share_quality_720">HD: صورة واضحة، وخفيفة بما يكفي لمعظم الاتصالات.</string>
+    <string name="share_quality_1080">Full HD: الأوضح، ويتطلب اتصالًا جيدًا لدى الطرفين.</string>
+    <string name="share_sound">صوت البث</string>
+    <string name="share_sound_on_desc">يسمع المشاهدون الميكروفون مع الصورة. يصمت أثناء كتم الميكروفون وأثناء تحدثك في القناة، حتى لا يُسمع صوتك مرتين.</string>
+    <string name="share_sound_off_desc">لا صوت مع الصورة: تحدّث في القناة كالمعتاد.</string>
+    <string name="share_screen_sound">صوت الهاتف</string>
+    <string name="share_screen_sound_on_desc">يسمع المشاهدون ما يشغّله هاتفك، مثل فيديو أو لعبة. بعض التطبيقات لا تسمح بذلك وتبقى صامتة. أصوات القناة غير مضمّنة.</string>
+    <string name="share_screen_sound_off_desc">لا صوت مع الصورة.</string>
+    <string name="share_screen_sound_watching">ليس أثناء مشاهدتك لبث: أوقف المشاهدة لمشاركة صوت الهاتف أيضًا.</string>
+    <string name="share_screen_desc">يطلب Android الإذن مرة أخرى قبل البدء. يُعرض كل ما على شاشتك، بما في ذلك الإشعارات.</string>
+    <string name="share_sound_quiet">صوت البث صامت</string>
+    <string name="share_sound_live">صوت البث مفعّل</string>
+    <string name="share_starting">جارٍ البدء…</string>
+    <string name="share_paused_call">متوقف مؤقتًا أثناء المكالمة</string>
+    <string name="share_watching">المشاهدون</string>
+    <string name="share_swap_cameras">تبديل الكاميرتين</string>
+    <string name="share_switch_camera">تبديل الكاميرا</string>
+    <string name="share_turn_locked">التدوير مقفل (اضغط ليتبع الهاتف)</string>
+    <string name="share_turn_follows">التدوير يتبع الهاتف (اضغط للقفل)</string>
+    <string name="share_light_on">الإضاءة الحلقية مفعّلة (اضغط للإيقاف)</string>
+    <string name="share_light_off">الإضاءة الحلقية: شاشة بيضاء ساطعة تضيء وجهك</string>
+    <string name="share_both_unsupported">لا يمكن لهذا الهاتف استخدام الكاميرتين في الوقت نفسه.</string>
+    <string name="share_failed">تعذّر بدء المشاركة.</string>
+    <!-- %1$s is TeamSpeak's reason -->
+    <string name="share_refused">رفض TeamSpeak المشاركة: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_general">عام</string>
+    <string name="settings_playback">التشغيل</string>
+    <string name="settings_capture">الالتقاط</string>
+    <!-- The tab with how the app looks and what it offers -->
+    <string name="settings_ui">الواجهة</string>
+    <string name="settings_save">حفظ وتطبيق</string>
+    <string name="cant_be_undone">لا يمكن التراجع عن هذا</string>
+    <string name="quiet">منخفض</string>
+    <string name="loud">مرتفع</string>
+
+    <!-- Settings › General -->
+    <string name="avatar_title">صورة الملف الشخصي</string>
+    <string name="avatar_change">تغيير</string>
+    <string name="avatar_desc">يراها الآخرون على هذا الخادم. مقاسها المناسب 320 × 320.</string>
+    <string name="general_floating_ptt">زر «اضغط للتحدث» العائم</string>
+    <string name="general_floating_ptt_desc">في وضع «اضغط للتحدث»، يبقى زر دائري أسفل شاشة PocketTS، لتتمكن من التحدث أثناء تمرير الدردشة. الزر فوق التطبيقات الأخرى (أدناه) إعداد منفصل.</string>
+    <string name="general_overlay_ptt">زر التحدث فوق التطبيقات الأخرى</string>
+    <string name="general_overlay_ptt_desc">في وضع «اضغط للتحدث»، يظهر زر دائري عند انتقالك إلى تطبيقات أخرى (وليس داخل PocketTS نفسه). اضغط عليه باستمرار للتحدث، واسحبه لنقله. يطلب Android مرة واحدة السماح لـ PocketTS بالظهور فوق التطبيقات الأخرى.</string>
+    <string name="general_volume_ptt">أزرار مستوى الصوت للتحدث</string>
+    <string name="general_volume_ptt_desc">في وضع «اضغط للتحدث»، الضغط باستمرار على زر مستوى الصوت يتيح لك التحدث ما دام التطبيق على الشاشة (بدلًا من تغيير مستوى الصوت).</string>
+    <string name="general_headset_ptt">زر سماعة الرأس للتحدث</string>
+    <string name="general_headset_ptt_desc">في وضع «اضغط للتحدث»، اضغط الزر على سماعتك لبدء التحدث واضغطه مرة أخرى للتوقف. يعمل والشاشة مطفأة أيضًا. أثناء تفعيله، لا يشغّل الزر الموسيقى ولا يوقفها مؤقتًا.</string>
+    <string name="general_call_mute">الكتم أثناء المكالمات الهاتفية</string>
+    <string name="general_call_mute_desc">عندما ترن مكالمة هاتفية أو تبدأ، يُغلق الميكروفون والصوت (وصوت البث الذي تشاهده)، ويعودان عند انتهائها. يتوقف البث الذي تشاركه مؤقتًا، حتى لا يرى المشاهدون المكالمة. ما كتمته بنفسك يبقى مكتومًا.</string>
+    <string name="general_updates">التحقق من التحديثات</string>
+    <string name="general_updates_desc">مرة يوميًا، يسأل PocketTS موقع GitHub عن صدور إصدار أحدث، ويُظهر ذلك في شاشة الاتصال. لا يُرسل أي شيء عنك.</string>
+    <string name="general_screen_on">إبقاء الشاشة مضاءة</string>
+    <string name="general_screen_on_desc">لا تنطفئ الشاشة ما دمت متصلًا والتطبيق مفتوحًا. أثناء مشاركة بث أو مشاهدته، تبقى مضاءة على أي حال.</string>
+    <string name="general_spacers">السماح بالانضمام إلى القنوات الفاصلة</string>
+    <string name="general_spacers_desc">الضغط على فاصل (خط فاصل أو عنوان في قائمة القنوات) ينضم إليه كأي قناة. بعض الخوادم تستخدمه كقناة AFK. عند الإيقاف، لا يمكن الانضمام إلى الفواصل بضغطة خاطئة.</string>
+    <string name="history_title">سجل الدردشة</string>
+    <!-- %1$s is how many days (history_days), %2$s how many lines (history_lines) -->
+    <string name="history_desc">تُحفظ دردشات القنوات والدردشات الخاصة ومن انضم أو غادر على هذا الهاتف مشفّرةً، وتُعرض مجددًا عند اتصالك بالخادم نفسه: آخر %1$s، وبحد أقصى %2$s لكل محادثة. لا تُحفظ النكزات.</string>
+    <plurals name="history_days">
+        <item quantity="zero">%1$d يوم</item>
+        <item quantity="one">يوم واحد</item>
+        <item quantity="two">يومين</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يومًا</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+    <plurals name="history_lines">
+        <item quantity="zero">%1$d سطر</item>
+        <item quantity="one">سطر واحد</item>
+        <item quantity="two">سطرين</item>
+        <item quantity="few">%1$d أسطر</item>
+        <item quantity="many">%1$d سطرًا</item>
+        <item quantity="other">%1$d سطر</item>
+    </plurals>
+    <string name="history_clear">مسح سجل الدردشة</string>
+    <string name="history_cleared">تم المسح.</string>
+    <string name="history_clear_title">مسح سجل الدردشة؟</string>
+    <string name="history_clear_button">مسح</string>
+    <string name="history_clear_desc">تُزال الدردشات المحفوظة لكل الخوادم من هذا الهاتف، وكذلك الدردشة المعروضة الآن.</string>
+
+    <!-- Settings › Playback -->
+    <string name="playback_voice_volume">مستوى صوت المتحدثين</string>
+    <string name="playback_test_sound">تشغيل صوت تجريبي</string>
+    <string name="playback_event_sounds">أصوات الأحداث</string>
+    <string name="playback_event_sounds_desc">أصوات قصيرة عند دخول أحد إلى قناتك أو مغادرتها، وللرسائل والنكزات والبث، ولأزرار الميكروفون والصوت.</string>
+    <string name="playback_sound_volume">مستوى صوت الأحداث</string>
+    <string name="playback_play_sound">تشغيل صوت</string>
+    <string name="playback_call_volume">عند التشغيل كمكالمة هاتفية، تتبع الأصوات مستوى صوت المكالمة: اضغط زر مستوى الصوت أثناء الاتصال.</string>
+    <string name="playback_media_volume">تتبع الأصوات مستوى صوت الوسائط.</string>
+    <string name="playback_output_speaker">مكبر الصوت</string>
+    <string name="playback_output_earpiece">سماعة الأذن</string>
+    <string name="playback_headset">استخدام السماعات المتصلة</string>
+    <string name="playback_headset_desc">تشغّل سماعات الرأس أو السماعة بميكروفون أو مكبر صوت Bluetooth الأصوات أثناء الاتصال. عند الإيقاف: يشغّلها الهاتف نفسه دائمًا.</string>
+    <string name="play_as">تُشغَّل الأصوات كـ</string>
+    <string name="play_media">وسائط</string>
+    <string name="play_call">مكالمة هاتفية</string>
+    <string name="play_ear">عند أذنك</string>
+    <string name="play_media_sound">أفضل جودة صوت، مستوى صوت الوسائط</string>
+    <string name="play_media_echo">قد يسمع الآخرون صدى ما لم تستخدم «اضغط للتحدث» أو سماعات</string>
+    <string name="play_media_bluetooth">لا يمكن استخدام ميكروفون سماعات Bluetooth</string>
+    <string name="play_call_echo">إزالة الصدى، مستوى صوت المكالمة</string>
+    <string name="play_call_bluetooth">ميكروفون سماعات Bluetooth يعمل</string>
+    <string name="play_call_quieter">أخفض صوتًا، وصوت Bluetooth بجودة المكالمات</string>
+    <string name="play_call_speakers">لا تُستخدم مكبرات صوت Bluetooth التي بلا ميكروفون</string>
+    <string name="play_ear_screen">تنطفئ الشاشة عند أذنك</string>
+    <string name="play_ear_quieter">أخفض صوتًا، لأنه مخصّص لأذنك</string>
+    <string name="capture_echo_follows">إلغاء الصدى مفعّل عندما تُشغَّل الأصوات كمكالمة هاتفية (التشغيل › تُشغَّل الأصوات كـ).</string>
+    <string name="a11y_pro">ميزة: %1$s</string>
+    <string name="a11y_con">عيب: %1$s</string>
+    <string name="audio_in_use">الصوت المستخدم</string>
+    <string name="audio_in_use_idle">اتصل بخادم لترى ما يُشغَّل وما يُسجَّل.</string>
+    <string name="audio_in_use_unsaved">تظهر التغييرات هنا بعد «حفظ وتطبيق».</string>
+    <string name="audio_mode">الوضع</string>
+    <string name="audio_mode_call">مكالمة هاتفية</string>
+    <string name="audio_mode_media">وسائط</string>
+    <string name="audio_playback">التشغيل</string>
+    <string name="audio_playback_waiting">يظهر عندما يتحدث أحد</string>
+    <string name="audio_microphone">الميكروفون</string>
+    <string name="audio_mic_phone">ميكروفون الهاتف</string>
+    <string name="audio_mic_wired">ميكروفون سماعة الرأس (سلكي)</string>
+    <string name="audio_mic_none">لا يسجّل</string>
+    <string name="audio_mic_no_permission">لا يوجد إذن</string>
+    <string name="audio_device_wired">سماعات سلكية</string>
+    <string name="audio_device_bluetooth">%1$s (Bluetooth)</string>
+    <string name="audio_device_bluetooth_call">%1$s (Bluetooth، جودة المكالمات)</string>
+    <string name="audio_device_bluetooth_le">%1$s (Bluetooth LE)</string>
+    <string name="audio_device_usb">%1$s (USB)</string>
+    <string name="audio_device_hearing_aid">%1$s (سماعة طبية)</string>
+    <string name="audio_device_unnamed">سماعات</string>
+    <string name="audio_device_other">جهاز آخر (%1$d)</string>
+
+    <!-- Settings › Capture -->
+    <string name="capture_mic_volume">مستوى صوت الميكروفون</string>
+    <string name="capture_activation">التفعيل</string>
+    <string name="capture_vad">التفعيل بالصوت</string>
+    <string name="capture_ptt">اضغط للتحدث</string>
+    <string name="capture_continuous">إرسال مستمر</string>
+    <string name="capture_ptt_desc">اضغط باستمرار على زر «اضغط باستمرار للتحدث» أثناء كلامك.</string>
+    <string name="capture_level">المستوى</string>
+    <string name="capture_level_desc">يُظهر الشريط الميكروفون ما دامت هذه الإعدادات مفتوحة، حتى وهو مكتوم. يستمر التحدث كالمعتاد.</string>
+    <string name="capture_vad_level">مستوى التفعيل بالصوت</string>
+    <!-- Direction-free on purpose: in Arabic the slider is mirrored, so "right" and "left" would be wrong -->
+    <string name="capture_vad_level_desc">ارفع المستوى لحجب ضوضاء الخلفية. إذا انقطع صوتك، اخفضه.</string>
+    <string name="capture_vad_delay">التأخير قبل الإيقاف</string>
+    <string name="capture_processing">معالجة الإشارة</string>
+    <string name="capture_noise">إزالة ضوضاء الخلفية</string>
+    <string name="capture_agc">التحكم التلقائي في الكسب</string>
+    <string name="echo_refused">لا يستطيع هذا الهاتف تشغيل صوت المكالمات عبر مكبر الصوت، لذا تُشغَّل الأصوات كوسائط. «اضغط للتحدث» أو السماعات تمنع الصدى.</string>
+
+    <!-- Settings › UI -->
+    <string name="ui_admin">إظهار وظائف الإدارة</string>
+    <string name="ui_controls_bottom">الأزرار في الأسفل</string>
+    <string name="ui_controls_bottom_desc">تكون أزرار الميكروفون والصوت والمشاركة ومبدّل القنوات/الدردشة أسفل الشاشة، في متناول إبهامك.</string>
+    <string name="ui_language">اللغة</string>
+    <string name="ui_language_phone">لغة الهاتف</string>
+    <string name="ui_admin_desc">تتيح قائمة الشخص أيضًا نقله إلى قناة أخرى، وطرده من القناة أو الخادم، وحظره. الخادم يقرر ما إذا كان مسموحًا لك: بدون الصلاحية يرفض.</string>
+
+    <!-- Settings › Advanced -->
+    <string name="relay_title">اتصال الفيديو</string>
+    <string name="relay_desc">يمر البث مباشرة بينك وبين الطرف الآخر. خلف بعض الشبكات يحتاج إلى مُرحِّل (خادم TURN): أدخله هنا إن كان لديك.</string>
+    <string name="relay_address">المُرحِّل (turn:host:port)</string>
+    <string name="relay_user">اسم مستخدم المُرحِّل</string>
+    <string name="relay_password">كلمة مرور المُرحِّل</string>
+    <string name="relay_only">دائمًا عبر المُرحِّل</string>
+    <string name="advanced_file_port">الخادم الذي يعمل نقل الملفات لديه على منفذ آخر (لا تُحمَّل صوره وصوره الرمزية) يمكن تحديد منفذه الخاص في قسم «متقدم» من المفضّل.</string>
+    <string name="passwords_title">كلمات مرور القنوات</string>
+    <string name="passwords_desc">كلمات المرور التي اخترت تذكّرها تُدخلك قنواتها بضغطة واحدة. تُحفظ على هذا الهاتف مشفّرة.</string>
+    <string name="passwords_forget">نسيان كلمات المرور المحفوظة</string>
+    <string name="passwords_forgotten">تم النسيان.</string>
+    <string name="identity_title">هوية TeamSpeak</string>
+    <string name="identity_desc">هويتك هي ما يعرّفك لدى الخوادم (مجموعاتك وصلاحياتك). احتفظ بنسخة منها، أو استخدم الهوية من تطبيق TeamSpeak آخر.</string>
+    <string name="identity_wipe">مسح</string>
+    <string name="identity_export">تصدير</string>
+    <string name="identity_import">استيراد</string>
+    <string name="identity_imported">تم الاستيراد. ستُستخدم من الاتصال التالي.</string>
+    <string name="identity_saved">تم الحفظ. احتفظ بالملف في مكان لا يصل إليه أحد سواك.</string>
+    <string name="identity_wiped">تم المسح. ستُنشأ هوية جديدة عند الاتصال التالي.</string>
+    <string name="identity_export_title">تصدير هويتك</string>
+    <string name="identity_export_subtitle">أبقِها خاصة</string>
+    <string name="identity_save_file">حفظ في ملف</string>
+    <string name="identity_export_what">الملف هو هويتك نفسها: أي شخص يملكه يصبح أنت على كل خادم، بمجموعاتك وصلاحياتك، مثل صلاحيات مشرف الخادم. لا أحد يستطيع التمييز.</string>
+    <string name="identity_export_where">احفظه في مكان لا يصل إليه أحد سواك، مثل هذا الهاتف أو مساحة تخزين خاصة. لا ترسله في دردشة أو بريد إلكتروني، ولا تنشره. يمكن لتطبيق TeamSpeak فتحه، وكذلك PocketTS على هاتف آخر.</string>
+    <string name="identity_wipe_title">مسح هويتك؟</string>
+    <string name="identity_wipe_what">تُحذف هوية هذا الهاتف، وتُنشأ هوية جديدة في المرة التالية التي تتصل فيها. ستصبح شخصًا جديدًا لدى كل خادم: مجموعاتك وصلاحياتك وأي شيء مُنح لهويتك القديمة (مثل صلاحيات المشرف) لن تنتقل معك.</string>
+    <string name="identity_wipe_back">الطريقة الوحيدة للعودة هي نسخة مُصدَّرة. إذا كنت قد تحتاجها مجددًا، فألغِ وصدّرها أولًا.</string>
+    <string name="identity_import_title">استيراد هوية</string>
+    <string name="identity_import_subtitle">من تطبيق TeamSpeak</string>
+    <string name="identity_import_desc">الصق الهوية التي صدّرها تطبيق TeamSpeak، أو اختر الملف الذي حفظه (.ini). ستحل محل هوية هذا الهاتف من الاتصال التالي.</string>
+    <string name="identity_field">الهوية</string>
+    <string name="identity_choose_file">اختيار ملف…</string>
+    <string name="level_title">مستوى الأمان</string>
+    <string name="level_desc">بعض الخوادم لا تسمح إلا بهويات من مستوى معين على الأقل. رفعه يُبقي الهوية نفسها، بمجموعاتها وصلاحياتها.</string>
+    <string name="level_raise_button">رفع المستوى</string>
+
+    <!-- A person's menu -->
+    <string name="person_you">أنت</string>
+    <string name="person_away">غائب</string>
+    <!-- %1$s is their away message -->
+    <string name="person_away_message">غائب: %1$s</string>
+    <string name="person_volume">مستوى صوته لديك</string>
+    <string name="away_message_field">رسالة الغياب (اختيارية)</string>
+    <string name="away_back">لقد عدت</string>
+    <string name="away_update">تحديث</string>
+    <string name="away_set">تعيين كغائب</string>
+    <string name="poke">نكز</string>
+    <string name="chat">دردشة</string>
+    <!-- %1$s is the person's name -->
+    <string name="poke_title">نكز %1$s</string>
+    <string name="poke_subtitle">ستظهر له نافذة منبثقة برسالتك</string>
+    <string name="poke_message_field">الرسالة (اختيارية)</string>
+    <!-- A poke received: %1$s is who poked -->
+    <string name="poked_you">نكزك %1$s</string>
+    <string name="dismiss">تجاهل</string>
+
+    <!-- A person's menu: admin functions (Settings › UI) -->
+    <string name="admin_row">الإدارة</string>
+    <string name="admin_move">نقل</string>
+    <string name="admin_kick">طرد</string>
+    <string name="admin_ban">حظر</string>
+    <!-- %1$s is the person's name -->
+    <string name="admin_move_title">نقل %1$s</string>
+    <string name="admin_move_subtitle">اختر القناة</string>
+    <!-- The channel the person is in now -->
+    <string name="admin_here_now">هنا الآن</string>
+    <string name="admin_has_password">لها كلمة مرور</string>
+    <string name="admin_kick_title">طرد %1$s</string>
+    <string name="admin_kick_subtitle">سيرى السبب</string>
+    <string name="admin_kick_channel">من القناة (إلى القناة الافتراضية)</string>
+    <string name="admin_kick_server">من الخادم</string>
+    <string name="admin_reason">السبب (اختياري)</string>
+    <string name="admin_ban_title">حظر %1$s</string>
+    <string name="admin_ban_subtitle">يحظر هويته وعنوان IP الخاص به</string>
+    <string name="ban_10_minutes">10 دقائق</string>
+    <string name="ban_1_hour">ساعة واحدة</string>
+    <string name="ban_1_day">يوم واحد</string>
+    <string name="ban_1_week">أسبوع واحد</string>
+    <string name="ban_permanently">نهائيًا</string>
+
+    <!-- Server info -->
+    <string name="info_title">معلومات الخادم</string>
+    <string name="key_button">مفتاح الامتياز</string>
+    <string name="key_title">استخدام مفتاح امتياز</string>
+    <string name="key_subtitle">من مشرف الخادم</string>
+    <string name="key_field">مفتاح الامتياز</string>
+    <string name="key_use">استخدام</string>
+    <string name="key_desc">يمنحك مفتاح الامتياز صلاحيات على هذا الخادم، مثل مجموعة خادم. كل مفتاح يعمل مرة واحدة. لا تستخدم إلا مفاتيح من شخص تثق به.</string>
+    <string name="key_used">تم استخدام مفتاح الامتياز: صلاحياتك الجديدة مفعّلة.</string>
+    <string name="info_users">المستخدمون</string>
+    <string name="info_channels">القنوات</string>
+    <string name="info_uptime">مدة التشغيل</string>
+    <string name="info_created">تاريخ الإنشاء</string>
+    <!-- %1$s is a time span, such as "3 months" -->
+    <string name="info_ago">منذ %1$s</string>
+    <plurals name="span_minutes">
+        <item quantity="zero">%1$d دقيقة</item>
+        <item quantity="one">دقيقة واحدة</item>
+        <item quantity="two">دقيقتين</item>
+        <item quantity="few">%1$d دقائق</item>
+        <item quantity="many">%1$d دقيقة</item>
+        <item quantity="other">%1$d دقيقة</item>
+    </plurals>
+    <plurals name="span_hours">
+        <item quantity="zero">%1$d ساعة</item>
+        <item quantity="one">ساعة واحدة</item>
+        <item quantity="two">ساعتين</item>
+        <item quantity="few">%1$d ساعات</item>
+        <item quantity="many">%1$d ساعة</item>
+        <item quantity="other">%1$d ساعة</item>
+    </plurals>
+    <plurals name="span_days">
+        <item quantity="zero">%1$d يوم</item>
+        <item quantity="one">يوم واحد</item>
+        <item quantity="two">يومين</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يومًا</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+    <plurals name="span_months">
+        <item quantity="zero">%1$d شهر</item>
+        <item quantity="one">شهر واحد</item>
+        <item quantity="two">شهرين</item>
+        <item quantity="few">%1$d أشهر</item>
+        <item quantity="many">%1$d شهرًا</item>
+        <item quantity="other">%1$d شهر</item>
+    </plurals>
+    <plurals name="span_years">
+        <item quantity="zero">%1$d سنة</item>
+        <item quantity="one">سنة واحدة</item>
+        <item quantity="two">سنتين</item>
+        <item quantity="few">%1$d سنوات</item>
+        <item quantity="many">%1$d سنة</item>
+        <item quantity="other">%1$d سنة</item>
+    </plurals>
+
+    <!-- Raising the security level -->
+    <!-- %1$d is the level the server needs -->
+    <string name="level_needed_title">يلزم مستوى الأمان %1$d</string>
+    <string name="level_raise_title">رفع مستوى الأمان</string>
+    <!-- %1$d is the identity's level now -->
+    <string name="level_needed_subtitle">هذا الخادم يتطلبه. مستواك %1$d.</string>
+    <string name="level_yours">مستواك %1$d</string>
+    <string name="level_raise">رفع</string>
+    <!-- %1$s is a rough time, such as "about 3 minutes" -->
+    <string name="level_estimate">يستغرق ذلك على هذا الهاتف %1$s في المتوسط. قد يكون أسرع أو أبطأ.</string>
+    <string name="level_measuring">جارٍ حساب المدة التي يستغرقها على هذا الهاتف…</string>
+    <string name="level_desc_raise">الرفع مهمة لمرة واحدة. تبقى هويتك كما هي: تبقى مجموعاتك وصلاحياتك، ويعمل المستوى الأعلى على كل خادم. أبقِ التطبيق مفتوحًا أثناء العمل؛ زر «إيقاف» يحتفظ بالمستوى الذي بلغته حتى الآن.</string>
+    <!-- %1$d is the level reached, %2$d the level aimed at -->
+    <string name="level_progress">المستوى %1$d من %2$d</string>
+    <string name="level_running_desc">أبقِ التطبيق مفتوحًا. كل مستوى يستغرق ضعف وقت المستوى الذي قبله تقريبًا.</string>
+    <string name="level_done">تم: مستوى الأمان لديك %1$d.</string>
+    <string name="level_done_connecting">تم: مستوى الأمان لديك %1$d. جارٍ الاتصال مجددًا…</string>
+    <string name="level_stopped">توقف عند المستوى %1$d. الرفع مرة أخرى يكمل من هناك.</string>
+    <string name="about_under_minute">أقل من دقيقة</string>
+    <plurals name="about_minutes">
+        <item quantity="zero">حوالي %1$d دقيقة</item>
+        <item quantity="one">حوالي دقيقة</item>
+        <item quantity="two">حوالي دقيقتين</item>
+        <item quantity="few">حوالي %1$d دقائق</item>
+        <item quantity="many">حوالي %1$d دقيقة</item>
+        <item quantity="other">حوالي %1$d دقيقة</item>
+    </plurals>
+    <plurals name="about_hours">
+        <item quantity="zero">حوالي %1$d ساعة</item>
+        <item quantity="one">حوالي ساعة</item>
+        <item quantity="two">حوالي ساعتين</item>
+        <item quantity="few">حوالي %1$d ساعات</item>
+        <item quantity="many">حوالي %1$d ساعة</item>
+        <item quantity="other">حوالي %1$d ساعة</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="zero">حوالي %1$d يوم</item>
+        <item quantity="one">حوالي يوم</item>
+        <item quantity="two">حوالي يومين</item>
+        <item quantity="few">حوالي %1$d أيام</item>
+        <item quantity="many">حوالي %1$d يومًا</item>
+        <item quantity="other">حوالي %1$d يوم</item>
+    </plurals>
+
+    <!-- Server screen -->
+    <string name="servers">الخوادم</string>
+    <string name="connected">متصل</string>
+    <!-- %1$s is the server's address -->
+    <string name="connecting_to">جارٍ الاتصال بـ %1$s…</string>
+    <string name="reconnecting_old">جارٍ إعادة الاتصال… لا يزال الخادم يحتفظ باتصالك القديم: بانتظار أن يتركه.</string>
+    <!-- %1$d is which try this is -->
+    <string name="reconnecting_try">انقطع الاتصال. جارٍ إعادة الاتصال… (المحاولة %1$d)</string>
+    <string name="channel_password_subtitle">لهذه القناة كلمة مرور</string>
+    <string name="view_channels">القنوات</string>
+    <!-- The stream player's title: %1$s is whose stream -->
+    <string name="stream_title">بث %1$s</string>
+    <string name="stream_title_unknown">البث</string>
+    <string name="not_an_address">لا يبدو هذا عنوان خادم</string>
+    <!-- A private chat's person left: %1$s is their name -->
+    <string name="private_left">غادر %1$s الخادم</string>
+    <string name="private_left_unknown">غادر الخادم</string>
+    <string name="level_not_connected">لم يتم الاتصال: يتطلب الخادم مستوى أمان الهوية %1$d. يمكنك رفع مستواك من الإعدادات › متقدم.</string>
+
+    <!-- Why a connection ended -->
+    <string name="end_no_answer">تعذّر الاتصال: لا رد من الخادم. تحقق من العنوان والمنفذ.</string>
+    <!-- %1$s is the address typed -->
+    <string name="end_no_such_host">تعذّر الاتصال: لم يُعثر على خادم في «%1$s». تحقق من العنوان.</string>
+    <!-- %1$s is the phone's own error -->
+    <string name="end_cant_connect">تعذّر الاتصال: %1$s</string>
+    <string name="end_network_error">خطأ في الشبكة: %1$s</string>
+    <string name="end_network_changed">تغيّرت الشبكة</string>
+    <string name="end_network_gone">انقطعت الشبكة</string>
+    <string name="end_server_silent">لم يرد الخادم</string>
+    <string name="end_server_stopped">توقف الخادم عن الرد</string>
+    <string name="end_lost">انقطع الاتصال</string>
+    <string name="end_handshake">تعذّر إعداد الاتصال بالخادم.</string>
+    <string name="end_by_server">قطع الخادم الاتصال</string>
+    <string name="end_kicked_channel">طُردت من القناة</string>
+    <!-- %1$s is the reason the admin gave -->
+    <string name="end_kicked_channel_reason">طُردت من القناة: %1$s</string>
+    <string name="end_kicked">طُردت من الخادم</string>
+    <string name="end_kicked_reason">طُردت من الخادم: %1$s</string>
+    <string name="end_banned">حُظرت من الخادم</string>
+    <string name="end_banned_reason">حُظرت من الخادم: %1$s</string>
+    <string name="end_shut_down">أُغلق الخادم</string>
+    <string name="end_shut_down_reason">أُغلق الخادم: %1$s</string>
+
+    <!-- Admin actions the server refused: %1$s is the person's name, %2$s the server's reason -->
+    <string name="admin_no_permission_move">ليست لديك صلاحية نقل %1$s.</string>
+    <string name="admin_no_permission_kick_channel">ليست لديك صلاحية طرد %1$s من القناة.</string>
+    <string name="admin_no_permission_kick_server">ليست لديك صلاحية طرد %1$s من الخادم.</string>
+    <string name="admin_no_permission_ban">ليست لديك صلاحية حظر %1$s.</string>
+    <string name="admin_failed_move">تعذّر نقل %1$s: %2$s</string>
+    <string name="admin_failed_kick_channel">تعذّر طرد %1$s من القناة: %2$s</string>
+    <string name="admin_failed_kick_server">تعذّر طرد %1$s من الخادم: %2$s</string>
+    <string name="admin_failed_ban">تعذّر حظر %1$s: %2$s</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_no_permission_create">ليست لديك صلاحية إنشاء القناة %1$s.</string>
+    <string name="channel_no_permission_edit">ليست لديك صلاحية تغيير %1$s.</string>
+    <string name="channel_no_permission_reorder">ليست لديك صلاحية نقل %1$s.</string>
+    <string name="channel_no_permission_delete">ليست لديك صلاحية حذف %1$s.</string>
+    <!-- %1$s: the channel, %2$s: the server's reason -->
+    <string name="channel_failed_create">تعذّر إنشاء %1$s: %2$s</string>
+    <string name="channel_failed_edit">تعذّر تغيير %1$s: %2$s</string>
+    <string name="channel_failed_reorder">تعذّر نقل %1$s: %2$s</string>
+    <string name="channel_failed_delete">تعذّر حذف %1$s: %2$s</string>
+    <string name="channels_editing">تعديل القنوات</string>
+    <string name="channels_add">إضافة</string>
+    <string name="channels_done">تم</string>
+    <string name="channels_edit_hint">اضغط مطولًا على قناة واسحبها لنقلها. اضغط عليها لتغييرها أو حذفها.</string>
+    <string name="files_title">الملفات</string>
+    <string name="files_refresh">تحديث</string>
+    <string name="files_up">المجلد الأعلى</string>
+    <string name="files_folder">مجلد</string>
+    <string name="files_download">تنزيل</string>
+    <string name="files_empty">هذا المجلد فارغ.</string>
+    <string name="files_downloading">جارٍ تنزيل %1$s…</string>
+    <string name="files_saved">تم حفظ %1$s</string>
+    <string name="files_download_cancelled">توقف تنزيل %1$s</string>
+    <string name="files_download_failed">تعذّر تنزيل %1$s: %2$s</string>
+    <string name="files_needs_password">لهذه القناة كلمة مرور. انضم إليها مرة بكلمة المرور مع تذكّرها، لترى ملفاتها.</string>
+    <string name="files_no_permission">ليست لديك صلاحية رؤية هذه الملفات.</string>
+    <string name="files_not_found">لم يعد هذا المجلد موجودًا.</string>
+    <string name="files_not_connected">غير متصل بالخادم.</string>
+    <string name="files_upload">رفع</string>
+    <string name="files_new_folder">مجلد جديد</string>
+    <string name="files_create">إنشاء</string>
+    <string name="files_rename">إعادة تسمية</string>
+    <string name="files_rename_title">إعادة تسمية %1$s</string>
+    <string name="files_name">الاسم</string>
+    <string name="files_uploading">جارٍ رفع %1$s…</string>
+    <string name="files_uploaded">تم رفع %1$s</string>
+    <string name="files_upload_cancelled">توقف رفع %1$s</string>
+    <string name="files_upload_failed">تعذّر رفع %1$s: %2$s</string>
+    <string name="files_unreadable">تعذّرت قراءة هذا الملف.</string>
+    <string name="files_no_permission_change">لا يسمح لك الخادم بفعل ذلك هنا.</string>
+    <string name="files_gone">لم يعد موجودًا.</string>
+    <string name="files_exists">يوجد هنا بالفعل شيء بهذا الاسم.</string>
+    <string name="files_delete_title">حذف %1$s؟</string>
+    <string name="files_delete_file">يُزال الملف من الخادم للجميع.</string>
+    <string name="files_delete_folder">يُزال المجلد وكل ما فيه من الخادم للجميع.</string>
+    <string name="files_replace_title">استبدال %1$s؟</string>
+    <string name="files_replace_text">يوجد هنا بالفعل ملف بهذا الاسم. استبداله يزيل القديم للجميع.</string>
+    <string name="files_replace">استبدال</string>
+    <string name="channel_info_here">أنت في هذه القناة</string>
+    <string name="channel_info_talk_power">قوة التحدث المطلوبة</string>
+    <string name="channel_info_default">القناة الافتراضية للخادم</string>
+    <string name="channel_info_no_description">لا يوجد وصف</string>
+    <string name="channel_info_loading">جارٍ التحميل…</string>
+    <string name="channel_info_arrange">ترتيب</string>
+    <plurals name="channel_people">
+        <item quantity="zero">لا أحد</item>
+        <item quantity="one">شخص واحد</item>
+        <item quantity="two">شخصان</item>
+        <item quantity="few">%d أشخاص</item>
+        <item quantity="many">%d شخصًا</item>
+        <item quantity="other">%d شخص</item>
+    </plurals>
+    <string name="channel_new_title">قناة جديدة</string>
+    <string name="channel_new_subtitle">الخادم يحدد أنواع القنوات التي يمكنك إنشاؤها.</string>
+    <string name="channel_edit_subtitle">إعدادات القناة</string>
+    <string name="channel_create">إنشاء</string>
+    <string name="channel_name">الاسم</string>
+    <string name="channel_description">الوصف</string>
+    <string name="channel_kind">النوع</string>
+    <string name="channel_kind_permanent">دائمة</string>
+    <string name="channel_kind_semi">شبه دائمة</string>
+    <string name="channel_kind_temporary">مؤقتة</string>
+    <string name="channel_kind_permanent_desc">تبقى حتى تُحذف.</string>
+    <string name="channel_kind_semi_desc">تبقى حتى إعادة تشغيل الخادم.</string>
+    <string name="channel_kind_temporary_desc">تختفي عندما يغادرها آخر شخص. تُنقل إليها عند إنشائها.</string>
+    <string name="channel_password_on">كلمة المرور</string>
+    <string name="channel_password_keep">اتركها فارغة للإبقاء على الحالية</string>
+    <string name="channel_codec">ترميز الصوت</string>
+    <string name="channel_codec_voice">Opus Voice</string>
+    <string name="channel_codec_music">Opus Music</string>
+    <!-- %1$d: 0 to 10 -->
+    <string name="channel_quality">الجودة: %1$d</string>
+    <string name="channel_unlimited">مستخدمون بلا حد</string>
+    <string name="channel_max_users">الحد الأقصى للمستخدمين</string>
+    <string name="channel_parent">داخل</string>
+    <string name="channel_top_level">المستوى الأعلى</string>
+    <string name="channel_parent_change">تغيير</string>
+    <string name="channel_parent_title">مكانها</string>
+    <!-- %1$s: the channel -->
+    <string name="channel_delete_title">حذف %1$s؟</string>
+    <string name="channel_delete_subtitle">لا يمكن التراجع عن هذا.</string>
+    <plurals name="channel_delete_subs">
+        <item quantity="zero">تُحذف أيضًا %d قناة فرعية تابعة لها.</item>
+        <item quantity="one">تُحذف أيضًا قناتها الفرعية الوحيدة.</item>
+        <item quantity="two">تُحذف أيضًا قناتاها الفرعيتان.</item>
+        <item quantity="few">تُحذف أيضًا %d قنوات فرعية تابعة لها.</item>
+        <item quantity="many">تُحذف أيضًا %d قناة فرعية تابعة لها.</item>
+        <item quantity="other">تُحذف أيضًا %d قناة فرعية تابعة لها.</item>
+    </plurals>
+    <plurals name="channel_delete_people">
+        <item quantity="zero">يُنقل %d شخص إلى القناة الافتراضية.</item>
+        <item quantity="one">يُنقل شخص واحد إلى القناة الافتراضية.</item>
+        <item quantity="two">يُنقل شخصان إلى القناة الافتراضية.</item>
+        <item quantity="few">يُنقل %d أشخاص إلى القناة الافتراضية.</item>
+        <item quantity="many">يُنقل %d شخصًا إلى القناة الافتراضية.</item>
+        <item quantity="other">يُنقل %d شخص إلى القناة الافتراضية.</item>
+    </plurals>
+    <string name="channel_delete_empty">لا أحد فيها.</string>
+    <string name="admin_move_needs_password">تعذّر نقل %1$s: القناة تتطلب كلمة مرورها. انضم إليها مرة بكلمة المرور مع تذكّرها، لتنقل الأشخاص إليها.</string>
+
+    <!-- Sending pictures: %1$s / %3$s is the reason -->
+    <string name="picture_not_sent">لم تُرسل الصورة: %1$s</string>
+    <!-- %1$d is which picture, %2$d of how many -->
+    <string name="pictures_not_sent">لم تُرسل الصورة %1$d من %2$d: %3$s</string>
+    <string name="picture_no_permission">%1$s (لا صلاحية في هذه القناة)</string>
+    <!-- %1$d is the limit in megabytes -->
+    <string name="picture_too_big">الصورة كبيرة جدًا (أكثر من %1$d ميغابايت).</string>
+
+    <!-- Profile picture -->
+    <string name="avatar_uploading">جارٍ الرفع…</string>
+    <string name="avatar_set">تم تعيين صورة الملف الشخصي.</string>
+    <string name="avatar_too_big">يسمح هذا الخادم بصورة ملف شخصي صغيرة جدًا فقط، أو لا يسمح بها.</string>
+    <string name="avatar_not_allowed">لا يسمح لك هذا الخادم بصورة ملف شخصي.</string>
+    <string name="avatar_failed">لم تُعيَّن صورة الملف الشخصي: %1$s</string>
+    <string name="avatar_removed">أُزيلت صورة الملف الشخصي.</string>
+
+    <!-- The identity -->
+    <string name="identity_not_valid">هذه ليست هوية TeamSpeak.</string>
+    <string name="identity_unreadable">لا يمكن فتح الهوية المحفوظة على هذا الهاتف. استورد هويتك من الإعدادات › متقدم › هوية TeamSpeak، أو أنشئ هوية جديدة هناك.</string>
+    <string name="identity_export_unreadable">لا يمكن قراءة الهوية، لذا لا يمكن حفظها.</string>
+    <string name="file_not_written">تعذّرت كتابة هذا الملف.</string>
+    <string name="file_not_opened">لا يمكن فتح هذا الملف.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel">الاتصال</string>
+    <string name="notification_mute">كتم</string>
+    <string name="notification_unmute">إلغاء الكتم</string>
+    <string name="notification_sound_off">إيقاف الصوت</string>
+    <string name="notification_sound_on">تشغيل الصوت</string>
+    <string name="notification_messages">الرسائل والنكزات</string>
+    <!-- %1$s is the server's name or address -->
+    <string name="notification_connected">متصل بـ %1$s</string>
+    <string name="notification_connecting">جارٍ الاتصال بـ %1$s</string>
+    <string name="notification_reconnecting">جارٍ إعادة الاتصال بـ %1$s…</string>
+    <string name="notification_sharing_camera">تتم مشاركة الكاميرا</string>
+    <string name="notification_sharing_cameras">تتم مشاركة الكاميرتين</string>
+    <string name="notification_sharing_screen">تتم مشاركة الشاشة</string>
+    <string name="whisper">همس</string>
+    <string name="hold_to_whisper">اضغط باستمرار للهمس</string>
+    <string name="whispering_to_you">يهمس لك %1$s</string>
+    <string name="whisper_list_line">همس: %1$s</string>
+    <string name="whisper_clear">مسح الكل</string>
+    <string name="whisper_remove">إزالة من القائمة</string>
+    <string name="whisper_channel">الهمس إلى القناة</string>
+    <string name="whisper_channel_off">إيقاف الهمس إلى القناة</string>
+    <string name="whisper_list_title">قائمة الهمس</string>
+    <string name="whisper_list_subtitle">أثناء ضغطك على زر الهمس، لا يسمعك إلا هؤلاء.</string>
+    <string name="capture_ai_noise">إزالة الضوضاء بالذكاء الاصطناعي (RNNoise)</string>
+    <string name="capture_ai_noise_desc">يزيل أيضًا نقرات لوحة المفاتيح وصوت المروحة والتلفاز وغيرها من الضوضاء التي تفلت من إزالة الهاتف نفسه، بشبكة عصبية صغيرة على الهاتف. يستهلك بطارية أكثر قليلًا.</string>
+    <string name="capture_ai_noise_license">ترخيص RNNoise</string>
+    <string name="share_torch_on">المصباح مضاء (اضغط للإطفاء)</string>
+    <string name="share_torch_off">المصباح: يضيء ما تصوّره الكاميرا الخلفية</string>
+    <string name="share_camera_lost">توقفت الكاميرا: أخذتها مكالمة أو تطبيق آخر أو الهاتف.</string>
+    <string name="share_preview_small">تصغير المعاينة</string>
+    <string name="share_lens_switch">العدسة %1$s: اضغط للعدسة التالية</string>
+    <string name="debug_log_title">سجل التصحيح</string>
+    <string name="debug_log">الاحتفاظ بسجل التصحيح</string>
+    <string name="debug_log_desc">لتقارير الأخطاء: ما يفعله التطبيق، بما في ذلك الأعطال، ويُحفظ على هذا الهاتف فقط. تُحذف منه عناوين الخوادم والأسماء والرسائل. لا يرسله التطبيق أبدًا: شاركه بنفسك، مثلًا في تقرير خطأ على GitHub. إيقاف هذا الخيار يحذفه.</string>
+    <string name="debug_log_share">مشاركة السجل</string>
+    <string name="debug_log_delete">حذف السجل</string>
+    <string name="debug_log_empty">سجل التصحيح فارغ حاليًا.</string>
+    <string name="debug_log_deleted">حُذف سجل التصحيح.</string>
+
+    <!-- Read out by screen readers (TalkBack) -->
+    <string name="a11y_on">مفعّل</string>
+    <string name="a11y_off">معطّل</string>
+    <string name="a11y_about">معلومات عن %1$s</string>
+    <string name="a11y_talk_start">بدء التحدث</string>
+    <string name="a11y_talk_stop">إيقاف التحدث</string>
+    <string name="a11y_whisper_start">بدء الهمس</string>
+    <string name="a11y_whisper_stop">إيقاف الهمس</string>
+    <string name="a11y_talking">يتحدث</string>
+    <string name="a11y_whispering">يهمس</string>
+    <string name="a11y_unread">رسائل غير مقروءة</string>
+    <string name="a11y_move_up">نقل لأعلى</string>
+    <string name="a11y_move_down">نقل لأسفل</string>
+    <string name="a11y_show_controls">إظهار الأزرار</string>
+    <string name="a11y_hide_controls">إخفاء الأزرار</string>
+    <string name="a11y_preview_bigger">تكبير المعاينة</string>
+    <string name="a11y_preview_smaller">تصغير المعاينة</string>
+</resources>

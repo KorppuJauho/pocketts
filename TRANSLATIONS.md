@@ -1,9 +1,10 @@
 # Translations
 
 PocketTS speaks English, Finnish, German, Spanish, French, Italian, Portuguese (Brazil), Polish, Turkish,
-Simplified Chinese, Russian, Ukrainian and Czech. It follows the phone's language, or the one chosen in PocketTS's Settings › UI ›
+Simplified Chinese, Russian, Ukrainian, Czech, Arabic and Persian. It follows the phone's language, or the one chosen in PocketTS's Settings › UI ›
 Language. On Android 13 and later, that choice is the same as the phone's own per-app setting: Settings › Apps ›
-PocketTS › Language. Portuguese is written as in Brazil, and phones set to Portugal's Portuguese get it too.
+PocketTS › Language. Portuguese is written as in Brazil, and phones set to Portugal's Portuguese get it too. In
+Arabic and Persian the screens are mirrored, right to left.
 
 | Language | File | Checked by a native speaker |
 |---|---|---|
@@ -20,6 +21,8 @@ PocketTS › Language. Portuguese is written as in Brazil, and phones set to Por
 | Russian | `values-ru/strings.xml` | not yet |
 | Ukrainian | `values-uk/strings.xml` | not yet |
 | Czech | `values-cs/strings.xml` | not yet |
+| Arabic | `values-ar/strings.xml` | not yet |
+| Persian | `values-fa/strings.xml` | not yet |
 
 The translations were written with AI help, like the rest of PocketTS. The Czech one was first made by
 [chochrunius](https://github.com/chochrunius) in their fork. If you speak one of these languages and
@@ -54,7 +57,8 @@ them yet.
 - Keep the placeholders: `%1$s` is a name or text, `%1$d` a number. Their order in the sentence can change.
 - Plurals (`<plurals>`) have one form per number category of the language (Finnish: one, other; Russian: one, few,
   many, other; Czech: one, few, many, other, where many is only for fractions; Polish: one, few, many, other; Portuguese: one,
-  many, other; Italian: one, many, other; Ukrainian: one, few, many, other; Turkish: one, other; Chinese: other only).
+  many, other; Italian: one, many, other; Ukrainian: one, few, many, other; Turkish: one, other; Arabic: zero, one,
+  two, few, many, other; Persian: one, other; Chinese: other only).
 - In Android's files, an apostrophe is written `\'` and a double quote `\"`. French uses the typographic `’`, which
   needs no escaping.
 - "PocketTS", "TeamSpeak", "GitHub", "Opus Voice" and "Opus Music" stay as they are.
