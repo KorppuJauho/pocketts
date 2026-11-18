@@ -23,9 +23,9 @@ object IdentityRaise {
 
     private val threads: Int get() = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
 
-    /** The saved identity's level (null when it can't be read). */
-    fun level(context: Context): Int? = try {
-        Settings(context).identity().securityLevel
+    /** A saved identity's level (null when it can't be read); [key] null is the default one. */
+    fun level(context: Context, key: String? = null): Int? = try {
+        Settings(context).let { it.identity(it.identityKey(key)) }.securityLevel
     } catch (e: Settings.IdentityUnreadable) {
         null
     }
@@ -33,12 +33,13 @@ object IdentityRaise {
     /** Tries a second on this phone, measured briefly (blocking: call it off the main thread). */
     fun triesPerSecond(): Double = Identity.triesPerSecond(millis = 400, threads = threads)
 
-    /** Starts raising to [target]; [onDone] (on the main thread) hears whether it got there. */
-    fun start(context: Context, target: Int, onDone: (Boolean) -> Unit = {}) {
+    /** Starts raising identity [key] (null: the default one) to [target]; [onDone] (on the main thread) hears whether it got there. */
+    fun start(context: Context, target: Int, key: String? = null, onDone: (Boolean) -> Unit = {}) {
         if (_progress.value?.running == true) return
         val settings = Settings(context.applicationContext)
+        val which = settings.identityKey(key)
         val id = try {
-            settings.identity()
+            settings.identity(which)
         } catch (e: Settings.IdentityUnreadable) {
             return
         }
@@ -49,7 +50,7 @@ object IdentityRaise {
             val raised = id.improvedTo(target, cancelled = { stopping }, threads = threads) { level ->
                 _progress.update { it?.copy(level = level) }
             }
-            if (raised.securityLevel > id.securityLevel) settings.saveIdentity(raised)
+            if (raised.securityLevel > id.securityLevel) settings.saveIdentity(raised, which)
             AppLog.log(
                 "Security level ${id.securityLevel} -> ${raised.securityLevel} (aimed at $target) in " +
                     "${(System.currentTimeMillis() - started) / 1000} s" + if (stopping) ", stopped" else ""

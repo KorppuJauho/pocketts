@@ -117,7 +117,7 @@ class SoundNotificationsTest {
         compose.setContent {
             PocketTsTheme {
                 io.github.korppujauho.pocketts.ui.SettingsContent(
-                    VoiceSettings(soundPack = true), "Jamie", actions, {}, startTab = 1, modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                    VoiceSettings(soundPack = true), actions, {}, startTab = 1, modifier = androidx.compose.ui.Modifier.fillMaxSize(),
                 )
             }
         }

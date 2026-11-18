@@ -40,7 +40,7 @@ private const val MAX_LEVEL = 40
  * without, the level is chosen first. The dialog stays open while it works, and the screen stays on.
  */
 @Composable
-fun RaiseLevelDialog(current: Int, needed: Int? = null, onReached: () -> Unit = {}, onClose: () -> Unit) {
+fun RaiseLevelDialog(current: Int, needed: Int? = null, identity: String? = null, onReached: () -> Unit = {}, onClose: () -> Unit) {
     val context = LocalContext.current
     val res = androidx.compose.ui.platform.LocalResources.current
     val progress by IdentityRaise.progress.collectAsState()
@@ -71,7 +71,7 @@ fun RaiseLevelDialog(current: Int, needed: Int? = null, onReached: () -> Unit = 
                 else -> {
                     PillButton(stringResource(R.string.cancel)) { close() }
                     PillButton(stringResource(R.string.level_raise), PillKind.PRIMARY, enabled = target > current) {
-                        IdentityRaise.start(context, target) { reached -> if (reached && needed != null) onReached() }
+                        IdentityRaise.start(context, target, identity) { reached -> if (reached && needed != null) onReached() }
                     }
                 }
             }

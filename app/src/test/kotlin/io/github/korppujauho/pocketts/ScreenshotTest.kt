@@ -260,7 +260,9 @@ class ScreenshotTest {
 
     @Test
     fun favouritePopup() = popup("popup-favourite") {
-        io.github.korppujauho.pocketts.ui.FavoriteDialog(Favorite("ts.example.com", "Friends", "Jamie"), {}, onDelete = {}) {}
+        io.github.korppujauho.pocketts.ui.FavoriteDialog(
+            Favorite("ts.example.com", "Friends", "Jamie"), {}, onDelete = {}, identities = Example.identities,
+        ) {}
     }
 
     @Test
@@ -347,12 +349,40 @@ class ScreenshotTest {
 
     @Test
     fun settings() = shot("settings-capture") {
-        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(), Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+    }
+
+    @Test
+    fun settingsGeneral() = shot("settings-general") {
+        SettingsContent(VoiceSettings(), Example.withIdentities, {}, startTab = 0, modifier = Modifier.fillMaxSize())
+    }
+
+    /** Settings › General's identities opened (folded at first). */
+    @Test
+    fun identitiesOpen() = shot("settings-identities") {
+        androidx.compose.foundation.layout.Column(Modifier.fillMaxSize().background(io.github.korppujauho.pocketts.ui.Ts.panel).padding(16.dp)) {
+            io.github.korppujauho.pocketts.ui.IdentityList(Example.identities, open = true, onToggle = {}, onOpen = {}, onNew = {})
+        }
+    }
+
+    @Test
+    fun identityPopup() = popup("popup-identity") {
+        io.github.korppujauho.pocketts.ui.IdentityDialog(Example.identities[1], Example.identities, Example.withIdentities) {}
+    }
+
+    @Test
+    fun newIdentityPopup() = popup("popup-identity-new") {
+        io.github.korppujauho.pocketts.ui.NewIdentityDialog(Example.withIdentities) {}
+    }
+
+    @Test
+    fun connectIdentities() = shot("connect-identities") {
+        ConnectScreen("Jamie", "ts.example.com", "", emptyList(), null, Example.noConnect, settingsActions = Example.withIdentities)
     }
 
     @Test
     fun settingsPlayback() = shot("settings-playback") {
-        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 1, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(), Example.noSettings, {}, startTab = 1, modifier = Modifier.fillMaxSize())
     }
 
     @Test
@@ -361,7 +391,7 @@ class ScreenshotTest {
         val withPack = object : SettingsActions by Example.noSettings {
             override fun soundPack() = io.github.korppujauho.pocketts.ui.SoundPackInfo("Radio Pack: Night Shift Edition", 34, 39, UiSounds.Cue.entries.take(34).toSet())
         }
-        SettingsContent(VoiceSettings(soundPack = true), "Jamie", withPack, {}, startTab = 1, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(soundPack = true), withPack, {}, startTab = 1, modifier = Modifier.fillMaxSize())
     }
 
     /** Sound notifications' events, People in your channel opened: one switched off, two the pack has no sound for. */
@@ -382,7 +412,7 @@ class ScreenshotTest {
 
     @Test
     fun settingsUi() = shot("settings-ui") {
-        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 3, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(), Example.noSettings, {}, startTab = 3, modifier = Modifier.fillMaxSize())
     }
 
     @Test
@@ -420,15 +450,21 @@ object Example {
     }
 
     val noConnect = object : ConnectActions {
-        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean) {}
+        override fun connect(address: String, nickname: String, password: String, remember: Boolean, favorite: Boolean, identity: String) {}
         override fun connectFavorite(f: Favorite) {}
         override fun saveFavorite(old: Favorite?, new: Favorite) {}
         override fun removeFavorite(f: Favorite) {}
         override fun toggleAuto(f: Favorite) {}
     }
 
+    /** Two identities: the default one with favourites and a raised security level, and a new one. */
+    val identities = listOf(
+        io.github.korppujauho.pocketts.ui.IdentityInfo("main", "Main", "Jamie", isDefault = true, level = 24, favourites = 2),
+        io.github.korppujauho.pocketts.ui.IdentityInfo("clan", "Clan", "Jamie|TAG", isDefault = false, level = 8),
+    )
+
     val noSettings = object : SettingsActions {
-        override fun save(voice: VoiceSettings, nickname: String) {}
+        override fun save(voice: VoiceSettings) {}
         override fun micLevel() = 0.022f to true
         override fun micTest(on: Boolean) {}
         override fun playTestSound() {}
@@ -437,6 +473,10 @@ object Example {
             playback = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER, "Phone"),
             microphone = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_MIC, "Phone"),
         )
+    }
+
+    val withIdentities = object : SettingsActions by noSettings {
+        override fun identities() = identities
     }
 
     /** An admin's view of a server's groups: theirs to give, and the default one, which isn't. */

@@ -34,7 +34,7 @@ class AudioInUseTest {
     private val saved = mutableListOf<VoiceSettings>()
 
     private fun actions(now: AudioInUse?) = object : SettingsActions {
-        override fun save(voice: VoiceSettings, nickname: String) { saved += voice }
+        override fun save(voice: VoiceSettings) { saved += voice }
         override fun micLevel() = 0f to false
         override fun micTest(on: Boolean) {}
         override fun playTestSound() {}
@@ -42,7 +42,7 @@ class AudioInUseTest {
     }
 
     private fun show(now: AudioInUse?, voice: VoiceSettings = VoiceSettings(), tab: Int = 1) = rule.setContent {
-        PocketTsTheme { SettingsContent(voice, "Jamie", actions(now), {}, startTab = tab) }
+        PocketTsTheme { SettingsContent(voice, actions(now), {}, startTab = tab) }
     }
 
     private fun seen(text: String) = rule.onNodeWithText(text).performScrollTo().assertIsDisplayed()

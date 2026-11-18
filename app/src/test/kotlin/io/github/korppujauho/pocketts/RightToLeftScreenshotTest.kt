@@ -53,6 +53,6 @@ class RightToLeftScreenshotTest {
 
     @Test
     fun settings() = shot("settings") {
-        SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
+        SettingsContent(VoiceSettings(), Example.noSettings, {}, startTab = 2, modifier = Modifier.fillMaxSize())
     }
 }
