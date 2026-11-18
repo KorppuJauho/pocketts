@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -432,10 +433,11 @@ fun ServerScreen(
                         )
                     }
                     if (ptt && state.voice.floatingPtt && state.phase == Session.Phase.CONNECTED) {
-                        // In the chat, above the message box
+                        // In the chat, above the message box; on the right in every language, as the bar's push-to-talk
                         FloatingPtt(
                             state.pttHeld, actions::setPtt,
-                            Modifier.align(Alignment.BottomEnd).padding(end = 1.dp, bottom = if (view == View.CHAT) 81.dp else 9.dp),
+                            Modifier.align(androidx.compose.ui.AbsoluteAlignment.BottomRight)
+                                .absolutePadding(right = 1.dp, bottom = if (view == View.CHAT) 81.dp else 9.dp),
                         )
                     }
                 }
