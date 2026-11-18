@@ -340,6 +340,14 @@ class ScreenshotTest {
         SettingsContent(VoiceSettings(), Example.withIdentities, {}, startTab = 0, modifier = Modifier.fillMaxSize())
     }
 
+    /** Settings › General's identities opened (folded at first). */
+    @Test
+    fun identitiesOpen() = shot("settings-identities") {
+        androidx.compose.foundation.layout.Column(Modifier.fillMaxSize().background(io.github.korppujauho.pocketts.ui.Ts.panel).padding(16.dp)) {
+            io.github.korppujauho.pocketts.ui.IdentityList(Example.identities, open = true, onToggle = {}, onOpen = {}, onNew = {})
+        }
+    }
+
     @Test
     fun identityPopup() = popup("popup-identity") {
         io.github.korppujauho.pocketts.ui.IdentityDialog(Example.identities[1], Example.identities, Example.withIdentities) {}

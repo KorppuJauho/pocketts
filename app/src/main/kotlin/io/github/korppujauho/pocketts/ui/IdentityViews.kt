@@ -1,6 +1,12 @@
 package io.github.korppujauho.pocketts.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,29 +63,73 @@ data class IdentityInfo(
     val label: String get() = name.ifBlank { nickname }
 }
 
-/** The identities in a card, one row each (the default one starred); a row opens that identity. */
+/**
+ * The identities in a box that folds as the favourites' folders do: its bar says how many there are and which is the
+ * default, and a tap on it opens or shuts it. Open, one row each (the default starred; a tap opens it), and New
+ * identity at the end. [about] is the ⓘ at the bar's end.
+ */
 @Composable
-internal fun IdentityList(identities: List<IdentityInfo>, onOpen: (IdentityInfo) -> Unit) {
-    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)) {
-        identities.forEachIndexed { i, e ->
-            if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+internal fun IdentityList(
+    identities: List<IdentityInfo>, open: Boolean, onToggle: () -> Unit, onOpen: (IdentityInfo) -> Unit, onNew: () -> Unit,
+    about: @Composable () -> Unit = {},
+) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.panel)
+            .border(1.dp, Ts.hairline, RoundedCornerShape(12.dp)),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().background(Ts.card)
+                .clickable(onClickLabel = stringResource(if (open) R.string.folder_fold else R.string.folder_unfold), onClick = onToggle)
+                .semantics { heading() }
+                .padding(start = 14.dp, end = 4.dp, top = 4.dp, bottom = 4.dp).heightIn(min = 44.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(stringResource(R.string.identities_title), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            ValueBadge(identities.size.toString())
+            // Folded, the bar still says which one connects
+            val default = identities.firstOrNull { it.isDefault }
+            if (!open && default != null) {
+                Icon(Icons.Rounded.Star, contentDescription = stringResource(R.string.identity_default), tint = Ts.amber, modifier = Modifier.size(14.dp))
+                Text(default.label, color = Ts.muted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
+            about()
+            Icon(if (open) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted)
+            Spacer(Modifier.size(6.dp))
+        }
+        if (!open) return@Column
+        identities.forEach { e ->
+            Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
             Row(
-                Modifier.fillMaxWidth().clickable(role = Role.Button) { onOpen(e) }.padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
+                Modifier.fillMaxWidth().clickable(role = Role.Button) { onOpen(e) }.padding(start = 14.dp, end = 10.dp).heightIn(min = 44.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (e.isDefault) {
-                    Icon(Icons.Rounded.Star, contentDescription = stringResource(R.string.identity_default), tint = Ts.amber, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Rounded.Star, contentDescription = stringResource(R.string.identity_default), tint = Ts.amber, modifier = Modifier.size(16.dp))
                 } else {
-                    Spacer(Modifier.size(18.dp))
+                    Spacer(Modifier.size(16.dp))
                 }
-                Column(Modifier.weight(1f)) {
-                    Text(e.label, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1)
+                // One line: the name, then the nickname and level after it (both shortened when long)
+                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        e.label, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
                     val level = e.level?.let { stringResource(R.string.identity_level, it) }
                     val line = listOfNotNull(e.nickname.ifBlank { null }.takeIf { e.name.isNotBlank() }, level).joinToString(" · ")
-                    if (line.isNotEmpty()) Text(line, color = Ts.muted, fontSize = 12.5.sp, maxLines = 1)
+                    Text(line, color = Ts.muted, fontSize = 12.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                 }
-                Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = Ts.muted)
+                Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp))
             }
+        }
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+        Row(
+            Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onNew).padding(start = 14.dp, end = 10.dp).heightIn(min = 44.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Rounded.PersonAdd, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(16.dp))
+            Text(stringResource(R.string.identity_new), color = Ts.accent, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         }
     }
 }

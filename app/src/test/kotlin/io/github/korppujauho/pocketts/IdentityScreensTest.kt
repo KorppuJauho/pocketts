@@ -51,8 +51,13 @@ class IdentityScreensTest {
     @Test
     fun generalListsThemAndOneOpens() {
         rule.setContent { PocketTsTheme { SettingsContent(VoiceSettings(), settings(Example.identities), {}, modifier = Modifier.fillMaxSize()) } }
+        // Folded at first: how many, and which one connects
         rule.onNodeWithText("Identities").assertIsDisplayed()
+        rule.onNodeWithText("Main").assertIsDisplayed()
+        rule.onNodeWithText("Clan").assertDoesNotExist()
+        rule.onNodeWithText("Identities").performClick()
         rule.onNodeWithText("Jamie · Level 24").assertIsDisplayed()
+        rule.onNodeWithText("New identity").assertIsDisplayed()
         rule.onNodeWithContentDescription("Default").assertIsDisplayed()
         rule.onNodeWithText("Clan").performClick()
         rule.waitForIdle()

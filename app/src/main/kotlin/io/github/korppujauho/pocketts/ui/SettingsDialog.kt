@@ -335,9 +335,15 @@ private fun Identities(actions: SettingsActions) {
     var list by remember { mutableStateOf(actions.identities()) }
     var open by remember { mutableStateOf<String?>(null) }
     var adding by remember { mutableStateOf(false) }
-    Group(stringResource(R.string.identities_title), info = stringResource(R.string.identities_desc)) {
-        IdentityList(list) { open = it.key }
-        SecondaryButton(stringResource(R.string.identity_new)) { adding = true }
+    // Folded until opened: most people have one identity and seldom change it
+    var unfolded by rememberSaveable { mutableStateOf(false) }
+    var about by rememberSaveable { mutableStateOf(false) }
+    val title = stringResource(R.string.identities_title)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        IdentityList(list, unfolded, { unfolded = !unfolded }, { open = it.key }, { adding = true }) {
+            InfoButton(title, about) { about = !about }
+        }
+        if (about) Desc(stringResource(R.string.identities_desc))
     }
     open?.let { key ->
         list.firstOrNull { it.key == key }?.let { e ->
