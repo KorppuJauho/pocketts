@@ -575,6 +575,15 @@
     <string name="admin_failed_kick_channel">تعذّر طرد %1$s من القناة: %2$s</string>
     <string name="admin_failed_kick_server">تعذّر طرد %1$s من الخادم: %2$s</string>
     <string name="admin_failed_ban">تعذّر حظر %1$s: %2$s</string>
+    <string name="admin_groups">المجموعات</string>
+    <string name="admin_server_groups">مجموعات الخادم</string>
+    <string name="admin_channel_group">مجموعة القناة في %1$s</string>
+    <string name="admin_groups_desc">المجموعات الباهتة تتطلب صلاحيات أكثر من صلاحياتك. لا يمكن منح المجموعة الافتراضية للخادم أو سحبها: إنها مجموعة من ليست لديهم مجموعات أخرى.</string>
+    <string name="admin_groups_none">لم يُرسل الخادم مجموعاته.</string>
+    <string name="admin_no_permission_groups">ليست لديك صلاحية تغيير مجموعات الخادم الخاصة بـ %1$s.</string>
+    <string name="admin_failed_groups">تعذّر تغيير مجموعات الخادم الخاصة بـ %1$s: %2$s</string>
+    <string name="admin_no_permission_channel_group">ليست لديك صلاحية تغيير مجموعة القناة الخاصة بـ %1$s.</string>
+    <string name="admin_failed_channel_group">تعذّر تغيير مجموعة القناة الخاصة بـ %1$s: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">ليست لديك صلاحية إنشاء القناة %1$s.</string>
     <string name="channel_no_permission_edit">ليست لديك صلاحية تغيير %1$s.</string>
