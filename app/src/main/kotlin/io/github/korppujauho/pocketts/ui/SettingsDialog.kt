@@ -616,7 +616,7 @@ private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
 
 /** A two-way choice in one row, as the server screen's Channels/Chat switch. */
 @Composable
-internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+internal fun Segmented(options: List<String>, selected: Int, oneLine: Boolean = false, onSelect: (Int) -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Ts.card)
             .border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)).padding(4.dp),
@@ -627,10 +627,15 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
             Box(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.RadioButton) { onSelect(i) }
-                    .padding(vertical = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                // [oneLine]: a name of any length (a sound pack's) shortened to fit, rather than wrapped
+                Text(
+                    label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    maxLines = if (oneLine) 1 else Int.MAX_VALUE, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -900,7 +905,7 @@ private fun SoundPackGroup(
     ) { uri -> if (uri != null) import(uri, false) }
     Group(stringResource(R.string.sound_pack_title), info = stringResource(R.string.sound_pack_desc)) {
         pack?.let { p ->
-            Segmented(listOf(stringResource(R.string.sound_pack_tones), p.name), if (v.soundPack) 1 else 0) { onChange(v.copy(soundPack = it == 1)) }
+            Segmented(listOf(stringResource(R.string.sound_pack_tones), p.name), if (v.soundPack) 1 else 0, oneLine = true) { onChange(v.copy(soundPack = it == 1)) }
             Desc(stringResource(R.string.sound_pack_events, p.events, p.of))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -342,7 +342,7 @@ class ScreenshotTest {
     @Config(qualifiers = "w411dp-h1500dp-xxhdpi")
     fun settingsSoundPack() = shot("settings-sound-pack") {
         val withPack = object : SettingsActions by Example.noSettings {
-            override fun soundPack() = io.github.korppujauho.pocketts.ui.SoundPackInfo("Radio Pack", 34, 39)
+            override fun soundPack() = io.github.korppujauho.pocketts.ui.SoundPackInfo("Radio Pack: Night Shift Edition", 34, 39, UiSounds.Cue.entries.take(34).toSet())
         }
         SettingsContent(VoiceSettings(soundPack = true), "Jamie", withPack, {}, startTab = 1, modifier = Modifier.fillMaxSize())
     }
