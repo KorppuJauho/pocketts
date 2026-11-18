@@ -571,7 +571,7 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun forgetIdentity() = Settings(context).forgetIdentity()
     override fun securityLevel(): Int? = IdentityRaise.level(context)
     override fun soundPack() = SoundPack.pack?.let {
-        io.github.korppujauho.pocketts.ui.SoundPackInfo(it.name, it.files.size, UiSounds.Cue.entries.size)
+        io.github.korppujauho.pocketts.ui.SoundPackInfo(it.name, it.files.size, UiSounds.Cue.entries.size, it.files.keys)
     }
     override fun importSoundPack(uri: android.net.Uri, folder: Boolean): String? = try {
         SoundPack.import(context, uri, folder)

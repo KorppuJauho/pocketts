@@ -347,6 +347,21 @@ class ScreenshotTest {
         SettingsContent(VoiceSettings(soundPack = true), "Jamie", withPack, {}, startTab = 1, modifier = Modifier.fillMaxSize())
     }
 
+    /** Sound notifications' events, People in your channel opened: one switched off, two the pack has no sound for. */
+    @Test
+    fun settingsSoundEvents() = shot("settings-sound-events") {
+        val cues = UiSounds.Cue.entries.toSet() - UiSounds.Cue.SOMEONE_KICKED_SERVER - UiSounds.Cue.SOMEONE_BANNED -
+            UiSounds.Cue.CHANNEL_MOVED - UiSounds.Cue.CHANNEL_EDITED - UiSounds.Cue.STREAM_STARTED
+        androidx.compose.foundation.layout.Column(
+            Modifier.fillMaxSize().background(io.github.korppujauho.pocketts.ui.Ts.panel).padding(16.dp),
+        ) {
+            io.github.korppujauho.pocketts.ui.EventSounds(
+                VoiceSettings(soundPack = true, mutedSounds = setOf("SOMEONE_LEFT", "MESSAGE_OUT")),
+                io.github.korppujauho.pocketts.ui.SoundPackInfo("Radio Pack", cues.size, 39, cues), {}, open = setOf(1),
+            )
+        }
+    }
+
     @Test
     fun settingsUi() = shot("settings-ui") {
         SettingsContent(VoiceSettings(), "Jamie", Example.noSettings, {}, startTab = 3, modifier = Modifier.fillMaxSize())

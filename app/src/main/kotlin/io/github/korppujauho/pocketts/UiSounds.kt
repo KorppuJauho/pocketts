@@ -41,10 +41,25 @@ object UiSounds {
     private val player = Executors.newSingleThreadExecutor { r -> Thread(r, "ui-sounds").apply { isDaemon = true } }
     private val made = HashMap<Cue, ShortArray>()
 
-    /** Plays [cue] if sounds are on; [soundOff] (the app's sound button) keeps everything but its own feedback quiet. */
+    /**
+     * Plays [cue] if sounds are on and the event isn't switched off on its own (Settings › Playback); [soundOff] (the
+     * app's sound button) keeps everything but its own feedback quiet.
+     */
     fun play(cue: Cue, v: VoiceSettings, soundOff: Boolean = false) {
-        if (!v.uiSounds || v.uiSoundVolume <= 0f) return
+        if (!v.uiSounds || cue.name in v.mutedSounds) return
         if (soundOff && cue != Cue.SOUND_OFF) return
+        sound(cue, v)
+    }
+
+    /** Settings' Listen: the event's sound as it plays with [v], also while the event is switched off. */
+    fun listen(cue: Cue, v: VoiceSettings) = sound(cue, v)
+
+    /** Whether [cue] has a sound with [v]: the tones have none for [PACK_ONLY], a pack only for the events it has a file for. */
+    fun hasSound(cue: Cue, v: VoiceSettings, packCues: Set<Cue>?): Boolean =
+        if (v.soundPack && packCues != null) cue in packCues else cue !in PACK_ONLY
+
+    private fun sound(cue: Cue, v: VoiceSettings) {
+        if (v.uiSoundVolume <= 0f) return
         player.execute {
             try {
                 if (v.soundPack && SoundPack.pack != null) {
