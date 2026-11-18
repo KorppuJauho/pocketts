@@ -708,93 +708,119 @@ internal val SOUND_CATEGORIES: List<Pair<Int, List<Cue>>> = listOf(
 )
 
 /**
- * Each event on or off, in its category: a category opens with a tap, and its box turns all of its events on or off
- * (all on: off; otherwise all on). Listen plays the event's sound, also while it's off. An event without a sound right
- * now says why: the tones have none for it, or the pack chosen has none. [open]: the categories open at first.
+ * Each event on or off, a category to a box as in the Groups window: the category's row opens it with a tap, and its
+ * tick turns all of its events on or off (all on: off; otherwise all on). In each event's row, Listen (the round
+ * button at the start) plays its sound, also while it's off. An event without a sound right now shows off, greyed,
+ * and says why: the tones have none for it, or the pack chosen has none. It plays once it has one, unless switched
+ * off. [open]: the categories open at first.
  */
 @Composable
 internal fun EventSounds(v: VoiceSettings, pack: SoundPackInfo?, onChange: (VoiceSettings) -> Unit, open: Set<Int> = emptySet()) {
     val packCues = pack?.cues
     val usingPack = v.soundPack && packCues != null
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         for ((i, category) in SOUND_CATEGORIES.withIndex()) {
             val (titleId, cues) = category
             var opened by rememberSaveable(titleId) { mutableStateOf(i in open) }
-            val on = cues.count { it.name !in v.mutedSounds }
+            val sounding = cues.filter { UiSounds.hasSound(it, v, packCues) }
+            val on = sounding.count { it.name !in v.mutedSounds }
             val title = stringResource(titleId)
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field)
+                    .border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+            ) {
                 Row(
-                    Modifier.weight(1f).clip(RoundedCornerShape(6.dp)).clickable { opened = !opened }
-                        .semantics { if (opened) collapse { opened = false; true } else expand { opened = true; true } }.padding(vertical = 6.dp),
+                    Modifier.fillMaxWidth().heightIn(min = 56.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    androidx.compose.material3.Icon(
-                        Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted,
-                        modifier = Modifier.size(22.dp).graphicsLayer { rotationZ = if (opened) 0f else -90f },
-                    )
-                    Column(Modifier.padding(start = 8.dp)) {
-                        Text(title, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        Text(stringResource(R.string.sounds_on_count, on, cues.size), color = Ts.muted, fontSize = 12.sp)
+                    Row(
+                        Modifier.weight(1f).clickable { opened = !opened }
+                            .semantics { if (opened) collapse { opened = false; true } else expand { opened = true; true } }
+                            .padding(start = 14.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Color(0x0DFFFFFF)), contentAlignment = Alignment.Center) {
+                            androidx.compose.material3.Icon(
+                                Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted,
+                                modifier = Modifier.size(20.dp).graphicsLayer { rotationZ = if (opened) 0f else -90f },
+                            )
+                        }
+                        Column {
+                            Text(title, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                            Text(stringResource(R.string.sounds_on_count, on, cues.size), color = Ts.muted, fontSize = 12.sp)
+                        }
+                    }
+                    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                        androidx.compose.material3.TriStateCheckbox(
+                            when (on) {
+                                0 -> androidx.compose.ui.state.ToggleableState.Off
+                                sounding.size -> androidx.compose.ui.state.ToggleableState.On
+                                else -> androidx.compose.ui.state.ToggleableState.Indeterminate
+                            },
+                            onClick = {
+                                val names = sounding.map { it.name }.toSet()
+                                onChange(v.copy(mutedSounds = if (on == sounding.size) v.mutedSounds + names else v.mutedSounds - names))
+                            },
+                            enabled = sounding.isNotEmpty(),
+                            colors = soundCheckColors(),
+                            modifier = Modifier.padding(start = 12.dp, end = 18.dp, top = 12.dp, bottom = 12.dp)
+                                .semantics { contentDescription = title },
+                        )
                     }
                 }
-                androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
-                    androidx.compose.material3.TriStateCheckbox(
-                        when (on) {
-                            cues.size -> androidx.compose.ui.state.ToggleableState.On
-                            0 -> androidx.compose.ui.state.ToggleableState.Off
-                            else -> androidx.compose.ui.state.ToggleableState.Indeterminate
-                        },
-                        onClick = {
-                            val names = cues.map { it.name }.toSet()
-                            onChange(v.copy(mutedSounds = if (on == cues.size) v.mutedSounds + names else v.mutedSounds - names))
-                        },
-                        colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted),
-                        // Lined up with the heading's box at the end
-                        modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 12.dp).semantics { contentDescription = title },
-                    )
-                }
+                if (opened) for (cue in cues) EventSoundRow(cue, v, cue in sounding, usingPack, onChange)
             }
-            if (opened) for (cue in cues) EventSoundRow(cue, v, UiSounds.hasSound(cue, v, packCues), usingPack, onChange)
+        }
+    }
+}
+
+/** An event in its category's box: Listen, its name (and why it has no sound, when it hasn't), and its tick at the end. */
+@Composable
+private fun EventSoundRow(cue: Cue, v: VoiceSettings, has: Boolean, usingPack: Boolean, onChange: (VoiceSettings) -> Unit) {
+    val on = has && cue.name !in v.mutedSounds
+    val name = stringResource(cueName(cue))
+    Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    Row(
+        Modifier.fillMaxWidth()
+            .toggleable(on, enabled = has, role = androidx.compose.ui.semantics.Role.Checkbox) {
+                onChange(v.copy(mutedSounds = if (it) v.mutedSounds - cue.name else v.mutedSounds + cue.name))
+            }
+            .padding(start = 14.dp, end = 6.dp).heightIn(min = 52.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        val listen = stringResource(R.string.sound_listen)
+        Box(
+            Modifier.size(28.dp).clip(RoundedCornerShape(8.dp))
+                .background(if (has) Ts.accent.copy(alpha = 0.16f) else Color(0x0DFFFFFF))
+                .then(
+                    if (has) Modifier.clickable { UiSounds.listen(cue, v) }
+                        .clearAndSetSemantics { contentDescription = "$listen: $name"; role = androidx.compose.ui.semantics.Role.Button }
+                    else Modifier.clearAndSetSemantics {}
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.material3.Icon(
+                Icons.Rounded.PlayArrow, contentDescription = null, tint = if (has) Ts.accent else Ts.faint, modifier = Modifier.size(18.dp),
+            )
+        }
+        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+            Text(name, color = if (has) Ts.text else Ts.muted, fontSize = 14.sp)
+            if (!has) Text(
+                stringResource(if (usingPack) R.string.sound_not_in_pack else R.string.sound_pack_only),
+                color = Ts.faint, fontSize = 12.sp,
+            )
+        }
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+            Checkbox(on, null, enabled = has, colors = soundCheckColors(), modifier = Modifier.padding(12.dp))
         }
     }
 }
 
 @Composable
-private fun EventSoundRow(cue: Cue, v: VoiceSettings, has: Boolean, usingPack: Boolean, onChange: (VoiceSettings) -> Unit) {
-    val on = cue.name !in v.mutedSounds
-    val name = stringResource(cueName(cue))
-    Row(Modifier.fillMaxWidth().padding(start = 30.dp), verticalAlignment = Alignment.CenterVertically) {
-        Row(
-            Modifier.weight(1f).toggleable(on, role = androidx.compose.ui.semantics.Role.Checkbox) {
-                onChange(v.copy(mutedSounds = if (it) v.mutedSounds - cue.name else v.mutedSounds + cue.name))
-            }.padding(vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
-                Checkbox(on, null, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
-            }
-            Column(Modifier.padding(start = 10.dp)) {
-                Text(name, color = if (has) Ts.text else Ts.muted, fontSize = 14.sp)
-                if (!has) Text(
-                    stringResource(if (usingPack) R.string.sound_not_in_pack else R.string.sound_pack_only),
-                    color = Ts.muted, fontSize = 12.sp,
-                )
-            }
-        }
-        if (has) {
-            val listen = stringResource(R.string.sound_listen)
-            Row(
-                Modifier.clip(RoundedCornerShape(6.dp)).clickable { UiSounds.listen(cue, v) }
-                    .clearAndSetSemantics { contentDescription = "$listen: $name"; role = androidx.compose.ui.semantics.Role.Button }
-                    .padding(horizontal = 8.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                androidx.compose.material3.Icon(Icons.Rounded.PlayArrow, contentDescription = null, tint = Ts.accent, modifier = Modifier.size(18.dp))
-                Text(listen, color = Ts.accent, fontSize = 12.5.sp, modifier = Modifier.padding(start = 2.dp))
-            }
-        }
-    }
-}
+private fun soundCheckColors() = CheckboxDefaults.colors(
+    checkedColor = Ts.accent, uncheckedColor = Ts.muted, disabledCheckedColor = Ts.accent.copy(alpha = 0.4f), disabledUncheckedColor = Ts.faint,
+    disabledIndeterminateColor = Ts.accent.copy(alpha = 0.4f),
+)
 
 /** The event's name in the list. */
 private fun cueName(cue: Cue): Int = when (cue) {

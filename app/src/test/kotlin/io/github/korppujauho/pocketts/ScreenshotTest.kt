@@ -349,6 +349,7 @@ class ScreenshotTest {
 
     /** Sound notifications' events, People in your channel opened: one switched off, two the pack has no sound for. */
     @Test
+    @Config(qualifiers = "w411dp-h1100dp-xxhdpi")
     fun settingsSoundEvents() = shot("settings-sound-events") {
         val cues = UiSounds.Cue.entries.toSet() - UiSounds.Cue.SOMEONE_KICKED_SERVER - UiSounds.Cue.SOMEONE_BANNED -
             UiSounds.Cue.CHANNEL_MOVED - UiSounds.Cue.CHANNEL_EDITED - UiSounds.Cue.STREAM_STARTED

@@ -5,6 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -95,5 +98,9 @@ class SoundNotificationsTest {
         compose.onNodeWithContentDescription("Listen: You were poked").assertIsDisplayed()
         // A message arrived, You sent a message, Someone whispers to you
         assertEquals(3, compose.onAllNodesWithText("Not in this pack", substring = true).fetchSemanticsNodes().size)
+        // Shown off, and can't be ticked while it has no sound
+        compose.onNodeWithText("A message arrived").assertIsOff().assertIsNotEnabled()
+        compose.onNodeWithText("You were poked").assertIsOn()
+        compose.onNodeWithText("1 of 4 on").assertIsDisplayed()
     }
 }
