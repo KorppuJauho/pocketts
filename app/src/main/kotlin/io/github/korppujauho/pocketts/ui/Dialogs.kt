@@ -124,6 +124,8 @@ fun PersonSheet(
                         PillButton(stringResource(R.string.away_set), PillKind.PRIMARY, modifier = Modifier.weight(1f)) { onAway(true, msg.trim()); onDismiss() }
                     }
                 }
+                // One's own groups, with the same powers as anyone's
+                if (admin && onGroups != null) PillButton(stringResource(R.string.admin_groups), modifier = Modifier.fillMaxWidth(), onClick = onGroups)
                 return@Column
             }
             var v by remember { mutableFloatStateOf(volume) }

@@ -186,6 +186,7 @@ data class ChannelGroups(val channel: String, val groups: List<ServerModel.Group
 fun ServerGroupsDialog(
     person: ServerModel.Client, choices: List<ServerModel.GroupChoice>, onChange: (ServerModel.Group, Boolean) -> Unit, onDismiss: () -> Unit,
     server: String = "", channelGroups: ChannelGroups? = null, onChannelGroup: (ServerModel.Group) -> Unit = {},
+    error: String? = null, onDismissError: () -> Unit = {},
 ) {
     TsDialog(
         onDismiss = onDismiss, title = stringResource(R.string.admin_groups), subtitle = person.nickname, icon = Icons.Rounded.Groups,
@@ -196,6 +197,8 @@ fun ServerGroupsDialog(
             return@TsDialog
         }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Why a change didn't go through, here in the window rather than behind it
+            if (error != null) WarningBanner(error, onDismissError, inset = 0.dp)
             if (choices.isNotEmpty()) {
                 SectionLabel(stringResource(R.string.admin_server_groups))
                 GroupCard {

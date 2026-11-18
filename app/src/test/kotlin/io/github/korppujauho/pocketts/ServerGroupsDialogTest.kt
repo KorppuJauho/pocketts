@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -27,12 +28,13 @@ class ServerGroupsDialogTest {
     private val asked = mutableListOf<Pair<Int, Boolean>>()
     private val channelGroup = mutableListOf<Int>()
 
-    private fun dialog(powers: ServerModel.GroupPowers = ServerModel.GroupPowers(75, 75)) = rule.setContent {
+    private fun dialog(powers: ServerModel.GroupPowers = ServerModel.GroupPowers(75, 75), error: String? = null) = rule.setContent {
         PocketTsTheme {
             ServerGroupsDialog(
                 ServerModel.Client(3, 1, "Lee", databaseId = 234, serverGroups = listOf(7), channelGroup = 8), Example.groupChoices,
                 onChange = { g, member -> asked += g.id to member }, onDismiss = {},
                 channelGroups = Example.channelGroups.copy(powers = powers), onChannelGroup = { channelGroup += it.id },
+                error = error,
             )
         }
     }
@@ -66,5 +68,27 @@ class ServerGroupsDialogTest {
         dialog()
         rule.onAllNodesWithText("Guest")[0].assertIsNotEnabled().performClick()
         assertEquals(emptyList<Pair<Int, Boolean>>(), asked)
+    }
+
+    /** The server's refusal shows in the window, where the tick was. */
+    @Test
+    fun aRefusalShowsInTheWindow() {
+        dialog(error = "You can't change the server groups of Lee")
+        rule.onNodeWithText("You can't change the server groups of Lee").assertIsDisplayed()
+    }
+
+    @Test
+    fun yourOwnGroupsFromYourOwnMenu() {
+        var opened = false
+        rule.setContent {
+            PocketTsTheme {
+                io.github.korppujauho.pocketts.ui.PersonSheet(
+                    ServerModel.Client(1, 1, "Jamie", databaseId = 12), "", isSelf = true, volume = 1f, onVolume = {}, onPoke = {}, onChat = {},
+                    onDismiss = {}, admin = true, onGroups = { opened = true },
+                )
+            }
+        }
+        rule.onNodeWithText("Groups").performClick()
+        assertEquals(true, opened)
     }
 }

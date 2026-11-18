@@ -521,7 +521,7 @@ fun ServerScreen(
             onKick = { person = null; kickTarget = p },
             onBan = { person = null; banTarget = p },
             // Only someone the server gave a lasting number (a query login has its own groups)
-            onGroups = if (p.databaseId > 0) ({ person = null; groupsTarget = p }) else null,
+            onGroups = if (p.databaseId > 0) ({ person = null; actions.dismissError(); groupsTarget = p }) else null,
             whispered = p.id in state.whisperTo.people,
             onWhisper = if (state.phase == Session.Phase.CONNECTED) ({ actions.toggleWhisperPerson(p) }) else null,
         )
@@ -539,6 +539,7 @@ fun ServerScreen(
             onDismiss = { groupsTarget = null }, server = state.serverKey,
             channelGroups = ChannelGroups(state.channel(now.channel)?.displayName.orEmpty(), state.channelGroupChoices, state.groupPowers),
             onChannelGroup = { actions.setChannelGroup(now, it) },
+            error = state.error, onDismissError = actions::dismissError,
         )
     }
     moveTarget?.let { p ->
