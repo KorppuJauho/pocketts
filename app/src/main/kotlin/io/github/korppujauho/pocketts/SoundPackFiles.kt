@@ -131,14 +131,15 @@ object SoundPackFiles {
                 if (key.equals("name", ignoreCase = true)) name = value.trim('"').ifBlank { null }
                 continue
             }
-            val file = PLAY.find(value)?.groupValues?.get(1)?.replace(CLIENT_TYPE, "neutral")
+            val file = PLAY.find(value)?.groupValues?.get(1)?.replace(CLIENT_TYPE, "neutral", ignoreCase = true)
             files[key.uppercase()] = file?.let { fileName(it) }
         }
         return Ini(name, files)
     }
 
     private val PLAY = Regex("""play\(\s*"([^"]+)"\s*\)""", RegexOption.IGNORE_CASE)
-    private val CLIENT_TYPE = Regex("""\$\{clientType}""", RegexOption.IGNORE_CASE)
+    // Plain text, not a pattern: Android's patterns refuse a lone "}" that the JVM's accept
+    private const val CLIENT_TYPE = "\${clientType}"
 
     /** A path as the pack's files are kept: its lower-case name, without folders. */
     fun fileName(path: String): String = path.replace('\\', '/').substringAfterLast('/').trim().lowercase()
