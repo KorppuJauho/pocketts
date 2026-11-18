@@ -6,12 +6,14 @@ files, and they stay on your phone.
 
 ## Importing one
 
-Settings › Playback › **Sound pack** › **Import**, then choose:
+Settings › Playback › Sound notifications › **Sound pack** › **Import** (**Replace** once a pack is imported: one at
+a time), then choose:
 
 - **a folder**: the pack's own folder (the one with the sound files in it), or
 - **a file**: a `.zip` of that folder, or a `.ts3_soundpack` file (a zip under another name).
 
-Then switch **Tones | (the pack's name)** to the pack, and Save & Apply. Remove brings the tones back.
+The pack is chosen once it's imported: Save & Apply keeps it. **Tones | (the pack's name)** switches between the two,
+and **Remove** (asked first) deletes the pack and brings the tones back.
 
 Both kinds of pack work:
 
@@ -36,8 +38,11 @@ Use packs you're allowed to use, and keep their authors' terms.
 
 ## Quieting an event
 
-An event without a sound in the pack is quiet. To quiet one, such as pokes, take its file out of the pack (or, in a
-TeamSpeak 3 pack, its line out of `settings.ini`) before importing.
+Every event can be switched off on its own: Settings › Playback › Sound notifications, in its category (Connection,
+People in your channel, Chat and pokes, and so on). **Listen** plays an event's sound, also while it's off. This works
+with the tones and with a pack alike.
+
+An event without a sound in the pack is quiet too, and shows "Not in this pack".
 
 ## Which file plays when
 
