@@ -107,6 +107,11 @@ class Settings(private val context: Context) {
         AppLog.log("Deleted an identity")
     }
 
+    /** Settings › General's identities box was left open (it's folded at first). */
+    var identitiesOpen: Boolean
+        get() = prefs.getBoolean("identitiesOpen", false)
+        set(v) = prefs.edit().putBoolean("identitiesOpen", v).apply()
+
     /** The connect screen's Connect and Community panel is folded shut to its bar. */
     var connectHidden: Boolean
         get() = prefs.getBoolean("connectHidden", false)

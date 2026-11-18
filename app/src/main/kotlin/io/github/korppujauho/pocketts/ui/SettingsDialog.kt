@@ -90,6 +90,9 @@ interface SettingsActions {
     /** An identity's name and nickname changed (connected with it, the server hears the new nickname). */
     fun editIdentity(key: String, name: String, nickname: String) {}
     fun makeDefaultIdentity(key: String) {}
+    /** Whether the identities box was left open, remembered for the next time. */
+    fun identitiesOpen(): Boolean = false
+    fun setIdentitiesOpen(open: Boolean) {}
     /** A new identity, made now or taken from [text] (exported by a TeamSpeak app); null when it worked, else why not. */
     fun newIdentity(name: String, nickname: String, text: String?): String? = null
     /** The same from a file a TeamSpeak app saved (its .ini export). */
@@ -335,12 +338,12 @@ private fun Identities(actions: SettingsActions) {
     var list by remember { mutableStateOf(actions.identities()) }
     var open by remember { mutableStateOf<String?>(null) }
     var adding by remember { mutableStateOf(false) }
-    // Folded until opened: most people have one identity and seldom change it
-    var unfolded by rememberSaveable { mutableStateOf(false) }
+    // Folded until opened (most people have one identity and seldom change it); left open, it's open the next time
+    var unfolded by rememberSaveable { mutableStateOf(actions.identitiesOpen()) }
     var about by rememberSaveable { mutableStateOf(false) }
     val title = stringResource(R.string.identities_title)
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        IdentityList(list, unfolded, { unfolded = !unfolded }, { open = it.key }, { adding = true }) {
+        IdentityList(list, unfolded, { unfolded = !unfolded; actions.setIdentitiesOpen(unfolded) }, { open = it.key }, { adding = true }) {
             InfoButton(title, about) { about = !about }
         }
         if (about) Desc(stringResource(R.string.identities_desc))

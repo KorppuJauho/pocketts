@@ -569,6 +569,8 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
     override fun makeDefaultIdentity(key: String) {
         Settings(context).defaultIdentity = key
     }
+    override fun identitiesOpen() = Settings(context).identitiesOpen
+    override fun setIdentitiesOpen(open: Boolean) { Settings(context).identitiesOpen = open }
     override fun newIdentity(name: String, nickname: String, text: String?): String? =
         if (Settings(context).newIdentity(name, nickname, text) == null) context.getString(R.string.identity_not_valid) else null
     override fun newIdentityFile(name: String, nickname: String, uri: android.net.Uri): String? {

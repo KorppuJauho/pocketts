@@ -66,6 +66,21 @@ class IdentityScreensTest {
         rule.onNodeWithText("Make default").assertIsDisplayed()
     }
 
+    /** Left open, the box is open the next time Settings opens; shut again, it's shut. */
+    @Test
+    fun theBoxRemembersBeingOpen() {
+        val remembered = mutableListOf<Boolean>()
+        val actions = object : SettingsActions by settings(Example.identities) {
+            override fun identitiesOpen() = true
+            override fun setIdentitiesOpen(open: Boolean) { remembered += open }
+        }
+        rule.setContent { PocketTsTheme { SettingsContent(VoiceSettings(), actions, {}, modifier = Modifier.fillMaxSize()) } }
+        rule.onNodeWithText("Clan").assertIsDisplayed()
+        rule.onNodeWithText("Identities").performClick()
+        rule.onNodeWithText("Clan").assertDoesNotExist()
+        assertEquals(listOf(false), remembered)
+    }
+
     @Test
     fun theConnectFormConnectsAsTheOneChosen() {
         val seen = Seen()
