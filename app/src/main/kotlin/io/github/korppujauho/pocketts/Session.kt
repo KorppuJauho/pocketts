@@ -65,6 +65,9 @@ object Session : TsClient.Listener {
         val whisperTo: WhisperList = WhisperList(),
         val whisperHeld: Boolean = false,
         val badges: Map<Int, List<Long>> = emptyMap(), // per person: their group and own icons
+        val groupChoices: List<ServerModel.GroupChoice> = emptyList(), // the server groups people can be put in, and which we may change
+        val channelGroupChoices: List<ServerModel.Group> = emptyList(), // the channel groups people can be given
+        val groupPowers: ServerModel.GroupPowers = ServerModel.GroupPowers(), // ours, where we are
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
         val sendingProgress: Pair<Int, Int>? = null, // sending several pictures: which one (from 1), of how many
@@ -765,6 +768,8 @@ object Session : TsClient.Listener {
         KICK_CHANNEL("kick from the channel", R.string.admin_no_permission_kick_channel, R.string.admin_failed_kick_channel),
         KICK_SERVER("kick from the server", R.string.admin_no_permission_kick_server, R.string.admin_failed_kick_server),
         BAN("ban", R.string.admin_no_permission_ban, R.string.admin_failed_ban),
+        SERVER_GROUPS("change the server groups of", R.string.admin_no_permission_groups, R.string.admin_failed_groups),
+        CHANNEL_GROUP("change the channel group of", R.string.admin_no_permission_channel_group, R.string.admin_failed_channel_group),
         CREATE_CHANNEL("create the channel", R.string.channel_no_permission_create, R.string.channel_failed_create),
         EDIT_CHANNEL("change the channel", R.string.channel_no_permission_edit, R.string.channel_failed_edit),
         REORDER_CHANNEL("move the channel", R.string.channel_no_permission_reorder, R.string.channel_failed_reorder),
@@ -828,6 +833,24 @@ object Session : TsClient.Listener {
         "banreason" to reason.trim().take(REASON_MAX).ifEmpty { null },
     )
 
+    /** Into server group [group], or out of it ([member] false); the server tells everyone, and the person's groups change then. */
+    fun setServerGroup(person: ServerModel.Client, group: ServerModel.Group, member: Boolean) {
+        if (person.databaseId <= 0) return
+        admin(
+            AdminAction.SERVER_GROUPS, person, if (member) "servergroupaddclient" else "servergroupdelclient",
+            "sgid" to group.id, "cldbid" to person.databaseId,
+        )
+    }
+
+    /** Channel group [group] for them in the channel they're in, in place of the one they have there. */
+    fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) {
+        if (person.databaseId <= 0) return
+        admin(
+            AdminAction.CHANNEL_GROUP, person, "setclientchannelgroup",
+            "cgid" to group.id, "cid" to person.channel, "cldbid" to person.databaseId,
+        )
+    }
+
     /** The longest reason given with a kick or a ban (TeamSpeak's limit). */
     const val REASON_MAX = 40
 
@@ -835,9 +858,10 @@ object Session : TsClient.Listener {
         val (action, who) = asked
         val id = cmd["id"] ?: return
         // Whom, as the log may say it: a person, or a channel
-        val whom = if (action.ordinal <= AdminAction.BAN.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
+        val whom = if (action.ordinal <= AdminAction.CHANNEL_GROUP.ordinal) LogPrivacy.person(who) else LogPrivacy.channel(who)
         if (id == "0") return AppLog.log("Admin: ${action.log} $whom")
         AppLog.log("Admin: couldn't ${action.log} $whom, error $id: ${LogPrivacy.text(cmd["msg"])} (permission ${cmd["failed_permid"]})")
+        if (id == NO_PERMISSION) sound(Cue.PERMISSION_REFUSED)
         val message = when (id) {
             NO_PERMISSION -> app.getString(action.noPermission, who)
             WRONG_CHANNEL_PASSWORD -> app.getString(R.string.admin_move_needs_password, who)
@@ -985,22 +1009,32 @@ object Session : TsClient.Listener {
                 } else {
                     val p = person(clid) ?: continue
                     if (to == here && here > 0) out += Cue.SOMEONE_JOINED
-                    else if (p.channel == here) out += Cue.SOMEONE_LEFT
+                    else if (p.channel == here) out += if (reason == 4) Cue.SOMEONE_KICKED_CHANNEL else Cue.SOMEONE_LEFT
                 }
             }
-            // Connected into your channel, or came from a channel you don't see
+            // Connected into your channel (reason 0), or came from a channel you don't see
             "notifycliententerview" -> for (g in cmd.groups) {
+                g["reasonid"]?.toIntOrNull()?.let { reason = it }
                 val clid = g["clid"]?.toIntOrNull() ?: continue
                 if (clid == me || g["client_type"] == "1") continue
-                if (g["ctid"]?.toIntOrNull() == here && here > 0) out += Cue.SOMEONE_JOINED
+                if (g["ctid"]?.toIntOrNull() == here && here > 0) out += if (reason == 0) Cue.SOMEONE_CONNECTED else Cue.SOMEONE_JOINED
             }
-            // Left the server from your channel; or you were kicked or banned
+            // Left the server from your channel (disconnected, lost the connection, or another way); or you were
+            // kicked from the server (5) or banned (6)
             "notifyclientleftview" -> for (g in cmd.groups) {
                 g["reasonid"]?.toIntOrNull()?.let { reason = it }
                 val clid = g["clid"]?.toIntOrNull() ?: continue
                 if (clid == me) {
-                    if (reason == 5 || reason == 6) { kicked = true; out += Cue.KICKED }
-                } else if (person(clid)?.channel == here) out += Cue.SOMEONE_LEFT
+                    if (reason == 5 || reason == 6) { kicked = true; out += if (reason == 6) Cue.BANNED else Cue.KICKED_SERVER }
+                } else if (person(clid)?.channel == here) {
+                    out += when (reason) {
+                        8 -> Cue.SOMEONE_DISCONNECTED
+                        3 -> Cue.SOMEONE_LOST_CONNECTION
+                        5 -> Cue.SOMEONE_KICKED_SERVER
+                        6 -> Cue.SOMEONE_BANNED
+                        else -> Cue.SOMEONE_LEFT
+                    }
+                }
             }
             // A stream in your channel (yours too) starts or stops
             "notifystreamstarted", "notifystreamstopped" -> {
@@ -1010,6 +1044,30 @@ object Session : TsClient.Listener {
                 if (clid > 0 && (clid == me || model.clients[clid]?.channel == here)) {
                     out += if (cmd.name == "notifystreamstarted") Cue.STREAM_STARTED else Cue.STREAM_STOPPED
                 }
+            }
+            // Talk power given or taken (a talker in a moderated channel)
+            "notifyclientupdated" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() != me) continue
+                val talker = g["client_is_talker"]?.let { it == "1" } ?: continue
+                if (talker != model.ownClient?.isTalker) out += if (talker) Cue.TALK_POWER_GRANTED else Cue.TALK_POWER_REVOKED
+            }
+            // Your own groups changed
+            "notifyservergroupclientadded", "notifyservergroupclientdeleted" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() == me) {
+                    out += if (cmd.name == "notifyservergroupclientadded") Cue.SERVER_GROUP_ADDED else Cue.SERVER_GROUP_REMOVED
+                }
+            }
+            "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
+                if (g["clid"]?.toIntOrNull() != me || g["cid"]?.toIntOrNull() != here) continue
+                if (g["cgid"]?.toIntOrNull() != model.ownClient?.channelGroup) out += Cue.CHANNEL_GROUP_CHANGED
+            }
+            // Channels changing. An edit counts when someone made it (the server also answers a description asked
+            // for with an edit, without anyone behind it)
+            "notifychannelcreated" -> out += Cue.CHANNEL_CREATED
+            "notifychanneldeleted" -> out += Cue.CHANNEL_DELETED
+            "notifychannelmoved" -> out += Cue.CHANNEL_MOVED
+            "notifychanneledited" -> if (cmd["invokerid"] != null) {
+                out += if (cmd["cid"]?.toIntOrNull() == here) Cue.YOUR_CHANNEL_EDITED else Cue.CHANNEL_EDITED
             }
         }
         return out.distinct()
@@ -1349,6 +1407,7 @@ object Session : TsClient.Listener {
         // Who's whispering to us (until they stop, or talk to the channel instead)
         if (voice.data.isNotEmpty() && (voice.clientId in _voices.value.whispering) != voice.whisper) {
             _voices.update { v -> v.copy(whispering = if (voice.whisper) v.whispering + voice.clientId else v.whispering - voice.clientId) }
+            if (voice.whisper) sound(Cue.WHISPER_RECEIVED)
         }
     }
 
@@ -1458,6 +1517,7 @@ object Session : TsClient.Listener {
 
     /** Away (with a message) or back, as the others see it. */
     fun setAway(away: Boolean, message: String = "") {
+        if (away != _state.value.away) UiSounds.play(if (away) Cue.AWAY_ON else Cue.AWAY_OFF, _state.value.voice, _state.value.outputMuted)
         _state.update { it.copy(away = away, awayMessage = if (away) message else "") }
         client?.sendCommand(Commands.build("clientupdate", "client_away" to away, "client_away_message" to if (away) message else ""))
     }
@@ -1551,6 +1611,9 @@ object Session : TsClient.Listener {
                 cannotTalk = model.clients.values.filter { c -> !model.canTalk(c) }.map { c -> c.id }.toSet(),
                 server = HashMap(model.serverVars),
                 badges = model.clients.values.associate { c -> c.id to model.badges(c) },
+                groupChoices = model.serverGroupChoices(),
+                channelGroupChoices = model.channelGroupChoices(),
+                groupPowers = model.groupPowers,
                 streams = HashMap(model.streams),
                 serverIcon = model.serverVars["virtualserver_icon_id"]?.toLongOrNull()?.let { v -> if (v < 0) v + (1L shl 32) else v } ?: 0,
                 channelCount = model.channels.size,

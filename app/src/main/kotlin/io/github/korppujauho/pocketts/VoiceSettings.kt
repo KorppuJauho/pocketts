@@ -35,6 +35,8 @@ data class VoiceSettings(
     val overlayPtt: Boolean = false, // the push-to-talk button stays on screen over other apps
     val uiSounds: Boolean = true, // sounds for events (people coming and going, messages, pokes, streams, the buttons)
     val uiSoundVolume: Float = 0.6f, // their volume, 0 - 1
+    val soundPack: Boolean = false, // the person's own sound pack in place of the tones, when one is imported ([SoundPack])
+    val mutedSounds: Set<String> = emptySet(), // the events switched off one by one ([UiSounds.Cue] names): every one plays by default
     val adminTools: Boolean = false, // the person menu offers move, kick and ban (the server decides who may)
     val controlsAtBottom: Boolean = false, // the buttons and the Channels/Chat switch at the bottom of the screen (within thumb reach)
     val debugLog: Boolean = false, // the debug log for bug reports (Settings › Advanced), kept on the phone
@@ -102,6 +104,8 @@ data class VoiceSettings(
                 overlayPtt = p.getBoolean("overlayPtt", d.overlayPtt),
                 uiSounds = p.getBoolean("uiSounds", d.uiSounds),
                 uiSoundVolume = p.getFloat("uiSoundVolume", d.uiSoundVolume),
+                soundPack = p.getBoolean("soundPack", d.soundPack),
+                mutedSounds = p.getStringSet("mutedSounds", null)?.toSet() ?: d.mutedSounds,
                 adminTools = p.getBoolean("adminTools", d.adminTools),
                 controlsAtBottom = p.getBoolean("controlsAtBottom", d.controlsAtBottom),
                 debugLog = p.getBoolean("debugLog", d.debugLog),
@@ -140,6 +144,8 @@ data class VoiceSettings(
             .putBoolean("overlayPtt", overlayPtt)
             .putBoolean("uiSounds", uiSounds)
             .putFloat("uiSoundVolume", uiSoundVolume)
+            .putBoolean("soundPack", soundPack)
+            .putStringSet("mutedSounds", mutedSounds)
             .putBoolean("adminTools", adminTools)
             .putBoolean("controlsAtBottom", controlsAtBottom)
             .putBoolean("debugLog", debugLog)

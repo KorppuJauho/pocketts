@@ -272,6 +272,9 @@ fun ControlsBar(
     sharing: Boolean = false,
     onShare: (() -> Unit)? = null,
     whisper: (@Composable () -> Unit)? = null,
+) = androidx.compose.runtime.CompositionLocalProvider(
+    // Left to right in every language: push-to-talk stays at the right end, under a right thumb, also in Arabic and Persian
+    androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr,
 ) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -76,6 +77,10 @@ interface ServerActions {
     fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) {}
     /** Admin: banned for [seconds] (0: for good). */
     fun ban(person: ServerModel.Client, seconds: Long, reason: String) {}
+    /** Into a server group, or out of it. */
+    fun setServerGroup(person: ServerModel.Client, group: ServerModel.Group, member: Boolean) {}
+    /** Their channel group in the channel they're in. */
+    fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) {}
     /** Admin: a new channel. */
     fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) {}
     /** Admin: a channel changed. */
@@ -178,6 +183,7 @@ fun ServerScreen(
     var moveTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var kickTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var banTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
+    var groupsTarget by remember { mutableStateOf<ServerModel.Client?>(null) }
     var serverInfo by remember { mutableStateOf(false) }
     var keyDialog by remember { mutableStateOf(false) }
     // Editing the channels (Settings › UI › Show admin functions, then holding a channel)
@@ -434,10 +440,11 @@ fun ServerScreen(
                         )
                     }
                     if (ptt && state.voice.floatingPtt && state.phase == Session.Phase.CONNECTED) {
-                        // In the chat, above the message box
+                        // In the chat, above the message box; on the right in every language, as the bar's push-to-talk
                         FloatingPtt(
                             state.pttHeld, actions::setPtt,
-                            Modifier.align(Alignment.BottomEnd).padding(end = 1.dp, bottom = if (view == View.CHAT) 81.dp else 9.dp),
+                            Modifier.align(androidx.compose.ui.AbsoluteAlignment.BottomRight)
+                                .absolutePadding(right = 1.dp, bottom = if (view == View.CHAT) 81.dp else 9.dp),
                         )
                     }
                 }
@@ -517,6 +524,8 @@ fun ServerScreen(
             onMove = { person = null; moveTarget = p },
             onKick = { person = null; kickTarget = p },
             onBan = { person = null; banTarget = p },
+            // Only someone the server gave a lasting number (a query login has its own groups)
+            onGroups = if (p.databaseId > 0) ({ person = null; actions.dismissError(); groupsTarget = p }) else null,
             whispered = p.id in state.whisperTo.people,
             onWhisper = if (state.phase == Session.Phase.CONNECTED) ({ actions.toggleWhisperPerson(p) }) else null,
         )
@@ -525,6 +534,17 @@ fun ServerScreen(
         val entries = state.whisperTo.people.mapNotNull { id -> state.client(id)?.let { p -> p.nickname to { actions.toggleWhisperPerson(p) } } } +
             state.whisperTo.channels.mapNotNull { id -> state.channel(id)?.let { ch -> ch.displayName.ifEmpty { ch.name } to { actions.toggleWhisperChannel(ch) } } }
         WhisperListDialog(entries, onClear = actions::clearWhisper, onDismiss = { whisperList = false })
+    }
+    groupsTarget?.let { p ->
+        // As the server has them now: a tick changes once the server says so
+        val now = state.client(p.id)
+        if (now == null) groupsTarget = null else ServerGroupsDialog(
+            now, state.groupChoices, onChange = { group, member -> actions.setServerGroup(now, group, member) },
+            onDismiss = { groupsTarget = null }, server = state.serverKey,
+            channelGroups = ChannelGroups(state.channel(now.channel)?.displayName.orEmpty(), state.channelGroupChoices, state.groupPowers),
+            onChannelGroup = { actions.setChannelGroup(now, it) },
+            error = state.error, onDismissError = actions::dismissError,
+        )
     }
     moveTarget?.let { p ->
         MoveDialog(

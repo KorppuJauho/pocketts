@@ -1,0 +1,134 @@
+package io.github.korppujauho.pocketts
+
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import io.github.korppujauho.pocketts.UiSounds.Cue
+import io.github.korppujauho.pocketts.ui.EventSounds
+import io.github.korppujauho.pocketts.ui.PocketTsTheme
+import io.github.korppujauho.pocketts.ui.SOUND_CATEGORIES
+import io.github.korppujauho.pocketts.ui.SoundPackInfo
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
+
+/** Settings › Playback › Sound notifications: each event on or off on its own, kept with the other settings. */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
+class SoundNotificationsTest {
+    @get:Rule
+    val compose = createComposeRule()
+
+    @Test
+    fun everyEventIsInOneCategory() {
+        val shown = SOUND_CATEGORIES.flatMap { it.second }
+        assertEquals(Cue.entries.toSet(), shown.toSet())
+        assertEquals(shown.size, shown.toSet().size)
+    }
+
+    @Test
+    fun mutedEventsAreKept() {
+        val context = RuntimeEnvironment.getApplication()
+        assertEquals(emptySet<String>(), VoiceSettings.load(context).mutedSounds) // all on at first
+        VoiceSettings(mutedSounds = setOf("SOMEONE_LEFT", "MESSAGE_OUT")).save(context)
+        assertEquals(setOf("SOMEONE_LEFT", "MESSAGE_OUT"), VoiceSettings.load(context).mutedSounds)
+    }
+
+    @Test
+    fun whichEventsHaveASound() {
+        val tones = VoiceSettings()
+        assertTrue(UiSounds.hasSound(Cue.CONNECTED, tones, null))
+        assertFalse(UiSounds.hasSound(Cue.WHISPER_RECEIVED, tones, null))
+        val pack = VoiceSettings(soundPack = true)
+        assertTrue(UiSounds.hasSound(Cue.WHISPER_RECEIVED, pack, setOf(Cue.WHISPER_RECEIVED)))
+        assertFalse(UiSounds.hasSound(Cue.CONNECTED, pack, setOf(Cue.WHISPER_RECEIVED)))
+        // A pack imported but not chosen: the tones
+        assertTrue(UiSounds.hasSound(Cue.CONNECTED, tones, setOf(Cue.WHISPER_RECEIVED)))
+    }
+
+    @Test
+    fun eventsSwitchOffOneByOneOrByCategory() {
+        var saved = VoiceSettings()
+        compose.setContent {
+            PocketTsTheme {
+                var v by remember { mutableStateOf(VoiceSettings()) }
+                EventSounds(v, null, { v = it; saved = it })
+            }
+        }
+        compose.onNodeWithText("8 of 8 on").assertIsDisplayed()
+        // Folded until opened
+        compose.onNodeWithText("People in your channel").performClick()
+        compose.onNodeWithText("Someone left your channel").performClick()
+        assertEquals(setOf("SOMEONE_LEFT"), saved.mutedSounds)
+        compose.onNodeWithText("7 of 8 on").assertIsDisplayed()
+        // The category's box: all of Connection off, and on again
+        compose.onNodeWithContentDescription("Connection").performClick()
+        assertEquals(
+            setOf("SOMEONE_LEFT", "CONNECTED", "DISCONNECTED", "CONNECTION_LOST", "KICKED", "KICKED_SERVER", "BANNED"),
+            saved.mutedSounds,
+        )
+        compose.onNodeWithText("0 of 6 on").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Connection").performClick()
+        assertEquals(setOf("SOMEONE_LEFT"), saved.mutedSounds)
+    }
+
+    @Test
+    fun anEventWithoutASoundSaysWhy() {
+        compose.setContent {
+            PocketTsTheme {
+                EventSounds(VoiceSettings(soundPack = true), SoundPackInfo("Radio Pack", 1, 39, setOf(Cue.POKE)), {}, open = setOf(2))
+            }
+        }
+        compose.onNodeWithContentDescription("Listen: You were poked").assertIsDisplayed()
+        // A message arrived, You sent a message, Someone whispers to you
+        assertEquals(3, compose.onAllNodesWithText("Not in this pack", substring = true).fetchSemanticsNodes().size)
+        // Shown off, and can't be ticked while it has no sound
+        compose.onNodeWithText("A message arrived").assertIsOff().assertIsNotEnabled()
+        compose.onNodeWithText("You were poked").assertIsOn()
+        compose.onNodeWithText("1 of 4 on").assertIsDisplayed()
+    }
+
+    /** With a pack imported, Import says Replace; Remove asks first, and only Remove in that window removes it. */
+    @Test
+    fun removingAPackIsAskedFirst() {
+        var removed = 0
+        val actions = object : io.github.korppujauho.pocketts.ui.SettingsActions by Example.noSettings {
+            override fun soundPack() = SoundPackInfo("Radio Pack", 34, 39, Cue.entries.take(34).toSet())
+            override fun removeSoundPack() { removed++ }
+        }
+        compose.setContent {
+            PocketTsTheme {
+                io.github.korppujauho.pocketts.ui.SettingsContent(
+                    VoiceSettings(soundPack = true), actions, {}, startTab = 1, modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                )
+            }
+        }
+        compose.onNodeWithText("Replace").assertExists()
+        compose.onNodeWithText("Remove").performScrollTo().performClick()
+        compose.onNodeWithText("Remove the sound pack?").assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performClick()
+        assertEquals(0, removed)
+        compose.onNodeWithText("Remove").performScrollTo().performClick()
+        compose.onAllNodesWithText("Remove")[1].performClick() // the window's button
+        assertEquals(1, removed)
+        compose.onNodeWithText("Import").assertExists()
+    }
+}

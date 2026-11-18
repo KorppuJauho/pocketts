@@ -432,6 +432,9 @@ private object SessionActions : ServerActions {
     override fun moveClient(person: ServerModel.Client, channelId: Int) = Session.moveClient(person, channelId)
     override fun kick(person: ServerModel.Client, fromServer: Boolean, reason: String) = Session.kick(person, fromServer, reason)
     override fun ban(person: ServerModel.Client, seconds: Long, reason: String) = Session.ban(person, seconds, reason)
+    override fun setServerGroup(person: ServerModel.Client, group: ServerModel.Group, member: Boolean) =
+        Session.setServerGroup(person, group, member)
+    override fun setChannelGroup(person: ServerModel.Client, group: ServerModel.Group) = Session.setChannelGroup(person, group)
     override fun createChannel(settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) = Session.createChannel(settings)
     override fun editChannel(channel: ServerModel.Channel, settings: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings) =
         Session.editChannel(channel, settings)
@@ -617,6 +620,19 @@ private class AppSettingsActions(private val context: Context) : SettingsActions
         AppLog.log("Couldn't read the identity file: ${e.javaClass.simpleName}")
         null
     }
+    override fun soundPack() = SoundPack.pack?.let {
+        io.github.korppujauho.pocketts.ui.SoundPackInfo(it.name, it.files.size, UiSounds.Cue.entries.size, it.files.keys)
+    }
+    override fun importSoundPack(uri: android.net.Uri, folder: Boolean): String? = try {
+        SoundPack.import(context, uri, folder)
+        null
+    } catch (e: SoundPack.ImportFailed) {
+        e.message
+    } catch (e: Exception) {
+        AppLog.log("Sound pack not imported: ${e.javaClass.simpleName}")
+        context.getString(R.string.file_not_opened)
+    }
+    override fun removeSoundPack() = SoundPack.remove(context)
     override fun clearChatHistory() = Session.clearChatHistory(context)
     override fun forgetChannelPasswords() = ChannelPasswords(context).clear()
 }
