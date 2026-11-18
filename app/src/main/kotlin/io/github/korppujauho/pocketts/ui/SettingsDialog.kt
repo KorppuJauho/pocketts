@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Check
@@ -19,6 +20,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -70,9 +78,12 @@ import androidx.compose.ui.window.DialogProperties
 import io.github.korppujauho.pocketts.VoiceSettings
 import io.github.korppujauho.pocketts.VoiceSettings.Activation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import io.github.korppujauho.pocketts.R
+import io.github.korppujauho.pocketts.UiSounds
+import io.github.korppujauho.pocketts.UiSounds.Cue
 
 /** What the settings window needs besides the settings themselves. */
 interface SettingsActions {
@@ -97,6 +108,11 @@ interface SettingsActions {
     fun forgetIdentity() {}
     /** The identity's security level (null when it can't be read). */
     fun securityLevel(): Int? = null
+    /** The sound pack imported (null when none). */
+    fun soundPack(): SoundPackInfo? = null
+    /** Imports a sound pack from a folder (a tree from the folder picker) or a .zip; null when it worked, else why not. */
+    fun importSoundPack(uri: android.net.Uri, folder: Boolean): String? = null
+    fun removeSoundPack() {}
     /** Forgets every server's chat history, and the lines on screen. */
     fun clearChatHistory() {}
     /** Forgets every remembered channel password. */
@@ -105,6 +121,9 @@ interface SettingsActions {
     fun language(): String = ""
     fun setLanguage(tag: String) {}
 }
+
+/** An imported sound pack: its name, how many of the [of] events have a sound, and which ([cues]). */
+data class SoundPackInfo(val name: String, val events: Int, val of: Int, val cues: Set<Cue> = emptySet())
 
 /** Who we are on the server, for the profile picture in Settings. */
 data class SelfInfo(val person: io.github.korppujauho.pocketts.proto.ServerModel.Client?, val server: String, val avatarStatus: String?)
@@ -597,7 +616,7 @@ private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
 
 /** A two-way choice in one row, as the server screen's Channels/Chat switch. */
 @Composable
-internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+internal fun Segmented(options: List<String>, selected: Int, oneLine: Boolean = false, onSelect: (Int) -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Ts.card)
             .border(1.dp, Ts.hairline, RoundedCornerShape(10.dp)).padding(4.dp),
@@ -608,10 +627,15 @@ internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> 
             Box(
                 Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.RadioButton) { onSelect(i) }
-                    .padding(vertical = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                // [oneLine]: a name of any length (a sound pack's) shortened to fit, rather than wrapped
+                Text(
+                    label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    maxLines = if (oneLine) 1 else Int.MAX_VALUE, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -634,13 +658,305 @@ private fun Playback(v: VoiceSettings, saved: VoiceSettings, actions: SettingsAc
     Group {
         SecondaryButton(stringResource(R.string.playback_test_sound)) { actions.playTestSound() }
     }
-    Group {
-        Check(stringResource(R.string.playback_event_sounds), v.uiSounds, info = stringResource(R.string.playback_event_sounds_desc)) { onChange(v.copy(uiSounds = it)) }
+    SoundNotifications(v, actions, onChange)
+}
+
+/**
+ * The sounds for events, as a section of their own: on or off as a whole in its heading, the tones or a sound pack,
+ * their volume, and each event on its own, in categories folded away until opened.
+ */
+@Composable
+private fun SoundNotifications(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
+    val title = stringResource(R.string.sound_notifications)
+    var about by rememberSaveable { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.card))
+        Row(
+            Modifier.fillMaxWidth().padding(top = 6.dp)
+                .toggleable(v.uiSounds, role = androidx.compose.ui.semantics.Role.Checkbox) { onChange(v.copy(uiSounds = it)) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(title, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            InfoButton(title, about) { about = !about }
+            Spacer(Modifier.weight(1f))
+            androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                Checkbox(v.uiSounds, null, colors = CheckboxDefaults.colors(checkedColor = Ts.accent, uncheckedColor = Ts.muted))
+            }
+        }
+        if (about) Desc(stringResource(R.string.playback_event_sounds_desc))
     }
-    if (v.uiSounds) {
-        Group(stringResource(R.string.playback_sound_volume), "${(v.uiSoundVolume * 100).roundToInt()}%") {
-            TsSlider(v.uiSoundVolume, 0f..1f, 19) { onChange(v.copy(uiSoundVolume = (it * 20).roundToInt() / 20f)) }
-            SecondaryButton(stringResource(R.string.playback_play_sound)) { io.github.korppujauho.pocketts.UiSounds.play(io.github.korppujauho.pocketts.UiSounds.Cue.MESSAGE_IN, v) }
+    if (!v.uiSounds) return
+    var pack by remember { mutableStateOf(actions.soundPack()) }
+    SoundPackGroup(v, pack, { pack = it }, actions, onChange)
+    Group(stringResource(R.string.playback_sound_volume), "${(v.uiSoundVolume * 100).roundToInt()}%") {
+        TsSlider(v.uiSoundVolume, 0f..1f, 19) { onChange(v.copy(uiSoundVolume = (it * 20).roundToInt() / 20f)) }
+        SecondaryButton(stringResource(R.string.playback_play_sound)) { UiSounds.listen(Cue.MESSAGE_IN, v) }
+    }
+    EventSounds(v, pack, onChange)
+}
+
+/** The events by kind, in the order they're shown (every [Cue] once). */
+internal val SOUND_CATEGORIES: List<Pair<Int, List<Cue>>> = listOf(
+    R.string.sound_cat_connection to listOf(Cue.CONNECTED, Cue.DISCONNECTED, Cue.CONNECTION_LOST, Cue.KICKED, Cue.KICKED_SERVER, Cue.BANNED),
+    R.string.sound_cat_people to listOf(
+        Cue.SOMEONE_JOINED, Cue.SOMEONE_CONNECTED, Cue.SOMEONE_LEFT, Cue.SOMEONE_DISCONNECTED, Cue.SOMEONE_LOST_CONNECTION,
+        Cue.SOMEONE_KICKED_CHANNEL, Cue.SOMEONE_KICKED_SERVER, Cue.SOMEONE_BANNED,
+    ),
+    R.string.sound_cat_chat to listOf(Cue.MESSAGE_IN, Cue.MESSAGE_OUT, Cue.POKE, Cue.WHISPER_RECEIVED),
+    R.string.sound_cat_status to listOf(Cue.MIC_OFF, Cue.MIC_ON, Cue.SOUND_OFF, Cue.SOUND_ON, Cue.AWAY_ON, Cue.AWAY_OFF),
+    R.string.sound_cat_channels to listOf(
+        Cue.CHANNEL_SWITCHED, Cue.MOVED, Cue.TALK_POWER_GRANTED, Cue.TALK_POWER_REVOKED, Cue.SERVER_GROUP_ADDED,
+        Cue.SERVER_GROUP_REMOVED, Cue.CHANNEL_GROUP_CHANGED, Cue.PERMISSION_REFUSED, Cue.CHANNEL_CREATED, Cue.CHANNEL_DELETED,
+        Cue.CHANNEL_EDITED, Cue.YOUR_CHANNEL_EDITED, Cue.CHANNEL_MOVED,
+    ),
+    R.string.sound_cat_streams to listOf(Cue.STREAM_STARTED, Cue.STREAM_STOPPED),
+)
+
+/**
+ * Each event on or off, a category to a box as in the Groups window: the category's row opens it with a tap, and its
+ * tick turns all of its events on or off (all on: off; otherwise all on). In each event's row, Listen (the round
+ * button at the start) plays its sound, also while it's off. An event without a sound right now shows off, greyed,
+ * and says why: the tones have none for it, or the pack chosen has none. It plays once it has one, unless switched
+ * off. [open]: the categories open at first.
+ */
+@Composable
+internal fun EventSounds(v: VoiceSettings, pack: SoundPackInfo?, onChange: (VoiceSettings) -> Unit, open: Set<Int> = emptySet()) {
+    val packCues = pack?.cues
+    val usingPack = v.soundPack && packCues != null
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        for ((i, category) in SOUND_CATEGORIES.withIndex()) {
+            val (titleId, cues) = category
+            var opened by rememberSaveable(titleId) { mutableStateOf(i in open) }
+            val sounding = cues.filter { UiSounds.hasSound(it, v, packCues) }
+            val on = sounding.count { it.name !in v.mutedSounds }
+            val title = stringResource(titleId)
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field)
+                    .border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        Modifier.weight(1f).clickable { opened = !opened }
+                            .semantics { if (opened) collapse { opened = false; true } else expand { opened = true; true } }
+                            .padding(start = 14.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Color(0x0DFFFFFF)), contentAlignment = Alignment.Center) {
+                            androidx.compose.material3.Icon(
+                                Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted,
+                                modifier = Modifier.size(20.dp).graphicsLayer { rotationZ = if (opened) 0f else -90f },
+                            )
+                        }
+                        Column {
+                            Text(title, color = Ts.bright, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                            Text(stringResource(R.string.sounds_on_count, on, cues.size), color = Ts.muted, fontSize = 12.sp)
+                        }
+                    }
+                    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                        androidx.compose.material3.TriStateCheckbox(
+                            when (on) {
+                                0 -> androidx.compose.ui.state.ToggleableState.Off
+                                sounding.size -> androidx.compose.ui.state.ToggleableState.On
+                                else -> androidx.compose.ui.state.ToggleableState.Indeterminate
+                            },
+                            onClick = {
+                                val names = sounding.map { it.name }.toSet()
+                                onChange(v.copy(mutedSounds = if (on == sounding.size) v.mutedSounds + names else v.mutedSounds - names))
+                            },
+                            enabled = sounding.isNotEmpty(),
+                            colors = soundCheckColors(),
+                            modifier = Modifier.padding(start = 12.dp, end = 18.dp, top = 12.dp, bottom = 12.dp)
+                                .semantics { contentDescription = title },
+                        )
+                    }
+                }
+                if (opened) for (cue in cues) EventSoundRow(cue, v, cue in sounding, usingPack, onChange)
+            }
+        }
+    }
+}
+
+/** An event in its category's box: Listen, its name (and why it has no sound, when it hasn't), and its tick at the end. */
+@Composable
+private fun EventSoundRow(cue: Cue, v: VoiceSettings, has: Boolean, usingPack: Boolean, onChange: (VoiceSettings) -> Unit) {
+    val on = has && cue.name !in v.mutedSounds
+    val name = stringResource(cueName(cue))
+    Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    Row(
+        Modifier.fillMaxWidth()
+            .toggleable(on, enabled = has, role = androidx.compose.ui.semantics.Role.Checkbox) {
+                onChange(v.copy(mutedSounds = if (it) v.mutedSounds - cue.name else v.mutedSounds + cue.name))
+            }
+            .padding(start = 14.dp, end = 6.dp).heightIn(min = 52.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        val listen = stringResource(R.string.sound_listen)
+        Box(
+            Modifier.size(28.dp).clip(RoundedCornerShape(8.dp))
+                .background(if (has) Ts.accent.copy(alpha = 0.16f) else Color(0x0DFFFFFF))
+                .then(
+                    if (has) Modifier.clickable { UiSounds.listen(cue, v) }
+                        .clearAndSetSemantics { contentDescription = "$listen: $name"; role = androidx.compose.ui.semantics.Role.Button }
+                    else Modifier.clearAndSetSemantics {}
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.material3.Icon(
+                Icons.Rounded.PlayArrow, contentDescription = null, tint = if (has) Ts.accent else Ts.faint, modifier = Modifier.size(18.dp),
+            )
+        }
+        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+            Text(name, color = if (has) Ts.text else Ts.muted, fontSize = 14.sp)
+            if (!has) Text(
+                stringResource(if (usingPack) R.string.sound_not_in_pack else R.string.sound_pack_only),
+                color = Ts.faint, fontSize = 12.sp,
+            )
+        }
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+            Checkbox(on, null, enabled = has, colors = soundCheckColors(), modifier = Modifier.padding(12.dp))
+        }
+    }
+}
+
+@Composable
+private fun soundCheckColors() = CheckboxDefaults.colors(
+    checkedColor = Ts.accent, uncheckedColor = Ts.muted, disabledCheckedColor = Ts.accent.copy(alpha = 0.4f), disabledUncheckedColor = Ts.faint,
+    disabledIndeterminateColor = Ts.accent.copy(alpha = 0.4f),
+)
+
+/** The event's name in the list. */
+private fun cueName(cue: Cue): Int = when (cue) {
+    Cue.CONNECTED -> R.string.sound_event_connected
+    Cue.DISCONNECTED -> R.string.sound_event_disconnected
+    Cue.CONNECTION_LOST -> R.string.sound_event_connection_lost
+    Cue.KICKED -> R.string.sound_event_kicked
+    Cue.KICKED_SERVER -> R.string.sound_event_kicked_server
+    Cue.BANNED -> R.string.sound_event_banned
+    Cue.CHANNEL_SWITCHED -> R.string.sound_event_channel_switched
+    Cue.MOVED -> R.string.sound_event_moved
+    Cue.SOMEONE_JOINED -> R.string.sound_event_someone_joined
+    Cue.SOMEONE_CONNECTED -> R.string.sound_event_someone_connected
+    Cue.SOMEONE_LEFT -> R.string.sound_event_someone_left
+    Cue.SOMEONE_DISCONNECTED -> R.string.sound_event_someone_disconnected
+    Cue.SOMEONE_LOST_CONNECTION -> R.string.sound_event_someone_lost_connection
+    Cue.SOMEONE_KICKED_CHANNEL -> R.string.sound_event_someone_kicked_channel
+    Cue.SOMEONE_KICKED_SERVER -> R.string.sound_event_someone_kicked_server
+    Cue.SOMEONE_BANNED -> R.string.sound_event_someone_banned
+    Cue.MESSAGE_IN -> R.string.sound_event_message_in
+    Cue.MESSAGE_OUT -> R.string.sound_event_message_out
+    Cue.POKE -> R.string.sound_event_poke
+    Cue.WHISPER_RECEIVED -> R.string.sound_event_whisper_received
+    Cue.MIC_OFF -> R.string.sound_event_mic_off
+    Cue.MIC_ON -> R.string.sound_event_mic_on
+    Cue.SOUND_OFF -> R.string.sound_event_sound_off
+    Cue.SOUND_ON -> R.string.sound_event_sound_on
+    Cue.AWAY_ON -> R.string.sound_event_away_on
+    Cue.AWAY_OFF -> R.string.sound_event_away_off
+    Cue.STREAM_STARTED -> R.string.sound_event_stream_started
+    Cue.STREAM_STOPPED -> R.string.sound_event_stream_stopped
+    Cue.TALK_POWER_GRANTED -> R.string.sound_event_talk_power_granted
+    Cue.TALK_POWER_REVOKED -> R.string.sound_event_talk_power_revoked
+    Cue.SERVER_GROUP_ADDED -> R.string.sound_event_server_group_added
+    Cue.SERVER_GROUP_REMOVED -> R.string.sound_event_server_group_removed
+    Cue.CHANNEL_GROUP_CHANGED -> R.string.sound_event_channel_group_changed
+    Cue.PERMISSION_REFUSED -> R.string.sound_event_permission_refused
+    Cue.CHANNEL_CREATED -> R.string.sound_event_channel_created
+    Cue.CHANNEL_DELETED -> R.string.sound_event_channel_deleted
+    Cue.CHANNEL_EDITED -> R.string.sound_event_channel_edited
+    Cue.YOUR_CHANNEL_EDITED -> R.string.sound_event_your_channel_edited
+    Cue.CHANNEL_MOVED -> R.string.sound_event_channel_moved
+}
+
+/**
+ * The tones or the person's own sound pack: Tones | the pack's name once one is imported, how many events it has a
+ * sound for, and Import (a folder or a .zip) and Remove. Importing chooses the pack; it takes effect with Save & Apply,
+ * as the rest.
+ */
+private const val SOUND_PACK_GUIDE = "https://github.com/KorppuJauho/pocketts/blob/main/docs/SOUND_PACKS.md"
+
+@Composable
+private fun SoundPackGroup(
+    v: VoiceSettings, pack: SoundPackInfo?, onPack: (SoundPackInfo?) -> Unit, actions: SettingsActions, onChange: (VoiceSettings) -> Unit,
+) {
+    var choosing by remember { mutableStateOf(false) }
+    var removing by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf<String?>(null) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val importing = stringResource(R.string.sound_pack_importing)
+    val res = androidx.compose.ui.platform.LocalResources.current
+    val import = { uri: android.net.Uri, folder: Boolean ->
+        status = importing
+        scope.launch {
+            val error = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { actions.importSoundPack(uri, folder) }
+            val now = actions.soundPack()
+            onPack(now)
+            status = error ?: now?.let { res.getString(R.string.sound_pack_imported, it.name) }
+            if (error == null) onChange(v.copy(soundPack = true))
+        }
+        Unit
+    }
+    val pickFolder = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()
+    ) { uri -> if (uri != null) import(uri, true) }
+    val pickZip = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) import(uri, false) }
+    Group(stringResource(R.string.sound_pack_title), info = stringResource(R.string.sound_pack_desc)) {
+        pack?.let { p ->
+            Segmented(listOf(stringResource(R.string.sound_pack_tones), p.name), if (v.soundPack) 1 else 0, oneLine = true) { onChange(v.copy(soundPack = it == 1)) }
+            Desc(stringResource(R.string.sound_pack_events, p.events, p.of))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // One pack at a time: importing another replaces it
+            SecondaryButton(stringResource(if (pack == null) R.string.sound_pack_import else R.string.sound_pack_replace)) { choosing = true }
+            if (pack != null) SecondaryButton(stringResource(R.string.sound_pack_remove)) { removing = true }
+        }
+        status?.let { Desc(it) }
+        // Where packs are, and how events are named: a page in the project, opened in the browser
+        val uri = androidx.compose.ui.platform.LocalUriHandler.current
+        Text(
+            stringResource(R.string.sound_pack_guide), color = Ts.accent, fontSize = 12.5.sp,
+            modifier = Modifier.clickable { uri.openUri(SOUND_PACK_GUIDE) }.padding(vertical = 2.dp),
+        )
+    }
+    // Asked first: the pack's files are deleted, and getting them back means finding and importing it again
+    if (removing && pack != null) {
+        TsDialog(
+            onDismiss = { removing = false }, title = stringResource(R.string.sound_pack_remove_title),
+            icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
+            buttons = {
+                PillButton(stringResource(R.string.cancel)) { removing = false }
+                PillButton(stringResource(R.string.sound_pack_remove), PillKind.DANGER) {
+                    actions.removeSoundPack()
+                    onPack(null)
+                    status = null
+                    removing = false
+                    onChange(v.copy(soundPack = false))
+                }
+            },
+        ) {
+            Desc(stringResource(R.string.sound_pack_remove_desc, pack.name))
+        }
+    }
+    if (choosing) {
+        TsDialog(
+            onDismiss = { choosing = false }, title = stringResource(R.string.sound_pack_import_title),
+            icon = androidx.compose.material.icons.Icons.Rounded.LibraryMusic,
+            buttons = { PillButton(stringResource(R.string.cancel)) { choosing = false } },
+        ) {
+            Desc(stringResource(R.string.sound_pack_import_desc))
+            PillButton(stringResource(R.string.sound_pack_folder), PillKind.PRIMARY, modifier = Modifier.fillMaxWidth()) {
+                choosing = false
+                pickFolder.launch(null)
+            }
+            PillButton(stringResource(R.string.sound_pack_zip), modifier = Modifier.fillMaxWidth()) {
+                choosing = false
+                // Any file: a .ts3_soundpack (a zip under another name) has no type Android knows
+                pickZip.launch(arrayOf("*/*"))
+            }
         }
     }
 }
