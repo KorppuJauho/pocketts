@@ -67,6 +67,26 @@ class SoundPackTest {
         assertEquals("your_channel_was_edited.wav", m[Cue.YOUR_CHANNEL_EDITED])
     }
 
+    /** TeamSpeak 3's own pack names some files by who the person is to you: PocketTS plays the "neutral" ones. */
+    @Test
+    fun aTeamSpeak3ClientTypeIsNeutral() {
+        val ini = SoundPackFiles.parseIni(
+            """
+            CLIENT_SWITCHED_TO_CURRENT_CHANNEL_STAYS = play("${'$'}{clientType}_switched_tocurrentchannel.wav")
+            CLIENT_CONNECTION_CONNECTED_CURRENT_CHANNEL = play("${'$'}{clientType}_connection_connected_currentchannel.wav")
+            STATUS_SET_AWAY = play("away.wav")
+            """.trimIndent()
+        )
+        val files = setOf(
+            "neutral_switched_tocurrentchannel.wav", "friend_switched_tocurrentchannel.wav",
+            "neutral_connection_connected_currentchannel.wav", "away.wav",
+        )
+        val m = SoundPackFiles.match(files, ini)
+        assertEquals("neutral_switched_tocurrentchannel.wav", m[Cue.SOMEONE_JOINED])
+        assertEquals("neutral_connection_connected_currentchannel.wav", m[Cue.SOMEONE_CONNECTED])
+        assertEquals("away.wav", m[Cue.AWAY_ON])
+    }
+
     @Test
     fun theSurestFormatWhenThereAreTwo() {
         assertEquals("connected.wav", SoundPackFiles.match(setOf("connected.mp3", "connected.wav"), null)[Cue.CONNECTED])

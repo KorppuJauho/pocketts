@@ -17,7 +17,8 @@ Both kinds of pack work:
 
 - **TeamSpeak 5 and 6:** files named after events, such as `connected.wav` and `you_were_poked.wav`.
 - **TeamSpeak 3:** a `settings.ini` that says which file plays for which event, such as
-  `CONNECTION_CONNECTED = play("connected.wav")`.
+  `CONNECTION_CONNECTED = play("connected.wav")`. Where a file is named with `${clientType}` (a different sound for
+  friends and blocked people), PocketTS plays the `neutral` one.
 
 Sounds can be WAV, OGG, MP3, Opus, FLAC or M4A. A pack can be 20 MB at most, and one file 5 MB.
 
@@ -72,8 +73,8 @@ TeamSpeak 3 pack's `settings.ini` lists the event without a sound: then it's qui
 | Someone in your channel was kicked from the server | `neutral_kicked_server_currentchannel` | `CLIENT_WAS_KICKED_FROM_SERVER_CURRENT_CHANNEL` |
 | Someone in your channel was banned | `neutral_banned_server_currentchannel` | `CLIENT_WAS_BANNED_CURRENT_CHANNEL` |
 | Someone whispers to you | `whisper_received` | `SPECIAL_WHISPER_NOTIFY` |
-| You set Away | `away_activated` | – |
-| You're back from Away | `away_deactivated` | – |
+| You set Away | `away_activated` | `STATUS_SET_AWAY` |
+| You're back from Away | `away_deactivated` | `STATUS_SET_PRESENT` |
 | You were given talk power | `talkpower_granted` | `YOU_WERE_GRANTED_TALK_POWER` |
 | Your talk power was taken | `talkpower_revoked` | `YOU_WERE_REVOKED_TALK_POWER` |
 | You were put in a server group | `servergroup_assigned` | `YOU_SERVERGROUP_ADDED_BY_USER`, `YOU_SERVERGROUP_ADDED_BY_SERVER` |

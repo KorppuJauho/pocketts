@@ -5,7 +5,9 @@ import io.github.korppujauho.pocketts.UiSounds.Cue
 /**
  * Which file of a sound pack plays for which event. Two kinds of pack are read, both a folder of sound files:
  * - a TeamSpeak 3 pack has a settings.ini, where each event's line names its file: `CONNECTION_CONNECTED = play("connected.wav")`.
- *   An event without a line, or with only spoken text (`say(...)`, not supported), stays silent.
+ *   An event without a line, or with only spoken text (`say(...)`, not supported), stays silent. A file named with
+ *   `${clientType}` (TeamSpeak 3 plays a friend's or a blocked person's own sound) is the "neutral" one: PocketTS has
+ *   no friends or blocked lists.
  * - a TeamSpeak 5 or 6 pack has no settings: each file is named after its event (connected.wav, you_were_poked.wav).
  * Each event tries its names best first, then falls back to a broader one (someone who connected to your channel to
  * someone who joined it). Files are known by their lower-case name without folders, as they're kept in one folder.
@@ -74,8 +76,8 @@ object SoundPackFiles {
         Cue.SOMEONE_KICKED_SERVER to Names(listOf("CLIENT_WAS_KICKED_FROM_SERVER_CURRENT_CHANNEL"), listOf("neutral_kicked_server_currentchannel")),
         Cue.SOMEONE_BANNED to Names(listOf("CLIENT_WAS_BANNED_CURRENT_CHANNEL"), listOf("neutral_banned_server_currentchannel")),
         Cue.WHISPER_RECEIVED to Names(listOf("SPECIAL_WHISPER_NOTIFY"), listOf("whisper_received")),
-        Cue.AWAY_ON to Names(emptyList(), listOf("away_activated")),
-        Cue.AWAY_OFF to Names(emptyList(), listOf("away_deactivated")),
+        Cue.AWAY_ON to Names(listOf("STATUS_SET_AWAY"), listOf("away_activated")),
+        Cue.AWAY_OFF to Names(listOf("STATUS_SET_PRESENT"), listOf("away_deactivated")),
         Cue.TALK_POWER_GRANTED to Names(listOf("YOU_WERE_GRANTED_TALK_POWER"), listOf("talkpower_granted")),
         Cue.TALK_POWER_REVOKED to Names(listOf("YOU_WERE_REVOKED_TALK_POWER"), listOf("talkpower_revoked")),
         Cue.SERVER_GROUP_ADDED to Names(listOf("YOU_SERVERGROUP_ADDED_BY_USER", "YOU_SERVERGROUP_ADDED_BY_SERVER"), listOf("servergroup_assigned")),
@@ -129,13 +131,14 @@ object SoundPackFiles {
                 if (key.equals("name", ignoreCase = true)) name = value.trim('"').ifBlank { null }
                 continue
             }
-            val file = PLAY.find(value)?.groupValues?.get(1)
+            val file = PLAY.find(value)?.groupValues?.get(1)?.replace(CLIENT_TYPE, "neutral")
             files[key.uppercase()] = file?.let { fileName(it) }
         }
         return Ini(name, files)
     }
 
     private val PLAY = Regex("""play\(\s*"([^"]+)"\s*\)""", RegexOption.IGNORE_CASE)
+    private val CLIENT_TYPE = Regex("""\$\{clientType}""", RegexOption.IGNORE_CASE)
 
     /** A path as the pack's files are kept: its lower-case name, without folders. */
     fun fileName(path: String): String = path.replace('\\', '/').substringAfterLast('/').trim().lowercase()
