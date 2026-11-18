@@ -3,6 +3,9 @@
 A free, unofficial TeamSpeak client for Android, made for TeamSpeak 6 servers. Type a nickname and a server address
 to join.
 
+**[Get it on Google Play](https://play.google.com/store/apps/details?id=io.github.korppujauho.pocketts)**, or download
+the APK from [GitHub Releases](https://github.com/KorppuJauho/pocketts/releases). Android 10 or newer.
+
 <img src="docs/screenshots/overview.png" alt="PocketTS screens: the channels and the people in them, the channel chat, a person's menu (volume, poke and private chat), and the settings">
 
 ## What it does
