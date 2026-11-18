@@ -277,6 +277,9 @@
     <string name="sound_pack_events">%1$d من %2$d حدثًا لها صوت</string>
     <string name="sound_pack_import">استيراد</string>
     <string name="sound_pack_remove">إزالة</string>
+    <string name="sound_pack_replace">استبدال</string>
+    <string name="sound_pack_remove_title">إزالة حزمة الأصوات؟</string>
+    <string name="sound_pack_remove_desc">سيُحذف %1$s من هذا الهاتف، وتعود النغمات. لاستخدامها مجددًا، استوردها مرة أخرى.</string>
     <string name="sound_pack_import_title">استيراد حزمة أصوات</string>
     <string name="sound_pack_import_desc">اختر مجلد الحزمة، أو ملف .zip أو .ts3_soundpack الخاص بها.</string>
     <string name="sound_pack_folder">اختيار مجلد</string>

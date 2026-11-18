@@ -1,5 +1,6 @@
 package io.github.korppujauho.pocketts
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import io.github.korppujauho.pocketts.UiSounds.Cue
 import io.github.korppujauho.pocketts.ui.EventSounds
 import io.github.korppujauho.pocketts.ui.PocketTsTheme
@@ -102,5 +104,31 @@ class SoundNotificationsTest {
         compose.onNodeWithText("A message arrived").assertIsOff().assertIsNotEnabled()
         compose.onNodeWithText("You were poked").assertIsOn()
         compose.onNodeWithText("1 of 4 on").assertIsDisplayed()
+    }
+
+    /** With a pack imported, Import says Replace; Remove asks first, and only Remove in that window removes it. */
+    @Test
+    fun removingAPackIsAskedFirst() {
+        var removed = 0
+        val actions = object : io.github.korppujauho.pocketts.ui.SettingsActions by Example.noSettings {
+            override fun soundPack() = SoundPackInfo("Radio Pack", 34, 39, Cue.entries.take(34).toSet())
+            override fun removeSoundPack() { removed++ }
+        }
+        compose.setContent {
+            PocketTsTheme {
+                io.github.korppujauho.pocketts.ui.SettingsContent(
+                    VoiceSettings(soundPack = true), "Jamie", actions, {}, startTab = 1, modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                )
+            }
+        }
+        compose.onNodeWithText("Replace").assertExists()
+        compose.onNodeWithText("Remove").performScrollTo().performClick()
+        compose.onNodeWithText("Remove the sound pack?").assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performClick()
+        assertEquals(0, removed)
+        compose.onNodeWithText("Remove").performScrollTo().performClick()
+        compose.onAllNodesWithText("Remove")[1].performClick() // the window's button
+        assertEquals(1, removed)
+        compose.onNodeWithText("Import").assertExists()
     }
 }

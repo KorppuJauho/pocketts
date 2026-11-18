@@ -263,6 +263,9 @@
     <string name="sound_pack_events">%1$d رویداد از %2$d صدا دارند</string>
     <string name="sound_pack_import">وارد کردن</string>
     <string name="sound_pack_remove">حذف</string>
+    <string name="sound_pack_replace">جایگزینی</string>
+    <string name="sound_pack_remove_title">بستهٔ صدا حذف شود؟</string>
+    <string name="sound_pack_remove_desc">%1$s از این گوشی پاک می‌شود و صداهای پیش‌فرض دوباره پخش می‌شوند. برای استفادهٔ دوباره، آن را دوباره وارد کنید.</string>
     <string name="sound_pack_import_title">وارد کردن بستهٔ صدا</string>
     <string name="sound_pack_import_desc">پوشهٔ بسته، یا فایل .zip یا .ts3_soundpack آن را انتخاب کنید.</string>
     <string name="sound_pack_folder">انتخاب پوشه</string>

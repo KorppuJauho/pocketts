@@ -882,6 +882,7 @@ private fun SoundPackGroup(
     v: VoiceSettings, pack: SoundPackInfo?, onPack: (SoundPackInfo?) -> Unit, actions: SettingsActions, onChange: (VoiceSettings) -> Unit,
 ) {
     var choosing by remember { mutableStateOf(false) }
+    var removing by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val importing = stringResource(R.string.sound_pack_importing)
@@ -909,13 +910,9 @@ private fun SoundPackGroup(
             Desc(stringResource(R.string.sound_pack_events, p.events, p.of))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton(stringResource(R.string.sound_pack_import)) { choosing = true }
-            if (pack != null) SecondaryButton(stringResource(R.string.sound_pack_remove)) {
-                actions.removeSoundPack()
-                onPack(null)
-                status = null
-                onChange(v.copy(soundPack = false))
-            }
+            // One pack at a time: importing another replaces it
+            SecondaryButton(stringResource(if (pack == null) R.string.sound_pack_import else R.string.sound_pack_replace)) { choosing = true }
+            if (pack != null) SecondaryButton(stringResource(R.string.sound_pack_remove)) { removing = true }
         }
         status?.let { Desc(it) }
         // Where packs are, and how events are named: a page in the project, opened in the browser
@@ -924,6 +921,25 @@ private fun SoundPackGroup(
             stringResource(R.string.sound_pack_guide), color = Ts.accent, fontSize = 12.5.sp,
             modifier = Modifier.clickable { uri.openUri(SOUND_PACK_GUIDE) }.padding(vertical = 2.dp),
         )
+    }
+    // Asked first: the pack's files are deleted, and getting them back means finding and importing it again
+    if (removing && pack != null) {
+        TsDialog(
+            onDismiss = { removing = false }, title = stringResource(R.string.sound_pack_remove_title),
+            icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
+            buttons = {
+                PillButton(stringResource(R.string.cancel)) { removing = false }
+                PillButton(stringResource(R.string.sound_pack_remove), PillKind.DANGER) {
+                    actions.removeSoundPack()
+                    onPack(null)
+                    status = null
+                    removing = false
+                    onChange(v.copy(soundPack = false))
+                }
+            },
+        ) {
+            Desc(stringResource(R.string.sound_pack_remove_desc, pack.name))
+        }
     }
     if (choosing) {
         TsDialog(

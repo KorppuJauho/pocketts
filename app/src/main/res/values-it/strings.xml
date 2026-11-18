@@ -256,6 +256,9 @@
     <string name="sound_pack_events">%1$d eventi su %2$d hanno un suono</string>
     <string name="sound_pack_import">Importa</string>
     <string name="sound_pack_remove">Rimuovi</string>
+    <string name="sound_pack_replace">Sostituisci</string>
+    <string name="sound_pack_remove_title">Rimuovere il pacchetto di suoni?</string>
+    <string name="sound_pack_remove_desc">%1$s viene eliminato da questo telefono e tornano i toni. Per usarlo di nuovo, importalo di nuovo.</string>
     <string name="sound_pack_import_title">Importa un pacchetto di suoni</string>
     <string name="sound_pack_import_desc">Scegli la cartella del pacchetto, o il suo file .zip o .ts3_soundpack.</string>
     <string name="sound_pack_folder">Scegli cartella</string>

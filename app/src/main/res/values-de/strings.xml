@@ -249,6 +249,9 @@
     <string name="sound_pack_events">%1$d von %2$d Ereignissen haben einen Sound</string>
     <string name="sound_pack_import">Importieren</string>
     <string name="sound_pack_remove">Entfernen</string>
+    <string name="sound_pack_replace">Ersetzen</string>
+    <string name="sound_pack_remove_title">Soundpack entfernen?</string>
+    <string name="sound_pack_remove_desc">%1$s wird von diesem Telefon gelöscht, und die Töne spielen wieder. Um es wieder zu nutzen, importiere es erneut.</string>
     <string name="sound_pack_import_title">Soundpack importieren</string>
     <string name="sound_pack_import_desc">Wähle den Ordner des Packs oder seine .zip- oder .ts3_soundpack-Datei.</string>
     <string name="sound_pack_folder">Ordner wählen</string>

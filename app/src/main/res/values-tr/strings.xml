@@ -249,6 +249,9 @@
     <string name="sound_pack_events">%2$d olaydan %1$d tanesinin sesi var</string>
     <string name="sound_pack_import">İçe aktar</string>
     <string name="sound_pack_remove">Kaldır</string>
+    <string name="sound_pack_replace">Değiştir</string>
+    <string name="sound_pack_remove_title">Ses paketi kaldırılsın mı?</string>
+    <string name="sound_pack_remove_desc">%1$s bu telefondan silinir ve tonlar yeniden çalar. Yeniden kullanmak için tekrar içe aktar.</string>
     <string name="sound_pack_import_title">Ses paketi içe aktar</string>
     <string name="sound_pack_import_desc">Paketin klasörünü ya da .zip veya .ts3_soundpack dosyasını seç.</string>
     <string name="sound_pack_folder">Klasör seç</string>

@@ -249,6 +249,9 @@
     <string name="sound_pack_events">Ääni %1$d / %2$d tapahtumalle</string>
     <string name="sound_pack_import">Tuo</string>
     <string name="sound_pack_remove">Poista</string>
+    <string name="sound_pack_replace">Vaihda</string>
+    <string name="sound_pack_remove_title">Poistetaanko äänipaketti?</string>
+    <string name="sound_pack_remove_desc">%1$s poistetaan tästä puhelimesta, ja äänimerkit soivat taas. Jos haluat sen takaisin, tuo se uudelleen.</string>
     <string name="sound_pack_import_title">Tuo äänipaketti</string>
     <string name="sound_pack_import_desc">Valitse paketin kansio tai sen .zip- tai .ts3_soundpack-tiedosto.</string>
     <string name="sound_pack_folder">Valitse kansio</string>

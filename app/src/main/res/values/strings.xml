@@ -267,6 +267,9 @@
     <string name="sound_pack_events">%1$d of %2$d events have a sound</string>
     <string name="sound_pack_import">Import</string>
     <string name="sound_pack_remove">Remove</string>
+    <string name="sound_pack_replace">Replace</string>
+    <string name="sound_pack_remove_title">Remove the sound pack?</string>
+    <string name="sound_pack_remove_desc">%1$s is deleted from this phone, and the tones play again. To use it again, import it again.</string>
     <string name="sound_pack_import_title">Import a sound pack</string>
     <string name="sound_pack_import_desc">Choose the pack\'s folder, or its .zip or .ts3_soundpack file.</string>
     <string name="sound_pack_folder">Choose folder</string>

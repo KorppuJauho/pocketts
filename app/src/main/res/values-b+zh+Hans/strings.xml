@@ -246,6 +246,9 @@
     <string name="sound_pack_events">%2$d 个事件中有 %1$d 个有声音</string>
     <string name="sound_pack_import">导入</string>
     <string name="sound_pack_remove">移除</string>
+    <string name="sound_pack_replace">替换</string>
+    <string name="sound_pack_remove_title">移除声音包？</string>
+    <string name="sound_pack_remove_desc">%1$s 将从这台手机上删除，并恢复提示音。如需再次使用，请重新导入。</string>
     <string name="sound_pack_import_title">导入声音包</string>
     <string name="sound_pack_import_desc">选择声音包的文件夹，或它的 .zip 或 .ts3_soundpack 文件。</string>
     <string name="sound_pack_folder">选择文件夹</string>

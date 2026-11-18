@@ -255,6 +255,9 @@
     <string name="sound_pack_events">Звук есть у %1$d из %2$d событий</string>
     <string name="sound_pack_import">Импорт</string>
     <string name="sound_pack_remove">Удалить</string>
+    <string name="sound_pack_replace">Заменить</string>
+    <string name="sound_pack_remove_title">Удалить звуковой пакет?</string>
+    <string name="sound_pack_remove_desc">%1$s будет удалён с этого телефона, и снова зазвучат сигналы. Чтобы снова им пользоваться, импортируйте его заново.</string>
     <string name="sound_pack_import_title">Импорт звукового пакета</string>
     <string name="sound_pack_import_desc">Выберите папку пакета или его файл .zip или .ts3_soundpack.</string>
     <string name="sound_pack_folder">Выбрать папку</string>
