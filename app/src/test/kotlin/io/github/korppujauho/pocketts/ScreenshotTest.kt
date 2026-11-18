@@ -264,6 +264,23 @@ class ScreenshotTest {
     }
 
     @Test
+    fun personAdminPopup() = popup("popup-person-admin") {
+        val s = Example.state()
+        io.github.korppujauho.pocketts.ui.PersonSheet(
+            s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {},
+            admin = true, onGroups = {},
+        )
+    }
+
+    @Test
+    fun groupsPopup() = popup("popup-groups") {
+        io.github.korppujauho.pocketts.ui.ServerGroupsDialog(
+            Example.state().client(2)!!.copy(serverGroups = listOf(7), channelGroup = 7), Example.groupChoices, onChange = { _, _ -> }, onDismiss = {},
+            channelGroups = Example.channelGroups,
+        )
+    }
+
+    @Test
     fun personPopup() = popup("popup-person") {
         val s = Example.state()
         io.github.korppujauho.pocketts.ui.PersonSheet(s.client(2)!!, s.serverKey, isSelf = false, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {}, whispered = true, onWhisper = {})
@@ -396,6 +413,26 @@ object Example {
             microphone = AudioInUse.Device(android.media.AudioDeviceInfo.TYPE_BUILTIN_MIC, "Phone"),
         )
     }
+
+    /** An admin's view of a server's groups: theirs to give, and the default one, which isn't. */
+    val groupChoices = listOf(
+        ServerModel.GroupChoice(ServerModel.Group(6, "Server Admin", 300, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(9, "Moderator", 200, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(7, "Member", 100, 0), canAdd = true, canRemove = true),
+        ServerModel.GroupChoice(ServerModel.Group(8, "Guest", 0, 0), canAdd = false, canRemove = false),
+    )
+
+    /** The channel groups in the channel someone is in, with an admin's powers there. */
+    val channelGroups = io.github.korppujauho.pocketts.ui.ChannelGroups(
+        "Default Channel",
+        listOf(
+            ServerModel.Group(5, "Channel Admin", 100, 0, neededAddPower = 50, neededRemovePower = 50),
+            ServerModel.Group(6, "Operator", 200, 0, neededAddPower = 30, neededRemovePower = 30),
+            ServerModel.Group(7, "Voice", 600, 0, neededAddPower = 25, neededRemovePower = 25),
+            ServerModel.Group(8, "Guest", 0, 0),
+        ),
+        ServerModel.GroupPowers(add = 75, remove = 75),
+    )
 
     fun model(): ServerModel {
         val m = ServerModel()

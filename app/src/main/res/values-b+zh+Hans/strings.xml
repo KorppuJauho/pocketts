@@ -486,6 +486,15 @@
     <string name="admin_failed_kick_channel">无法将 %1$s 踢出频道：%2$s</string>
     <string name="admin_failed_kick_server">无法将 %1$s 踢出服务器：%2$s</string>
     <string name="admin_failed_ban">无法封禁 %1$s：%2$s</string>
+    <string name="admin_groups">组</string>
+    <string name="admin_server_groups">服务器组</string>
+    <string name="admin_channel_group">%1$s 中的频道组</string>
+    <string name="admin_groups_desc">灰色的组需要比你更高的权限。服务器的默认组无法手动授予或移除：没有其他组的人都在其中。</string>
+    <string name="admin_groups_none">服务器尚未告知其组。</string>
+    <string name="admin_no_permission_groups">你没有权限更改 %1$s 的服务器组。</string>
+    <string name="admin_failed_groups">无法更改 %1$s 的服务器组：%2$s</string>
+    <string name="admin_no_permission_channel_group">你没有权限更改 %1$s 的频道组。</string>
+    <string name="admin_failed_channel_group">无法更改 %1$s 的频道组：%2$s</string>
     <string name="channel_no_permission_create">你没有创建频道 %1$s 的权限。</string>
     <string name="channel_no_permission_edit">你没有修改 %1$s 的权限。</string>
     <string name="channel_no_permission_reorder">你没有移动 %1$s 的权限。</string>

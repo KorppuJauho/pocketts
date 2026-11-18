@@ -528,6 +528,15 @@
     <string name="admin_failed_kick_channel">اخراج %1$s از کانال ممکن نشد: %2$s</string>
     <string name="admin_failed_kick_server">اخراج %1$s از سرور ممکن نشد: %2$s</string>
     <string name="admin_failed_ban">بن کردن %1$s ممکن نشد: %2$s</string>
+    <string name="admin_groups">گروه‌ها</string>
+    <string name="admin_server_groups">گروه‌های سرور</string>
+    <string name="admin_channel_group">گروه کانال در %1$s</string>
+    <string name="admin_groups_desc">گروه‌های کم‌رنگ به مجوزهایی بیش از مجوزهای شما نیاز دارند. گروه پیش‌فرض سرور را نمی‌توان داد یا گرفت: گروه کسانی است که گروه دیگری ندارند.</string>
+    <string name="admin_groups_none">سرور گروه‌هایش را اعلام نکرده است.</string>
+    <string name="admin_no_permission_groups">اجازه تغییر گروه‌های سرور %1$s را ندارید.</string>
+    <string name="admin_failed_groups">تغییر گروه‌های سرور %1$s ممکن نشد: %2$s</string>
+    <string name="admin_no_permission_channel_group">اجازه تغییر گروه کانال %1$s را ندارید.</string>
+    <string name="admin_failed_channel_group">تغییر گروه کانال %1$s ممکن نشد: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">اجازه ساختن کانال %1$s را ندارید.</string>
     <string name="channel_no_permission_edit">اجازه تغییر %1$s را ندارید.</string>

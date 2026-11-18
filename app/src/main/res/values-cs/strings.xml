@@ -549,6 +549,15 @@
     <string name="admin_failed_kick_channel">Nepodařilo se vykopnout uživatele %1$s z kanálu: %2$s</string>
     <string name="admin_failed_kick_server">Nepodařilo se vykopnout uživatele %1$s ze serveru: %2$s</string>
     <string name="admin_failed_ban">Nepodařilo se zakázat přístup uživateli %1$s: %2$s</string>
+    <string name="admin_groups">Skupiny</string>
+    <string name="admin_server_groups">Skupiny serveru</string>
+    <string name="admin_channel_group">Skupina kanálu v %1$s</string>
+    <string name="admin_groups_desc">Zašedlé skupiny vyžadují vyšší oprávnění, než máte. Výchozí skupinu serveru nelze přidělit ani odebrat: mají ji ti, kdo nemají jiné skupiny.</string>
+    <string name="admin_groups_none">Server nesdělil své skupiny.</string>
+    <string name="admin_no_permission_groups">Nemáte oprávnění měnit skupiny serveru uživatele %1$s.</string>
+    <string name="admin_failed_groups">Skupiny serveru uživatele %1$s nelze změnit: %2$s</string>
+    <string name="admin_no_permission_channel_group">Nemáte oprávnění měnit skupinu kanálu uživatele %1$s.</string>
+    <string name="admin_failed_channel_group">Skupinu kanálu uživatele %1$s nelze změnit: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">Nemáte oprávnění vytvořit kanál %1$s.</string>
     <string name="channel_no_permission_edit">Nemáte oprávnění upravit kanál %1$s.</string>

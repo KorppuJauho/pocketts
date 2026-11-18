@@ -497,6 +497,15 @@
     <string name="admin_failed_kick_channel">%1$s kanaldan atılamadı: %2$s</string>
     <string name="admin_failed_kick_server">%1$s sunucudan atılamadı: %2$s</string>
     <string name="admin_failed_ban">%1$s yasaklanamadı: %2$s</string>
+    <string name="admin_groups">Gruplar</string>
+    <string name="admin_server_groups">Sunucu grupları</string>
+    <string name="admin_channel_group">%1$s kanalındaki kanal grubu</string>
+    <string name="admin_groups_desc">Gri gruplar seninkinden daha fazla izin gerektirir. Sunucunun varsayılan grubu verilemez ve alınamaz: başka grubu olmayanlarda bulunur.</string>
+    <string name="admin_groups_none">Sunucu gruplarını bildirmedi.</string>
+    <string name="admin_no_permission_groups">%1$s kullanıcısının sunucu gruplarını değiştirme iznin yok.</string>
+    <string name="admin_failed_groups">%1$s kullanıcısının sunucu grupları değiştirilemedi: %2$s</string>
+    <string name="admin_no_permission_channel_group">%1$s kullanıcısının kanal grubunu değiştirme iznin yok.</string>
+    <string name="admin_failed_channel_group">%1$s kullanıcısının kanal grubu değiştirilemedi: %2$s</string>
     <string name="channel_no_permission_create">%1$s kanalını oluşturma iznin yok.</string>
     <string name="channel_no_permission_edit">%1$s kanalını değiştirme iznin yok.</string>
     <string name="channel_no_permission_reorder">%1$s kanalını taşıma iznin yok.</string>

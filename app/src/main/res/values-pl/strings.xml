@@ -549,6 +549,15 @@
     <string name="admin_failed_kick_channel">Nie udało się wyrzucić %1$s z kanału: %2$s</string>
     <string name="admin_failed_kick_server">Nie udało się wyrzucić %1$s z serwera: %2$s</string>
     <string name="admin_failed_ban">Nie udało się zbanować %1$s: %2$s</string>
+    <string name="admin_groups">Grupy</string>
+    <string name="admin_server_groups">Grupy serwera</string>
+    <string name="admin_channel_group">Grupa kanału w %1$s</string>
+    <string name="admin_groups_desc">Wyszarzone grupy wymagają większych uprawnień niż twoje. Domyślnej grupy serwera nie można nadać ani odebrać: mają ją osoby bez innych grup.</string>
+    <string name="admin_groups_none">Serwer nie podał swoich grup.</string>
+    <string name="admin_no_permission_groups">Nie masz uprawnień do zmiany grup serwera użytkownika %1$s.</string>
+    <string name="admin_failed_groups">Nie udało się zmienić grup serwera użytkownika %1$s: %2$s</string>
+    <string name="admin_no_permission_channel_group">Nie masz uprawnień do zmiany grupy kanału użytkownika %1$s.</string>
+    <string name="admin_failed_channel_group">Nie udało się zmienić grupy kanału użytkownika %1$s: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">Nie masz uprawnień, aby utworzyć kanał %1$s.</string>
     <string name="channel_no_permission_edit">Nie masz uprawnień, aby zmienić %1$s.</string>

@@ -532,6 +532,15 @@
     <string name="admin_failed_kick_channel">Couldn\'t kick %1$s from the channel: %2$s</string>
     <string name="admin_failed_kick_server">Couldn\'t kick %1$s from the server: %2$s</string>
     <string name="admin_failed_ban">Couldn\'t ban %1$s: %2$s</string>
+    <string name="admin_groups">Groups</string>
+    <string name="admin_server_groups">Server groups</string>
+    <string name="admin_channel_group">Channel group in %1$s</string>
+    <string name="admin_groups_desc">Greyed-out groups need more permissions than yours. The server\'s default group can\'t be given or taken: it\'s what people without other groups have.</string>
+    <string name="admin_groups_none">The server hasn\'t told its groups.</string>
+    <string name="admin_no_permission_groups">You don\'t have permission to change the server groups of %1$s.</string>
+    <string name="admin_failed_groups">Couldn\'t change the server groups of %1$s: %2$s</string>
+    <string name="admin_no_permission_channel_group">You don\'t have permission to change the channel group of %1$s.</string>
+    <string name="admin_failed_channel_group">Couldn\'t change the channel group of %1$s: %2$s</string>
     <!-- %1$s: the channel -->
     <string name="channel_no_permission_create">You don\'t have permission to create the channel %1$s.</string>
     <string name="channel_no_permission_edit">You don\'t have permission to change %1$s.</string>
