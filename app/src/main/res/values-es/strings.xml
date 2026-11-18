@@ -254,14 +254,15 @@
     <string name="sound_pack_import">Importar</string>
     <string name="sound_pack_remove">Quitar</string>
     <string name="sound_pack_import_title">Importar un paquete de sonidos</string>
-    <string name="sound_pack_import_desc">Elige la carpeta del paquete o un .zip de ella.</string>
+    <string name="sound_pack_import_desc">Elige la carpeta del paquete, o su archivo .zip o .ts3_soundpack.</string>
     <string name="sound_pack_folder">Elegir carpeta</string>
-    <string name="sound_pack_zip">Elegir .zip</string>
+    <string name="sound_pack_zip">Elegir archivo (.zip o .ts3_soundpack)</string>
     <string name="sound_pack_importing">Importando…</string>
     <string name="sound_pack_imported">%1$s importado.</string>
     <string name="sound_pack_no_sounds">No se encontraron archivos de sonido allí.</string>
     <string name="sound_pack_no_events">Ningún archivo tiene el nombre de un evento y no hay settings.ini.</string>
     <string name="sound_pack_too_big">El paquete es demasiado grande (20 MB como máximo, y 5 MB por archivo).</string>
+    <string name="sound_pack_guide">Dónde encontrar un paquete de sonidos</string>
     <string name="playback_call_volume">Como llamada, las voces siguen el volumen de llamada: pulsa un botón de volumen mientras estás conectado.</string>
     <string name="playback_media_volume">Las voces siguen el volumen multimedia.</string>
     <string name="playback_output_speaker">Altavoz</string>

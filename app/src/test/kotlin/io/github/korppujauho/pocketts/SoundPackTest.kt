@@ -127,6 +127,27 @@ class SoundPackTest {
     }
 
     @Test
+    fun aTs3SoundpackFileIsReadAsTheZipItIs() {
+        val file = File(context.cacheDir, "radio.ts3_soundpack")
+        ZipOutputStream(file.outputStream()).use { z ->
+            for ((name, text) in listOf(
+                "package.ini" to "Name = Radio Pack\nType = Sound\n",
+                "sound/radio/settings.ini" to "[info]\nname = Radio Pack\n[sounds]\nCONNECTION_CONNECTED = play(\"on.wav\")\nOTHER_RECEIVED_POKE = play(\"beep.wav\")\n",
+                "sound/radio/on.wav" to "x",
+                "sound/radio/beep.wav" to "x",
+            )) {
+                z.putNextEntry(ZipEntry(name))
+                z.write(text.toByteArray())
+                z.closeEntry()
+            }
+        }
+        val pack = SoundPack.import(context, Uri.fromFile(file), folder = false)
+        assertEquals("Radio Pack", pack.name)
+        assertEquals("on.wav", pack.files[Cue.CONNECTED])
+        assertEquals("beep.wav", pack.files[Cue.POKE])
+    }
+
+    @Test
     fun aZipWithoutEventsIsRefused() {
         val zip = File(context.cacheDir, "music.zip")
         ZipOutputStream(zip.outputStream()).use { z ->

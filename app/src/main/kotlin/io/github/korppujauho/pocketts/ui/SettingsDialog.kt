@@ -661,6 +661,8 @@ private fun Playback(v: VoiceSettings, saved: VoiceSettings, actions: SettingsAc
  * sound for, and Import (a folder or a .zip) and Remove. Importing chooses the pack; it takes effect with Save & Apply,
  * as the rest.
  */
+private const val SOUND_PACK_GUIDE = "https://github.com/KorppuJauho/pocketts/blob/main/docs/SOUND_PACKS.md"
+
 @Composable
 private fun SoundPackGroup(v: VoiceSettings, actions: SettingsActions, onChange: (VoiceSettings) -> Unit) {
     var pack by remember { mutableStateOf(actions.soundPack()) }
@@ -700,6 +702,12 @@ private fun SoundPackGroup(v: VoiceSettings, actions: SettingsActions, onChange:
             }
         }
         status?.let { Desc(it) }
+        // Where packs are, and how events are named: a page in the project, opened in the browser
+        val uri = androidx.compose.ui.platform.LocalUriHandler.current
+        Text(
+            stringResource(R.string.sound_pack_guide), color = Ts.accent, fontSize = 12.5.sp,
+            modifier = Modifier.clickable { uri.openUri(SOUND_PACK_GUIDE) }.padding(vertical = 2.dp),
+        )
     }
     if (choosing) {
         TsDialog(
@@ -714,7 +722,8 @@ private fun SoundPackGroup(v: VoiceSettings, actions: SettingsActions, onChange:
             }
             PillButton(stringResource(R.string.sound_pack_zip), modifier = Modifier.fillMaxWidth()) {
                 choosing = false
-                pickZip.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+                // Any file: a .ts3_soundpack (a zip under another name) has no type Android knows
+                pickZip.launch(arrayOf("*/*"))
             }
         }
     }

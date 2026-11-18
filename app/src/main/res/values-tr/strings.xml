@@ -251,14 +251,15 @@
     <string name="sound_pack_import">İçe aktar</string>
     <string name="sound_pack_remove">Kaldır</string>
     <string name="sound_pack_import_title">Ses paketi içe aktar</string>
-    <string name="sound_pack_import_desc">Paketin klasörünü ya da .zip dosyasını seç.</string>
+    <string name="sound_pack_import_desc">Paketin klasörünü ya da .zip veya .ts3_soundpack dosyasını seç.</string>
     <string name="sound_pack_folder">Klasör seç</string>
-    <string name="sound_pack_zip">.zip seç</string>
+    <string name="sound_pack_zip">Dosya seç (.zip veya .ts3_soundpack)</string>
     <string name="sound_pack_importing">İçe aktarılıyor…</string>
     <string name="sound_pack_imported">%1$s içe aktarıldı.</string>
     <string name="sound_pack_no_sounds">Orada ses dosyası bulunamadı.</string>
     <string name="sound_pack_no_events">Hiçbir dosya bir olayın adını taşımıyor ve settings.ini yok.</string>
     <string name="sound_pack_too_big">Paket çok büyük (en fazla 20 MB, dosya başına 5 MB).</string>
+    <string name="sound_pack_guide">Ses paketi nerede bulunur</string>
     <string name="playback_call_volume">Telefon araması olarak çalınırken konuşmalar arama ses düzeyini izler: ayarlamak için bağlıyken bir ses düğmesine bas.</string>
     <string name="playback_media_volume">Konuşmalar medya ses düzeyini izler.</string>
     <string name="playback_output_speaker">Hoparlör</string>
