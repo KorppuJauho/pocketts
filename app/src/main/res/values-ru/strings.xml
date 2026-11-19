@@ -490,7 +490,6 @@
     <string name="info_channels">Каналы</string>
     <string name="info_uptime">Время работы</string>
     <string name="info_created">Создан</string>
-    <string name="info_ago">%1$s назад</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d мин.</item>
         <item quantity="few">%1$d мин.</item>

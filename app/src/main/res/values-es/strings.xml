@@ -486,7 +486,6 @@
     <string name="info_channels">Canales</string>
     <string name="info_uptime">Tiempo activo</string>
     <string name="info_created">Creado</string>
-    <string name="info_ago">hace %1$s</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d minuto</item>
         <item quantity="many">%1$d minutos</item>

@@ -482,7 +482,6 @@
     <string name="info_channels">Kanallar</string>
     <string name="info_uptime">Çalışma süresi</string>
     <string name="info_created">Oluşturulma</string>
-    <string name="info_ago">%1$s önce</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d dakika</item>
         <item quantity="other">%1$d dakika</item>

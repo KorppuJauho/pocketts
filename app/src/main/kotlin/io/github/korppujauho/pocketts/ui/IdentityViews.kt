@@ -1,5 +1,7 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.foundation.background
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.semantics
@@ -171,24 +173,28 @@ internal fun IdentityDialog(e: IdentityInfo, all: List<IdentityInfo>, actions: S
             TsField(name, { name = it.take(40) }, stringResource(R.string.identity_name))
             TsField(nick, { nick = it.take(30) }, stringResource(R.string.nickname))
             e.problem?.let { Desc(it) }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (!isDefault) SecondaryButton(stringResource(R.string.identity_make_default)) {
-                    actions.makeDefaultIdentity(e.key)
-                    isDefault = true
+            // What can be done with it, one row each, as the menus' rows
+            val rows = buildList<@Composable (Boolean) -> Unit> {
+                if (!isDefault) add { first ->
+                    ActionRow(Icons.Rounded.Star, stringResource(R.string.identity_make_default), first, tint = Ts.amber) {
+                        actions.makeDefaultIdentity(e.key)
+                        isDefault = true
+                    }
                 }
-                if (e.problem == null) SecondaryButton(stringResource(R.string.identity_export)) { warning = true }
+                if (e.problem == null) add { first -> ActionRow(Icons.Rounded.FileUpload, stringResource(R.string.identity_export), first, more = true) { warning = true } }
+                // The security level: some servers need a higher one than a new identity has
+                level?.let { current ->
+                    add { first ->
+                        ActionRow(
+                            Icons.Rounded.Shield, stringResource(R.string.level_title), first, more = true,
+                            detail = stringResource(R.string.level_raise_button), trailing = { ValueBadge("$current") },
+                        ) { raising = true }
+                    }
+                }
             }
+            if (rows.isNotEmpty()) ActionCard { rows.forEachIndexed { i, row -> row(i == 0) } }
             status?.let { Desc(it) }
-            // The security level: some servers need a higher one than a new identity has
-            level?.let { current ->
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.level_title), color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    ValueBadge("$current")
-                    Spacer(Modifier.weight(1f))
-                    SecondaryButton(stringResource(R.string.level_raise_button)) { raising = true }
-                }
-                Desc(stringResource(R.string.level_desc))
-            }
+            if (level != null) Desc(stringResource(R.string.level_desc))
         }
     }
     if (raising) {

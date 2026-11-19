@@ -502,7 +502,6 @@
     <string name="info_uptime">زمان روشن بودن</string>
     <string name="info_created">ساخته‌شده</string>
     <!-- %1$s is a time span, such as "3 months" -->
-    <string name="info_ago">%1$s پیش</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d دقیقه</item>
         <item quantity="other">%1$d دقیقه</item>

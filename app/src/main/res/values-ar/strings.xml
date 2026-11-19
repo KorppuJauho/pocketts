@@ -521,7 +521,6 @@
     <string name="info_uptime">مدة التشغيل</string>
     <string name="info_created">تاريخ الإنشاء</string>
     <!-- %1$s is a time span, such as "3 months" -->
-    <string name="info_ago">منذ %1$s</string>
     <plurals name="span_minutes">
         <item quantity="zero">%1$d دقيقة</item>
         <item quantity="one">دقيقة واحدة</item>
