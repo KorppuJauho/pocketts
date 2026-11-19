@@ -221,7 +221,7 @@ class ScreenshotTest {
             topic = "Tonight: co-op", maxClients = 10, hasPassword = true, codecQuality = 8,
             description = "[b]Games every evening.[/b]\nAsk Lee for the password. Rules: https://example.com/rules",
         )
-        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {}, onNewBelow = {})
+        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {}, onNewBelow = {}, onWhisper = {})
     }
 
     @Test
