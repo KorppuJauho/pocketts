@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.9.0 (2026-11-19)
+
+- **Several identities:** Settings › General has Identities, a box that folds like the favourite folders. Each
+  identity has its own name and nickname, and the default one is starred. New identity makes one or imports one from
+  a TeamSpeak export, and an identity's window makes it the default, exports it, raises its security level or deletes
+  it. The connect form and Edit favourite choose which one connects, once there are two or more. The identity used
+  so far carries over as the default. Suggested by imaliaz.
+- **Groups:** with admin functions on, a person's menu (one's own too) has Groups: their server groups to tick, and
+  their channel group in the channel they're in, each with the server's own icon. Groups beyond your permissions are
+  greyed out, and the server's refusal shows in the window. Suggested on Reddit.
+- **New channel below:** holding a channel offers New channel below, for anyone the server lets create channels. It
+  goes right below the held channel, or last at that level when the server doesn't let you choose the place. A new
+  channel is permanent or temporary with one switch, as in TeamSpeak 6. Suggested on Reddit.
+- **Sound notifications:** Settings › Playback has its own section for event sounds. Each of 39 events can be switched
+  off on its own, in six categories, and Listen plays its sound. Suggested in a Google Play review.
+- **Sound packs:** a sound pack of your own can play in place of the tones: import a folder, a .zip or a
+  .ts3_soundpack. TeamSpeak 3 packs (with a settings.ini) and TeamSpeak 5 and 6 packs both work, and a pack can have
+  sounds for events the tones are quiet for, such as whispers and Away. PocketTS ships and downloads no pack; a guide
+  in the repository says where to find one.
+- **Settings without a Save button:** a change in Settings is kept as it's made, and Save & Apply is gone. The
+  language has its own Apply, as it redraws the app, and turning the debug log off asks first, as that deletes it.
+- **Tidier menus:** a channel's, a person's and the server's info, and an identity's window, show their facts in a
+  compact form and their actions as a list.
+- **Four more languages:** Italian, Ukrainian, Arabic and Persian, so PocketTS speaks fifteen. Arabic and Persian are
+  written right to left; the button bar keeps its order, so push-to-talk stays on the right. A native speaker's
+  review is welcome.
+- **For developers:** a test build's crash trace reaches the test page also when the app crashes on its main thread.
+
 ## 1.8.0 (2026-11-15)
 
 - **Voices play as:** Settings › Playback starts with one choice: Media, Phone call or At your ear. Under it, what
