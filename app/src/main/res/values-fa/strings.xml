@@ -677,6 +677,10 @@
     </plurals>
     <string name="channel_new_title">کانال جدید</string>
     <string name="channel_new_subtitle">سرور تعیین می‌کند چه نوع کانال‌هایی می‌توانید بسازید.</string>
+    <string name="channel_new_below">کانال جدید در زیر</string>
+    <string name="channel_place_below">زیر %1$s</string>
+    <string name="channel_place_end">در انتهای %1$s</string>
+    <string name="channel_place_end_top">در انتهای بالاترین سطح</string>
     <string name="channel_edit_subtitle">تنظیمات کانال</string>
     <string name="channel_create">ساختن</string>
     <string name="channel_name">نام</string>

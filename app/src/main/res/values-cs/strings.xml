@@ -702,6 +702,10 @@
     </plurals>
     <string name="channel_new_title">Nový kanál</string>
     <string name="channel_new_subtitle">Server určuje, jaké typy kanálů smíte vytvářet.</string>
+    <string name="channel_new_below">Nový kanál pod</string>
+    <string name="channel_place_below">Pod kanálem %1$s</string>
+    <string name="channel_place_end">Na konec kanálu %1$s</string>
+    <string name="channel_place_end_top">Na konec nejvyšší úrovně</string>
     <string name="channel_edit_subtitle">Nastavení kanálu</string>
     <string name="channel_create">Vytvořit</string>
     <string name="channel_name">Název</string>

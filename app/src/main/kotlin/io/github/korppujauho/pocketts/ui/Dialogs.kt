@@ -11,6 +11,16 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeDown
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.SwapVert
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -311,6 +321,7 @@ fun ChannelInfoDialog(
     onFiles: (() -> Unit)? = null,
     whispered: Boolean = false,
     onWhisper: (() -> Unit)? = null,
+    onNewBelow: (() -> Unit)? = null,
 ) {
     // The description comes a moment after asking; empty after that, there's none
     var waited by remember { mutableStateOf(false) }
@@ -329,69 +340,107 @@ fun ChannelInfoDialog(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (here) Text(stringResource(R.string.channel_info_here), color = Ts.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            val stats = buildList {
-                add(res.getString(R.string.info_users) to if (ch.maxClients >= 0) ltr("$people / ${ch.maxClients}") else "$people")
-                add(
-                    res.getString(R.string.channel_kind) to res.getString(
-                        when {
-                            ch.permanent -> R.string.channel_kind_permanent
-                            ch.semiPermanent -> R.string.channel_kind_semi
-                            else -> R.string.channel_kind_temporary
-                        },
-                    ),
-                )
-                if (ch.neededTalkPower > 0) add(res.getString(R.string.channel_info_talk_power) to "${ch.neededTalkPower}")
-            }
-            for (row in stats.chunked(2)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    for ((k, value) in row) {
-                        InfoBox(Modifier.weight(1f)) {
-                            Text(k, color = Ts.muted, fontSize = 12.sp)
-                            Text(value, color = Ts.text, fontSize = 15.sp)
-                        }
-                    }
-                    if (row.size == 1) Spacer(Modifier.weight(1f))
-                }
-            }
-            // The voice on a line of its own: codec and quality don't fit half the width
-            InfoBox {
-                Text(stringResource(R.string.channel_codec), color = Ts.muted, fontSize = 12.sp)
-                Text(
-                    stringResource(if (ch.codec == 5) R.string.channel_codec_music else R.string.channel_codec_voice) + " · " +
-                        stringResource(R.string.channel_quality, ch.codecQuality),
-                    color = Ts.text, fontSize = 15.sp,
-                )
-            }
-            val notes = listOfNotNull(
-                if (ch.hasPassword) stringResource(R.string.channel_password_subtitle) else null,
-                if (ch.isDefault) stringResource(R.string.channel_info_default) else null,
+            // What it is, in short chips: people, type, voice, talk power, password, default
+            val kind = stringResource(
+                when {
+                    ch.permanent -> R.string.channel_kind_permanent
+                    ch.semiPermanent -> R.string.channel_kind_semi
+                    else -> R.string.channel_kind_temporary
+                },
             )
-            if (notes.isNotEmpty()) Text(notes.joinToString(" · "), color = Ts.muted, fontSize = 13.sp)
+            val voice = stringResource(if (ch.codec == 5) R.string.channel_codec_music else R.string.channel_codec_voice) + " · " +
+                stringResource(R.string.channel_quality, ch.codecQuality)
+            @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                InfoChip(
+                    if (ch.maxClients >= 0) ltr("$people / ${ch.maxClients}") else "$people",
+                    androidx.compose.material.icons.Icons.Rounded.Person, stringResource(R.string.info_users),
+                )
+                InfoChip(kind)
+                InfoChip(voice)
+                if (ch.neededTalkPower > 0) InfoChip(stringResource(R.string.channel_info_talk_power) + ": ${ch.neededTalkPower}")
+                if (ch.hasPassword) InfoChip(null, androidx.compose.material.icons.Icons.Rounded.Lock, stringResource(R.string.channel_password_subtitle))
+                if (ch.isDefault) InfoChip(stringResource(R.string.channel_info_default))
+            }
+            // The description as it is, without a heading: the window is about this channel
             val description = ch.description.trim()
             InfoBox {
-                Text(stringResource(R.string.channel_description), color = Ts.muted, fontSize = 12.sp)
                 when {
                     description.isNotEmpty() -> Text(formatted(description), color = Ts.text, fontSize = 14.sp)
                     waited -> Text(stringResource(R.string.channel_info_no_description), color = Ts.faint, fontSize = 14.sp)
                     else -> Text(stringResource(R.string.channel_info_loading), color = Ts.faint, fontSize = 14.sp)
                 }
             }
-            if (onFiles != null) {
-                PillButton(stringResource(R.string.files_title), modifier = Modifier.fillMaxWidth(), onClick = onFiles)
+            // What can be done, one row each, as the Groups window's rows; the admin ones in a box of their own
+            val actions = buildList<@Composable (Boolean) -> Unit> {
+                if (onFiles != null) add { first -> ActionRow(androidx.compose.material.icons.Icons.Rounded.Folder, stringResource(R.string.files_title), first, more = true, onClick = onFiles) }
+                if (onWhisper != null) add { first ->
+                    // Everyone in it hears a whisper (not its sub-channels)
+                    ActionRow(
+                        androidx.compose.material.icons.Icons.Filled.Hearing,
+                        stringResource(if (whispered) R.string.whisper_channel_off else R.string.whisper_channel), first,
+                        tint = if (whispered) Ts.whisper else Ts.accent, onClick = onWhisper,
+                    )
+                }
+                if (onNewBelow != null) add { first -> ActionRow(androidx.compose.material.icons.Icons.Rounded.Add, stringResource(R.string.channel_new_below), first, more = true, onClick = onNewBelow) }
             }
-            if (onWhisper != null) {
-                // Everyone in it hears a whisper (not its sub-channels)
-                PillButton(
-                    stringResource(if (whispered) R.string.whisper_channel_off else R.string.whisper_channel), modifier = Modifier.fillMaxWidth(), onClick = onWhisper,
-                )
-            }
+            if (actions.isNotEmpty()) ActionCard { actions.forEachIndexed { i, row -> row(i == 0) } }
             if (onEdit != null || onArrange != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (onEdit != null) PillButton(stringResource(R.string.edit), modifier = Modifier.weight(1f), onClick = onEdit)
-                    if (onArrange != null) PillButton(stringResource(R.string.channel_info_arrange), modifier = Modifier.weight(1f), onClick = onArrange)
+                Text(
+                    stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp),
+                )
+                ActionCard {
+                    if (onEdit != null) ActionRow(androidx.compose.material.icons.Icons.Rounded.Edit, stringResource(R.string.edit), true, more = true, onClick = onEdit)
+                    if (onArrange != null) ActionRow(
+                        androidx.compose.material.icons.Icons.Rounded.SwapVert, stringResource(R.string.channel_info_arrange), onEdit == null, more = true, onClick = onArrange,
+                    )
                 }
             }
         }
+    }
+}
+
+/** A small fact about a channel: [text], an [icon], or both ([label]: what a screen reader says for an icon alone). */
+@Composable
+private fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, label: String? = null) {
+    Row(
+        Modifier.clip(RoundedCornerShape(50)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(50))
+            .then(if (label != null) Modifier.semantics(mergeDescendants = true) { contentDescription = listOfNotNull(label, text).joinToString(": ") } else Modifier)
+            .heightIn(min = 30.dp).padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        if (icon != null) androidx.compose.material3.Icon(icon, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(14.dp))
+        if (text != null) Text(text, color = Ts.text, fontSize = 13.sp)
+    }
+}
+
+/** A box of action rows, as the Groups window's boxes. */
+@Composable
+private fun ActionCard(content: @Composable ColumnScope.() -> Unit) = Column(
+    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+    content = content,
+)
+
+/** One action: its icon, its name, and an arrow when it opens something of its own ([more]). */
+@Composable
+private fun ActionRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, first: Boolean, more: Boolean = false, tint: Color = Ts.accent,
+    onClick: () -> Unit,
+) {
+    if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    Row(
+        Modifier.fillMaxWidth().clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
+            .padding(start = 14.dp, end = 10.dp).heightIn(min = 50.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(tint.copy(alpha = 0.14f)), contentAlignment = Alignment.Center) {
+            androidx.compose.material3.Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
+        }
+        Text(text, color = Ts.text, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        if (more) androidx.compose.material3.Icon(
+            androidx.compose.material.icons.Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp),
+        )
     }
 }
 

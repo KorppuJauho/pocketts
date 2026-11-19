@@ -595,6 +595,7 @@ fun ServerScreen(
         val item = items.firstOrNull { it.node.channel.id == id } ?: return@let
         val ch = item.node.channel
         val admin = state.voice.adminTools && state.phase == Session.Phase.CONNECTED
+        val res = androidx.compose.ui.platform.LocalResources.current
         ChannelInfoDialog(
             ch, people = item.node.clients.size, here = ch.id == state.ownChannel,
             // Joining as a tap does it (a spacer too, from here: holding it was on purpose)
@@ -607,6 +608,11 @@ fun ServerScreen(
             onArrange = if (admin) ({ infoChannel = null; held = ch; editing = true }) else null,
             onDismiss = { infoChannel = null },
             onFiles = { infoChannel = null; filesChannel = ch.id },
+            // As TeamSpeak's own "insert channel below", for anyone the server lets create channels
+            onNewBelow = if (state.phase == Session.Phase.CONNECTED && state.channelCreate.any) ({
+                infoChannel = null
+                channelDialog = newBelow(ch, state.channelCreate, items, res)
+            }) else null,
             whispered = ch.id in state.whisperTo.channels,
             onWhisper = if (state.phase == Session.Phase.CONNECTED) ({ actions.toggleWhisperChannel(ch) }) else null,
         )
@@ -626,6 +632,7 @@ fun ServerScreen(
                 },
                 onDelete = ch?.let { c -> { channelDialog = null; deleteTarget = c } },
                 onDismiss = { channelDialog = null },
+                place = d.place, create = state.channelCreate,
             )
         }
     }
@@ -686,4 +693,29 @@ fun ErrorLine(text: String) {
 }
 
 /** The channel settings window: a channel's own ([id]), or a new one (null), starting as [start]. */
-private data class ChannelEditing(val id: Int?, val start: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings)
+/**
+ * A new channel below [ch]: next to it, at the same level, when the server lets us choose a channel's place; else last
+ * at that level (or last at the top, when we may not create inside another channel). Temporary when that's allowed.
+ */
+private fun newBelow(
+    ch: io.github.korppujauho.pocketts.proto.ServerModel.Channel, can: io.github.korppujauho.pocketts.proto.ServerModel.ChannelCreatePowers,
+    items: List<ChannelItem>, res: android.content.res.Resources,
+): ChannelEditing {
+    val parent = if (ch.parent == 0 || !can.known || can.child) ch.parent else 0
+    val below = parent == ch.parent && (!can.known || can.sortOrder)
+    fun name(c: io.github.korppujauho.pocketts.proto.ServerModel.Channel) = c.displayName.ifBlank { c.name }
+    val place = when {
+        below -> res.getString(R.string.channel_place_below, name(ch))
+        parent == 0 -> res.getString(R.string.channel_place_end_top)
+        else -> items.firstOrNull { it.node.channel.id == parent }?.node?.channel?.let { res.getString(R.string.channel_place_end, name(it)) }
+            ?: res.getString(R.string.channel_place_end_top)
+    }
+    val kind = when {
+        !can.known || can.temporary -> io.github.korppujauho.pocketts.proto.ChannelEdits.Kind.TEMPORARY
+        can.permanent -> io.github.korppujauho.pocketts.proto.ChannelEdits.Kind.PERMANENT
+        else -> io.github.korppujauho.pocketts.proto.ChannelEdits.Kind.SEMI_PERMANENT
+    }
+    return ChannelEditing(null, io.github.korppujauho.pocketts.proto.ChannelEdits.Settings("", kind = kind, parent = parent, after = if (below) ch.id else -1), place)
+}
+
+private data class ChannelEditing(val id: Int?, val start: io.github.korppujauho.pocketts.proto.ChannelEdits.Settings, val place: String? = null)

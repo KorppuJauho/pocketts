@@ -644,6 +644,10 @@
     </plurals>
     <string name="channel_new_title">Yeni kanal</string>
     <string name="channel_new_subtitle">Hangi tür kanalları oluşturabileceğine sunucu karar verir.</string>
+    <string name="channel_new_below">Altına yeni kanal</string>
+    <string name="channel_place_below">%1$s altına</string>
+    <string name="channel_place_end">%1$s sonuna</string>
+    <string name="channel_place_end_top">En üst düzeyin sonuna</string>
     <string name="channel_edit_subtitle">Kanal ayarları</string>
     <string name="channel_create">Oluştur</string>
     <string name="channel_name">Ad</string>

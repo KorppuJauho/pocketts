@@ -702,6 +702,10 @@
     </plurals>
     <string name="channel_new_title">Nowy kanał</string>
     <string name="channel_new_subtitle">Serwer decyduje, jakie rodzaje kanałów możesz tworzyć.</string>
+    <string name="channel_new_below">Nowy kanał poniżej</string>
+    <string name="channel_place_below">Pod kanałem %1$s</string>
+    <string name="channel_place_end">Na końcu kanału %1$s</string>
+    <string name="channel_place_end_top">Na końcu najwyższego poziomu</string>
     <string name="channel_edit_subtitle">Ustawienia kanału</string>
     <string name="channel_create">Utwórz</string>
     <string name="channel_name">Nazwa</string>

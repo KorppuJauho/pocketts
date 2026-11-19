@@ -68,6 +68,7 @@ object Session : TsClient.Listener {
         val groupChoices: List<ServerModel.GroupChoice> = emptyList(), // the server groups people can be put in, and which we may change
         val channelGroupChoices: List<ServerModel.Group> = emptyList(), // the channel groups people can be given
         val groupPowers: ServerModel.GroupPowers = ServerModel.GroupPowers(), // ours, where we are
+        val channelCreate: ServerModel.ChannelCreatePowers = ServerModel.ChannelCreatePowers(), // which channels we may create, and where
         val serverIcon: Long = 0,
         val sendingPicture: Boolean = false,
         val sendingProgress: Pair<Int, Int>? = null, // sending several pictures: which one (from 1), of how many
@@ -1614,6 +1615,7 @@ object Session : TsClient.Listener {
                 groupChoices = model.serverGroupChoices(),
                 channelGroupChoices = model.channelGroupChoices(),
                 groupPowers = model.groupPowers,
+                channelCreate = model.channelCreatePowers,
                 streams = HashMap(model.streams),
                 serverIcon = model.serverVars["virtualserver_icon_id"]?.toLongOrNull()?.let { v -> if (v < 0) v + (1L shl 32) else v } ?: 0,
                 channelCount = model.channels.size,

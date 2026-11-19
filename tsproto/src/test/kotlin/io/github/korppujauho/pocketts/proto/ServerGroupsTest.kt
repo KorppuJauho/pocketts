@@ -2,6 +2,8 @@ package io.github.korppujauho.pocketts.proto
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Server groups as a TeamSpeak 6 server tells them (these lines are from one, shortened): only groups for people are
@@ -48,14 +50,14 @@ class ServerGroupsTest {
     @Test
     fun anAdminsPowersReachTheirGroupsButNotTheDefaultOne() {
         val m = model()
-        // Made an admin: the server sends the whole set again
+        // Made an admin: the server sends what changed
         m.apply(Commands.parse("notifyclientneededpermissions permid=170 permvalue=75|permid=172 permvalue=75|permid=248 permvalue=75"))
         val choices = m.serverGroupChoices().associateBy { it.group.id }
         assertEquals(true to true, choices.getValue(6).let { it.canAdd to it.canRemove })
         assertEquals(true to true, choices.getValue(7).let { it.canAdd to it.canRemove })
         assertEquals(false to false, choices.getValue(8).let { it.canAdd to it.canRemove })
-        // And no longer: what isn't in the new set is gone
-        m.apply(Commands.parse("notifyclientneededpermissions permid=248 permvalue=25"))
+        // And no longer: the powers come back as 0
+        m.apply(Commands.parse("notifyclientneededpermissions permid=170 permvalue=0|permid=172 permvalue=0|permid=248 permvalue=25"))
         assertEquals(emptyList(), m.serverGroupChoices().filter { it.canAdd || it.canRemove })
     }
 
@@ -108,5 +110,39 @@ class ServerGroupsTest {
         m.apply(Commands.parse("notifyservergroupclientdeleted invokerid=2 sgid=7 clid=3 name=Lee"))
         m.apply(Commands.parse("notifyclientupdated clid=3 client_servergroups=8"))
         assertEquals(listOf(8), m.clients.getValue(3).serverGroups)
+    }
+
+    /** Which channels we may create, from the permissions a TeamSpeak 6 server lists (only those we have). */
+    @Test
+    fun whatChannelsWeMayCreate() {
+        val m = ServerModel()
+        assertEquals(ServerModel.ChannelCreatePowers(), m.channelCreatePowers)
+        assertTrue(m.channelCreatePowers.any) // not said yet: offered, the server decides
+        // A guest on the test server: temporary channels only, last in their place
+        m.apply(Commands.parse("notifyclientneededpermissions permid=94 permvalue=1|permid=95 permvalue=1|permid=97 permvalue=1"))
+        assertEquals(ServerModel.ChannelCreatePowers(known = true, temporary = true), m.channelCreatePowers)
+        // Nothing to create: taken away (0)
+        m.apply(Commands.parse("notifyclientneededpermissions permid=94 permvalue=0"))
+        assertFalse(m.channelCreatePowers.any)
+        // An admin: everything
+        m.apply(Commands.parse("notifyclientneededpermissions permid=91 permvalue=1|permid=92 permvalue=1|permid=93 permvalue=1|permid=94 permvalue=1|permid=105 permvalue=1"))
+        assertEquals(ServerModel.ChannelCreatePowers(true, true, true, true, true, true), m.channelCreatePowers)
+    }
+
+    /**
+     * As a TeamSpeak 6 server tells it (seen on the test server): the whole set after connecting, then only what
+     * changed. Entering one's own new temporary channel gives the channel admin's powers, leaving takes them (0):
+     * creating channels, which the server group gives, stays.
+     */
+    @Test
+    fun laterListsAreOnlyWhatChanged() {
+        val m = ServerModel()
+        m.apply(Commands.parse("notifyclientneededpermissions permid=94 permvalue=1|permid=95 permvalue=1|permid=248 permvalue=25"))
+        m.apply(Commands.parse("notifyclientneededpermissions permid=170 permvalue=50|permid=172 permvalue=50|permid=114 permvalue=1"))
+        assertTrue(m.channelCreatePowers.temporary)
+        assertEquals(ServerModel.GroupPowers(50, 50), m.groupPowers)
+        m.apply(Commands.parse("notifyclientneededpermissions permid=170 permvalue=0|permid=172 permvalue=0|permid=114 permvalue=0"))
+        assertTrue(m.channelCreatePowers.temporary)
+        assertEquals(ServerModel.GroupPowers(0, 0), m.groupPowers)
     }
 }
