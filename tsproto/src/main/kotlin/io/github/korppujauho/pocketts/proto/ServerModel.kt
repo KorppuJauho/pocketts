@@ -156,8 +156,9 @@ class ServerModel {
     val clients = LinkedHashMap<Int, Client>()
 
     /**
-     * Our own permissions the server tells (by number), the whole set each time it changes: the ones the app needs
-     * to know what it may do. Absent is none.
+     * Our own permissions the server tells (by number): the ones the app needs to know what it may do. A TeamSpeak 6
+     * server sends the whole set once, after connecting, and then only what changed (0 for one taken away, such as a
+     * channel group's powers when leaving its channel), so each list is merged into what's known. Absent is none.
      */
     val ownPermissions = HashMap<Int, Int>()
 
@@ -188,7 +189,6 @@ class ServerModel {
             "notifyservergrouplist", "servergrouplist" -> readGroups(serverGroups, "sgid", cmd)
             "notifychannelgrouplist", "channelgrouplist" -> readGroups(channelGroups, "cgid", cmd)
             "notifyclientneededpermissions" -> {
-                ownPermissions.clear()
                 for (g in cmd.groups) {
                     val id = g["permid"]?.toIntOrNull() ?: continue
                     ownPermissions[id] = g["permvalue"]?.toIntOrNull() ?: continue
