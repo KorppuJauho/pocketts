@@ -509,7 +509,6 @@
     <string name="info_uptime">Czas działania</string>
     <string name="info_created">Utworzono</string>
     <!-- %1$s is a time span, such as "3 months" -->
-    <string name="info_ago">%1$s temu</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d minuta</item>
         <item quantity="few">%1$d minuty</item>

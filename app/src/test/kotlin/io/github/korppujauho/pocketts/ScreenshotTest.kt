@@ -283,6 +283,47 @@ class ScreenshotTest {
         )
     }
 
+    /** One's own menu with admin functions on: Away, and one's own groups. */
+    @Test
+    fun selfPopup() = popup("popup-person-self") {
+        val s = Example.state()
+        io.github.korppujauho.pocketts.ui.PersonSheet(
+            s.client(1)!!, s.serverKey, isSelf = true, volume = 1f, onVolume = {}, onPoke = {}, onChat = {}, onDismiss = {},
+            admin = true, onGroups = {},
+        )
+    }
+
+    /** The server's info: its welcome, numbers, website, version, and the privilege key. */
+    @Test
+    fun serverInfoPopup() = popup("popup-server-info") {
+        val now = System.currentTimeMillis()
+        val s = Example.state().copy(
+            serverName = "TeamSpeak 6 Server", address = "ts.example.com", clientCount = 7, channelCount = 12,
+            server = hashMapOf(
+                "virtualserver_welcomemessage" to "Welcome! Be nice, and read the [b]rules[/b] channel.",
+                "virtualserver_maxclients" to "32", "virtualserver_uptime" to "${3 * 86400 + 4 * 3600}", "received_at" to "$now",
+                "virtualserver_created" to "${now / 1000 - 400 * 86400}",
+                "virtualserver_hostbutton_url" to "https://example.com", "virtualserver_hostbutton_tooltip" to "Our website",
+                "virtualserver_version" to "6.0.0-beta5 [Build: 1730000000]", "virtualserver_platform" to "Linux",
+            ),
+        )
+        io.github.korppujauho.pocketts.ui.ServerInfoDialog(s, onDismiss = {})
+    }
+
+    /** Without a website, welcome or banner: the numbers and the privilege key. */
+    @Test
+    fun serverInfoPlainPopup() = popup("popup-server-info-plain") {
+        val now = System.currentTimeMillis()
+        val s = Example.state().copy(
+            serverName = "TeamSpeak 6 Server", address = "ts.example.com", clientCount = 7, channelCount = 12,
+            server = hashMapOf(
+                "virtualserver_maxclients" to "32", "virtualserver_uptime" to "${3 * 86400}", "received_at" to "$now",
+                "virtualserver_created" to "${now / 1000 - 400 * 86400}", "virtualserver_version" to "6.0.0-beta5", "virtualserver_platform" to "Linux",
+            ),
+        )
+        io.github.korppujauho.pocketts.ui.ServerInfoDialog(s, onDismiss = {})
+    }
+
     @Test
     fun groupsPopup() = popup("popup-groups") {
         io.github.korppujauho.pocketts.ui.ServerGroupsDialog(

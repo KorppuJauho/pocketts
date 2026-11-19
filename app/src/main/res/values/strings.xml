@@ -506,7 +506,6 @@
     <string name="info_uptime">Uptime</string>
     <string name="info_created">Created</string>
     <!-- %1$s is a time span, such as "3 months" -->
-    <string name="info_ago">%1$s ago</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

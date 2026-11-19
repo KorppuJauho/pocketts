@@ -1,5 +1,8 @@
 package io.github.korppujauho.pocketts.ui
 
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.NotificationsActive
@@ -11,6 +14,8 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeDown
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Folder
@@ -135,7 +140,10 @@ fun PersonSheet(
                     }
                 }
                 // One's own groups, with the same powers as anyone's
-                if (admin && onGroups != null) PillButton(stringResource(R.string.admin_groups), modifier = Modifier.fillMaxWidth(), onClick = onGroups)
+                if (admin && onGroups != null) {
+                    Text(stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 4.dp))
+                    ActionCard { ActionRow(androidx.compose.material.icons.Icons.Rounded.Groups, stringResource(R.string.admin_groups), true, more = true, onClick = onGroups) }
+                }
                 return@Column
             }
             var v by remember { mutableFloatStateOf(volume) }
@@ -241,7 +249,6 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeK
         onDismiss = onDismiss, title = state.serverName.ifEmpty { stringResource(R.string.info_title) }, icon = androidx.compose.material.icons.Icons.Rounded.Dns,
         subtitle = state.address,
         buttons = {
-            PillButton(stringResource(R.string.key_button), onClick = onPrivilegeKey)
             PillButton(stringResource(R.string.close), PillKind.PRIMARY, onClick = onDismiss)
         },
     ) {
@@ -274,26 +281,42 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeK
                         add(res.getString(R.string.info_uptime) to span(res, it * 1000 + since))
                     }
                     v["virtualserver_created"]?.toLongOrNull()?.takeIf { it > 0 }?.let {
-                        add(res.getString(R.string.info_created) to res.getString(R.string.info_ago, span(res, System.currentTimeMillis() - it * 1000)))
+                        // The month it was made ("Oct 2025"), in the phone's language: short enough for its cell
+                        val locale = res.configuration.locales[0]
+                        val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "MMMyyyy")
+                        add(res.getString(R.string.info_created) to java.text.SimpleDateFormat(pattern, locale).format(java.util.Date(it * 1000)))
                     }
                 }
-                for (row in stats.chunked(2)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        for ((k, value) in row) {
-                            InfoBox(Modifier.weight(1f)) {
-                                Text(k, color = Ts.muted, fontSize = 12.sp)
-                                Text(value, color = Ts.text, fontSize = 15.sp)
-                            }
+                // The numbers side by side in one box, each over what it is
+                Row(
+                    Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).clip(RoundedCornerShape(14.dp)).background(Pop.field)
+                        .border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(14.dp)),
+                ) {
+                    stats.forEachIndexed { i, (k, value) ->
+                        if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(Color(0x0DFFFFFF)))
+                        Column(
+                            Modifier.weight(1f).semantics(mergeDescendants = true) {}.padding(horizontal = 4.dp, vertical = 10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(value, color = Ts.text, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 18.sp)
+                            Text(k, color = Ts.muted, fontSize = 11.5.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 1)
                         }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
                     }
                 }
+                // What can be done: the server's website, and a privilege key from its admin
                 val site = v["virtualserver_hostbutton_url"].orEmpty()
-                if (site.startsWith("http://") || site.startsWith("https://")) {
-                    InfoBox(Modifier.clickable { uri.openUri(site) }) {
-                        Text(v["virtualserver_hostbutton_tooltip"].orEmpty().ifEmpty { site }, color = Ts.text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        Text(site, color = Ts.muted, fontSize = 12.sp)
-                    }
+                val web = site.startsWith("http://") || site.startsWith("https://")
+                ActionCard {
+                    if (web) ActionRow(
+                        androidx.compose.material.icons.Icons.Rounded.Public, v["virtualserver_hostbutton_tooltip"].orEmpty().ifEmpty { site }, true,
+                        detail = site.takeIf { v["virtualserver_hostbutton_tooltip"].orEmpty().isNotEmpty() },
+                        trailing = {
+                            androidx.compose.material3.Icon(
+                                androidx.compose.material.icons.Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(18.dp),
+                            )
+                        },
+                    ) { uri.openUri(site) }
+                    ActionRow(androidx.compose.material.icons.Icons.Rounded.Key, stringResource(R.string.key_button), !web, more = true, onClick = onPrivilegeKey)
                 }
                 val version = listOf(
                     v["virtualserver_version"].orEmpty().replace(Regex("""\s*\[Build:[^\]]*]""", RegexOption.IGNORE_CASE), ""),
@@ -403,7 +426,7 @@ fun ChannelInfoDialog(
 
 /** A small fact about a channel: [text], an [icon], or both ([label]: what a screen reader says for an icon alone). */
 @Composable
-private fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, label: String? = null) {
+internal fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, label: String? = null) {
     Row(
         Modifier.clip(RoundedCornerShape(50)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(50))
             .then(if (label != null) Modifier.semantics(mergeDescendants = true) { contentDescription = listOfNotNull(label, text).joinToString(": ") } else Modifier)
@@ -417,16 +440,19 @@ private fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.Im
 
 /** A box of action rows, as the Groups window's boxes. */
 @Composable
-private fun ActionCard(content: @Composable ColumnScope.() -> Unit) = Column(
+internal fun ActionCard(content: @Composable ColumnScope.() -> Unit) = Column(
     Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
     content = content,
 )
 
-/** One action: its icon, its name, and an arrow when it opens something of its own ([more]). */
+/**
+ * One action: its icon, its name ([detail] under it), [trailing] at its end, and an arrow when it opens something of
+ * its own ([more]).
+ */
 @Composable
-private fun ActionRow(
+internal fun ActionRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, first: Boolean, more: Boolean = false, tint: Color = Ts.accent,
-    onClick: () -> Unit,
+    detail: String? = null, trailing: (@Composable () -> Unit)? = null, onClick: () -> Unit,
 ) {
     if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
     Row(
@@ -437,7 +463,11 @@ private fun ActionRow(
         Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(tint.copy(alpha = 0.14f)), contentAlignment = Alignment.Center) {
             androidx.compose.material3.Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
         }
-        Text(text, color = Ts.text, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        Column(Modifier.weight(1f).padding(vertical = 6.dp)) {
+            Text(text, color = Ts.text, fontSize = 15.sp)
+            if (detail != null) Text(detail, color = Ts.muted, fontSize = 12.5.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        }
+        trailing?.invoke()
         if (more) androidx.compose.material3.Icon(
             androidx.compose.material.icons.Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp),
         )

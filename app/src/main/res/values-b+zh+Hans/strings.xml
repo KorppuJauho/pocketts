@@ -478,7 +478,6 @@
     <string name="info_channels">频道</string>
     <string name="info_uptime">运行时间</string>
     <string name="info_created">创建于</string>
-    <string name="info_ago">%1$s前</string>
     <plurals name="span_minutes">
         <item quantity="other">%1$d 分钟</item>
     </plurals>

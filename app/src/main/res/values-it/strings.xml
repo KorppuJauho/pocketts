@@ -492,7 +492,6 @@
     <string name="info_uptime">Attivo da</string>
     <string name="info_created">Creato</string>
     <!-- %1$s is a time span, such as "3 months" -->
-    <string name="info_ago">%1$s fa</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d minuto</item>
         <item quantity="many">%1$d minuti</item>

@@ -482,7 +482,6 @@
     <string name="info_channels">Kanavat</string>
     <string name="info_uptime">Käynnissä</string>
     <string name="info_created">Luotu</string>
-    <string name="info_ago">%1$s sitten</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d minuutti</item>
         <item quantity="other">%1$d minuuttia</item>

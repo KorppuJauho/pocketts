@@ -513,7 +513,6 @@
     <string name="info_uptime">Час роботи</string>
     <string name="info_created">Створено</string>
     <!-- %1$s is a time span, such as "3 місяці" -->
-    <string name="info_ago">%1$s тому</string>
     <plurals name="span_minutes">
         <item quantity="one">%1$d хвилина</item>
         <item quantity="few">%1$d хвилини</item>

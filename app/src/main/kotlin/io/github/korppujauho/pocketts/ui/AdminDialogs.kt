@@ -160,15 +160,14 @@ private fun Choice(text: String, selected: Boolean, onClick: () -> Unit) {
 /** The person menu's admin row (Settings › UI › Show admin functions), and their server groups under it. */
 @Composable
 fun AdminTiles(onMove: () -> Unit, onKick: () -> Unit, onBan: () -> Unit, onGroups: (() -> Unit)? = null) {
+    // As the channel menu's: one row each, the ones that remove someone in red, last
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, modifier = Modifier.padding(start = 4.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ActionTile(Icons.Rounded.SwapVert, stringResource(R.string.admin_move), Modifier.weight(1f), onClick = onMove)
-            ActionTile(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.admin_kick), Modifier.weight(1f), tint = Ts.red, onClick = onKick)
-            ActionTile(Icons.Rounded.Block, stringResource(R.string.admin_ban), Modifier.weight(1f), tint = Ts.red, onClick = onBan)
-        }
-        if (onGroups != null) {
-            PillButton(stringResource(R.string.admin_groups), modifier = Modifier.fillMaxWidth(), onClick = onGroups)
+        Text(stringResource(R.string.admin_row), color = Ts.muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 4.dp))
+        ActionCard {
+            ActionRow(Icons.Rounded.SwapVert, stringResource(R.string.admin_move), true, more = true, onClick = onMove)
+            if (onGroups != null) ActionRow(Icons.Rounded.Groups, stringResource(R.string.admin_groups), false, more = true, onClick = onGroups)
+            ActionRow(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.admin_kick), false, more = true, tint = Ts.red, onClick = onKick)
+            ActionRow(Icons.Rounded.Block, stringResource(R.string.admin_ban), false, more = true, tint = Ts.red, onClick = onBan)
         }
     }
 }
