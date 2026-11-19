@@ -195,7 +195,6 @@
     <string name="settings_playback">播放</string>
     <string name="settings_capture">采集</string>
     <string name="settings_ui">界面</string>
-    <string name="settings_save">保存并应用</string>
     <string name="cant_be_undone">此操作无法撤销</string>
     <string name="quiet">小</string>
     <string name="loud">大</string>
@@ -333,7 +332,6 @@
     <string name="a11y_con">缺点：%1$s</string>
     <string name="audio_in_use">当前音频</string>
     <string name="audio_in_use_idle">连接到服务器后可查看播放和录音所用的设备。</string>
-    <string name="audio_in_use_unsaved">保存并应用后，更改会显示在这里。</string>
     <string name="audio_mode">模式</string>
     <string name="audio_mode_call">通话</string>
     <string name="audio_mode_media">媒体</string>
@@ -375,6 +373,7 @@
     <string name="ui_controls_bottom">按钮置于底部</string>
     <string name="ui_controls_bottom_desc">麦克风、声音和分享按钮以及「频道/聊天」切换位于屏幕底部，拇指即可够到。</string>
     <string name="ui_language">语言</string>
+    <string name="ui_language_apply">应用</string>
     <string name="ui_language_phone">跟随手机语言</string>
     <string name="ui_admin_desc">用户菜单中还会提供将其移动到其他频道、将其从频道或服务器中踢出以及封禁的功能。由服务器决定你是否有权这样做：没有权限时会被拒绝。</string>
 
@@ -725,6 +724,9 @@
     <string name="debug_log_delete">删除日志</string>
     <string name="debug_log_empty">调试日志目前为空。</string>
     <string name="debug_log_deleted">调试日志已删除。</string>
+    <string name="debug_log_off_title">关闭调试日志？</string>
+    <string name="debug_log_off_desc">目前保存的日志将从这台手机上删除。</string>
+    <string name="debug_log_off">关闭</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">开</string>

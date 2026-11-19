@@ -210,7 +210,6 @@
     <string name="settings_capture">Nagrywanie</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">Interfejs</string>
-    <string name="settings_save">Zapisz i zastosuj</string>
     <string name="cant_be_undone">Tego nie można cofnąć</string>
     <string name="quiet">Cicho</string>
     <string name="loud">Głośno</string>
@@ -355,7 +354,6 @@
     <string name="a11y_con">Minus: %1$s</string>
     <string name="audio_in_use">Używany dźwięk</string>
     <string name="audio_in_use_idle">Połącz się z serwerem, aby zobaczyć, co odtwarza i nagrywa dźwięk.</string>
-    <string name="audio_in_use_unsaved">Zmiany pojawią się tutaj po naciśnięciu „Zapisz i zastosuj”.</string>
     <string name="audio_mode">Tryb</string>
     <string name="audio_mode_call">Rozmowa telefoniczna</string>
     <string name="audio_mode_media">Multimedia</string>
@@ -397,6 +395,7 @@
     <string name="ui_controls_bottom">Przyciski na dole</string>
     <string name="ui_controls_bottom_desc">Przyciski mikrofonu, dźwięku i udostępniania oraz przełącznik Kanały/Czat są na dole ekranu, w zasięgu kciuka.</string>
     <string name="ui_language">Język</string>
+    <string name="ui_language_apply">Zastosuj</string>
     <string name="ui_language_phone">Język telefonu</string>
     <string name="ui_admin_desc">Menu osoby oferuje też przeniesienie jej do innego kanału, wyrzucenie z kanału lub serwera oraz zbanowanie. To serwer decyduje, czy ci wolno: bez uprawnienia odmówi.</string>
 
@@ -807,6 +806,9 @@
     <string name="debug_log_delete">Usuń dziennik</string>
     <string name="debug_log_empty">Dziennik debugowania jest na razie pusty.</string>
     <string name="debug_log_deleted">Usunięto dziennik debugowania.</string>
+    <string name="debug_log_off_title">Wyłączyć dziennik debugowania?</string>
+    <string name="debug_log_off_desc">Zebrany dotąd dziennik zostanie usunięty z tego telefonu.</string>
+    <string name="debug_log_off">Wyłącz</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Włączone</string>

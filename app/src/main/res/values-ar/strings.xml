@@ -215,7 +215,6 @@
     <string name="settings_capture">الالتقاط</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">الواجهة</string>
-    <string name="settings_save">حفظ وتطبيق</string>
     <string name="cant_be_undone">لا يمكن التراجع عن هذا</string>
     <string name="quiet">منخفض</string>
     <string name="loud">مرتفع</string>
@@ -364,7 +363,6 @@
     <string name="a11y_con">عيب: %1$s</string>
     <string name="audio_in_use">الصوت المستخدم</string>
     <string name="audio_in_use_idle">اتصل بخادم لترى ما يُشغَّل وما يُسجَّل.</string>
-    <string name="audio_in_use_unsaved">تظهر التغييرات هنا بعد «حفظ وتطبيق».</string>
     <string name="audio_mode">الوضع</string>
     <string name="audio_mode_call">مكالمة هاتفية</string>
     <string name="audio_mode_media">وسائط</string>
@@ -407,6 +405,7 @@
     <string name="ui_controls_bottom">الأزرار في الأسفل</string>
     <string name="ui_controls_bottom_desc">تكون أزرار الميكروفون والصوت والمشاركة ومبدّل القنوات/الدردشة أسفل الشاشة، في متناول إبهامك.</string>
     <string name="ui_language">اللغة</string>
+    <string name="ui_language_apply">تطبيق</string>
     <string name="ui_language_phone">لغة الهاتف</string>
     <string name="ui_admin_desc">تتيح قائمة الشخص أيضًا نقله إلى قناة أخرى، وطرده من القناة أو الخادم، وحظره. الخادم يقرر ما إذا كان مسموحًا لك: بدون الصلاحية يرفض.</string>
 
@@ -841,6 +840,9 @@
     <string name="debug_log_delete">حذف السجل</string>
     <string name="debug_log_empty">سجل التصحيح فارغ حاليًا.</string>
     <string name="debug_log_deleted">حُذف سجل التصحيح.</string>
+    <string name="debug_log_off_title">إيقاف سجل التصحيح؟</string>
+    <string name="debug_log_off_desc">سيُحذف السجل المحفوظ حتى الآن من هذا الهاتف.</string>
+    <string name="debug_log_off">إيقاف</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">مفعّل</string>

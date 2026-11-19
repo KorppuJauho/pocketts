@@ -197,7 +197,6 @@
     <string name="settings_playback">Reprodução</string>
     <string name="settings_capture">Captura</string>
     <string name="settings_ui">Interface</string>
-    <string name="settings_save">Salvar e aplicar</string>
     <string name="cant_be_undone">Isso não pode ser desfeito</string>
     <string name="quiet">Baixo</string>
     <string name="loud">Alto</string>
@@ -339,7 +338,6 @@
     <string name="a11y_con">Desvantagem: %1$s</string>
     <string name="audio_in_use">Áudio em uso</string>
     <string name="audio_in_use_idle">Conecte-se a um servidor para ver o que toca e o que grava.</string>
-    <string name="audio_in_use_unsaved">As mudanças aparecem aqui depois de Salvar e aplicar.</string>
     <string name="audio_mode">Modo</string>
     <string name="audio_mode_call">Chamada telefônica</string>
     <string name="audio_mode_media">Mídia</string>
@@ -381,6 +379,7 @@
     <string name="ui_controls_bottom">Botões embaixo</string>
     <string name="ui_controls_bottom_desc">Os botões de microfone, som e compartilhar e a troca Canais/Chat ficam na parte de baixo da tela, ao alcance do polegar.</string>
     <string name="ui_language">Idioma</string>
+    <string name="ui_language_apply">Aplicar</string>
     <string name="ui_language_phone">Idioma do celular</string>
     <string name="ui_admin_desc">O menu de uma pessoa também oferece movê-la para outro canal, expulsá-la do canal ou do servidor e bani-la. O servidor decide se você pode: sem a permissão, ele recusa.</string>
 
@@ -755,6 +754,9 @@
     <string name="debug_log_delete">Excluir log</string>
     <string name="debug_log_empty">O log de depuração está vazio por enquanto.</string>
     <string name="debug_log_deleted">Log de depuração excluído.</string>
+    <string name="debug_log_off_title">Desativar o registro de depuração?</string>
+    <string name="debug_log_off_desc">O registro guardado até agora é apagado deste telefone.</string>
+    <string name="debug_log_off">Desativar</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Ligado</string>

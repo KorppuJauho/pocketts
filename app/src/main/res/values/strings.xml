@@ -213,7 +213,6 @@
     <string name="settings_capture">Capture</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">UI</string>
-    <string name="settings_save">Save &amp; Apply</string>
     <string name="cant_be_undone">This can\'t be undone</string>
     <string name="quiet">Quiet</string>
     <string name="loud">Loud</string>
@@ -354,7 +353,6 @@
     <string name="a11y_con">Minus: %1$s</string>
     <string name="audio_in_use">Audio in use</string>
     <string name="audio_in_use_idle">Connect to a server to see what plays and records.</string>
-    <string name="audio_in_use_unsaved">Changes show here after Save &amp; Apply.</string>
     <string name="audio_mode">Mode</string>
     <string name="audio_mode_call">Phone call</string>
     <string name="audio_mode_media">Media</string>
@@ -396,6 +394,7 @@
     <string name="ui_controls_bottom">Buttons at the bottom</string>
     <string name="ui_controls_bottom_desc">The microphone, sound and share buttons and the Channels/Chat switch sit at the bottom of the screen, within reach of your thumb.</string>
     <string name="ui_language">Language</string>
+    <string name="ui_language_apply">Apply</string>
     <string name="ui_language_phone">Phone\'s language</string>
     <string name="ui_admin_desc">A person\'s menu also offers moving them to another channel, kicking them from the channel or the server, and banning them. The server decides whether you\'re allowed: without the permission it says no.</string>
 
@@ -782,6 +781,9 @@
     <string name="debug_log_delete">Delete log</string>
     <string name="debug_log_empty">The debug log is empty for now.</string>
     <string name="debug_log_deleted">Debug log deleted.</string>
+    <string name="debug_log_off_title">Turn off the debug log?</string>
+    <string name="debug_log_off_desc">The log kept so far is deleted from this phone.</string>
+    <string name="debug_log_off">Turn off</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">On</string>

@@ -210,7 +210,6 @@
     <string name="settings_capture">Nahrávání</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">Rozhraní</string>
-    <string name="settings_save">Uložit a použít</string>
     <string name="cant_be_undone">Tuto akci nelze vrátit zpět</string>
     <string name="quiet">Potichu</string>
     <string name="loud">Nahlas</string>
@@ -355,7 +354,6 @@
     <string name="a11y_con">Mínus: %1$s</string>
     <string name="audio_in_use">Používaný zvuk</string>
     <string name="audio_in_use_idle">Připojte se k serveru a uvidíte, co přehrává a co nahrává.</string>
-    <string name="audio_in_use_unsaved">Změny se zde ukážou po Uložit a použít.</string>
     <string name="audio_mode">Režim</string>
     <string name="audio_mode_call">Hovor</string>
     <string name="audio_mode_media">Média</string>
@@ -397,6 +395,7 @@
     <string name="ui_controls_bottom">Tlačítka dole</string>
     <string name="ui_controls_bottom_desc">Tlačítka mikrofonu, zvuku a sdílení i přepínač Kanály/Chat se zobrazují dole na obrazovce, v dosahu palce.</string>
     <string name="ui_language">Jazyk</string>
+    <string name="ui_language_apply">Použít</string>
     <string name="ui_language_phone">Jazyk telefonu</string>
     <string name="ui_admin_desc">Nabídka uživatele navíc umožní přesun do jiného kanálu, vykopnutí z kanálu či serveru a zákaz přístupu. O povolení rozhoduje server: bez příslušného oprávnění akci odmítne.</string>
 
@@ -807,6 +806,9 @@
     <string name="debug_log_delete">Smazat protokol</string>
     <string name="debug_log_empty">Ladicí protokol je zatím prázdný.</string>
     <string name="debug_log_deleted">Ladicí protokol byl smazán.</string>
+    <string name="debug_log_off_title">Vypnout ladicí záznam?</string>
+    <string name="debug_log_off_desc">Dosud uložený záznam se z tohoto telefonu smaže.</string>
+    <string name="debug_log_off">Vypnout</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Zapnuto</string>

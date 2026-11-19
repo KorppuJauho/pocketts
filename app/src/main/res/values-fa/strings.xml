@@ -209,7 +209,6 @@
     <string name="settings_capture">ضبط</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">رابط کاربری</string>
-    <string name="settings_save">ذخیره و اعمال</string>
     <string name="cant_be_undone">این کار برگشت‌پذیر نیست</string>
     <string name="quiet">آرام</string>
     <string name="loud">بلند</string>
@@ -350,7 +349,6 @@
     <string name="a11y_con">عیب: %1$s</string>
     <string name="audio_in_use">صدای در حال استفاده</string>
     <string name="audio_in_use_idle">برای دیدن آنچه پخش و ضبط می‌شود، به یک سرور وصل شوید.</string>
-    <string name="audio_in_use_unsaved">تغییرات پس از «ذخیره و اعمال» اینجا نمایش داده می‌شوند.</string>
     <string name="audio_mode">حالت</string>
     <string name="audio_mode_call">تماس تلفنی</string>
     <string name="audio_mode_media">رسانه</string>
@@ -392,6 +390,7 @@
     <string name="ui_controls_bottom">دکمه‌ها در پایین</string>
     <string name="ui_controls_bottom_desc">دکمه‌های میکروفون، صدا و اشتراک‌گذاری و کلید کانال‌ها/چت پایین صفحه قرار می‌گیرند، در دسترس انگشت شست شما.</string>
     <string name="ui_language">زبان</string>
+    <string name="ui_language_apply">اعمال</string>
     <string name="ui_language_phone">زبان گوشی</string>
     <string name="ui_admin_desc">منوی هر فرد گزینه‌های انتقال او به کانال دیگر، اخراج از کانال یا سرور و بن کردن را هم دارد. سرور تصمیم می‌گیرد که اجازه دارید یا نه: بدون مجوز، درخواست را رد می‌کند.</string>
 
@@ -778,6 +777,9 @@
     <string name="debug_log_delete">حذف گزارش</string>
     <string name="debug_log_empty">گزارش اشکال‌زدایی فعلاً خالی است.</string>
     <string name="debug_log_deleted">گزارش اشکال‌زدایی حذف شد.</string>
+    <string name="debug_log_off_title">گزارش اشکال‌زدایی خاموش شود؟</string>
+    <string name="debug_log_off_desc">گزارشی که تا حالا نگه داشته شده از این گوشی پاک می‌شود.</string>
+    <string name="debug_log_off">خاموش کردن</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">روشن</string>

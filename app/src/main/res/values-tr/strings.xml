@@ -196,7 +196,6 @@
     <string name="settings_playback">Oynatma</string>
     <string name="settings_capture">Kayıt</string>
     <string name="settings_ui">Arayüz</string>
-    <string name="settings_save">Kaydet ve Uygula</string>
     <string name="cant_be_undone">Bu geri alınamaz</string>
     <string name="quiet">Kısık</string>
     <string name="loud">Yüksek</string>
@@ -336,7 +335,6 @@
     <string name="a11y_con">Eksi: %1$s</string>
     <string name="audio_in_use">Kullanımdaki ses</string>
     <string name="audio_in_use_idle">Neyin çalıp kaydettiğini görmek için bir sunucuya bağlan.</string>
-    <string name="audio_in_use_unsaved">Değişiklikler, Kaydet ve Uygula sonrasında burada görünür.</string>
     <string name="audio_mode">Mod</string>
     <string name="audio_mode_call">Telefon araması</string>
     <string name="audio_mode_media">Medya</string>
@@ -378,6 +376,7 @@
     <string name="ui_controls_bottom">Düğmeler altta</string>
     <string name="ui_controls_bottom_desc">Mikrofon, ses ve paylaşma düğmeleri ile Kanallar/Sohbet geçişi ekranın altında, başparmağının yetişeceği yerde durur.</string>
     <string name="ui_language">Dil</string>
+    <string name="ui_language_apply">Uygula</string>
     <string name="ui_language_phone">Telefonun dili</string>
     <string name="ui_admin_desc">Bir kişinin menüsünde ayrıca onu başka bir kanala taşıma, kanaldan ya da sunucudan atma ve yasaklama seçenekleri de olur. Buna iznin olup olmadığına sunucu karar verir: iznin yoksa reddeder.</string>
 
@@ -740,6 +739,9 @@
     <string name="debug_log_delete">Günlüğü sil</string>
     <string name="debug_log_empty">Hata ayıklama günlüğü şimdilik boş.</string>
     <string name="debug_log_deleted">Hata ayıklama günlüğü silindi.</string>
+    <string name="debug_log_off_title">Hata ayıklama günlüğü kapatılsın mı?</string>
+    <string name="debug_log_off_desc">Şimdiye kadar tutulan günlük bu telefondan silinir.</string>
+    <string name="debug_log_off">Kapat</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Açık</string>
