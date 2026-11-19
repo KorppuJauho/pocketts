@@ -196,7 +196,6 @@
     <string name="settings_playback">Wiedergabe</string>
     <string name="settings_capture">Aufnahme</string>
     <string name="settings_ui">Oberfläche</string>
-    <string name="settings_save">Speichern &amp; anwenden</string>
     <string name="cant_be_undone">Das lässt sich nicht rückgängig machen</string>
     <string name="quiet">Leise</string>
     <string name="loud">Laut</string>
@@ -336,7 +335,6 @@
     <string name="a11y_con">Minus: %1$s</string>
     <string name="audio_in_use">Audio in Verwendung</string>
     <string name="audio_in_use_idle">Verbinde dich mit einem Server, um zu sehen, was abspielt und aufnimmt.</string>
-    <string name="audio_in_use_unsaved">Änderungen erscheinen hier nach Speichern &amp; anwenden.</string>
     <string name="audio_mode">Modus</string>
     <string name="audio_mode_call">Anruf</string>
     <string name="audio_mode_media">Medien</string>
@@ -378,6 +376,7 @@
     <string name="ui_controls_bottom">Tasten unten</string>
     <string name="ui_controls_bottom_desc">Die Mikrofon-, Ton- und Teilen-Tasten und der Channels/Chat-Schalter sitzen unten auf dem Bildschirm, in Reichweite deines Daumens.</string>
     <string name="ui_language">Sprache</string>
+    <string name="ui_language_apply">Übernehmen</string>
     <string name="ui_language_phone">Sprache des Handys</string>
     <string name="ui_admin_desc">Das Menü einer Person bietet auch an, sie in einen anderen Channel zu verschieben, aus dem Channel oder vom Server zu kicken und sie zu bannen. Der Server entscheidet, ob du das darfst: Ohne die Berechtigung lehnt er ab.</string>
 
@@ -740,6 +739,9 @@
     <string name="debug_log_delete">Protokoll löschen</string>
     <string name="debug_log_empty">Das Debug-Protokoll ist noch leer.</string>
     <string name="debug_log_deleted">Debug-Protokoll gelöscht.</string>
+    <string name="debug_log_off_title">Debug-Log ausschalten?</string>
+    <string name="debug_log_off_desc">Das bisher geführte Log wird von diesem Telefon gelöscht.</string>
+    <string name="debug_log_off">Ausschalten</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Ein</string>

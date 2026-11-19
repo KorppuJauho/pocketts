@@ -198,7 +198,6 @@
     <string name="settings_playback">Воспроизведение</string>
     <string name="settings_capture">Запись</string>
     <string name="settings_ui">Интерфейс</string>
-    <string name="settings_save">Сохранить и применить</string>
     <string name="cant_be_undone">Это нельзя отменить</string>
     <string name="quiet">Тихо</string>
     <string name="loud">Громко</string>
@@ -342,7 +341,6 @@
     <string name="a11y_con">Минус: %1$s</string>
     <string name="audio_in_use">Используемый звук</string>
     <string name="audio_in_use_idle">Подключитесь к серверу, чтобы увидеть, что воспроизводит и что записывает.</string>
-    <string name="audio_in_use_unsaved">Изменения появятся здесь после «Сохранить и применить».</string>
     <string name="audio_mode">Режим</string>
     <string name="audio_mode_call">Звонок</string>
     <string name="audio_mode_media">Медиа</string>
@@ -384,6 +382,7 @@
     <string name="ui_controls_bottom">Кнопки внизу</string>
     <string name="ui_controls_bottom_desc">Кнопки микрофона, звука и трансляции и переключатель Каналы/Чат находятся внизу экрана, под большим пальцем.</string>
     <string name="ui_language">Язык</string>
+    <string name="ui_language_apply">Применить</string>
     <string name="ui_language_phone">Язык телефона</string>
     <string name="ui_admin_desc">В меню пользователя также можно переместить его в другой канал, выгнать из канала или с сервера и забанить. Сервер решает, разрешено ли вам это: без разрешения он откажет.</string>
 
@@ -770,6 +769,9 @@
     <string name="debug_log_delete">Удалить журнал</string>
     <string name="debug_log_empty">Журнал отладки пока пуст.</string>
     <string name="debug_log_deleted">Журнал отладки удалён.</string>
+    <string name="debug_log_off_title">Выключить журнал отладки?</string>
+    <string name="debug_log_off_desc">Собранный до сих пор журнал будет удалён с этого телефона.</string>
+    <string name="debug_log_off">Выключить</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Вкл.</string>

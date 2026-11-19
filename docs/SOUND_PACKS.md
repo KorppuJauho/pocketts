@@ -12,7 +12,7 @@ a time), then choose:
 - **a folder**: the pack's own folder (the one with the sound files in it), or
 - **a file**: a `.zip` of that folder, or a `.ts3_soundpack` file (a zip under another name).
 
-The pack is chosen once it's imported: Save & Apply keeps it. **Tones | (the pack's name)** switches between the two,
+The pack is chosen once it's imported. **Tones | (the pack's name)** switches between the two,
 and **Remove** (asked first) deletes the pack and brings the tones back.
 
 Both kinds of pack work:

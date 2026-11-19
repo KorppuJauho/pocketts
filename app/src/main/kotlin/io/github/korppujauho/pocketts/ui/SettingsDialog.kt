@@ -63,6 +63,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -132,7 +133,11 @@ data class SoundPackInfo(val name: String, val events: Int, val of: Int, val cue
 /** Who we are on the server, for the profile picture in Settings. */
 data class SelfInfo(val person: io.github.korppujauho.pocketts.proto.ServerModel.Client?, val server: String, val avatarStatus: String?)
 
-/** WebTS's Settings: General, Playback and Capture, saved with "Save & Apply". */
+/**
+ * WebTS's Settings: General, Playback, Capture, UI and Advanced. A change is kept and used as it's made (a moment
+ * after, so a slider being dragged or choices tapped through quickly are kept once), except the language, which has
+ * its own Apply: it makes the screen again.
+ */
 @Composable
 fun SettingsDialog(
     voice: VoiceSettings,
@@ -161,8 +166,25 @@ fun SettingsContent(
 ) {
     var tab by rememberSaveable { mutableStateOf(startTab) }
     var v by remember { mutableStateOf(voice) }
+    var saved by remember { mutableStateOf(voice) }
+    // The relay's fields, as typed: kept when one is left (or Settings closes), not after every letter
+    var relay by remember { mutableStateOf(Relay(voice.turnUrl, voice.turnUser, voice.turnPassword)) }
     val savedLanguage = remember { actions.language() }
     var language by rememberSaveable { mutableStateOf(savedLanguage) }
+
+    // Kept a moment after the last change: a slider settles, quick taps through choices restart the audio once
+    LaunchedEffect(v) {
+        if (v == saved) return@LaunchedEffect
+        delay(SAVE_AFTER_MS)
+        actions.save(v)
+        saved = v
+    }
+    // Closed before that, or with a relay field still being typed in: kept now
+    val latest by androidx.compose.runtime.rememberUpdatedState(relay.into(v))
+    val lastSaved by androidx.compose.runtime.rememberUpdatedState(saved)
+    DisposableEffect(Unit) {
+        onDispose { if (latest != lastSaved) actions.save(latest) }
+    }
 
     // While the settings are open the microphone is measured, nothing is sent
     DisposableEffect(Unit) {
@@ -213,24 +235,28 @@ fun SettingsContent(
                     2 -> Capture(v, actions) { v = it }
                     3 -> {
                         Ui(v) { v = it }
-                        Language(language) { language = it }
+                        Language(language, applied = savedLanguage, onChange = { language = it }) {
+                            onDismiss()
+                            // The screen is made again in the new language
+                            actions.setLanguage(language)
+                        }
                     }
                     else -> {
-                        Advanced(v) { v = it }
+                        Advanced(v, relay, { relay = it }, { v = relay.into(v) }) { v = it }
                         ChannelPasswordsGroup(actions)
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.End) {
-                PrimaryButton(stringResource(R.string.settings_save)) {
-                    actions.save(v)
-                    onDismiss()
-                    // Last: the screen is made again in the new language
-                    if (language != savedLanguage) actions.setLanguage(language)
-                }
-            }
         }
     }
+}
+
+/** How long after the last change it's kept. */
+private const val SAVE_AFTER_MS = 400L
+
+/** The relay server's fields while they're being typed in. */
+private data class Relay(val url: String, val user: String, val password: String) {
+    fun into(v: VoiceSettings) = v.copy(turnUrl = url, turnUser = user, turnPassword = password)
 }
 
 /**
@@ -470,7 +496,7 @@ private fun Ui(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
  * opens the list (it scrolls when there are many).
  */
 @Composable
-private fun Language(tag: String, onChange: (String) -> Unit) {
+private fun Language(tag: String, applied: String, onChange: (String) -> Unit, onApply: () -> Unit) {
     val choices = listOf("" to stringResource(R.string.ui_language_phone)) + io.github.korppujauho.pocketts.AppLanguage.choices
     val chosen = choices.firstOrNull { it.first == tag }?.second ?: choices.first().second
     var open by remember { mutableStateOf(false) }
@@ -503,23 +529,50 @@ private fun Language(tag: String, onChange: (String) -> Unit) {
                 }
             }
         }
+        // Chosen but not in use yet: the screen is made again when it is, so it waits for Apply
+        if (tag != applied) PrimaryButton(stringResource(R.string.ui_language_apply), onClick = onApply)
     }
 }
 
+/**
+ * [relay]: the relay's fields as typed, kept ([onRelayDone]) when one is left; a half-typed address isn't used.
+ * Turning the debug log off asks first: that deletes it.
+ */
 @Composable
-private fun Advanced(v: VoiceSettings, onChange: (VoiceSettings) -> Unit) {
+private fun Advanced(
+    v: VoiceSettings, relay: Relay, onRelay: (Relay) -> Unit, onRelayDone: () -> Unit, onChange: (VoiceSettings) -> Unit,
+) {
+    var asking by remember { mutableStateOf(false) }
+    val left = Modifier.onFocusChanged { if (!it.isFocused) onRelayDone() }
     Group(stringResource(R.string.relay_title), info = stringResource(R.string.relay_desc)) {
-        TsField(v.turnUrl, { onChange(v.copy(turnUrl = it)) }, stringResource(R.string.relay_address), placeholder = "turn:relay.example.com:3478")
-        TsField(v.turnUser, { onChange(v.copy(turnUser = it)) }, stringResource(R.string.relay_user))
-        TsField(v.turnPassword, { onChange(v.copy(turnPassword = it)) }, stringResource(R.string.relay_password), password = true)
+        TsField(relay.url, { onRelay(relay.copy(url = it)) }, stringResource(R.string.relay_address), left, placeholder = "turn:relay.example.com:3478")
+        TsField(relay.user, { onRelay(relay.copy(user = it)) }, stringResource(R.string.relay_user), left)
+        TsField(relay.password, { onRelay(relay.copy(password = it)) }, stringResource(R.string.relay_password), left, password = true)
         Check(stringResource(R.string.relay_only), v.relayOnly) { onChange(v.copy(relayOnly = it)) }
+    }
+    if (asking) {
+        TsDialog(
+            onDismiss = { asking = false }, title = stringResource(R.string.debug_log_off_title),
+            icon = androidx.compose.material.icons.Icons.Rounded.DeleteOutline, tint = Ts.red,
+            buttons = {
+                PillButton(stringResource(R.string.cancel)) { asking = false }
+                PillButton(stringResource(R.string.debug_log_off), PillKind.DANGER) {
+                    asking = false
+                    onChange(v.copy(debugLog = false))
+                }
+            },
+        ) {
+            Desc(stringResource(R.string.debug_log_off_desc))
+        }
     }
     Group {
         Desc(stringResource(R.string.advanced_file_port))
     }
     // For bug reports: kept on the phone, without names or addresses (see AppLog); the app never sends it
     Group(stringResource(R.string.debug_log_title)) {
-        Check(stringResource(R.string.debug_log), v.debugLog, info = stringResource(R.string.debug_log_desc)) { onChange(v.copy(debugLog = it)) }
+        Check(stringResource(R.string.debug_log), v.debugLog, info = stringResource(R.string.debug_log_desc)) {
+            if (it) onChange(v.copy(debugLog = true)) else asking = true
+        }
         if (v.debugLog) {
             val context = androidx.compose.ui.platform.LocalContext.current
             Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -807,7 +860,7 @@ private fun cueName(cue: Cue): Int = when (cue) {
 
 /**
  * The tones or the person's own sound pack: Tones | the pack's name once one is imported, how many events it has a
- * sound for, and Import (a folder or a .zip) and Remove. Importing chooses the pack; it takes effect with Save & Apply,
+ * sound for, and Import (a folder or a .zip) and Remove. Importing chooses the pack, kept as the other settings are,
  * as the rest.
  */
 private const val SOUND_PACK_GUIDE = "https://github.com/KorppuJauho/pocketts/blob/main/docs/SOUND_PACKS.md"
@@ -953,8 +1006,7 @@ private fun ProCon(good: Boolean, text: String) {
 
 /**
  * Audio in use: how the voices play (a phone call or media), through what, and which microphone records, as Android
- * reports it while connected. Only shows; the choice above changes it. It shows the saved settings at work, so a
- * change waits for Save & Apply.
+ * reports it while connected. Only shows; the choice above changes it, a moment after it's made.
  */
 @Composable
 private fun AudioInUseGroup(v: VoiceSettings, saved: VoiceSettings, actions: SettingsActions) {
@@ -986,9 +1038,7 @@ private fun AudioInUseGroup(v: VoiceSettings, saved: VoiceSettings, actions: Set
                 },
             )
         }
-        if (v.earpiece != saved.earpiece || v.useHeadset != saved.useHeadset || v.callAudio != saved.callAudio) {
-            Desc(stringResource(R.string.audio_in_use_unsaved))
-        }
+
     }
 }
 

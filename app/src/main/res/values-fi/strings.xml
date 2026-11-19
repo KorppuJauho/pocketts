@@ -196,7 +196,6 @@
     <string name="settings_playback">Toisto</string>
     <string name="settings_capture">Äänitys</string>
     <string name="settings_ui">Käyttöliittymä</string>
-    <string name="settings_save">Tallenna ja ota käyttöön</string>
     <string name="cant_be_undone">Tätä ei voi perua</string>
     <string name="quiet">Hiljaa</string>
     <string name="loud">Kovaa</string>
@@ -336,7 +335,6 @@
     <string name="a11y_con">Miinus: %1$s</string>
     <string name="audio_in_use">Käytössä nyt</string>
     <string name="audio_in_use_idle">Yhdistä palvelimelle, niin näet, mikä toistaa ja mikä äänittää.</string>
-    <string name="audio_in_use_unsaved">Muutokset näkyvät tässä, kun valitset Tallenna ja ota käyttöön.</string>
     <string name="audio_mode">Tila</string>
     <string name="audio_mode_call">Puhelu</string>
     <string name="audio_mode_media">Media</string>
@@ -378,6 +376,7 @@
     <string name="ui_controls_bottom">Painikkeet alareunassa</string>
     <string name="ui_controls_bottom_desc">Mikrofoni-, ääni- ja jakopainikkeet sekä Kanavat/Keskustelu-valitsin ovat näytön alareunassa, peukalosi ulottuvilla.</string>
     <string name="ui_language">Kieli</string>
+    <string name="ui_language_apply">Ota käyttöön</string>
     <string name="ui_language_phone">Puhelimen kieli</string>
     <string name="ui_admin_desc">Henkilön valikossa voi myös siirtää hänet toiselle kanavalle, potkaista hänet kanavalta tai palvelimelta ja antaa porttikiellon. Palvelin päättää, onko sinulla lupa: ilman käyttöoikeutta se kieltäytyy.</string>
 
@@ -740,6 +739,9 @@
     <string name="debug_log_delete">Poista loki</string>
     <string name="debug_log_empty">Vianetsintäloki on vielä tyhjä.</string>
     <string name="debug_log_deleted">Vianetsintäloki poistettu.</string>
+    <string name="debug_log_off_title">Poistetaanko vianetsintäloki käytöstä?</string>
+    <string name="debug_log_off_desc">Tähän mennessä kerätty loki poistetaan tästä puhelimesta.</string>
+    <string name="debug_log_off">Poista käytöstä</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Päällä</string>

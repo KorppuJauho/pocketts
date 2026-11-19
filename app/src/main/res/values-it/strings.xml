@@ -200,7 +200,6 @@
     <string name="settings_playback">Riproduzione</string>
     <string name="settings_capture">Acquisizione</string>
     <string name="settings_ui">Interfaccia</string>
-    <string name="settings_save">Salva e applica</string>
     <string name="cant_be_undone">Non si può annullare</string>
     <string name="quiet">Basso</string>
     <string name="loud">Alto</string>
@@ -343,7 +342,6 @@
     <string name="a11y_con">Contro: %1$s</string>
     <string name="audio_in_use">Audio in uso</string>
     <string name="audio_in_use_idle">Connettiti a un server per vedere cosa riproduce e registra.</string>
-    <string name="audio_in_use_unsaved">Le modifiche appaiono qui dopo Salva e applica.</string>
     <string name="audio_mode">Modalità</string>
     <string name="audio_mode_call">Chiamata</string>
     <string name="audio_mode_media">Media</string>
@@ -385,6 +383,7 @@
     <string name="ui_controls_bottom">Pulsanti in basso</string>
     <string name="ui_controls_bottom_desc">I pulsanti di microfono, audio e condivisione e lo scambio Canali/Chat stanno in fondo allo schermo, a portata di pollice.</string>
     <string name="ui_language">Lingua</string>
+    <string name="ui_language_apply">Applica</string>
     <string name="ui_language_phone">Lingua del telefono</string>
     <string name="ui_admin_desc">Il menu di una persona offre anche di spostarla in un altro canale, espellerla dal canale o dal server e bannarla. Decide il server se puoi farlo: senza il permesso, rifiuta.</string>
 
@@ -769,6 +768,9 @@
     <string name="debug_log_delete">Elimina log</string>
     <string name="debug_log_empty">Il log di debug per ora è vuoto.</string>
     <string name="debug_log_deleted">Log di debug eliminato.</string>
+    <string name="debug_log_off_title">Disattivare il log di debug?</string>
+    <string name="debug_log_off_desc">Il log raccolto finora viene eliminato da questo telefono.</string>
+    <string name="debug_log_off">Disattiva</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Attivo</string>

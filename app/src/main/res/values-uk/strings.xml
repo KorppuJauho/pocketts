@@ -214,7 +214,6 @@
     <string name="settings_capture">Запис</string>
     <!-- The tab with how the app looks and what it offers -->
     <string name="settings_ui">Інтерфейс</string>
-    <string name="settings_save">Зберегти й застосувати</string>
     <string name="cant_be_undone">Цю дію не можна скасувати</string>
     <string name="quiet">Тихо</string>
     <string name="loud">Гучно</string>
@@ -359,7 +358,6 @@
     <string name="a11y_con">Мінус: %1$s</string>
     <string name="audio_in_use">Активне аудіо</string>
     <string name="audio_in_use_idle">Підключіться до сервера, щоб побачити, що відтворюється і записується.</string>
-    <string name="audio_in_use_unsaved">Зміни зʼявляться тут після «Зберегти й застосувати».</string>
     <string name="audio_mode">Режим</string>
     <string name="audio_mode_call">Дзвінок</string>
     <string name="audio_mode_media">Медіа</string>
@@ -401,6 +399,7 @@
     <string name="ui_controls_bottom">Кнопки внизу</string>
     <string name="ui_controls_bottom_desc">Кнопки мікрофона, звуку й трансляції та перемикач Канали/Чат розміщуються внизу екрана, під великим пальцем.</string>
     <string name="ui_language">Мова</string>
+    <string name="ui_language_apply">Застосувати</string>
     <string name="ui_language_phone">Мова телефона</string>
     <string name="ui_admin_desc">Меню людини також пропонує перемістити її в інший канал, вигнати з каналу чи сервера та заблокувати. Чи можна вам це робити, вирішує сервер: без дозволу він відмовить.</string>
 
@@ -811,6 +810,9 @@
     <string name="debug_log_delete">Видалити журнал</string>
     <string name="debug_log_empty">Журнал налагодження поки порожній.</string>
     <string name="debug_log_deleted">Журнал налагодження видалено.</string>
+    <string name="debug_log_off_title">Вимкнути журнал налагодження?</string>
+    <string name="debug_log_off_desc">Зібраний досі журнал буде видалено з цього телефона.</string>
+    <string name="debug_log_off">Вимкнути</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Увімкнено</string>

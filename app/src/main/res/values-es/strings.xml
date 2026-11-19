@@ -197,7 +197,6 @@
     <string name="settings_playback">Reproducción</string>
     <string name="settings_capture">Captura</string>
     <string name="settings_ui">Interfaz</string>
-    <string name="settings_save">Guardar y aplicar</string>
     <string name="cant_be_undone">No se puede deshacer</string>
     <string name="quiet">Bajo</string>
     <string name="loud">Alto</string>
@@ -339,7 +338,6 @@
     <string name="a11y_con">En contra: %1$s</string>
     <string name="audio_in_use">Audio en uso</string>
     <string name="audio_in_use_idle">Conéctate a un servidor para ver qué reproduce y qué graba.</string>
-    <string name="audio_in_use_unsaved">Los cambios se ven aquí tras Guardar y aplicar.</string>
     <string name="audio_mode">Modo</string>
     <string name="audio_mode_call">Llamada</string>
     <string name="audio_mode_media">Multimedia</string>
@@ -381,6 +379,7 @@
     <string name="ui_controls_bottom">Botones abajo</string>
     <string name="ui_controls_bottom_desc">Los botones de micrófono, sonido y compartir y el selector Canales/Chat están en la parte inferior de la pantalla, al alcance de tu pulgar.</string>
     <string name="ui_language">Idioma</string>
+    <string name="ui_language_apply">Aplicar</string>
     <string name="ui_language_phone">Idioma del teléfono</string>
     <string name="ui_admin_desc">El menú de una persona también ofrece moverla a otro canal, expulsarla del canal o del servidor y banearla. El servidor decide si puedes hacerlo: sin el permiso, lo rechaza.</string>
 
@@ -755,6 +754,9 @@
     <string name="debug_log_delete">Borrar registro</string>
     <string name="debug_log_empty">El registro de depuración está vacío por ahora.</string>
     <string name="debug_log_deleted">Registro de depuración borrado.</string>
+    <string name="debug_log_off_title">¿Desactivar el registro de depuración?</string>
+    <string name="debug_log_off_desc">El registro guardado hasta ahora se borra de este teléfono.</string>
+    <string name="debug_log_off">Desactivar</string>
 
     <!-- Read out by screen readers (TalkBack) -->
     <string name="a11y_on">Activado</string>

@@ -50,10 +50,11 @@ class AudioInUseTest {
     /** A "Voices play as" choice (the box below may say the same word: the choice comes first). */
     private fun choice(text: String) = rule.onAllNodesWithText(text)[0]
 
-    /** Taps a choice, then Save & Apply: what was saved. */
+    /** Taps a choice: what's kept a moment after (there's no Save button: changes are kept as they're made). */
     private fun choose(text: String): VoiceSettings {
+        val before = saved.size
         choice(text).performClick()
-        rule.onNodeWithText("Save & Apply").performClick()
+        repeat(20) { if (saved.size == before) { rule.waitForIdle(); rule.mainClock.advanceTimeBy(500) } }
         return saved.last()
     }
 
@@ -130,10 +131,17 @@ class AudioInUseTest {
     }
 
     @Test
-    fun anUnsavedChangeIsSaidToWait() {
+    fun aChangeIsKeptAMomentAfterItsMade() {
         show(AudioInUse(call = true, speaker, null))
+        rule.mainClock.autoAdvance = false
         choice("Media").performClick()
-        seen("Changes show here after Save & Apply.")
+        rule.mainClock.advanceTimeByFrame()
+        // Not at once: tapping through the choices restarts the sound once, not each time
+        assertTrue(saved.isEmpty())
+        choice("At your ear").performClick()
+        repeat(20) { if (saved.isEmpty()) rule.mainClock.advanceTimeBy(500) }
+        assertEquals(1, saved.size)
+        assertTrue(saved.last().earpiece)
     }
 
     @Test
