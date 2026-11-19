@@ -733,6 +733,10 @@
     </plurals>
     <string name="channel_new_title">قناة جديدة</string>
     <string name="channel_new_subtitle">الخادم يحدد أنواع القنوات التي يمكنك إنشاؤها.</string>
+    <string name="channel_new_below">قناة جديدة أسفلها</string>
+    <string name="channel_place_below">أسفل %1$s</string>
+    <string name="channel_place_end">في نهاية %1$s</string>
+    <string name="channel_place_end_top">في نهاية المستوى الأعلى</string>
     <string name="channel_edit_subtitle">إعدادات القناة</string>
     <string name="channel_create">إنشاء</string>
     <string name="channel_name">الاسم</string>

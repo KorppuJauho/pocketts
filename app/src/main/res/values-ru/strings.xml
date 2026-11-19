@@ -671,6 +671,10 @@
     </plurals>
     <string name="channel_new_title">Новый канал</string>
     <string name="channel_new_subtitle">Сервер решает, какие типы каналов вы можете создавать.</string>
+    <string name="channel_new_below">Новый канал ниже</string>
+    <string name="channel_place_below">Под каналом %1$s</string>
+    <string name="channel_place_end">В конец канала %1$s</string>
+    <string name="channel_place_end_top">В конец верхнего уровня</string>
     <string name="channel_edit_subtitle">Настройки канала</string>
     <string name="channel_create">Создать</string>
     <string name="channel_name">Название</string>

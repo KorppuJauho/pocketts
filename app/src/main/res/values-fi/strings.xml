@@ -645,6 +645,10 @@
     </plurals>
     <string name="channel_new_title">Uusi kanava</string>
     <string name="channel_new_subtitle">Palvelin päättää, millaisia kanavia saat luoda.</string>
+    <string name="channel_new_below">Uusi kanava alle</string>
+    <string name="channel_place_below">Kanavan %1$s alle</string>
+    <string name="channel_place_end">Kanavan %1$s loppuun</string>
+    <string name="channel_place_end_top">Ylimmän tason loppuun</string>
     <string name="channel_edit_subtitle">Kanavan asetukset</string>
     <string name="channel_create">Luo</string>
     <string name="channel_name">Nimi</string>

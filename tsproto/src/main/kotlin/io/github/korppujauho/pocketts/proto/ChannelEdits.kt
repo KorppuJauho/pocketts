@@ -19,7 +19,7 @@ object ChannelEdits {
         val quality: Int = 6, // 0 - 10
         val maxClients: Int = -1, // -1 = unlimited
         val parent: Int = 0,
-        val after: Int = 0, // the channel it comes after (0 = first): a new one's place, or a moved one's in its new parent
+        val after: Int = 0, // the channel it comes after (0 = first): a new one's place, or a moved one's in its new parent; -1: a new one goes last (no place asked for)
     )
 
     /** A command to send: its name and parameters. */
@@ -42,7 +42,8 @@ object ChannelEdits {
         listOf(
             "channel_name" to s.name.trim(),
             "cpid" to s.parent.takeIf { it != 0 },
-            "channel_order" to s.after,
+            // Asking for a place needs its own permission: without it the server puts the channel last
+            "channel_order" to s.after.takeIf { it >= 0 },
             "channel_description" to s.description.trim().ifEmpty { null },
             "channel_codec" to s.codec,
             "channel_codec_quality" to s.quality,

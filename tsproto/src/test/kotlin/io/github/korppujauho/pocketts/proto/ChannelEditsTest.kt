@@ -96,6 +96,11 @@ class ChannelEditsTest {
             "channelcreate channel_name=T channel_order=0 channel_codec=4 channel_codec_quality=6 channel_flag_maxclients_unlimited=1",
             ChannelEdits.create(ChannelEdits.Settings("T", kind = ChannelEdits.Kind.TEMPORARY)).line(),
         )
+        // No place asked for (without the permission for it): no channel_order, the server puts it last
+        assertEquals(
+            "channelcreate channel_name=T channel_codec=4 channel_codec_quality=6 channel_flag_maxclients_unlimited=1",
+            ChannelEdits.create(ChannelEdits.Settings("T", kind = ChannelEdits.Kind.TEMPORARY, after = -1)).line(),
+        )
     }
 
     @Test

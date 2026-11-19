@@ -632,6 +632,10 @@
     </plurals>
     <string name="channel_new_title">新频道</string>
     <string name="channel_new_subtitle">服务器决定你可以创建哪些类型的频道。</string>
+    <string name="channel_new_below">在下方新建频道</string>
+    <string name="channel_place_below">在 %1$s 下方</string>
+    <string name="channel_place_end">在 %1$s 末尾</string>
+    <string name="channel_place_end_top">在顶层末尾</string>
     <string name="channel_edit_subtitle">频道设置</string>
     <string name="channel_create">创建</string>
     <string name="channel_name">名称</string>

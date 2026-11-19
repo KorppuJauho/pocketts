@@ -103,6 +103,15 @@ class ScreenshotTest {
         )
     }
 
+    /** From the channel menu's New channel below, as a guest: temporary, its place said instead of chosen. */
+    @Test
+    fun channelNewBelow() = popup("popup-channel-new-below") {
+        io.github.korppujauho.pocketts.ui.ChannelDialog(
+            null, io.github.korppujauho.pocketts.proto.ChannelEdits.Settings("Raid night", kind = io.github.korppujauho.pocketts.proto.ChannelEdits.Kind.TEMPORARY, parent = 0, after = 2),
+            Example.state().tree, "", onSave = {}, onDelete = null, onDismiss = {}, place = "Below Gaming",
+        )
+    }
+
     @Test
     fun channelEdit() = popup("popup-channel-edit") {
         val s = Example.state()
@@ -212,7 +221,7 @@ class ScreenshotTest {
             topic = "Tonight: co-op", maxClients = 10, hasPassword = true, codecQuality = 8,
             description = "[b]Games every evening.[/b]\nAsk Lee for the password. Rules: https://example.com/rules",
         )
-        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {})
+        io.github.korppujauho.pocketts.ui.ChannelInfoDialog(ch, people = 3, here = false, onJoin = {}, onEdit = {}, onArrange = {}, onDismiss = {}, onFiles = {}, onNewBelow = {})
     }
 
     @Test

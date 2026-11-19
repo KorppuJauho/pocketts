@@ -311,6 +311,7 @@ fun ChannelInfoDialog(
     onFiles: (() -> Unit)? = null,
     whispered: Boolean = false,
     onWhisper: (() -> Unit)? = null,
+    onNewBelow: (() -> Unit)? = null,
 ) {
     // The description comes a moment after asking; empty after that, there's none
     var waited by remember { mutableStateOf(false) }
@@ -385,6 +386,7 @@ fun ChannelInfoDialog(
                     stringResource(if (whispered) R.string.whisper_channel_off else R.string.whisper_channel), modifier = Modifier.fillMaxWidth(), onClick = onWhisper,
                 )
             }
+            if (onNewBelow != null) PillButton(stringResource(R.string.channel_new_below), modifier = Modifier.fillMaxWidth(), onClick = onNewBelow)
             if (onEdit != null || onArrange != null) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (onEdit != null) PillButton(stringResource(R.string.edit), modifier = Modifier.weight(1f), onClick = onEdit)

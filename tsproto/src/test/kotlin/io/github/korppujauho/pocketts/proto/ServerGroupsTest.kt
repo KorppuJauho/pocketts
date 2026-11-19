@@ -2,6 +2,8 @@ package io.github.korppujauho.pocketts.proto
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Server groups as a TeamSpeak 6 server tells them (these lines are from one, shortened): only groups for people are
@@ -108,5 +110,22 @@ class ServerGroupsTest {
         m.apply(Commands.parse("notifyservergroupclientdeleted invokerid=2 sgid=7 clid=3 name=Lee"))
         m.apply(Commands.parse("notifyclientupdated clid=3 client_servergroups=8"))
         assertEquals(listOf(8), m.clients.getValue(3).serverGroups)
+    }
+
+    /** Which channels we may create, from the permissions a TeamSpeak 6 server lists (only those we have). */
+    @Test
+    fun whatChannelsWeMayCreate() {
+        val m = ServerModel()
+        assertEquals(ServerModel.ChannelCreatePowers(), m.channelCreatePowers)
+        assertTrue(m.channelCreatePowers.any) // not said yet: offered, the server decides
+        // A guest on the test server: temporary channels only, last in their place
+        m.apply(Commands.parse("notifyclientneededpermissions permid=94 permvalue=1|permid=95 permvalue=1|permid=97 permvalue=1"))
+        assertEquals(ServerModel.ChannelCreatePowers(known = true, temporary = true), m.channelCreatePowers)
+        // Nothing to create
+        m.apply(Commands.parse("notifyclientneededpermissions permid=248 permvalue=25"))
+        assertFalse(m.channelCreatePowers.any)
+        // An admin: everything
+        m.apply(Commands.parse("notifyclientneededpermissions permid=91 permvalue=1|permid=92 permvalue=1|permid=93 permvalue=1|permid=94 permvalue=1|permid=105 permvalue=1"))
+        assertEquals(ServerModel.ChannelCreatePowers(true, true, true, true, true, true), m.channelCreatePowers)
     }
 }

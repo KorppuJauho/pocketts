@@ -8,6 +8,13 @@ class ServerModel {
         const val GROUP_MEMBER_ADD_POWER = 170
         const val GROUP_MEMBER_REMOVE_POWER = 172
 
+        // Creating channels, numbered the same way (a TeamSpeak 6 server lists only the ones we have)
+        const val CHANNEL_CREATE_CHILD = 91
+        const val CHANNEL_CREATE_PERMANENT = 92
+        const val CHANNEL_CREATE_SEMI_PERMANENT = 93
+        const val CHANNEL_CREATE_TEMPORARY = 94
+        const val CHANNEL_CREATE_WITH_SORT_ORDER = 105
+
         val BANNER = Regex("""^(https|ts3image)://\S{1,500}$""", RegexOption.IGNORE_CASE)
         val MYTS_AVATAR = Regex("""^(?:\d+,)?(https://storage\.googleapis\.com/ts-sys-myts-avatars/[A-Za-z0-9-]{1,64}/[0-9]{1,20})$""")
         val SPACER = Regex("""^\[([^\]]*)spacer[^\]]*](.*)$""")
@@ -110,6 +117,22 @@ class ServerModel {
 
         /** Someone's channel group changed from [from] to [to]: the one is taken, the other given. */
         fun canSwitch(from: Group?, to: Group) = canAdd(to) && (from == null || canRemove(from))
+    }
+
+    /**
+     * What kinds of channel we may create, and how ([known] false: the server hasn't said yet, so creating is offered
+     * and the server's answer decides). [child]: inside another channel; [sortOrder]: at a chosen place among its
+     * neighbours, else it goes last.
+     */
+    data class ChannelCreatePowers(
+        val known: Boolean = false,
+        val permanent: Boolean = false,
+        val semiPermanent: Boolean = false,
+        val temporary: Boolean = false,
+        val child: Boolean = false,
+        val sortOrder: Boolean = false,
+    ) {
+        val any: Boolean get() = !known || permanent || semiPermanent || temporary
     }
 
     /** A channel with its sub-channels and the people in it, in the server's order. */
@@ -293,6 +316,15 @@ class ServerModel {
     fun channelGroupChoices(): List<Group> = forPeople(channelGroups)
 
     val groupPowers: GroupPowers get() = GroupPowers(ownPermissions[GROUP_MEMBER_ADD_POWER] ?: 0, ownPermissions[GROUP_MEMBER_REMOVE_POWER] ?: 0)
+
+    val channelCreatePowers: ChannelCreatePowers get() {
+        fun has(id: Int) = (ownPermissions[id] ?: 0) > 0
+        return ChannelCreatePowers(
+            known = ownPermissions.isNotEmpty(),
+            permanent = has(CHANNEL_CREATE_PERMANENT), semiPermanent = has(CHANNEL_CREATE_SEMI_PERMANENT),
+            temporary = has(CHANNEL_CREATE_TEMPORARY), child = has(CHANNEL_CREATE_CHILD), sortOrder = has(CHANNEL_CREATE_WITH_SORT_ORDER),
+        )
+    }
 
     private fun forPeople(groups: Map<Int, Group>) =
         groups.values.filter { it.type == 1 }.sortedWith(compareBy<Group> { it.sortId }.thenBy { it.id })

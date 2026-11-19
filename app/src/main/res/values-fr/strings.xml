@@ -658,6 +658,10 @@
     </plurals>
     <string name="channel_new_title">Nouveau canal</string>
     <string name="channel_new_subtitle">Le serveur décide quels types de canal vous pouvez créer.</string>
+    <string name="channel_new_below">Nouveau canal en dessous</string>
+    <string name="channel_place_below">Sous %1$s</string>
+    <string name="channel_place_end">À la fin de %1$s</string>
+    <string name="channel_place_end_top">À la fin du niveau supérieur</string>
     <string name="channel_edit_subtitle">Paramètres du canal</string>
     <string name="channel_create">Créer</string>
     <string name="channel_name">Nom</string>

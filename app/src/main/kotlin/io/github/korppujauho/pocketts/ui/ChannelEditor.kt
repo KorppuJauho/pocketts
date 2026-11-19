@@ -239,6 +239,9 @@ fun ChannelEditList(
 /**
  * A new channel's settings, or a channel's own ([channel]). [description] is the channel's description as it comes
  * from the server (asked for when this opens), shown unless something was already typed.
+ *
+ * A new channel is permanent or not, one switch as in TeamSpeak 6 (not permanent: temporary), shown when [create] lets
+ * us make both kinds. [place]: where a new one goes, said in the subtitle instead of the place row (New channel below).
  */
 @Composable
 fun ChannelDialog(
@@ -249,6 +252,8 @@ fun ChannelDialog(
     onSave: (ChannelEdits.Settings) -> Unit,
     onDelete: (() -> Unit)?,
     onDismiss: () -> Unit,
+    place: String? = null,
+    create: ServerModel.ChannelCreatePowers = ServerModel.ChannelCreatePowers(),
 ) {
     var s by remember { mutableStateOf(start) }
     var typedDescription by remember { mutableStateOf(false) }
@@ -264,7 +269,7 @@ fun ChannelDialog(
         onDismiss = onDismiss,
         title = channel?.displayName?.ifBlank { channel.name } ?: stringResource(R.string.channel_new_title),
         icon = Icons.Rounded.Tune,
-        subtitle = stringResource(if (channel == null) R.string.channel_new_subtitle else R.string.channel_edit_subtitle),
+        subtitle = place ?: stringResource(if (channel == null) R.string.channel_new_subtitle else R.string.channel_edit_subtitle),
         buttons = {
             if (onDelete != null) {
                 PillButton(stringResource(R.string.delete), PillKind.DANGER_TEXT, onClick = onDelete)
@@ -282,13 +287,22 @@ fun ChannelDialog(
             singleLine = false,
         )
 
-        Label(stringResource(R.string.channel_kind))
-        // One under another: three long names don't fit side by side on a phone
-        for ((kind, label) in listOf(
-            ChannelEdits.Kind.PERMANENT to R.string.channel_kind_permanent,
-            ChannelEdits.Kind.SEMI_PERMANENT to R.string.channel_kind_semi,
-            ChannelEdits.Kind.TEMPORARY to R.string.channel_kind_temporary,
-        )) Radio(stringResource(label), s.kind == kind) { s = s.copy(kind = kind) }
+        if (channel == null) {
+            // Permanent or temporary; with only one of them allowed, there's nothing to choose
+            if ((!create.known || create.permanent) && (!create.known || create.temporary)) {
+                Check(stringResource(R.string.channel_kind_permanent), s.kind == ChannelEdits.Kind.PERMANENT) {
+                    s = s.copy(kind = if (it) ChannelEdits.Kind.PERMANENT else ChannelEdits.Kind.TEMPORARY)
+                }
+            }
+        } else {
+            Label(stringResource(R.string.channel_kind))
+            // One under another: three long names don't fit side by side on a phone
+            for ((kind, label) in listOf(
+                ChannelEdits.Kind.PERMANENT to R.string.channel_kind_permanent,
+                ChannelEdits.Kind.SEMI_PERMANENT to R.string.channel_kind_semi,
+                ChannelEdits.Kind.TEMPORARY to R.string.channel_kind_temporary,
+            )) Radio(stringResource(label), s.kind == kind) { s = s.copy(kind = kind) }
+        }
         Text(
             stringResource(
                 when (s.kind) {
@@ -320,7 +334,9 @@ fun ChannelDialog(
             TsField(maxText, { t -> maxText = t.filter { it.isDigit() }.take(5) }, stringResource(R.string.channel_max_users), keyboard = KeyboardType.Number)
         }
 
-        // Where it is in the tree: tap to choose another place (in a window of its own; not inside itself)
+        // Where it is in the tree: tap to choose another place (in a window of its own; not inside itself). Not when
+        // the place was chosen already (New channel below)
+        if (place != null) return@TsDialog
         val parentName = if (s.parent == 0) stringResource(R.string.channel_top_level)
         else flattenTree(tree).firstOrNull { it.node.channel.id == s.parent }?.node?.channel?.let { it.displayName.ifBlank { it.name } } ?: "?"
         Row(
