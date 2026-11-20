@@ -273,7 +273,7 @@
     <string name="sound_pack_import_title">Importuj pakiet dźwięków</string>
     <string name="sound_pack_import_desc">Wybierz folder pakietu albo jego plik .zip lub .ts3_soundpack.</string>
     <string name="sound_pack_folder">Wybierz folder</string>
-    <string name="sound_pack_zip">Wybierz plik (.zip lub .ts3_soundpack)</string>
+    <string name="sound_pack_zip">Wybierz plik</string>
     <string name="sound_pack_importing">Importowanie…</string>
     <string name="sound_pack_imported">Zaimportowano %1$s.</string>
     <string name="sound_pack_no_sounds">Nie znaleziono tam plików dźwiękowych.</string>

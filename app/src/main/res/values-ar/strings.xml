@@ -282,7 +282,7 @@
     <string name="sound_pack_import_title">استيراد حزمة أصوات</string>
     <string name="sound_pack_import_desc">اختر مجلد الحزمة، أو ملف .zip أو .ts3_soundpack الخاص بها.</string>
     <string name="sound_pack_folder">اختيار مجلد</string>
-    <string name="sound_pack_zip">اختيار ملف (.zip أو .ts3_soundpack)</string>
+    <string name="sound_pack_zip">اختيار ملف</string>
     <string name="sound_pack_importing">جارٍ الاستيراد…</string>
     <string name="sound_pack_imported">تم استيراد %1$s.</string>
     <string name="sound_pack_no_sounds">لم يُعثر على ملفات صوت هناك.</string>
