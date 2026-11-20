@@ -107,6 +107,7 @@ class MicSender(
         var sentWhisper = false // what [sending] is: a whisper or talking
         AppLog.log("Microphone on (echo ${s.callAudio}, noise ${s.noiseSuppression}, gain ${s.autoGainControl})")
         var frames = 0 // since recording started, for looking which microphone records now and then
+        val summary = MicSummary() // what it hears, every 30 s, for the log
         var lastMic = -1 // the microphone last logged (its id)
         try {
             rec.startRecording()
@@ -125,6 +126,8 @@ class MicSender(
                     if (n <= 0) throw IllegalStateException("read failed ($n)")
                     got += n
                 }
+                // As recorded, before anything changes it: exact zeros are Android silencing the app
+                summary.add(pcm, sending)?.let { AppLog.log(it) }
                 val cfg = settings()
                 // AI noise removal first, on the microphone's own sound (turned on and off as the setting changes)
                 if (cfg.aiNoiseRemoval != rnnoiseOn) {
