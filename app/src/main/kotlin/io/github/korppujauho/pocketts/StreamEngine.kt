@@ -225,9 +225,41 @@ class StreamEngine(
             })
         }!!
 
+    /** Each connection's routes, by its name in the log ("watch", "viewer 5"), for saying why one fails. */
+    private val traces = java.util.concurrent.ConcurrentHashMap<String, Observer>()
+
+    /** Which kinds of route the working connection took (local, public or relay, at each end), from its stats. */
+    private fun chosenRoute(name: String, pc: PeerConnection) = pc.getStats { r ->
+        val pair = r.statsMap.values.firstOrNull { it.type == "candidate-pair" && it.members["state"] == "succeeded" && it.members["nominated"] == true }
+            ?: return@getStats
+        fun kindOf(id: Any?) = (r.statsMap[id as? String]?.members?.get("candidateType") as? String)?.let { IceRoutes.kind(it) } ?: "unknown"
+        log("$name: through ${kindOf(pair.members["localCandidateId"])} to ${kindOf(pair.members["remoteCandidateId"])}")
+    }
+
     private open inner class Observer(val name: String) : PeerConnection.Observer {
+        val routes = IceRoutes()
+        @Volatile var pc: PeerConnection? = null
+        @Volatile private var since = 0L
+
+        init {
+            traces[name] = this
+        }
+
         override fun onSignalingChange(s: PeerConnection.SignalingState) {}
-        override fun onIceConnectionChange(s: PeerConnection.IceConnectionState) = log("$name: ice $s")
+        override fun onIceConnectionChange(s: PeerConnection.IceConnectionState) {
+            log("$name: ice $s")
+            // How long finding a route took, and which kinds there were: the reason a connection fails
+            val took = if (since > 0) " after %.1f s".format((System.currentTimeMillis() - since) / 1000.0) else ""
+            when (s) {
+                PeerConnection.IceConnectionState.CHECKING -> since = System.currentTimeMillis()
+                PeerConnection.IceConnectionState.CONNECTED -> {
+                    log("$name: connected$took (routes ${routes.summary()})")
+                    pc?.let { chosenRoute(name, it) }
+                }
+                PeerConnection.IceConnectionState.FAILED -> log("$name: no route worked$took (routes ${routes.summary()})")
+                else -> {}
+            }
+        }
         override fun onIceConnectionReceivingChange(b: Boolean) {}
         override fun onIceGatheringChange(s: PeerConnection.IceGatheringState) {}
         override fun onIceCandidate(c: IceCandidate) {}
@@ -331,6 +363,7 @@ class StreamEngine(
     private fun createViewerConnection(w: Watch): PeerConnection? {
         val pc = factory.createPeerConnection(config(), object : Observer("watch") {
             override fun onIceCandidate(c: IceCandidate) {
+                routes.ours(c.sdp)
                 val id = w.streamId ?: return
                 send(Streams.candidate(id, w.streamerId, c.sdp, c.sdpMid, c.sdpMLineIndex, rc("ice")))
             }
@@ -366,6 +399,7 @@ class StreamEngine(
                 }
             }
         }) ?: return null
+        traces["watch"]?.pc = pc
         w.pc = pc
         return pc
     }
@@ -780,6 +814,7 @@ class StreamEngine(
         lateinit var v: Viewer
         val pc = factory.createPeerConnection(config(), object : Observer("viewer $clid") {
             override fun onIceCandidate(c: IceCandidate) = exec.execute {
+                routes.ours(c.sdp)
                 // TeamSpeak refuses a viewer's addresses sent before our offer let them in: they wait until it's gone
                 if (viewers[clid] !== v) return@execute
                 if (v.offerSent) send(Streams.candidate(id, clid, c.sdp, c.sdpMid, c.sdpMLineIndex, rc("ice"))) else v.outgoing.add(c)
@@ -792,6 +827,7 @@ class StreamEngine(
                 }
             }
         }) ?: return
+        traces["viewer $clid"]?.pc = pc
         v = Viewer(clid, pc)
         viewers[clid] = v
         try {
@@ -862,6 +898,7 @@ class StreamEngine(
             when (s.cmd) {
                 "answer" -> {
                     val sdp = s.sdp ?: return
+                    traces["viewer ${s.from}"]?.routes?.theirsIn(sdp)
                     setRemote(v.pc, SessionDescription.Type.ANSWER, Streams.withShareSendLevel(Streams.restoreH264(sdp, v.original)))
                     v.answered = true
                     v.pending.forEach { v.pc.addIceCandidate(it) }
@@ -869,6 +906,7 @@ class StreamEngine(
                 }
                 "iceCandidate" -> {
                     val c = IceCandidate(s.mid ?: "0", s.mLine ?: 0, s.candidate ?: return)
+                    traces["viewer ${s.from}"]?.routes?.theirs(c.sdp)
                     if (v.answered) v.pc.addIceCandidate(c) else v.pending.add(c)
                 }
                 "reconnect" -> {
@@ -941,10 +979,11 @@ class StreamEngine(
                 val w = watch ?: return
                 val streamId = s.streamId.ifEmpty { w.streamId ?: return }
                 when (s.cmd) {
-                    "offer", "reconnectOffer" -> s.sdp?.let { onOffer(streamId, it) }
-                    "joinResponse" -> if (s.args["decision"] != false) (s.args["offer"] as? String)?.let { onOffer(streamId, it) }
+                    "offer", "reconnectOffer" -> s.sdp?.let { traces["watch"]?.routes?.theirsIn(it); onOffer(streamId, it) }
+                    "joinResponse" -> if (s.args["decision"] != false) (s.args["offer"] as? String)?.let { traces["watch"]?.routes?.theirsIn(it); onOffer(streamId, it) }
                     "iceCandidate" -> {
                         val c = IceCandidate(s.mid ?: "0", s.mLine ?: 0, s.candidate ?: return)
+                        traces["watch"]?.routes?.theirs(c.sdp)
                         val pc = w.pc
                         if (pc?.remoteDescription != null) pc.addIceCandidate(c) else w.pending.add(c)
                     }

@@ -221,6 +221,7 @@ object Session : TsClient.Listener {
     }
     private var player: VoicePlayer? = null
     private var sender: MicSender? = null
+    private var micWatch: MicWatch? = null
     @Volatile private var whisperTargets = WhisperList() // [UiState.whisperTo], for the microphone thread
     private var route: AudioRoute? = null
     @Volatile private var ownCodec = 4 // our channel's (Opus Voice 4 or Opus Music 5)
@@ -679,6 +680,9 @@ object Session : TsClient.Listener {
     }
 
     private fun startSender() {
+        micWatch?.stop()
+        // For the log: the audio mode, and Android silencing the microphone (another app took it)
+        micWatch = MicWatch(app) { sender?.sessionId ?: 0 }
         sender = MicSender(
             settings = { _state.value.voice },
             // Whispering doesn't need the channel's talk power (the server decides who may be whispered to)
@@ -700,6 +704,8 @@ object Session : TsClient.Listener {
     private fun stopAudio() {
         sender?.release()
         sender = null
+        micWatch?.stop()
+        micWatch = null
         player?.release()
         player = null
         route?.stop()
