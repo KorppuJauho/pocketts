@@ -27,6 +27,9 @@
   written right to left; the button bar keeps its order, so push-to-talk stays on the right. A native speaker's
   review is welcome.
 - **For developers:** a test build's crash trace reaches the test page also when the app crashes on its main thread.
+  The debug log notes what the microphone hears (its loudest moment, exact digital silence, Android silencing it for
+  another app) and, for each stream connection, the kinds of route each end found and which one worked, never the
+  addresses.
 
 ## 1.8.0 (2026-11-15)
 
