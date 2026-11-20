@@ -251,7 +251,7 @@
     <string name="sound_pack_import_title">导入声音包</string>
     <string name="sound_pack_import_desc">选择声音包的文件夹，或它的 .zip 或 .ts3_soundpack 文件。</string>
     <string name="sound_pack_folder">选择文件夹</string>
-    <string name="sound_pack_zip">选择文件（.zip 或 .ts3_soundpack）</string>
+    <string name="sound_pack_zip">选择文件</string>
     <string name="sound_pack_importing">正在导入…</string>
     <string name="sound_pack_imported">已导入 %1$s。</string>
     <string name="sound_pack_no_sounds">那里没有找到声音文件。</string>

@@ -254,7 +254,7 @@
     <string name="sound_pack_import_title">Soundpack importieren</string>
     <string name="sound_pack_import_desc">Wähle den Ordner des Packs oder seine .zip- oder .ts3_soundpack-Datei.</string>
     <string name="sound_pack_folder">Ordner wählen</string>
-    <string name="sound_pack_zip">Datei wählen (.zip oder .ts3_soundpack)</string>
+    <string name="sound_pack_zip">Datei wählen</string>
     <string name="sound_pack_importing">Wird importiert…</string>
     <string name="sound_pack_imported">%1$s importiert.</string>
     <string name="sound_pack_no_sounds">Dort wurden keine Sounddateien gefunden.</string>
