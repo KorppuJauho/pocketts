@@ -986,6 +986,7 @@ object Session : TsClient.Listener {
     // Quiet for the first seconds after connecting, while the server lists who is already there (as in WebTS)
     @Volatile private var soundsFrom = 0L
     @Volatile private var kicked = false
+    private val newChannelSounds = NewChannelSounds()
 
     private fun sound(cue: Cue) {
         if (System.currentTimeMillis() < soundsFrom) return
@@ -1006,7 +1007,8 @@ object Session : TsClient.Listener {
                 val to = g["ctid"]?.toIntOrNull() ?: continue
                 if (clid == me) {
                     // Switched yourself, moved by someone, or kicked from the channel
-                    out += when (reason) { 1 -> Cue.MOVED; 4 -> Cue.KICKED; else -> Cue.CHANNEL_SWITCHED }
+                    val cue = when (reason) { 1 -> Cue.MOVED; 4 -> Cue.KICKED; else -> Cue.CHANNEL_SWITCHED }
+                    if (newChannelSounds.plays(cue, to)) out += cue
                 } else {
                     val p = person(clid) ?: continue
                     if (to == here && here > 0) out += Cue.SOMEONE_JOINED
@@ -1060,11 +1062,20 @@ object Session : TsClient.Listener {
             }
             "notifyclientchannelgroupchanged" -> for (g in cmd.groups) {
                 if (g["clid"]?.toIntOrNull() != me || g["cid"]?.toIntOrNull() != here) continue
-                if (g["cgid"]?.toIntOrNull() != model.ownClient?.channelGroup) out += Cue.CHANNEL_GROUP_CHANGED
+                if (g["cgid"]?.toIntOrNull() != model.ownClient?.channelGroup && newChannelSounds.plays(Cue.CHANNEL_GROUP_CHANGED, here)) {
+                    out += Cue.CHANNEL_GROUP_CHANGED
+                }
             }
             // Channels changing. An edit counts when someone made it (the server also answers a description asked
             // for with an edit, without anyone behind it)
-            "notifychannelcreated" -> out += Cue.CHANNEL_CREATED
+            "notifychannelcreated" -> {
+                out += Cue.CHANNEL_CREATED
+                // Yours: the move into it and your channel group there follow, and one sound is enough
+                val cid = cmd["cid"]?.toIntOrNull()
+                if (cid != null && me > 0 && cmd["invokerid"]?.toIntOrNull() == me) {
+                    newChannelSounds.created(cid, UiSounds.audible(Cue.CHANNEL_CREATED, _state.value.voice))
+                }
+            }
             "notifychanneldeleted" -> out += Cue.CHANNEL_DELETED
             "notifychannelmoved" -> out += Cue.CHANNEL_MOVED
             "notifychanneledited" -> if (cmd["invokerid"] != null) {
