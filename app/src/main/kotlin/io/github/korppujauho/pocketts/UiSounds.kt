@@ -58,6 +58,13 @@ object UiSounds {
     fun hasSound(cue: Cue, v: VoiceSettings, packCues: Set<Cue>?): Boolean =
         if (v.soundPack && packCues != null) cue in packCues else cue !in PACK_ONLY
 
+    /** Whether [play] would make [cue] heard with [v]: on, not switched off, and with a sound (the pack's, or a tone). */
+    fun audible(cue: Cue, v: VoiceSettings): Boolean {
+        if (!v.uiSounds || cue.name in v.mutedSounds || v.uiSoundVolume <= 0f) return false
+        val pack = SoundPack.pack
+        return if (v.soundPack && pack != null) cue in pack.files else cue !in PACK_ONLY
+    }
+
     private fun sound(cue: Cue, v: VoiceSettings) {
         if (v.uiSoundVolume <= 0f) return
         player.execute {
