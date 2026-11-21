@@ -20,6 +20,9 @@ People who have helped make PocketTS. Thank you!
 - **[imaliaz](https://github.com/imaliaz)**: the ideas for the favourites: folders that fold shut, arranging by
   dragging, removing only from the edit window, and a connect panel that can be put away
   ([#128](https://github.com/KorppuJauho/pocketts/issues/128)).
+- **[Alirelone](https://github.com/Alirelone)**: found why 1.9.0 crashed on Android 10 and 11 when the microphone
+  started, down to the missing Android version check
+  ([#168](https://github.com/KorppuJauho/pocketts/issues/168)).
 
 ## Translations
 
