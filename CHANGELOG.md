@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.1 (2026-11-21)
+
+- **No crash on Android 10 and 11:** 1.9.0 closed itself on Android 10 and 11 as soon as the microphone started, so
+  on every connect. Found by Alirelone.
+
 ## 1.9.0 (2026-11-19)
 
 - **Several identities:** Settings › General has Identities, a box that folds like the favourite folders. Each
