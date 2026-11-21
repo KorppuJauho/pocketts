@@ -3,6 +3,7 @@ package io.github.korppujauho.pocketts
 import android.content.Context
 import android.media.AudioManager
 import android.media.AudioRecordingConfiguration
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 
@@ -26,7 +27,8 @@ class MicWatch(context: Context, private val ourSession: () -> Int) {
             AudioManager.MODE_RINGTONE -> "ringing"
             else -> "normal"
         }
-        val device = am.communicationDevice?.let { ", call audio to type ${it.type}" }.orEmpty()
+        // Android tells where call audio goes only from Android 12 on; asking earlier crashes the app
+        val device = if (Build.VERSION.SDK_INT >= 31) am.communicationDevice?.let { ", call audio to type ${it.type}" }.orEmpty() else ""
         AppLog.log("Audio mode: $mode$device")
         am.registerAudioRecordingCallback(callback, Handler(Looper.getMainLooper()))
     }
