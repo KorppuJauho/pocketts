@@ -110,6 +110,11 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    lint {
+        // A call that needs a newer Android than the app's minimum, without a version check, crashes on older phones
+        // (1.9.0 on Android 10 and 11, #168). Fatal stops every release build on one, also the release workflow.
+        fatal += "NewApi"
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
