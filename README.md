@@ -6,33 +6,19 @@ to join.
 **[Get it on Google Play](https://play.google.com/store/apps/details?id=io.github.korppujauho.pocketts)**, or download
 the APK from [GitHub Releases](https://github.com/KorppuJauho/pocketts/releases). Android 10 or newer.
 
-<img src="docs/screenshots/overview.png" alt="PocketTS screens: the channels and the people in them, the channel chat, a person's menu (volume, poke and private chat), and the settings">
+<img src="docs/screenshots/overview.png" alt="PocketTS screens: the channels and the people in them, the channel chat, watching a stream above the channels, and the settings">
 
 ## What it does
 
-- **Voice:** voice activation, push-to-talk (also a floating button over other apps), whispering to chosen people or
-  channels, echo and noise removal, and AI noise removal (RNNoise) for keyboard clicks, fans and the like. Voices
-  play as media or as a phone call (with echo cancellation), on the loudspeaker or at your ear, or through connected
-  headphones, and Settings shows which speaker and microphone are in use. Keeps working with the screen off, and goes
-  quiet during phone calls.
-- **Channels:** who is where, with avatars, icons, badges and banners. Password-protected channels ask for the
-  password. Hold a channel for its info.
-- **Chat:** channel and private chats, pictures, pokes, and a history kept on the phone for 90 days.
-- **Files:** a channel's files: download, upload, rename and delete them, and make folders (as the server allows).
-- **Streams:** watch others' screen and camera streams (at the size you choose, small over the app, in a small window
-  over other apps, or on the full screen with push-to-talk and the stream's volume), and share your own camera (with
-  your microphone) or screen (with what the phone plays). The camera has a flashlight, zoom, tap to focus and a
-  button for the phone's other back lenses.
-- **Admin tools** (optional): move, kick and ban people, and add, edit, move and delete channels. The server decides
-  who may.
-- **Connecting** by address, server nickname, TeamSpeak link or invite; favourites, in folders you name and arrange
-  by dragging, each with a channel to join if you like; TeamSpeak's own public community servers, one tap away;
-  privilege keys from a server's admin; reconnecting by itself when the network changes; and mute, sound and
-  disconnect buttons in the notification.
-- **Settings** and sounds for events.
-- **Languages:** English, Finnish, German, Spanish, French, Italian, Portuguese (Brazil), Polish, Turkish, Simplified
-  Chinese, Russian, Ukrainian, Czech, Arabic and Persian (see
-  [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
+- **Voice:** voice activation or push-to-talk, whispering, and echo and noise removal. Keeps working with the screen
+  off.
+- **Streams:** watch others' screen and camera streams, small over the channels or on the full screen, and share
+  your own camera or screen.
+- **Chat:** channel and private chats, with pictures and pokes.
+- **Channels and files:** who is where, and each channel's files.
+- **Connecting** by address, server nickname, TeamSpeak link or invite, with favourites in folders.
+- **Admin tools** (optional): move, kick and ban people, and edit channels.
+- **Fifteen languages** (see [TRANSLATIONS.md](TRANSLATIONS.md); corrections welcome).
 
 Your TeamSpeak identity and saved passwords are encrypted on the phone. No account, no ads, no tracking (see the
 [privacy policy](PRIVACY.md)). The GitHub version asks GitHub once a day whether there's a newer version (you can turn

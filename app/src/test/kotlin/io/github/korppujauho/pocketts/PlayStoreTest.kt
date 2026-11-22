@@ -69,6 +69,14 @@ class PlayStoreTest {
     @Test
     fun chat() = shot("2-chat") { ServerScreen(Example.chatState(), Example.noActions, voices = Example.voices(), startView = View.CHAT) }
 
+    /** Watching Riley's stream (a made-up still picture stands in for the video; see StreamPicturesTest). */
+    @Test
+    fun streams() = shot("6-streams") {
+        androidx.compose.runtime.CompositionLocalProvider(io.github.korppujauho.pocketts.ui.LocalVideoStill provides StreamExample.game()) {
+            ServerScreen(StreamExample.watching(), Example.noActions, voices = Example.voices(setOf(4)))
+        }
+    }
+
     // The person menu opens in a window of its own over the channels: the whole screen is captured
     @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
     @Test
