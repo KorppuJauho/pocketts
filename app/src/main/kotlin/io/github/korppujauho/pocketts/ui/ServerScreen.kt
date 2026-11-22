@@ -340,7 +340,9 @@ fun ServerScreen(
                     }
                 }
                 if (!typing && !bottom) controls()
-                if (egl != null) {
+                // Without the video's graphics (egl), only the screenshot tests' still picture can be shown
+                val video = egl != null || io.github.korppujauho.pocketts.ui.LocalVideoStill.current != null
+                if (video) {
                     ShareBar(
                         state.stream, egl, actions::flipCamera, actions::stopShare, actions::setRotateLock, screenTurn = screenTurn,
                         light = if (frontCamera) ringLight else null, onLight = { ringLight = it },
@@ -348,7 +350,7 @@ fun ServerScreen(
                         onZoom = actions::setZoom, onFocus = actions::focusAt, onLens = actions::nextLens,
                     )
                 }
-                if (state.stream.watching != 0 && egl != null && !pip) {
+                if (state.stream.watching != 0 && video && !pip) {
                     val who = state.client(state.stream.watching)?.nickname
                     WatchCard(
                         state.stream, who?.let { stringResource(R.string.stream_title, it) } ?: stringResource(R.string.stream_title_unknown), egl, actions::stopWatching, actions::setWatchMuted, actions::setWatchVolume,

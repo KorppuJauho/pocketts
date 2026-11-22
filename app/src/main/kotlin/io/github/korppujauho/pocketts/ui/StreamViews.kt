@@ -138,13 +138,31 @@ private class TextureVideoView(
     fun release() = renderer.release()
 }
 
+/**
+ * For the screenshot tests only: a still picture drawn where a stream's video goes, since the video itself needs the
+ * phone's graphics. The app never sets it.
+ */
+val LocalVideoStill = androidx.compose.runtime.staticCompositionLocalOf<androidx.compose.ui.graphics.ImageBitmap?> { null }
+
+/** The test picture in place of a video, reporting its size as the video would. */
+@Composable
+private fun VideoStill(still: androidx.compose.ui.graphics.ImageBitmap, modifier: Modifier, fill: Boolean, onSize: ((Int, Int) -> Unit)?) {
+    androidx.compose.runtime.LaunchedEffect(still) { onSize?.invoke(still.width, still.height) }
+    androidx.compose.foundation.Image(
+        still, null, modifier,
+        contentScale = if (fill) androidx.compose.ui.layout.ContentScale.Crop else androidx.compose.ui.layout.ContentScale.Fit,
+    )
+}
+
 /** Our own share's picture: the whole of it, in its own shape, turned by [turn] more for what's shown here only. */
 @Composable
 private fun PreviewVideo(
-    track: VideoTrack, egl: EglBase, modifier: Modifier, turn: Int,
+    track: VideoTrack, egl: EglBase?, modifier: Modifier, turn: Int,
     shownTurn: java.util.concurrent.atomic.AtomicInteger? = null, // set to the whole turn each picture is drawn with
     onSize: (Int, Int) -> Unit,
 ) {
+    LocalVideoStill.current?.let { return VideoStill(it, modifier, fill = false, onSize) }
+    egl ?: return // only with a test picture, drawn above
     var view by remember { mutableStateOf<TextureVideoView?>(null) }
     var shape by remember { mutableStateOf<Float?>(null) }
     val turnNow = androidx.compose.runtime.rememberUpdatedState(turn)
@@ -183,10 +201,12 @@ private fun PreviewVideo(
 /** A video track on screen. */
 @Composable
 fun VideoView(
-    track: VideoTrack, egl: EglBase, modifier: Modifier = Modifier, mirror: Boolean = false, fill: Boolean = false,
+    track: VideoTrack, egl: EglBase?, modifier: Modifier = Modifier, mirror: Boolean = false, fill: Boolean = false,
     onSize: ((width: Int, height: Int) -> Unit)? = null,
     turn: Int = 0, // more turn (clockwise) for what's shown here only
 ) {
+    LocalVideoStill.current?.let { return VideoStill(it, modifier, fill, onSize) }
+    egl ?: return // only with a test picture, drawn above
     var renderer by remember { mutableStateOf<SurfaceViewRenderer?>(null) }
     val turnNow = androidx.compose.runtime.rememberUpdatedState(turn)
     val report = androidx.compose.runtime.rememberUpdatedState(onSize)
@@ -252,7 +272,7 @@ private const val PULL_TO_SWITCH = 56f // dp dragged on past the top that makes 
  */
 @Composable
 fun WatchCard(
-    state: StreamEngine.State, title: String, egl: EglBase, onClose: () -> Unit,
+    state: StreamEngine.State, title: String, egl: EglBase?, onClose: () -> Unit,
     onMute: (Boolean) -> Unit = {}, onVolume: (Float) -> Unit = {}, onSmallWindow: (() -> Unit)? = null,
     talk: (@Composable (Modifier) -> Unit)? = null,
 ) {
@@ -356,7 +376,7 @@ fun WatchCard(
  * in the top corner, moved by dragging it. A tap brings the box back; the ✕ stops watching.
  */
 @Composable
-private fun MiniPlayer(state: StreamEngine.State, video: VideoTrack?, egl: EglBase, aspect: Float, onOpen: () -> Unit, onClose: () -> Unit) {
+private fun MiniPlayer(state: StreamEngine.State, video: VideoTrack?, egl: EglBase?, aspect: Float, onOpen: () -> Unit, onClose: () -> Unit) {
     val density = androidx.compose.ui.platform.LocalDensity.current.density
     val config = LocalConfiguration.current
     val width = config.screenWidthDp * if (aspect >= 1f) 0.5f else 0.32f
@@ -445,7 +465,7 @@ private fun ThinSlider(value: Float, onChange: (Float) -> Unit, modifier: Modifi
  */
 @Composable
 private fun FullScreenPlayer(
-    state: StreamEngine.State, video: VideoTrack, title: String, egl: EglBase, aspect: Float,
+    state: StreamEngine.State, video: VideoTrack, title: String, egl: EglBase?, aspect: Float,
     onMute: (Boolean) -> Unit, onVolume: (Float) -> Unit, talk: (@Composable (Modifier) -> Unit)?, onExit: () -> Unit,
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
@@ -609,7 +629,7 @@ internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> U
  */
 @Composable
 fun ShareBar(
-    state: StreamEngine.State, egl: EglBase, onFlip: () -> Unit, onStop: () -> Unit, onRotateLock: (Boolean) -> Unit = {},
+    state: StreamEngine.State, egl: EglBase?, onFlip: () -> Unit, onStop: () -> Unit, onRotateLock: (Boolean) -> Unit = {},
     screenTurn: Int = 0,
     light: Boolean? = null, // the ring light, when it can be had (the front camera): on or off
     onLight: (Boolean) -> Unit = {},

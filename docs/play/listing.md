@@ -46,7 +46,7 @@ All in `docs/screenshots/play/`, made by `scripts/dev.sh screenshots`:
 |---|---|
 | App icon (512 × 512) | `icon.png` |
 | Feature graphic (1024 × 500) | `feature-graphic.png` |
-| Phone screenshots (1080 × 1920) | `1-channels.png`, `2-chat.png`, `3-person.png`, `4-settings.png`, `5-connect.png` |
+| Phone screenshots (1215 × 2160) | `1-channels.png`, `2-chat.png`, `3-person.png`, `4-settings.png`, `5-connect.png`, `6-streams.png` |
 
 ## Category and contact
 
