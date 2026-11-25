@@ -69,10 +69,17 @@ object ServerAddress {
     fun isNickname(typed: Typed): Boolean =
         typed.port == null && '.' !in typed.host && !isIpLiteral(typed.host) && !typed.host.equals("localhost", ignoreCase = true)
 
-    /** "host", "host:port", "[ipv6]:port", an IPv6 address, or a ts3server:// link (its port also as `?port=`). */
+    // People copy a server's address from a browser, a website or a chat as a web link. TeamSpeak connects the same
+    // way whatever the link starts with, so the start and any path after the address are left out.
+    private val SCHEME = Regex("""^(?:ts3server|ts|https?)://""", RegexOption.IGNORE_CASE)
+
+    /**
+     * "host", "host:port", "[ipv6]:port", an IPv6 address, a ts3server:// link (its port also as `?port=`), or the
+     * same written as a web address (`https://ts.example.com/`).
+     */
     fun parse(input: String): Typed? {
-        val link = input.trim().removePrefix("ts3server://").removePrefix("ts://")
-        val t = link.substringBefore('?').trimEnd('/')
+        val link = input.trim().replaceFirst(SCHEME, "")
+        val t = link.substringBefore('?').substringBefore('#').substringBefore('/')
         if (t.isEmpty() || t.any { it.isWhitespace() }) return null
         // A link's port can come after the address: ts3server://ts.example.com?port=9988&nickname=...
         // (a port in the address itself wins)

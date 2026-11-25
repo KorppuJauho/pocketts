@@ -28,6 +28,18 @@ class ServerAddressTest {
     }
 
     @Test
+    fun webAddress() {
+        // A server's address copied as a web link connects like the address alone
+        assertEquals(Typed("ts.example.com", null), ServerAddress.parse("https://ts.example.com"))
+        assertEquals(Typed("ts.example.com", null), ServerAddress.parse("http://ts.example.com/"))
+        assertEquals(Typed("ts.example.com", null), ServerAddress.parse("HTTPS://ts.example.com/teamspeak#join"))
+        assertEquals(Typed("ts.example.com", 9988), ServerAddress.parse("https://ts.example.com:9988/"))
+        assertEquals(Typed("2001:db8::1", 9000), ServerAddress.parse("https://[2001:db8::1]:9000"))
+        assertEquals(Typed("ts.example.com", 9988), ServerAddress.parse("TS3SERVER://ts.example.com?port=9988"))
+        assertNull(ServerAddress.parse("https://"))
+    }
+
+    @Test
     fun portOrIpSkipsLookups() {
         val noDns = ServerAddress.SrvLookup { error("no lookups expected") }
         assertEquals(9000, ServerAddress.resolve(Typed("ts.example.com", 9000), noDns).port)
