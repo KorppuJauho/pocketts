@@ -162,7 +162,7 @@ fun ConnectScreen(
                     },
                     onFold = { fold(!hidden) },
                 )
-                if (!hidden) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+                if (!hidden) Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.separator))
                 if (!hidden) androidx.compose.foundation.pager.HorizontalPager(pages, Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) { page ->
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // The same identity and nickname on both pages
@@ -267,7 +267,7 @@ private fun FolderPanel(
             )
         }
         if (open) {
-            Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.separator))
             Column(rows.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
         }
     }
@@ -310,12 +310,12 @@ private fun PageSwitch(page: Int, open: Boolean, onPage: (Int) -> Unit, onFold: 
         for ((i, label) in listOf(stringResource(R.string.connect), stringResource(R.string.community_tab)).withIndex()) {
             val active = open && i == page // folded shut, neither page is the one shown
             Box(
-                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Ts.selected else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onPage(i) }
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(label, color = if (active) Ts.bright else Ts.tab, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             }
         }
         Box(
@@ -341,7 +341,7 @@ private fun CommunityServers(nick: String, onJoin: (String) -> Unit) {
         for (s in io.github.korppujauho.pocketts.CommunityServers.list) {
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Ts.card)
-                    .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                    .border(1.dp, Ts.boxBorder, RoundedCornerShape(8.dp))
                     .clickable(enabled = nick.isNotBlank()) { onJoin(s.address) }.padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -516,7 +516,7 @@ private fun FavoriteRow(
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Column(
             Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(Ts.card)
-                .border(1.dp, if (lifted) Ts.accent else Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                .border(1.dp, if (lifted) Ts.accent else Ts.boxBorder, RoundedCornerShape(8.dp))
                 .semantics {
                     role = androidx.compose.ui.semantics.Role.Button
                     onClick(connect) { tap(); true }

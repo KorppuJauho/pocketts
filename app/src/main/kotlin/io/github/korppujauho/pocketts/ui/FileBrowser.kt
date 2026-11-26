@@ -288,7 +288,7 @@ fun FileBrowser(
                             ) {
                                 if (!e.folder && download == null) MenuItem(stringResource(R.string.files_download)) { menuFor = null; saveIt() }
                                 MenuItem(stringResource(R.string.files_rename)) { menuFor = null; ask = FileAsk.Rename(e) }
-                                MenuItem(stringResource(R.string.delete), Color(0xFFF87171)) { menuFor = null; ask = FileAsk.Delete(e) }
+                                MenuItem(stringResource(R.string.delete), Ts.redText) { menuFor = null; ask = FileAsk.Delete(e) }
                             }
                         }
                     }
@@ -342,7 +342,7 @@ fun FileBrowser(
             }
         }
         is FileAsk.Delete -> TsDialog(
-            onDismiss = { ask = null }, title = stringResource(R.string.files_delete_title, a.entry.name), icon = Icons.Rounded.Delete, tint = Color(0xFFF87171),
+            onDismiss = { ask = null }, title = stringResource(R.string.files_delete_title, a.entry.name), icon = Icons.Rounded.Delete, tint = Ts.redText,
             buttons = {
                 PillButton(stringResource(R.string.cancel), onClick = { ask = null })
                 PillButton(stringResource(R.string.delete), PillKind.DANGER) {

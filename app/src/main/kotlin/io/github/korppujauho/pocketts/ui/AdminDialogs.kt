@@ -247,7 +247,7 @@ private fun SectionLabel(text: String) =
 /** The rows of one kind of group, together in a box as the popups' other boxes. */
 @Composable
 private fun GroupCard(content: @Composable ColumnScope.() -> Unit) = Column(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Ts.groupBorder, RoundedCornerShape(16.dp)),
     content = content,
 )
 
@@ -260,7 +260,7 @@ private fun GroupRow(
     g: ServerModel.Group, server: String, on: Boolean, enabled: Boolean, first: Boolean, toggle: Modifier,
     control: @Composable (Boolean) -> Unit,
 ) {
-    if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
     Row(
         Modifier.fillMaxWidth().background(if (on) Ts.accent.copy(alpha = 0.10f) else Color.Transparent).then(toggle)
             .padding(start = 14.dp, end = 6.dp).heightIn(min = 52.dp)
@@ -268,7 +268,7 @@ private fun GroupRow(
             .alpha(if (enabled) 1f else 0.45f),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Color(0x0DFFFFFF)), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Pop.field), contentAlignment = Alignment.Center) {
             if (g.iconId > 0) TsIcon(g.iconId, server, 18.dp)
             else Icon(Icons.Outlined.Shield, contentDescription = null, tint = Ts.faint, modifier = Modifier.size(16.dp))
         }

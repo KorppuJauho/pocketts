@@ -267,13 +267,13 @@ fun ServerScreen(
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 12.dp, vertical = 8.dp),
                                 )
-                                Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+                                Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.separator))
                                 Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                     for (f in inFolder) {
                                         val here = io.github.korppujauho.pocketts.Favorites.same(f.address, state.address)
                                         Row(
                                             Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Ts.card)
-                                                .border(1.dp, if (here) Ts.green.copy(alpha = 0.6f) else Color(0x1FFFFFFF), RoundedCornerShape(8.dp))
+                                                .border(1.dp, if (here) Ts.green.copy(alpha = 0.6f) else Ts.boxBorder, RoundedCornerShape(8.dp))
                                                 .clickable(enabled = !here, role = androidx.compose.ui.semantics.Role.Button) {
                                                     serversMenu = false
                                                     actions.switchTo(f)
@@ -673,14 +673,14 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
             val active = v == view
             val unreadLabel = if (v == View.CHAT && unread && !active) stringResource(R.string.a11y_unread) else null
             Row(
-                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Ts.selected else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { onView(v) }
                     .then(if (unreadLabel != null) Modifier.semantics { stateDescription = unreadLabel } else Modifier)
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(label, color = if (active) Ts.bright else Ts.tab, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 if (v == View.CHAT && unread && !active) {
                     Box(Modifier.padding(start = 6.dp).size(8.dp).clip(CircleShape).background(Ts.red))
                 }
@@ -691,7 +691,7 @@ private fun ViewSwitch(view: View, unread: Boolean, onView: (View) -> Unit) {
 
 @Composable
 fun ErrorLine(text: String) {
-    Text(text, color = Color(0xFFF87171), fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+    Text(text, color = Ts.redText, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 }
 
 /** The channel settings window: a channel's own ([id]), or a new one (null), starting as [start]. */

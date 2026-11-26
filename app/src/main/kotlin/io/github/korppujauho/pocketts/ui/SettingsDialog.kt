@@ -210,11 +210,12 @@ fun SettingsContent(
             ) {
                 listOf(R.string.settings_general, R.string.settings_playback, R.string.settings_capture, R.string.settings_ui, R.string.advanced).map { stringResource(it) }.forEachIndexed { i, name ->
                     val active = i == tab
+                    val accent = Ts.accent
                     Text(
-                        name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                        name, color = if (active) Ts.bright else Ts.tab, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
                         maxLines = 1, softWrap = false,
                         modifier = Modifier.selectable(selected = active, role = androidx.compose.ui.semantics.Role.Tab) { tab = i }
-                            .drawBehind { if (active) drawLine(Ts.accent, Offset(0f, size.height), Offset(size.width, size.height), 2.dp.toPx()) }
+                            .drawBehind { if (active) drawLine(accent, Offset(0f, size.height), Offset(size.width, size.height), 2.dp.toPx()) }
                             .padding(horizontal = 8.dp, vertical = 12.dp),
                     )
                 }
@@ -504,7 +505,7 @@ private fun Language(tag: String, applied: String, onChange: (String) -> Unit, o
         Box {
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.card)
-                    .border(1.dp, Color(0x14FFFFFF), RoundedCornerShape(12.dp))
+                    .border(1.dp, Ts.line, RoundedCornerShape(12.dp))
                     .clickable(role = androidx.compose.ui.semantics.Role.DropdownList) { open = true }
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -613,14 +614,14 @@ internal fun Segmented(options: List<String>, selected: Int, oneLine: Boolean = 
         options.forEachIndexed { i, label ->
             val active = i == selected
             Box(
-                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+                Modifier.weight(1f).clip(RoundedCornerShape(7.dp)).background(if (active) Ts.selected else Color.Transparent)
                     .selectable(selected = active, role = androidx.compose.ui.semantics.Role.RadioButton) { onSelect(i) }
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 // [oneLine]: a name of any length (a sound pack's) shortened to fit, rather than wrapped
                 Text(
-                    label, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                    label, color = if (active) Ts.bright else Ts.tab, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     maxLines = if (oneLine) 1 else Int.MAX_VALUE, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
@@ -720,7 +721,7 @@ internal fun EventSounds(v: VoiceSettings, pack: SoundPackInfo?, onChange: (Voic
             val title = stringResource(titleId)
             Column(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field)
-                    .border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+                    .border(1.dp, Ts.groupBorder, RoundedCornerShape(16.dp)),
             ) {
                 Row(
                     Modifier.fillMaxWidth().heightIn(min = 56.dp),
@@ -732,7 +733,7 @@ internal fun EventSounds(v: VoiceSettings, pack: SoundPackInfo?, onChange: (Voic
                             .padding(start = 14.dp, top = 8.dp, bottom = 8.dp),
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Color(0x0DFFFFFF)), contentAlignment = Alignment.Center) {
+                        Box(Modifier.size(28.dp).clip(RoundedCornerShape(8.dp)).background(Pop.field), contentAlignment = Alignment.Center) {
                             androidx.compose.material3.Icon(
                                 Icons.Rounded.ExpandMore, contentDescription = null, tint = Ts.muted,
                                 modifier = Modifier.size(20.dp).graphicsLayer { rotationZ = if (opened) 0f else -90f },
@@ -772,7 +773,7 @@ internal fun EventSounds(v: VoiceSettings, pack: SoundPackInfo?, onChange: (Voic
 private fun EventSoundRow(cue: Cue, v: VoiceSettings, has: Boolean, usingPack: Boolean, onChange: (VoiceSettings) -> Unit) {
     val on = has && cue.name !in v.mutedSounds
     val name = stringResource(cueName(cue))
-    Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
     Row(
         Modifier.fillMaxWidth()
             .toggleable(on, enabled = has, role = androidx.compose.ui.semantics.Role.Checkbox) {
@@ -784,7 +785,7 @@ private fun EventSoundRow(cue: Cue, v: VoiceSettings, has: Boolean, usingPack: B
         val listen = stringResource(R.string.sound_listen)
         Box(
             Modifier.size(28.dp).clip(RoundedCornerShape(8.dp))
-                .background(if (has) Ts.accent.copy(alpha = 0.16f) else Color(0x0DFFFFFF))
+                .background(if (has) Ts.accent.copy(alpha = 0.16f) else Pop.field)
                 .then(
                     if (has) Modifier.clickable { UiSounds.listen(cue, v) }
                         .clearAndSetSemantics { contentDescription = "$listen: $name"; role = androidx.compose.ui.semantics.Role.Button }
@@ -1142,10 +1143,10 @@ private fun LevelMeter(actions: SettingsActions, threshold: Float?) {
     var width by remember { mutableStateOf(0) }
     val density = LocalDensity.current
     Box(
-        Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF111214)).onSizeChanged { width = it.width },
+        Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Ts.separator).onSizeChanged { width = it.width },
     ) {
         val fraction = (level / 0.1f).coerceIn(0f, 1f)
-        Box(Modifier.fillMaxHeight().fillMaxWidth(fraction).background(if (on) Ts.green else Color(0xFF64748B)))
+        Box(Modifier.fillMaxHeight().fillMaxWidth(fraction).background(if (on) Ts.green else Ts.meterOff))
         if (threshold != null && width > 0) {
             val x = with(density) { (width * (threshold / 0.1f).coerceIn(0f, 1f)).toDp() }
             Box(Modifier.offset(x = x).width(2.dp).fillMaxSize().background(Ts.red))

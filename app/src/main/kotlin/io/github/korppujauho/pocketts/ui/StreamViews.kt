@@ -84,8 +84,8 @@ import io.github.korppujauho.pocketts.R
 @Composable
 fun WatchButton(onClick: () -> Unit) {
     Text(
-        stringResource(R.string.stream_watch), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
-        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(WatchGreen).clickable(role = Role.Button, onClick = onClick)
+        stringResource(R.string.stream_watch), color = Ts.onFill, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Ts.watch).clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 4.dp),
     )
 }
@@ -532,7 +532,7 @@ fun ShareDialog(
     val qualities = listOf(480, 720, 1080)
     TsDialog(
         onDismiss = onDismiss, title = stringResource(if (screen) R.string.share_screen_title else R.string.share_camera_title),
-        icon = if (screen) androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ScreenShare else androidx.compose.material.icons.Icons.Rounded.Videocam, tint = ShareGreen,
+        icon = if (screen) androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ScreenShare else androidx.compose.material.icons.Icons.Rounded.Videocam, tint = Ts.share,
         subtitle = stringResource(R.string.share_subtitle),
         buttons = {
             PillButton(stringResource(R.string.cancel), onClick = onDismiss)
@@ -606,12 +606,12 @@ fun ShareDialog(
 @Composable
 internal fun Segments(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(14.dp)).padding(4.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Pop.field).border(1.dp, Ts.groupBorder, RoundedCornerShape(14.dp)).padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         options.forEachIndexed { i, o ->
             Text(
-                o, color = if (i == selected) Color.White else Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+                o, color = if (i == selected) Ts.onFill else Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(if (i == selected) Ts.accent.copy(alpha = 0.9f) else Color.Transparent)
                     .clickable { onSelect(i) }.padding(vertical = 9.dp),
@@ -749,22 +749,22 @@ fun ShareBar(
                 state.shareBoth -> stringResource(R.string.share_both_cameras)
                 else -> stringResource(R.string.share_camera)
             }
-            Text(what, color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
+            Text(what, color = Ts.shareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
             if (state.shareSound) {
                 Icon(
                     if (state.soundPaused) Icons.Filled.MicOff else Icons.Filled.Mic,
                     contentDescription = stringResource(if (state.soundPaused) R.string.share_sound_quiet else R.string.share_sound_live),
-                    tint = ShareText, modifier = Modifier.size(16.dp),
+                    tint = Ts.shareText, modifier = Modifier.size(16.dp),
                 )
             }
             if (!state.shareLive) {
-                Text(stringResource(R.string.share_starting), color = ShareText, fontSize = 14.sp, maxLines = 1)
+                Text(stringResource(R.string.share_starting), color = Ts.shareText, fontSize = 14.sp, maxLines = 1)
             } else if (state.sharePaused) {
-                Icon(Icons.Filled.Pause, contentDescription = null, tint = ShareText, modifier = Modifier.size(16.dp))
-                Text(stringResource(R.string.share_paused_call), color = ShareText, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(Icons.Filled.Pause, contentDescription = null, tint = Ts.shareText, modifier = Modifier.size(16.dp))
+                Text(stringResource(R.string.share_paused_call), color = Ts.shareText, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             } else {
-                Icon(Icons.Filled.Visibility, contentDescription = stringResource(R.string.share_watching), tint = ShareText, modifier = Modifier.size(16.dp))
-                Text("${state.viewers}", color = ShareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
+                Icon(Icons.Filled.Visibility, contentDescription = stringResource(R.string.share_watching), tint = Ts.shareText, modifier = Modifier.size(16.dp))
+                Text("${state.viewers}", color = Ts.shareText, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
             }
         }
     }
@@ -778,24 +778,24 @@ fun ShareBar(
             RoundButton(
                 if (state.rotateLocked) Icons.Filled.ScreenLockRotation else Icons.Filled.ScreenRotation,
                 stringResource(if (state.rotateLocked) R.string.share_turn_locked else R.string.share_turn_follows),
-                if (state.rotateLocked) Color(0xFFFBBF24) else Ts.text,
+                if (state.rotateLocked) Ts.lit else Ts.text,
             ) { onRotateLock(!state.rotateLocked) }
             if (light != null) {
                 RoundButton(
                     Icons.Filled.LightMode, stringResource(if (light) R.string.share_light_on else R.string.share_light_off),
-                    if (light) Color(0xFFFBBF24) else Ts.text,
+                    if (light) Ts.lit else Ts.text,
                 ) { onLight(!light) }
             }
             if (torch != null) {
                 RoundButton(
                     if (torch) Icons.Filled.FlashlightOn else Icons.Filled.FlashlightOff,
                     stringResource(if (torch) R.string.share_torch_on else R.string.share_torch_off),
-                    if (torch) Color(0xFFFBBF24) else Ts.text,
+                    if (torch) Ts.lit else Ts.text,
                 ) { onTorch(!torch) }
             }
         }
         Text(
-            stringResource(R.string.stop), color = Color(0xFFF87171), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, softWrap = false,
+            stringResource(R.string.stop), color = Ts.redText, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, softWrap = false,
             modifier = Modifier.height(40.dp).clip(RoundedCornerShape(20.dp)).background(Ts.redButton.copy(alpha = 0.15f))
                 .border(1.dp, Ts.redButton, RoundedCornerShape(20.dp)).clickable(role = Role.Button, onClick = onStop)
                 .wrapContentHeight(Alignment.CenterVertically).padding(horizontal = 18.dp),
@@ -814,8 +814,8 @@ fun ShareBar(
     }
 
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(ShareGreen.copy(alpha = 0.15f))
-            .border(1.dp, ShareGreen, RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 10.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Ts.share.copy(alpha = 0.15f))
+            .border(1.dp, Ts.share, RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         if (big) {
@@ -837,9 +837,6 @@ fun ShareBar(
     }
 }
 
-private val WatchGreen = Color(0xFF15803D) // dark enough for WATCH's white letters
-private val ShareText = Color(0xFF4ADE80)
-private val ShareGreen = Color(0xFF23A559)
 
 /** WebTS's round share button. */
 @Composable
@@ -848,7 +845,7 @@ private fun RoundButton(
     size: androidx.compose.ui.unit.Dp = 40.dp, background: Color = Ts.button, onClick: () -> Unit,
 ) {
     Box(
-        Modifier.size(size).clip(CircleShape).background(background).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(role = Role.Button, onClick = onClick),
+        Modifier.size(size).clip(CircleShape).background(background).border(1.dp, Ts.buttonBorder, CircleShape).clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(size / 2).upright())
@@ -859,7 +856,7 @@ private fun RoundButton(
 @Composable
 private fun LensButton(text: String, label: String, onClick: () -> Unit) {
     Box(
-        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Color(0x1AFFFFFF), CircleShape).clickable(role = Role.Button, onClick = onClick)
+        Modifier.size(40.dp).clip(CircleShape).background(Ts.button).border(1.dp, Ts.buttonBorder, CircleShape).clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,
     ) {
@@ -876,10 +873,11 @@ private fun LiveDot() {
         androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween<Float>(1600)),
         label = "ring",
     )
+    val red = Ts.red
     Box(Modifier.size(9.dp).drawBehind {
         val ring = (t / 0.7f).coerceAtMost(1f)
-        drawCircle(Color(0xFFEF4444).copy(alpha = 0.6f * (1f - ring)), radius = size.minDimension / 2 + 7.dp.toPx() * ring)
-        drawCircle(Color(0xFFEF4444))
+        drawCircle(red.copy(alpha = 0.6f * (1f - ring)), radius = size.minDimension / 2 + 7.dp.toPx() * ring)
+        drawCircle(red)
     })
 }
 

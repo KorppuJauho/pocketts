@@ -63,10 +63,10 @@ import io.github.korppujauho.pocketts.proto.ServerModel
 fun PersonAvatar(person: ServerModel.Client?, server: String, size: Int = 24, talking: Boolean = false, ring: Color = Ts.green) {
     val border = if (talking) Modifier.border(2.dp, ring, CircleShape) else Modifier
     Box(
-        Modifier.size(size.dp).then(border).clip(CircleShape).background(Color(0xFF3F4147)),
+        Modifier.size(size.dp).then(border).clip(CircleShape).background(Ts.avatar),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFF8E9297), modifier = Modifier.size((size * 0.95).dp))
+        Icon(Icons.Filled.Person, contentDescription = null, tint = Ts.placeholder, modifier = Modifier.size((size * 0.95).dp))
         val model: Any? = person?.let {
             TsFile.avatar(server, it.uid, it.avatarName, it.avatar) ?: it.myTeamSpeakAvatar.ifEmpty { null }
         }
