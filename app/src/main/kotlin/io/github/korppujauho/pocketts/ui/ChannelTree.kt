@@ -130,12 +130,13 @@ private fun ChannelBox(
         box.shadow(6.dp, shape, ambientColor = Ts.accent.copy(alpha = 0.3f), spotColor = Ts.accent.copy(alpha = 0.3f))
             .border(1.dp, Ts.accent.copy(alpha = 0.5f), shape)
     } else {
-        box.border(1.dp, Color(0x05FFFFFF), shape)
+        box.border(1.dp, Ts.subtle, shape)
     }
     val sub = item.depth > 0
+    val edge = Ts.hairline
     Column(
         box.clip(shape).background(Ts.card).drawBehind {
-            if (sub) drawRect(Color(0x0DFFFFFF), size = Size(2.dp.toPx(), size.height)) // a sub-channel's edge
+            if (sub) drawRect(edge, size = Size(2.dp.toPx(), size.height)) // a sub-channel's edge
         },
     ) {
         ChannelTitle(ch, ctx.server, onLongClick = onLongChannel?.let { { it(ch) } }) { onChannel(ch) }
@@ -208,13 +209,14 @@ internal fun androidx.compose.foundation.layout.BoxScope.BannerPicture(picture: 
                 },
             )
         }
+        val card = Ts.card
         Box(
             Modifier.matchParentSize().drawBehind {
-                val dark = Ts.card.copy(alpha = 0.9f)
-                val mid = Ts.card.copy(alpha = 0.55f)
+                val dark = card.copy(alpha = 0.9f)
+                val mid = card.copy(alpha = 0.55f)
                 val brush = when (align) {
                     ServerModel.Spacer.Align.CENTER -> Brush.horizontalGradient(
-                        0f to Color.Transparent, 0.4f to Ts.card.copy(alpha = 0.75f), 0.6f to Ts.card.copy(alpha = 0.75f), 1f to Color.Transparent,
+                        0f to Color.Transparent, 0.4f to card.copy(alpha = 0.75f), 0.6f to card.copy(alpha = 0.75f), 1f to Color.Transparent,
                     )
                     ServerModel.Spacer.Align.RIGHT -> Brush.horizontalGradient(
                         0f to Color.Transparent, 0.5f to mid, 1f to dark, startX = this.size.width - 220.dp.toPx(), endX = this.size.width,
@@ -253,6 +255,7 @@ private fun ChannelTitleRow(ch: ServerModel.Channel, spacer: ServerModel.Spacer?
 private fun androidx.compose.foundation.layout.RowScope.SpacerTitle(s: ServerModel.Spacer) {
     val line = s.line
     if (line != null) {
+        val color = Ts.spacerLine
         Canvas(Modifier.weight(1f).height(14.dp)) {
             val y = size.height / 2
             val effect = when (line) {
@@ -261,7 +264,7 @@ private fun androidx.compose.foundation.layout.RowScope.SpacerTitle(s: ServerMod
                 ServerModel.Spacer.Line.SOLID -> null
             }
             drawLine(
-                Color(0x73_94A3B8), Offset(0f, y), Offset(size.width, y), strokeWidth = 2.dp.toPx(),
+                color, Offset(0f, y), Offset(size.width, y), strokeWidth = 2.dp.toPx(),
                 pathEffect = effect, cap = StrokeCap.Butt,
             )
         }
@@ -338,10 +341,10 @@ private fun PersonRow(c: ServerModel.Client, ctx: TreeContext, onClick: () -> Un
 fun Avatar(talking: Boolean, size: Int = 24) {
     val ring = if (talking) Modifier.border(2.dp, Ts.green, CircleShape) else Modifier
     Box(
-        Modifier.size(size.dp).then(ring).clip(CircleShape).background(Color(0xFF3F4147)),
+        Modifier.size(size.dp).then(ring).clip(CircleShape).background(Ts.avatar),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        Icon(Icons.Filled.Person, contentDescription = null, tint = Color(0xFF8E9297), modifier = Modifier.size((size * 0.95).dp))
+        Icon(Icons.Filled.Person, contentDescription = null, tint = Ts.placeholder, modifier = Modifier.size((size * 0.95).dp))
     }
 }
 

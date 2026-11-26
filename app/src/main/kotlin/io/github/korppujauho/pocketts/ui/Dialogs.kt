@@ -230,7 +230,7 @@ fun PokeCards(pokes: List<Chat.Poke>, onDismiss: (Long) -> Unit, modifier: Modif
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(stringResource(R.string.poked_you, p.fromName), color = Ts.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                if (p.text.isNotEmpty()) Text(formatted(p.text), color = Ts.text, fontSize = 14.sp)
+                if (p.text.isNotEmpty()) Text(formatted(p.text, Ts.talking), color = Ts.text, fontSize = 14.sp)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(timeFormat.format(Date(p.time)), color = Ts.faint, fontSize = 12.sp, modifier = Modifier.weight(1f))
                     SecondaryButton(stringResource(R.string.dismiss)) { onDismiss(p.id) }
@@ -270,7 +270,7 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeK
                     )
                 }
                 val welcome = v["virtualserver_welcomemessage"].orEmpty().trim()
-                if (welcome.isNotEmpty()) InfoBox { Text(formatted(welcome), color = Ts.text, fontSize = 14.sp) }
+                if (welcome.isNotEmpty()) InfoBox { Text(formatted(welcome, Ts.talking), color = Ts.text, fontSize = 14.sp) }
                 val max = v["virtualserver_maxclients"]?.toIntOrNull() ?: 0
                 val res = androidx.compose.ui.platform.LocalResources.current
                 val stats = buildList {
@@ -290,10 +290,10 @@ fun ServerInfoDialog(state: Session.UiState, onDismiss: () -> Unit, onPrivilegeK
                 // The numbers side by side in one box, each over what it is
                 Row(
                     Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).clip(RoundedCornerShape(14.dp)).background(Pop.field)
-                        .border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(14.dp)),
+                        .border(1.dp, Ts.groupBorder, RoundedCornerShape(14.dp)),
                 ) {
                     stats.forEachIndexed { i, (k, value) ->
-                        if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(Color(0x0DFFFFFF)))
+                        if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(Ts.hairline))
                         Column(
                             Modifier.weight(1f).semantics(mergeDescendants = true) {}.padding(horizontal = 4.dp, vertical = 10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
@@ -389,7 +389,7 @@ fun ChannelInfoDialog(
             val description = ch.description.trim()
             InfoBox {
                 when {
-                    description.isNotEmpty() -> Text(formatted(description), color = Ts.text, fontSize = 14.sp)
+                    description.isNotEmpty() -> Text(formatted(description, Ts.talking), color = Ts.text, fontSize = 14.sp)
                     waited -> Text(stringResource(R.string.channel_info_no_description), color = Ts.faint, fontSize = 14.sp)
                     else -> Text(stringResource(R.string.channel_info_loading), color = Ts.faint, fontSize = 14.sp)
                 }
@@ -428,7 +428,7 @@ fun ChannelInfoDialog(
 @Composable
 internal fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, label: String? = null) {
     Row(
-        Modifier.clip(RoundedCornerShape(50)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(50))
+        Modifier.clip(RoundedCornerShape(50)).background(Pop.field).border(1.dp, Ts.groupBorder, RoundedCornerShape(50))
             .then(if (label != null) Modifier.semantics(mergeDescendants = true) { contentDescription = listOfNotNull(label, text).joinToString(": ") } else Modifier)
             .heightIn(min = 30.dp).padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -441,7 +441,7 @@ internal fun InfoChip(text: String?, icon: androidx.compose.ui.graphics.vector.I
 /** A box of action rows, as the Groups window's boxes. */
 @Composable
 internal fun ActionCard(content: @Composable ColumnScope.() -> Unit) = Column(
-    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp)),
+    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Ts.groupBorder, RoundedCornerShape(16.dp)),
     content = content,
 )
 
@@ -454,7 +454,7 @@ internal fun ActionRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, first: Boolean, more: Boolean = false, tint: Color = Ts.accent,
     detail: String? = null, trailing: (@Composable () -> Unit)? = null, onClick: () -> Unit,
 ) {
-    if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x0DFFFFFF)))
+    if (!first) Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.hairline))
     Row(
         Modifier.fillMaxWidth().clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
             .padding(start = 14.dp, end = 10.dp).heightIn(min = 50.dp),

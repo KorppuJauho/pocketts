@@ -102,7 +102,7 @@ internal fun IdentityList(
         }
         if (!open) return@Column
         identities.forEach { e ->
-            Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.line))
             Row(
                 Modifier.fillMaxWidth().clickable(role = Role.Button) { onOpen(e) }.padding(start = 14.dp, end = 10.dp).heightIn(min = 44.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -125,7 +125,7 @@ internal fun IdentityList(
                 Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = Ts.muted, modifier = Modifier.size(20.dp))
             }
         }
-        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.line))
         Row(
             Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onNew).padding(start = 14.dp, end = 10.dp).heightIn(min = 44.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -130,16 +130,16 @@ fun WarningBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modi
     }
     val shape = RoundedCornerShape(10.dp)
     Row(
-        modifier.fillMaxWidth().padding(horizontal = inset).shadow(8.dp, shape).clip(shape).background(Color(0xFF3A1D20))
+        modifier.fillMaxWidth().padding(horizontal = inset).shadow(8.dp, shape).clip(shape).background(Ts.errorBg)
             .border(1.dp, Ts.red.copy(alpha = 0.6f), shape).semantics { liveRegion = LiveRegionMode.Polite }
             .padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Warning, contentDescription = null, tint = Color(0xFFF87171), modifier = Modifier.size(20.dp))
+        Icon(Icons.Filled.Warning, contentDescription = null, tint = Ts.redText, modifier = Modifier.size(20.dp))
         Spacer(Modifier.width(10.dp))
-        Text(text, color = Color(0xFFFECACA), fontSize = 14.sp, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
+        Text(text, color = Ts.errorText, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
         androidx.compose.material3.IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
-            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Color(0xFFFECACA), modifier = Modifier.size(20.dp))
+            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.errorText, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -156,7 +156,7 @@ fun ControlButton(icon: ImageVector, label: String, off: Boolean = false, enable
             .then(if (state != null) Modifier.semantics { stateDescription = state } else Modifier),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = label, tint = if (off) Color.White else Ts.text.copy(alpha = if (enabled) 1f else 0.4f), modifier = Modifier.upright())
+        Icon(icon, contentDescription = label, tint = if (off) Ts.onFill else Ts.text.copy(alpha = if (enabled) 1f else 0.4f), modifier = Modifier.upright())
     }
 }
 
@@ -255,12 +255,12 @@ fun FloatingPtt(held: Boolean, onHold: (Boolean) -> Unit, modifier: Modifier = M
     val size = (if (small) 48.dp else 60.dp) + if (held) 6.dp else 0.dp
     Box(
         modifier.size(size).shadow(10.dp, CircleShape).clip(CircleShape)
-            .background(if (held) Color(0xEB0E7490) else Color(0xC71E1F22))
-            .border(1.dp, if (held) Ts.talking else Color(0x24FFFFFF), CircleShape).holdToTalk(held, stringResource(R.string.hold_to_talk), onHold = onHold),
+            .background(if (held) Ts.talkHeld else Ts.talkButton)
+            .border(1.dp, if (held) Ts.talking else Ts.talkButtonBorder, CircleShape).holdToTalk(held, stringResource(R.string.hold_to_talk), onHold = onHold),
         contentAlignment = Alignment.Center,
     ) {
         // The same icon as the push-to-talk button in the bar: the microphone there means muting
-        Icon(Icons.Filled.RecordVoiceOver, contentDescription = null, tint = if (held) Color(0xFFE0F2FE) else Ts.text, modifier = Modifier.size(if (small) 22.dp else 28.dp).upright())
+        Icon(Icons.Filled.RecordVoiceOver, contentDescription = null, tint = if (held) Ts.talkHeldIcon else Ts.text, modifier = Modifier.size(if (small) 22.dp else 28.dp).upright())
     }
 }
 
@@ -289,12 +289,12 @@ fun ControlsBar(
         if (onShare != null) {
             val shareState = stringResource(if (sharing) R.string.a11y_on else R.string.a11y_off)
             Box(
-                Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Color(0xFF23A559) else Ts.button)
-                    .border(1.dp, if (sharing) Color(0xFF23A559) else Ts.buttonBorder, CircleShape).clickable(role = Role.Button, onClick = onShare)
+                Modifier.size(48.dp).clip(CircleShape).background(if (sharing) Ts.share else Ts.button)
+                    .border(1.dp, if (sharing) Ts.share else Ts.buttonBorder, CircleShape).clickable(role = Role.Button, onClick = onShare)
                     .semantics { stateDescription = shareState },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Color.White else Ts.text, modifier = Modifier.upright())
+                Icon(Icons.Filled.ScreenShare, contentDescription = stringResource(R.string.share), tint = if (sharing) Ts.onFill else Ts.text, modifier = Modifier.upright())
             }
         }
         whisper?.invoke()
@@ -317,7 +317,7 @@ fun Panel(
         Row(Modifier.fillMaxWidth().background(Ts.card).padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             header()
         }
-        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF111214)))
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Ts.separator))
         content()
     }
 }
@@ -353,7 +353,7 @@ fun TsField(
         keyboardOptions = KeyboardOptions(keyboardType = if (password) KeyboardType.Password else keyboard, imeAction = imeAction),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Ts.card, unfocusedContainerColor = Ts.card,
-            focusedBorderColor = Ts.accent, unfocusedBorderColor = Color(0x14FFFFFF),
+            focusedBorderColor = Ts.accent, unfocusedBorderColor = Ts.line,
             focusedTextColor = Ts.bright, unfocusedTextColor = Ts.bright,
             focusedLabelColor = Ts.accent, unfocusedLabelColor = Ts.muted, cursorColor = Ts.accent,
         ),
@@ -370,7 +370,7 @@ fun PrimaryButton(text: String, enabled: Boolean = true, modifier: Modifier = Mo
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 18.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = Color.White.copy(alpha = if (enabled) 1f else 0.6f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        Text(text, color = Ts.onFill.copy(alpha = if (enabled) 1f else 0.6f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
     }
 }
 
@@ -378,7 +378,7 @@ fun PrimaryButton(text: String, enabled: Boolean = true, modifier: Modifier = Mo
 fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier.clip(RoundedCornerShape(6.dp)).background(Ts.card)
-            .border(1.dp, Color(0x1FFFFFFF), RoundedCornerShape(6.dp))
+            .border(1.dp, Ts.boxBorder, RoundedCornerShape(6.dp))
             .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {

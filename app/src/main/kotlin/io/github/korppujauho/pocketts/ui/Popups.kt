@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.heading
@@ -46,16 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-
-/** The popups' own colours: a card a little lighter than the page, fading down, with a faint edge. */
-object Pop {
-    val top = Color(0xFF31333A)
-    val bottom = Color(0xFF24252A)
-    val edge = Color(0x1AFFFFFF)
-    val field = Color(0x0DFFFFFF) // boxes inside a popup
-    val handle = Color(0x40FFFFFF)
-    val background = Brush.verticalGradient(listOf(top, bottom))
-}
 
 /**
  * A popup in the app's style: a rounded card over the dimmed screen, an icon in a soft badge, the title (and a line
@@ -138,10 +127,10 @@ enum class PillKind { PRIMARY, SECONDARY, DANGER, DANGER_TEXT }
 fun PillButton(text: String, kind: PillKind = PillKind.SECONDARY, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val shape = RoundedCornerShape(22.dp)
     val (bg, fg) = when (kind) {
-        PillKind.PRIMARY -> Ts.accentFill to Color.White
-        PillKind.SECONDARY -> Color(0x0FFFFFFF) to Ts.text
-        PillKind.DANGER -> Ts.redButton to Color.White
-        PillKind.DANGER_TEXT -> Color.Transparent to Color(0xFFF87171)
+        PillKind.PRIMARY -> Ts.accentFill to Ts.onFill
+        PillKind.SECONDARY -> Ts.pill to Ts.text
+        PillKind.DANGER -> Ts.redButton to Ts.onFill
+        PillKind.DANGER_TEXT -> Color.Transparent to Ts.redText
     }
     Box(
         modifier.height(44.dp).clip(shape).background(if (enabled) bg else bg.copy(alpha = bg.alpha * 0.4f))
@@ -157,7 +146,7 @@ fun PillButton(text: String, kind: PillKind = PillKind.SECONDARY, enabled: Boole
 @Composable
 fun PopCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
-        modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Color(0x0AFFFFFF), RoundedCornerShape(16.dp))
+        modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Pop.field).border(1.dp, Ts.groupBorder, RoundedCornerShape(16.dp))
             .padding(horizontal = 16.dp, vertical = 12.dp),
         content = content,
     )
@@ -169,7 +158,7 @@ fun ActionTile(icon: ImageVector, label: String, modifier: Modifier = Modifier, 
     // [selected]: on (such as on the whisper list), in its colour
     Column(
         modifier.height(76.dp).clip(RoundedCornerShape(18.dp)).background(if (selected) tint.copy(alpha = 0.16f) else Pop.field)
-            .border(1.dp, if (selected) tint else Color(0x0AFFFFFF), RoundedCornerShape(18.dp))
+            .border(1.dp, if (selected) tint else Ts.groupBorder, RoundedCornerShape(18.dp))
             .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,

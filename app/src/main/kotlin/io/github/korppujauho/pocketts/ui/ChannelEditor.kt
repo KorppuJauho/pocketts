@@ -81,12 +81,12 @@ fun ChannelEditHeader(onAdd: () -> Unit, onDone: () -> Unit) {
         )
         HeaderPill(Icons.Filled.Add, stringResource(R.string.channels_add), Ts.text, onAdd)
         Spacer(Modifier.width(8.dp))
-        HeaderPill(null, stringResource(R.string.channels_done), Color.White, onDone, Ts.accent)
+        HeaderPill(null, stringResource(R.string.channels_done), Ts.onFill, onDone, Ts.accent)
     }
 }
 
 @Composable
-private fun HeaderPill(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: String, color: Color, onClick: () -> Unit, bg: Color = Color(0x14FFFFFF)) {
+private fun HeaderPill(icon: androidx.compose.ui.graphics.vector.ImageVector?, text: String, color: Color, onClick: () -> Unit, bg: Color = Ts.line) {
     Row(
         Modifier.clip(RoundedCornerShape(16.dp)).background(bg).clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -193,7 +193,7 @@ fun ChannelEditList(
                         }
                         if (y != null) drawLine(accent, Offset(0f, y), Offset(size.width, y), strokeWidth = 3.dp.toPx())
                     }
-                    .clip(shape).background(if (moving) Color(0xFF2A2C31) else Ts.card).border(1.dp, Color(0x0DFFFFFF), shape)
+                    .clip(shape).background(if (moving) Ts.lifted else Ts.card).border(1.dp, Ts.hairline, shape)
                     .pointerInput(ch.id) {
                         detectDragGesturesAfterLongPress(
                             onDragStart = { dragged = ch.id; dragY = 0f },
@@ -417,7 +417,7 @@ private fun LocationBar(
     Row(
         Modifier.fillMaxWidth().padding(start = (depth * 15).dp).clip(shape)
             .background(if (selected) Ts.accent.copy(alpha = 0.16f) else Ts.card)
-            .border(1.dp, if (selected) Ts.accent else Color(0x0DFFFFFF), shape)
+            .border(1.dp, if (selected) Ts.accent else Ts.hairline, shape)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,

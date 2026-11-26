@@ -154,7 +154,7 @@ fun ChatPanel(
 private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boolean, onClose: (() -> Unit)? = null, onClick: () -> Unit) {
     val unreadLabel = stringResource(R.string.a11y_unread)
     Row(
-        Modifier.clip(RoundedCornerShape(6.dp)).background(if (active) Color(0x12FFFFFF) else Color.Transparent)
+        Modifier.clip(RoundedCornerShape(6.dp)).background(if (active) Ts.selected else Color.Transparent)
             .selectable(selected = active, role = Role.Tab, onClick = onClick)
             .semantics { if (unread) stateDescription = unreadLabel }
             .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -162,7 +162,7 @@ private fun ChatTab(prefix: String, name: String, active: Boolean, unread: Boole
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         if (prefix.isNotEmpty()) Text(prefix, color = Ts.muted, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-        Text(name, color = if (active) Ts.bright else Color(0xFF94A3B8), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
+        Text(name, color = if (active) Ts.bright else Ts.tab, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1)
         if (unread) Box(Modifier.size(8.dp).clip(CircleShape).background(Ts.red))
         if (onClose != null) Icon(
             androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close), tint = Ts.muted,
@@ -297,12 +297,14 @@ private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?
     // A file from the TeamSpeak app (through myTeamSpeak): one short line instead of its note
     val tsFile = remember(e.text) { Pictures.teamSpeakFile(e.text) }
     val (pictures, rest) = remember(e.text) { if (tsFile != null) emptyList<Pictures.ChannelPicture>() to "" else Pictures.channelPictures(e.text) }
-    val text = remember(rest) { formatted(rest) }
+    val link = Ts.talking
+    val text = remember(rest, link) { formatted(rest, link) }
     val uri = LocalUriHandler.current
     val system = stringResource(R.string.chat_system)
+    val accent = Ts.accent
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0x05FFFFFF))
-            .drawBehind { drawLine(Ts.accent, Offset(1f, 0f), Offset(1f, size.height), strokeWidth = 2.dp.toPx()) }
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Ts.subtle)
+            .drawBehind { drawLine(accent, Offset(1f, 0f), Offset(1f, size.height), strokeWidth = 2.dp.toPx()) }
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -364,8 +366,8 @@ private fun MessageLine(time: String, e: Chat.Entry, sender: ServerModel.Client?
     }
 }
 
-/** A message's styles and links (tapping a link opens it in the browser). */
-fun formatted(text: String): AnnotatedString = buildAnnotatedString {
+/** A message's styles and links in [linkColor] (tapping a link opens it in the browser). */
+fun formatted(text: String, linkColor: Color): AnnotatedString = buildAnnotatedString {
     for (s in MessageText.parse(text)) {
         val style = SpanStyle(
             fontWeight = if (s.bold) FontWeight.Bold else null,
@@ -379,7 +381,7 @@ fun formatted(text: String): AnnotatedString = buildAnnotatedString {
         )
         val link = s.link
         if (link != null) {
-            withLink(LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = Ts.talking, textDecoration = TextDecoration.Underline)))) {
+            withLink(LinkAnnotation.Url(link, TextLinkStyles(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)))) {
                 withStyle(style) { append(s.text) }
             }
         } else {
@@ -498,10 +500,10 @@ private fun MessageBox(
         Box(
             Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(Ts.input).padding(horizontal = 16.dp, vertical = 13.dp),
         ) {
-            if (text.isEmpty()) Text(placeholder, color = Color(0xFF8E9297), fontSize = 15.sp, maxLines = 1)
+            if (text.isEmpty()) Text(placeholder, color = Ts.placeholder, fontSize = 15.sp, maxLines = 1)
             BasicTextField(
                 value = text, onValueChange = { text = it }, enabled = enabled,
-                textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
+                textStyle = TextStyle(color = Ts.typed, fontSize = 15.sp),
                 cursorBrush = SolidColor(Ts.accent),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = { send() }),
@@ -514,7 +516,7 @@ private fun MessageBox(
                 .clickable(enabled = canSend) { send() },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.chat_send), tint = if (canSend) Color.White else Ts.muted)
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.chat_send), tint = if (canSend) Ts.onFill else Ts.muted)
         }
     }
 }
