@@ -14,7 +14,11 @@ val devEnv: Map<String, String> = rootProject.file("dev.env").takeIf { it.exists
 
 android {
     namespace = "io.github.korppujauho.pocketts"
-    compileSdk = 37
+    // Builds against Android 17's second update (37.2): newer Compose needs at least 37.1. Which phones can install
+    // the app (minSdk) and which Android's behaviour it opts into (targetSdk) don't change with this.
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
 
     defaultConfig {
         applicationId = "io.github.korppujauho.pocketts"
