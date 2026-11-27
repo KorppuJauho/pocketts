@@ -48,6 +48,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -448,8 +449,11 @@ private val FullScreenButton = Color(0x59000000)
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun ThinSlider(value: Float, onChange: (Float) -> Unit, modifier: Modifier = Modifier) {
+    // Material's own thumb and track can only be replaced through a SliderState; it follows the value given here
+    val state = remember { androidx.compose.material3.SliderState(value) }
+    SideEffect { state.value = value }
     androidx.compose.material3.Slider(
-        value = value, onValueChange = onChange, modifier = modifier,
+        state = state, onValueChange = onChange, modifier = modifier,
         thumb = { Box(Modifier.size(14.dp).clip(CircleShape).background(Color.White)) },
         track = { s ->
             Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0x40FFFFFF))) {
