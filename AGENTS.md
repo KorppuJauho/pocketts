@@ -23,7 +23,7 @@ scripts/dev.sh screenshots                            # pictures of the screens 
 
 The image build accepts the Android SDK licence: ask the person before running it, don't accept it for them.
 
-Without Docker: JDK 17 or later, Android SDK platform 37, NDK 29.0.14206865 and CMake 3.31.5, then
+Without Docker: JDK 17 or later, Android SDK platform 37.2, NDK 29.0.14206865 and CMake 3.31.5, then
 `./gradlew :tsproto:test :app:testDebugUnitTest`.
 
 ## Before writing code
